@@ -1,0 +1,801 @@
+/* styles.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Calibri', sans-serif;
+    font-size: 12.5px;
+    letter-spacing: 1.5px;
+    background-color: #F5F7FA;
+    color: #2C3E50;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+    box-sizing: border-box; 
+}
+
+.color-box {
+    position: fixed;
+    top: 9px;
+    right: 10px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 5px;
+    z-index: 50;
+}
+
+.color-picker-container {
+    display: flex;
+    align-items: center;
+}
+
+input[type="color"] {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: 50%;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+input[type="color"]::-moz-focus-inner {
+    border: 0;
+}
+
+.divHeader {
+    position: fixed; 
+    top: 0px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    z-index: 20; 
+    transition: top 0.3s ease;
+    background-color: #2C3E50;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: border-radius 0.3s ease, background-color 0.3s ease; 
+}
+
+.version-circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45px;
+    height: 45px;
+    background-color: #1E90FF; 
+    color: white;
+    border-radius: 50%;
+    font-size: 17.5px;
+    margin-right: 10px; 
+    border: solid 2px white;
+}
+
+header {
+    display: flex;
+    width: 100%;
+    align-items: center; 
+    font-size: 15px;
+    font-weight: bold;
+    color: #ffffff;
+    padding: 5px 25px 5px 10px; 
+    text-align: center;
+    cursor: default;
+    letter-spacing: 1.5px;
+}
+
+.divsContainer {
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    width: 100%; 
+    margin: 55px 0 0 0; 
+}
+
+table {
+    width: 100%;
+    border: none;
+    border-collapse: collapse; 
+    table-layout: fixed; 
+    letter-spacing: 1px;
+}
+
+th {
+    border: none;
+    text-align: left;
+    padding: 10px 5px 0 5px;
+}
+
+td {
+    position: relative;
+    border: none;
+    text-align: left;
+    padding: 5px 5px 0 5px;
+}
+
+td:first-child {
+    padding-right: 5px;  
+}
+
+td:last-child {
+    padding-left: 5px;  
+}
+
+.form1Div {
+    width: 470px; 
+}
+
+.form1DivHeader {
+    position: inherit;
+    width: 100%;  
+    box-sizing: border-box;  
+    background-color: #2C3E50;
+    font-weight: bold;
+    color: #ffffff;
+    padding: 10px 20px 7px 20px;  
+    text-align: center;
+    cursor: default;
+    border-radius: 5px;
+}
+
+.form1DivInput {
+    display: flex;  
+    align-items: stretch;  
+    justify-content: space-between;  
+    width: 100%;  
+    box-sizing: border-box;
+    background-color: none;
+    color: #ffffff;
+    padding: 0;
+}
+
+label {
+    display: block; 
+    color: default;
+    margin-left: 10px; 
+}
+
+input, select {
+    width: 100%;  
+    padding: 0 5px;
+    margin: 0;
+    box-sizing: border-box;
+    border: solid 2px #2C3E50;
+    border-radius: 5px;  
+    line-height: 1.5;
+    color: #2C3E50;
+}
+
+input:focus, select:focus {
+    outline: none;  
+}
+
+textarea.notepad {
+    width: 100%;
+    padding: 5px;  
+    margin: 0;
+    box-sizing: border-box;  
+    border: none;
+    border-radius: 5px;
+    border: solid 2px #2C3E50;  
+    line-height: 1.5;  
+    resize: vertical;  
+    min-height: 50px;  
+    overflow-y: hidden; 
+    resize: none; 
+    color: #2C3E50;
+}
+
+textarea:focus {
+    outline: none;  
+}
+
+input.input-and-button {
+    width: 75%;  
+    padding: 0 5px;  
+    line-height: 1.5px;
+    box-sizing: border-box;
+    border: 2px solid #2C3E50;
+    border-radius: 5px;  
+    margin-right: 5px;
+}
+
+select.input-and-button {
+    width: 75%;  
+    padding: 0 5px;  
+    line-height: 1.5px;
+    box-sizing: border-box;
+    border: 2px solid #2C3E50;
+    border-radius: 5px; 
+    margin-right: 5px; 
+}
+
+button.input-and-button {
+    width: 25%;  
+    padding: 0;  
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 1.5px;
+    transition: transform 0.1s ease; 
+    line-height: 23px; 
+}
+
+button.form1-button {
+    width: 100%;
+    padding: 0;  
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 1.5px;
+    transition: transform 0.1s ease;
+    margin-top: 7.5px;
+}
+
+.form2Div {
+    width: 470px; 
+    margin-bottom: 50px;
+}
+
+.buttonDiv {
+    margin-bottom: 50px;
+    width: 470px; 
+}
+
+.form2DivInput {
+    display: flex;  
+    align-items: center;  
+    justify-content: space-between;  
+    width: 100%;  
+    box-sizing: border-box;  
+    border-radius: 5px;
+    color: #ffffff;
+    padding: 0;
+    background-color: #2C3E50;
+    margin-top: 10px;
+}
+
+.form2DivChecklist {
+    display: flex;  
+    flex-direction: column;
+    align-items: flex-start;  
+    text-align: left;
+    width: 100%;  
+    box-sizing: border-box;  
+    border-radius: 5px;
+    border: 2px solid #2C3E50;
+    color: #2C3E50;
+    padding: 0;
+    background-color: #fff;
+    margin-top: 10px;
+}
+
+label.form2-label {
+    color: #ffffff; 
+    display: flex;
+    width: 42.5%; 
+    padding-right: 5px;
+}
+
+input.form2-input, select.form2-input {
+    width: 57.5%; 
+    border-radius: 0px 5px 5px 0px; 
+}
+
+.form2DivTextarea {
+    display: flex;  
+    flex-direction: column;  
+    align-items: flex-start;  
+    justify-content: flex-start;  
+    width: 100%;  
+    box-sizing: border-box;  
+    border-radius: 5px;
+    border: 2px solid #2C3E50;
+    color: #ffffff;
+    padding: 0;
+    background-color: #2C3E50;
+    margin-top: 10px;
+}
+
+label.form2-label-textarea {
+    height: 15px;
+    color: #ffffff; 
+    margin-top: 5px;  
+    margin-bottom: 5px;  
+}
+
+textarea.form2-textarea {
+    width: 100%;
+    padding: 5px; 
+    margin: 0;  
+    box-sizing: border-box; 
+    border: none;
+    border-radius: 0 0 5px 5px; 
+    line-height: 1.5; 
+    resize: none;
+    overflow-y: hidden; 
+    color: #2C3E50;
+}
+
+button.form2-button {
+    width: 100%;  
+    padding: 0;  
+    border-radius: 5px;  
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.1s ease;  
+    margin-top: 7.5px;
+}
+
+button.form2-button:active {
+    transform: scale(0.95); 
+}
+
+button {
+    padding: 0px 20px; 
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.1s ease, background-color 0.3s ease; 
+    line-height: 25px; 
+    display: block;
+    margin: 0 auto;  
+    border: 2px solid #2C3E50;
+    border-radius: 5px;  
+    background-color: #1E90FF; 
+    height: 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.6),
+        transparent
+    );
+    transform: skewX(-20deg);
+    pointer-events: none;
+}
+
+button:hover {
+    background-color: #1C86EE;
+    border: solid 2px #1C86EE;
+}
+
+button:hover::after {
+    animation: shimmer 0.5s linear 1;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -75%;
+    }
+    100% {
+        left: 125%;
+    }
+}
+
+button:active {
+    transform: scale(0.95); 
+}
+
+input, select {
+    height: 28px;
+}
+
+input, select, textarea, button {
+    font-family: 'Calibri', sans-serif;
+    font-size: 12.5px;
+    letter-spacing: 1.5px;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: 999; 
+    pointer-events: all; 
+}
+
+#floatingDiv {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8); /* Start with a smaller scale */
+    border: 2.5px solid #2C3E50;
+    border-radius: 7.5px;
+    background-color: #F5F7FA;
+    padding: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 450px;
+    font-weight: normal;
+    overflow: hidden;
+    opacity: 0; 
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+#floatingDiv.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}    
+
+#floatingDivHeader {
+    width: 100%; 
+    text-align: left;
+    background-color: #2C3E50;
+    color: white;
+    padding: 10px; 
+    box-sizing: content-box; 
+    margin: 0;
+}
+
+#copiedValues {
+    padding: 0 15px;
+    text-align: left; 
+    margin: 10px auto;
+    word-wrap: break-word;
+    white-space: pre-wrap; 
+    overflow-wrap: break-word; 
+    display: block; 
+    width: calc(100% - 15px); 
+    max-width: 100%; 
+    color: #555555;
+}
+
+#floating1Div {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    border: 2.5px solid #2C3E50;
+    border-radius: 7.5px;
+    background-color: #F5F7FA;
+    padding: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 450px;
+    font-weight: normal;
+    overflow: hidden;
+    opacity: 0; 
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; 
+}
+
+#floating1Div.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1); /* Keep centering and zoom effect */
+}
+
+#floating1DivHeader {
+    width: 100%; 
+    text-align: left;
+    background-color: #2C3E50;
+    color: white;
+    padding: 10px 10px 10px 20px; 
+    box-sizing: content-box; 
+    margin: 0;
+}
+
+#sfTaggingValues {
+    padding: 0 10px;
+    text-align: center; 
+    margin: 10px 0; 
+    overflow-wrap: break-word; 
+    color: #2C3E50;
+}
+
+#okButton {
+    margin-bottom: 10px; 
+    line-height: 24px;
+}
+
+#okButton1 {
+    margin-bottom: 10px; 
+    line-height: 24px;
+}
+
+#floating2Div {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    border: 2.5px solid #2C3E50;
+    border-radius: 7.5px;
+    background-color: #F5F7FA;
+    padding: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 460px;
+    min-height: 15%; 
+    max-height: 95%; 
+    font-weight: normal;
+    box-sizing: border-box;
+    overflow-y: auto; 
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+#floating2Div.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+#floating2Div::-webkit-scrollbar {
+    display: none; 
+}
+
+#floating2DivHeader {
+    width: 100%;
+    text-align: left;
+    background-color: #2C3E50;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.form3Div {
+    position: relative;
+    margin: 0;
+    width: 100%;
+    height: auto;
+}
+
+#form3Container {
+    position: relative;
+    overflow-y: auto;  
+    height: 100%;  
+    box-sizing: border-box; 
+    min-height: 100px;
+    background-color: transparent;
+}
+
+.form3DivInput {
+    display: flex;  
+    align-items: center;  
+    justify-content: space-between;  
+    width: 100%;  
+    box-sizing: border-box;
+    color: white;
+    background-color: #2C3E50;
+    margin-top: 10px;
+    padding: 0;
+    border-radius: 5px;
+}
+
+label.form3-label {
+    color: #ffffff; 
+    display: flex;
+    width: 42.5%; 
+    padding-right: 5px;
+}
+
+input.form3-input, select.form3-input {
+    width: 57.5%; 
+    border-radius: 0px 5px 5px 0px; 
+}
+
+.form3DivTextarea {
+    display: flex;  
+    flex-direction: column;  
+    align-items: flex-start;  
+    justify-content: flex-start;  
+    width: 100%;  
+    box-sizing: border-box;  
+    border-radius: 5px;
+    border: 2px solid #2C3E50;
+    background-color: none;
+    color: #ffffff;
+    padding: 0;
+    background-color: #2C3E50;
+    margin-top: 10px;
+}
+
+label.form3-label-textarea {
+    height: 15px;
+    color: #ffffff; 
+    margin-top: 5px;  
+    margin-bottom: 5px;  
+}
+
+textarea.form3-textarea {
+    width: 100%;
+    padding: 5px; 
+    margin: 0;  
+    box-sizing: border-box; 
+    border: none;
+    border-radius: 0 0 5px 5px; 
+    line-height: 1.5; 
+    resize: none;
+    overflow-y: hidden;
+    color: #2C3E50; 
+}
+
+button.form3-button {
+    width: 100%;  
+    padding: 0;  
+    border-radius: 5px;  
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.1s ease;  
+    margin-top: 7.5px;
+    margin-bottom: 15px;
+}
+
+.instructions-list {
+    list-style-type: disc; 
+    margin-left: 0; 
+    font-size: 14px; 
+    color: #fff; 
+}
+
+.instructions-list li {
+    line-height: 1.5;
+}
+
+.checklist {
+    list-style-type: circle; 
+    margin-left: 0; 
+    font-size: 14px; 
+    color: #2C3E50; 
+}
+
+.checklist li {
+    line-height: 1.5;
+}
+
+.requirements-header {
+    font-size: 14.5px;
+    font-weight: bold;
+    margin: 15px 0 0 20px;   /* top, right, bottom, left */
+    text-align: left;
+    color: #2C3E50;
+}
+
+.customer-talking-points-header {
+    font-size: 14.5px;
+    font-weight: bold;
+    margin: 0 0 0 20px;   /* top, right, bottom, left */
+    text-align: left;
+    color: #2C3E50;
+}
+
+.checklist-header {
+    font-size: 14.5px;
+    font-weight: bold;
+    margin: 0 0 0 20px;   /* top, right, bottom, left */
+    text-align: left;
+    color: #2C3E50;
+}
+
+.footer {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    padding: 4px;
+    background-color: #2C3E50; 
+    backdrop-filter: blur(10px); 
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1); 
+    font: 1em Arial, sans-serif;
+    font-size: 0.7em;
+    color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 55px;
+    letter-spacing: 1px;
+    z-index: 100;
+}
+
+.timer {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    border-radius: 10px;
+    width: 150px; 
+    height: 45px; 
+    border: solid 2px white;
+    box-sizing: border-box; 
+}
+
+#timerTable {
+    width: 100%; 
+    border-collapse: collapse; 
+    text-align: center; 
+    margin: 0;
+    height: 100%;
+}
+
+#timerTable tr, #timerTable td {
+    padding: 0; 
+    margin: 0; 
+}
+
+#timerTable tr:not(:first-child) td:first-child {
+    border-right: 2px solid white; 
+    border-radius: 0 0 0 8px;
+    background-color: #1E90FF;
+}
+
+#timerTable tr:not(:first-child) td:last-child {
+    border-left: 2px solid white; 
+    border-radius: 0 0 8px 0;
+    background-color: #1E90FF;
+    
+}
+
+#timerDisplay {
+    font-size: 1.5em;
+    letter-spacing: 5px;
+    font-weight: bold;
+    text-align: center;
+    padding: 0;
+    height: 20px; 
+    border-bottom: 2px solid white; 
+    background-color: #2C3E50;
+    border-radius: 8px 8px 0 0;
+    cursor: default;
+    font-family: 'Courier New', Courier, monospace; 
+}
+
+#timerToggleButton,
+#timerResetButton {
+    width: 100%; 
+    height: 20px; 
+    font-size: 1.2em; 
+    padding: 0;
+    box-sizing: border-box;
+    border: none;
+    background-color: #1E90FF;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    transition: transform 0.05s ease; 
+}
+
+#timerToggleButton {
+    border-radius: 0 0 0 8px;
+}
+
+#timerResetButton {
+    border-radius: 0 0 8px 0;
+}
+
+.footer > .timer {
+    margin-right: 10px; 
+}

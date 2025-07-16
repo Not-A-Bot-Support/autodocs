@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standard Notes Generator V5.2</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div id="overlay" style="display: none;"></div>
+
+    <div class="color-box" id="colorBox">
+        <div class="color-picker-container">
+            <input type="color" id="bgColorPicker">
+        </div>
+    </div>
+
+    <div class="divHeader">
+        <header id="headerValue"><span class="version-circle">V5</span>Standard Notes Generator</header>
+    </div>
+
+    <div class="divsContainer">
+        <div class="form1Div" id="form1Container">
+            <form id="frm1" name="frm1">
+            <table>
+                <tr>
+                    <th colspan="2">
+                        <div class="form1DivHeader">AGENT DETAILS</div>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="agent-name">Agent Name*</label>
+                        <div class="form1DivInput">
+                            <input type="text" id="agent-name" name="agentName" placeholder="John Dela Cruz">
+                        </div>
+                    </td>
+                    <td>
+                        <label for="team-lead">Team Lead*</label>
+                        <div class="form1DivInput">
+                            <input type="text" id="team-lead" name="teamLead" placeholder="Sue P. Vyser">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="pldt-user">PLDT Username*</label>
+                        <div class="form1DivInput">
+                            <input type="text" id="pldt-user" name="pldtUser" placeholder="t-jdelacruz">
+                        </div>
+                    </td>
+                    <td>
+                        <label for="channel">Channel*</label>
+                        <div class="form1DivInput">
+                            <select id="channel" name="selectChannel">
+                                <option value="" disabled selected></option>
+                                <option value="CDT-HOTLINE">CDT-HOTLINE</option>
+                                <option value="CDT-SOCMED">CDT-SOCMED</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                </tr>
+                <tr>
+                    <th colspan="2">
+                        <div class="form1DivHeader">NOTEPAD</div>
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="form1DivInput">
+                            <textarea class="notepad" rows="10" id="notepad" name="Notepad" style="margin-top: 5px;"></textarea>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2">
+                        <div class="form1DivHeader">CASE & ACCOUNT DETAILS</div>
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label for="cust-name">Name/ANI/DNIS</label>
+                        <div class="form1DivInput">
+                            <input type="text" class="input-and-button" id="cust-name" name="custName">
+                            <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
+                        </div>
+                    </td>               
+                </tr>
+                <tr id="case-num-row" style="display: none;">
+                    <td colspan="2">
+                        <label for="case-num" id="case-num-label">Salesforce Case #</label>
+                        <div class="form1DivInput">
+                            <input type="number" class="input-and-button" id="case-num" name="sfCaseNum">
+                            <button type="button" class="input-and-button" id="case-num-btn" tabindex="-1">📋 Copy</button>
+                        </div>
+                    </td> 
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label for="wocas" id="wocas-label">WOCAS</label>
+                        <div class="form1DivInput">
+                            <textarea class="notepad" rows="2" id="wocas" name="WOCAS""></textarea>
+                        </div>
+                    </td>
+                </tr>
+                <tr>    
+                    <td colspan="2">
+                        <label for="account-num">Account #</label>
+                        <div class="form1DivInput">
+                            <input type="number" class="input-and-button" id="account-num" name="accountNum">
+                            <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
+                        </div>
+                    </td>               
+                </tr>
+                <tr id="landline-num-row" style="display: none;">
+                    <td colspan="2">
+                        <label for="landline-num">Landline #</label>
+                        <div class="form1DivInput">
+                            <input type="number" class="input-and-button" id="landline-num" name="landlineNum">
+                            <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
+                        </div>
+                    </td> 
+                </tr>
+                <tr id="service-id-row" style="display: none;">    
+                    <td colspan="2">
+                        <label for="service-id">Service ID*</label>
+                        <div class="form1DivInput">
+                            <input type="text" class="input-and-button" id="service-id" name="serviceID">
+                            <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
+                        </div>
+                    </td>                
+                </tr>
+                <tr id="option82-row" style="display: none;">
+                    <td colspan="2">
+                        <label for="option82">Option82/NE Type*</label>
+                        <div class="form1DivInput">
+                            <input type="text" class="input-and-button" id="option82" name="Option82">
+                            <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="lob">LOB*</label>
+                        <div class="form1DivInput">
+                            <select id="lob" name="selectLOB">
+                                <option value="" disabled selected></option>
+                                <option value="NON-TECH">NON-TECH</option>
+                                <option value="TECH">TECH</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <label for="voc">Voice of the Customer*</label>
+                        <div class="form1DivInput">
+                            <select id="voc" name="selectVOC">
+                                <option value="" disabled selected></option>
+                                <option value="INQUIRY">INQUIRY</option>
+                                <option value="COMPLAINT">COMPLAINT</option>
+                                <option value="FOLLOW-UP">FOLLOW-UP</option>
+                                <option value="REQUEST">REQUEST</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="intent-wocas-row" style="display: none;">
+                    <td colspan="2">
+                        <label for="selectIntent">WOCAS Based Intent</label>
+                        <div class="form1DivInput">
+                            <select id="selectIntent" name="slctFrm1">
+                                <option value="" disabled selected>— Please select the correct Intent/WOCAS —</option>
+                                <option value="formFFUP">Follow-Up Repair</option>
+                                <optgroup label="No Dial Tone and No Internet Connection">
+                                    <option value="form100_1">All Services Down</option>
+                                    <option value="form100_2">Red LOS</option>
+                                    <option value="form100_3">Defective Modem - No Power Light</option>
+                                    <option value="form100_4">Defective/Damaged Modem</option>
+                                    <option value="form100_5">Damaged Modem Cable/Cord</option>
+                                    <option value="form100_6">Uninstalled Modem (Fiber)</option>
+                                    <option value="form100_7">Old Devices Not Working on WiFi6 Modem (Fiber)</option>
+                                </optgroup>
+                                <optgroup label="No Internet Connection">
+                                    <option value="form500_1">No Internet Connection</option>
+                                    <option value="form500_2">Redirected to PLDT Payment Reminder Portal</option>
+                                    <option value="form500_3">Defective Mesh</option>
+                                    <option value="form500_4">Damaged Mesh</option>
+                                </optgroup>
+                                <optgroup label="Slow Internet/Intermittent Connection">
+                                    <option value="form501_1">Slow Browsing</option>
+                                    <option value="form501_2">Low Download/Upload Speed</option>
+                                    <option value="form501_3">Availed SAO</option>
+                                    <option value="form501_4">Frequent Disconnection</option>
+                                </optgroup>
+                                <optgroup label="No Dial Tone">
+                                    <option value="form101_1">No Dial Tone</option>
+                                    <option value="form101_2">Fast Busy Tone</option>
+                                    <option value="form101_3">Defective Telset - NDT</option>
+                                    <option value="form101_4">Defective/Damaged Telset</option>
+                                </optgroup>
+                                <optgroup label="Poor Call Quality/Noisy Telephone Line">
+                                    <option value="form102_1">Noisy Line</option>
+                                    <option value="form102_2">Cut Calls</option>
+                                    <option value="form102_3">Poor Reception/Transmission</option>
+                                    <option value="form102_4">Defective Telset - Noisy Line</option>
+                                    <option value="form102_5">Defective Telset - Cut Calls</option>
+                                    <option value="form102_6">Defective Telset - Poor Reception/Transmission</option>
+                                    <option value="form102_7">Damaged Telset Cable/Cord</option>
+                                </optgroup>
+                                <optgroup label="Cannot Make a Call">
+                                    <option value="form103_1">Cannot Make a Call</option>
+                                    <option value="form103_2">No Outgoing Call</option>
+                                    <option value="form103_3">Defective Telset - Number Keys</option>
+                                </optgroup>
+                                <optgroup label="Cannot Receive a Call">
+                                    <option value="form103_4">Cannot Receive Calls</option>
+                                    <option value="form103_5">No Incoming Call</option>
+                                </optgroup>
+                                <optgroup label="Selective Browsing Complaints">
+                                    <option value="form502_1">Selective Browsing</option>
+                                    <option value="form502_2">Cannot Load Specific Website</option>
+                                </optgroup>
+                                <optgroup label="No Audio/Video Output">
+                                    <option value="form510_1">No Audio/Video Output</option>
+                                    <option value="form510_2">Cignal TV is Down/No Connection</option>
+                                    <option value="form510_3">Defective Set-Top-Box</option>
+                                    <option value="form510_4">Damaged Set-Top-Box</option>
+                                    <option value="form510_5">Cannot Read Smart Card</option>
+                                    <option value="form510_6">Defective HDMI/RCA</option>
+                                    <option value="form510_7">No Channel</option>
+                                    <option value="form510_8">Channel 001 Only</option>
+                                </optgroup>
+                                <optgroup label="Poor Audio/Video Quality">
+                                    <option value="form511_1">Poor Audio/Video Quality</option>
+                                    <option value="form511_2">Picture Freezing</option>
+                                    <option value="form511_3">Pixelated Video</option>
+                                    <option value="form511_4">Out-of-Sync</option>
+                                    <option value="form511_5">Loop Back Video</option>
+                                </optgroup>
+                                <optgroup label="Missing Set-Top-Box Functions">
+                                    <option value="form512_1">Missing Channels</option>
+                                    <option value="form512_2">Cannot Record Video</option>
+                                    <option value="form512_3">Defective Remote Control</option>
+                                </optgroup>
+                                <optgroup label="Modem Request Transactions">
+                                    <option value="form300_1">Change of WiFi Name/Password</option>
+                                    <option value="form300_2">Request for Local User GUI Access</option>
+                                    <option value="form300_3">Request for Super Admin GUI Access</option>
+                                    <option value="form300_4">Change modem set-up from Route to Bridge Mode</option>
+                                    <option value="form300_5">Change modem set-up from Bridge to Route Mode</option>
+                                    <option value="form300_6">LAN Port Activation</option>
+                                    <option value="form300_7">Request for Public IP</option>
+                                </optgroup>
+                                <optgroup label="Streaming Apps Issues">
+                                    <option value="formStrmApps_1">Eufy is Not Working</option>
+                                    <option value="formStrmApps_2">Stream TV is Not Working</option>
+                                    <option value="formStrmApps_3">NETFLIX Problem</option>
+                                    <option value="formStrmApps_4">VIU Problem</option>
+                                    <option value="formStrmApps_5">HBO Max Problem</option>
+                                </optgroup>
+                                <option value="formInqAccSrvcStatus" data-group="inquiry">Account/Service Status</option>
+                                <option value="formInqRebCredAdj" data-group="inquiry">Approved rebate / Credit Adjustment</option>
+                                <option value="formInqAda" data-group="inquiry">Auto Debit Arrangement (ADA)</option>
+                                <option value="formInqBalTransfer" data-group="inquiry">Balance transfer</option>
+                                <option value="formInqBillInterpret" data-group="inquiry">Bill Interpretation</option>
+                                <option value="formInqLockIn" data-group="inquiry">Contract / Lock In</option>
+                                <option value="formInqCopyOfBill" data-group="inquiry">Copy of Bill</option>
+                                <option value="formInqMyHomeAcc" data-group="inquiry">My Home Account</option>
+                                <option value="formInqPlanDetails" data-group="inquiry">Plan Details</option>
+                                <option value="formMyHomeWeb" data-group="complaint">Cannot Open MyHome Website</option>
+                                <option value="formMisappliedPayment" data-group="complaint">Misapplied Payment</option>
+                                <option value="formPersonnelIssue" data-group="complaint">Personnel Issue</option>
+                                <option value="formUnreflectedPayment" data-group="complaint">Unreflected Payment</option>
+                                <option value="formReqNonServiceRebate" data-group="request">Dispute Non-Service</option>
+                                <option value="formReqReconnection" data-group="request">Reconnection</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            </form>
+        </div>
+
+        <div class="form2Div" id="form2Container">
+            <table id="form2ButtonTable">
+                <tr>
+                    <td><button type="button" id="saveButton" class="form1-button" tabindex="-1">💾 Save</button></td>
+                    <td><button type="button" id="resetButton" class="form1-button" tabindex="-1">🔄 Reset</button></td>
+                    <td><button type="button" id="exportButton" class="form1-button" tabindex="-1">📄 Export</button></td>
+                    <td><button type="button" id="deleteButton" class="form1-button" tabindex="-1">🗑️ Delete All</button></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="footer">
+            <div class="timer">
+                <table id="timerTable">
+                    <tr>
+                        <td id="timerDisplay" colspan="2">00:00:00</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button id="timerToggleButton">Start</button>
+                        </td>
+                        <td>
+                            <button id="timerResetButton">Reset</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            Standard Notes Generator Version 5.2.160725<br> <!--Version #.#.DDMMYY -->
+            &copy; Developed and designed by: QA Team
+        </div>
+    </div>
+
+    <div id="floatingDiv" style="display: none;">
+        <div id="floatingDivHeader"></div>
+        <div id="copiedValues"></div>
+        <button id="okButton">Close</button>
+    </div>
+
+    <div id="floating1Div" style="display: none;">
+        <div id="floating1DivHeader"></div>
+        <div id="sfTaggingValues"></div>
+        <button id="okButton1">Close</button>
+    </div>
+
+    <div id="floating2Div" style="display: none;">
+        <div class="form3Div" id="form3Container"></div>
+    </div>
+
+    <br>
+</body>
+
+<script src="js/script.js"></script>
+</html>
