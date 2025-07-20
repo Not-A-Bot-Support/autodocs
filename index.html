@@ -10,11 +10,11 @@
 <body>
     <div id="overlay" style="display: none;"></div>
 
-    <div class="color-box" id="colorBox">
+    <!-- <div class="color-box" id="colorBox">
         <div class="color-picker-container">
             <input type="color" id="bgColorPicker">
         </div>
-    </div>
+    </div> -->
 
     <div class="divHeader">
         <header id="headerValue"><span class="version-circle">V5</span>Standard Notes Generator</header>
@@ -114,7 +114,7 @@
                         </div>
                     </td>               
                 </tr>
-                <tr id="landline-num-row" style="display: none;">
+                <tr>
                     <td colspan="2">
                         <label for="landline-num">Landline #</label>
                         <div class="form1DivInput">
@@ -122,24 +122,6 @@
                             <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
                         </div>
                     </td> 
-                </tr>
-                <tr id="service-id-row" style="display: none;">    
-                    <td colspan="2">
-                        <label for="service-id">Service ID*</label>
-                        <div class="form1DivInput">
-                            <input type="text" class="input-and-button" id="service-id" name="serviceID">
-                            <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
-                        </div>
-                    </td>                
-                </tr>
-                <tr id="option82-row" style="display: none;">
-                    <td colspan="2">
-                        <label for="option82">Option82/NE Type*</label>
-                        <div class="form1DivInput">
-                            <input type="text" class="input-and-button" id="option82" name="Option82">
-                            <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
-                        </div>
-                    </td>
                 </tr>
                 <tr>
                     <td>
@@ -162,6 +144,24 @@
                                 <option value="FOLLOW-UP">FOLLOW-UP</option>
                                 <option value="REQUEST">REQUEST</option>
                             </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="service-id-row" style="display: none;">    
+                    <td colspan="2">
+                        <label for="service-id">Service ID*</label>
+                        <div class="form1DivInput">
+                            <input type="text" class="input-and-button" id="service-id" name="serviceID">
+                            <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
+                        </div>
+                    </td>                
+                </tr>
+                <tr id="option82-row" style="display: none;">
+                    <td colspan="2">
+                        <label for="option82">Option82/NE Type*</label>
+                        <div class="form1DivInput">
+                            <input type="text" class="input-and-button" id="option82" name="Option82">
+                            <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
                         </div>
                     </td>
                 </tr>
@@ -259,21 +259,46 @@
                                     <option value="formStrmApps_4">VIU Problem</option>
                                     <option value="formStrmApps_5">HBO Max Problem</option>
                                 </optgroup>
-                                <option value="formInqAccSrvcStatus" data-group="inquiry">Account/Service Status</option>
-                                <option value="formInqRebCredAdj" data-group="inquiry">Approved rebate / Credit Adjustment</option>
-                                <option value="formInqAda" data-group="inquiry">Auto Debit Arrangement (ADA)</option>
-                                <option value="formInqBalTransfer" data-group="inquiry">Balance transfer</option>
-                                <option value="formInqBillInterpret" data-group="inquiry">Bill Interpretation</option>
-                                <option value="formInqLockIn" data-group="inquiry">Contract / Lock In</option>
-                                <option value="formInqCopyOfBill" data-group="inquiry">Copy of Bill</option>
-                                <option value="formInqMyHomeAcc" data-group="inquiry">My Home Account</option>
-                                <option value="formInqPlanDetails" data-group="inquiry">Plan Details</option>
-                                <option value="formMyHomeWeb" data-group="complaint">Cannot Open MyHome Website</option>
-                                <option value="formMisappliedPayment" data-group="complaint">Misapplied Payment</option>
-                                <option value="formPersonnelIssue" data-group="complaint">Personnel Issue</option>
-                                <option value="formUnreflectedPayment" data-group="complaint">Unreflected Payment</option>
-                                <option value="formReqNonServiceRebate" data-group="request">Dispute Non-Service</option>
-                                <option value="formReqReconnection" data-group="request">Reconnection</option>
+                                <option data-group="inquiry" value="formInqAccSrvcStatus">Account/Service Status</option>
+                                <option data-group="inquiry" value="formInqRebCredAdj">Approved rebate / Credit Adjustment</option>
+                                <option data-group="inquiry" value="formInqAda">Auto Debit Arrangement (ADA)</option>
+                                <option data-group="inquiry" value="formInqBalTransfer">Balance transfer</option>
+                                <option data-group="inquiry" value="formInqBillInterpret">Bill Interpretation</option>
+                                <option data-group="inquiry" value="formInqLockIn">Contract / Lock In</option>
+                                <option data-group="inquiry" value="formInqCopyOfBill">Copy of Bill</option>
+                                <option data-group="inquiry" value="formInqMyHomeAcc">My Home Account</option>
+                                <option data-group="inquiry" value="formInqPlanDetails">Plan Details</option>
+                                <option data-group="complaint" value="formMyHomeWeb">Cannot Open MyHome Website</option>
+                                <option data-group="complaint" value="formMisappliedPayment">Misapplied Payment</option>
+                                <option data-group="complaint" value="formPersonnelIssue">Personnel Issue</option>
+                                <option data-group="complaint" value="formUnreflectedPayment">Unreflected Payment</option>
+                                <option data-group="follow-up" value="formFfupChangeOwnership">Change Ownership</option>
+                                <option data-group="follow-up" value="">Change Telephone Number	</option>
+                                <option data-group="follow-up" value="">Change Telephone Unit</option>
+                                <option data-group="follow-up" value="">Disconnection (VAS)</option>
+                                <option data-group="follow-up" value="">Dispute</option>
+                                <option data-group="follow-up" value="">Downgrade</option>
+                                <option data-group="follow-up" value="">Due Date Extension</option>
+                                <option data-group="follow-up" value="">Inmove</option>
+                                <option data-group="follow-up" value="">Migration</option>
+                                <option data-group="follow-up" value="">Misapplied Payment</option>
+                                <option data-group="follow-up" value="">New Application</option>
+                                <option data-group="follow-up" value="">Ocular Inspection/AMEND SAM</option>
+                                <option data-group="follow-up" value="">Overpayment</option>
+                                <option data-group="follow-up" value="">Permanent Disconnection</option>
+                                <option data-group="follow-up" value="">Reconnection</option>
+                                <option data-group="follow-up" value="">Refund</option>
+                                <option data-group="follow-up" value="">Relocation</option>
+                                <option data-group="follow-up" value="">Special Features</option>
+                                <option data-group="follow-up" value="">Speed Add On 500</option>
+                                <option data-group="follow-up" value="">Temporary Disconnection (VTD/HTD)</option>
+                                <option data-group="follow-up" value="">Unreflected Payment</option>
+                                <option data-group="follow-up" value="">Upgrade</option>
+                                <option data-group="follow-up" value="">VAS</option>
+                                <option data-group="follow-up" value="">Wire Re-Route</option>
+                                <option data-group="follow-up" value="">Withholding Tax Adjustment</option>
+                                <option data-group="request" value="formReqNonServiceRebate">Dispute Non-Service</option>
+                                <option data-group="request" value="formReqReconnection">Reconnection</option>
                             </select>
                         </div>
                     </td>

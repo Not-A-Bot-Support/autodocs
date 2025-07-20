@@ -8,7 +8,7 @@ body {
     letter-spacing: 1.5px;
     background-color: #F5F7FA;
     color: #2C3E50;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease; 
 }
 
 * {
@@ -276,6 +276,20 @@ button.form1-button {
     margin-top: 10px;
 }
 
+.formToolLabel {
+    display: flex;  
+    align-items: center;  
+    justify-content: space-between;  
+    width: 100%;  
+    box-sizing: border-box;  
+    color: #999;
+    padding: 0 10px;
+    background-color: transparent;
+    margin-top: 10px;
+    font-style: italic;
+    font-weight: bold;
+}
+
 .form2DivChecklist {
     display: flex;  
     flex-direction: column;
@@ -434,24 +448,31 @@ input, select, textarea, button {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.8); /* Start with a smaller scale */
+    transform: translate(-50%, -50%) scale(0.8);
     border: 2.5px solid #2C3E50;
     border-radius: 7.5px;
     background-color: #F5F7FA;
     padding: 0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    width: 450px;
+    width: 460px;
+    min-height: 15%; 
+    max-height: 95%; 
     font-weight: normal;
-    overflow: hidden;
-    opacity: 0; 
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    box-sizing: border-box;
+    overflow-y: auto; 
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 #floatingDiv.show {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
-}    
+}
+
+#floatingDiv::-webkit-scrollbar {
+    display: none; 
+}
 
 #floatingDivHeader {
     width: 100%; 
