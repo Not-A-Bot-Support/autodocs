@@ -1,10 +1,10 @@
 //script.js
 
-// Standard Notes Generator Version 5.2.160725
+// Standard Notes Generator Version 5.2.290725
 // Developed & Designed by: QA Ryan
 
 let lobSelect, vocSelect, intentSelect;
-let serviceIDRow, option82Row, intentWocasRow;
+let serviceIDRow, option82Row, intentWocasRow, wocasRow;;
 let allVocOptions, allIntentChildren, placeholderClone;
 
 function initializeFormElements() {
@@ -15,6 +15,7 @@ function initializeFormElements() {
     serviceIDRow = document.getElementById("service-id-row");
     option82Row = document.getElementById("option82-row");
     intentWocasRow = document.getElementById("intent-wocas-row");
+    wocasRow = document.getElementById("wocas-row");
 
     allVocOptions = Array.from(vocSelect.options).map(opt => opt.cloneNode(true));
     vocSelect.innerHTML = "";
@@ -38,7 +39,7 @@ function hideRow(rowElement) {
     rowElement.style.display = "none";
 }
 
-function handleSplitChange() {
+function handleLobChange() {
     const lobSelectedValue = lobSelect.value;
     const channelField = document.getElementById("channel").value;
 
@@ -63,11 +64,11 @@ function handleSplitChange() {
 
     allVocOptions.forEach(option => {
         if (
-                (lobSelectedValue === "TECH" && ["REQUEST", "FOLLOW-UP", "COMPLAINT"].includes(option.value)) ||
-                (lobSelectedValue === "NON-TECH" && option.value === "REQUEST")
-            ) {
-                vocSelect.appendChild(option);
-            }
+            (lobSelectedValue === "TECH" && ["REQUEST", "FOLLOW-UP", "COMPLAINT"].includes(option.value)) ||
+            (lobSelectedValue === "NON-TECH" && option.value === "REQUEST")
+        ) {
+            vocSelect.appendChild(option);
+        }
     });
 
     vocSelect.selectedIndex = 0;
@@ -84,6 +85,7 @@ function handleVocChange() {
     hideRow(serviceIDRow);
     hideRow(option82Row);
     hideRow(intentWocasRow);
+    hideRow(wocasRow);
 
     if (vocValue === "") {
         intentSelect.innerHTML = "";
@@ -95,20 +97,18 @@ function handleVocChange() {
 
     if (lobValue === "TECH") {
         if (vocValue === "FOLLOW-UP") {
-        showRowAndScroll(intentWocasRow);
-        } else if (vocValue === "REQUEST") {
-        showRowAndScroll(serviceIDRow);
-        showRowAndScroll(option82Row);
-        showRowAndScroll(intentWocasRow);
+            showRowAndScroll(intentWocasRow);
         } else {
-        showRowAndScroll(serviceIDRow);
-        showRowAndScroll(option82Row);
-        showRowAndScroll(intentWocasRow);
+            showRowAndScroll(serviceIDRow);
+            showRowAndScroll(option82Row);
+            showRowAndScroll(intentWocasRow);
+            showRowAndScroll(wocasRow);
         }
     } else if (lobValue === "NON-TECH") {
         hideRow(serviceIDRow);
         hideRow(option82Row);
         showRowAndScroll(intentWocasRow);
+        hideRow(wocasRow);
     }
 
     intentSelect.innerHTML = "";
@@ -175,7 +175,7 @@ function handleVocChange() {
 }
 
 function registerEventHandlers() {
-    lobSelect.addEventListener("change", handleSplitChange);
+    lobSelect.addEventListener("change", handleLobChange);
     vocSelect.addEventListener("change", handleVocChange);
 }
 
@@ -766,7 +766,7 @@ function createForm2() {
                 "Clearview",
                 "CEP Affected Services Tab"
             ]},
-            { label: "Parent Case Number", type: "number", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
+            { label: "Parent Case Number", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
             // NMS Skin
             { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Also available in DMS."},
             { label: "ONU Status/RUNSTAT", type: "select", name: "onuRunStats", options: [
@@ -1938,7 +1938,7 @@ function createForm2() {
                 "Secondary Trouble"
             ]},
             { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer’s actual experience in detail.\ne.g. “No internet connection using WiFi”. DO NOT input the WOCAS!"},
-            { label: "Troubleshooting/ Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please include SNOW/E-Solve tickets for any tool issues or latency encountered." },
+            { label: "Troubleshooting/ Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, “CONDUCT BTS”, “CREATE FT”, or “PROVIDE SLA/PLDT TRACKER”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "FLM Findings", type: "select", name: "flmFindings", options: [
                 "",
                 "Cannot Browse",
@@ -4877,7 +4877,7 @@ function createForm2() {
         const fields = [
             { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
             { label: "Ownership", type: "select", name: "ownership", options: ["", "SOR", "Non-SOR"] },
-            { label: "Misapplied Payment due to", type: "select", name: "rootCause", options: ["", "Wrong Account Number", "Wrong Biller"] },
+            { label: "Misapplied Payment due to", type: "select", name: "findings", options: ["", "Wrong Account Number", "Wrong Biller"] },
             { label: "Customer Authentication", type: "select", name: "custAuth", options: [
                 "", 
                 "Failed", 
@@ -4915,10 +4915,10 @@ function createForm2() {
 
         function createPromptRow() {
             const ownershipEl = document.querySelector('[name="ownership"]');
-            const rootCauseEl = document.querySelector('[name="rootCause"]');
+            const findingsEl = document.querySelector('[name="findings"]');
 
             const ownership = ownershipEl ? ownershipEl.value : "";
-            const rootCause = rootCauseEl ? rootCauseEl.value : "";
+            const findings = findingsEl ? findingsEl.value : "";
 
             const row = document.createElement("tr");
             const td = document.createElement("td");
@@ -4968,13 +4968,13 @@ function createForm2() {
             const li6 = document.createElement("li");
             li6.textContent = "Letter of Authorization (LOA) for Non-SOR with one (1) signature";
 
-            if (rootCause === "Wrong Account Number") {
+            if (findings === "Wrong Account Number") {
                 if (ownership === "SOR") {
                     [li1, li2, li3].forEach(li => ulReq.appendChild(li));
                 } else if (ownership === "Non-SOR") {
                     [li5, li6].forEach(li => ulReq.appendChild(li));
                 }
-            } else if (rootCause === "Wrong Biller") {
+            } else if (findings === "Wrong Biller") {
                 if (ownership === "SOR") {
                     [li1, li2, li4].forEach(li => ulReq.appendChild(li));
                 } else if (ownership === "Non-SOR") {
@@ -5018,7 +5018,7 @@ function createForm2() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                if (field.name === "ownership" || field.name === "rootCause") {
+                if (field.name === "ownership" || field.name === "findings") {
                     input.id = field.name;
                 }
 
@@ -5034,7 +5034,7 @@ function createForm2() {
                     input.appendChild(option);
                 });
 
-                if (field.name === "ownership" || field.name === "rootCause") {
+                if (field.name === "ownership" || field.name === "findings") {
                     input.addEventListener("change", updateChecklist);
                 }
             } else if (field.type === "textarea") {
@@ -5058,7 +5058,7 @@ function createForm2() {
         fields.forEach(field => {
             const row = createFieldRow(field);
             table.appendChild(row);
-            if (field.name === "rootCause") {
+            if (field.name === "findings") {
             ownershipRow = row;
             }
         });
@@ -7023,17 +7023,17 @@ function createForm2() {
         const table = document.createElement("table");
 
         const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
             { label: "Status", type: "select", name: "ffupStatus", options: [
                 "", 
                 "Beyond SLA", 
                 "Within SLA"
             ]},
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer." },
             { label: "SO/SR #", type: "text", name: "srNum"},
             { label: "Type of Request", type: "select", name: "requestType", options: [
                 "", 
-                "Supersedure retain Account number ",
+                "Supersedure retain Account number",
                 "Supersedure with change account number"
             ] },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
@@ -7244,22 +7244,39 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-    //******************** FOLLOW-UP:  ****************************************************
+    //******************** FOLLOW-UP: Change Telephone Number ****************************************************
     } else if (selectedValue === "formFfupChangeTelNum") { 
         const table = document.createElement("table");
 
         const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Ownership", type: "select", name: "ownership", options: [
+                "", 
+                "SOR", 
+                "Non-SOR"
+            ]},
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
             { label: "Status", type: "select", name: "ffupStatus", options: [
                 "", 
                 "Beyond SLA", 
                 "Within SLA"
             ]},
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Findings", type: "select", name: "findings", options: [
+                "", 
+                "Activation Task",
+                "No SO Generated",
+                "System Task / Stuck SO"
+            ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer." },
             { label: "SO/SR #", type: "text", name: "srNum"},
             { label: "Type of Request", type: "select", name: "requestType", options: [
                 "", 
-                "Supersedure retain Account number ",
+                "Supersedure retain Account number",
                 "Supersedure with change account number"
             ] },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
@@ -7281,108 +7298,140 @@ function createForm2() {
         function createInstructionsRow() {
             const row = document.createElement("tr");
             const td = document.createElement("td");
-
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInput"; 
+            instructionsDiv.className = "form2DivInput";
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
 
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
+            ["Please fill out all required fields.",
+            "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.",
+            "Ensure that the information is accurate.",
+            "Please review your inputs before generating the notes."].forEach(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                ul.appendChild(li);
+            });
 
             instructionsDiv.appendChild(ul);
-
             td.appendChild(instructionsDiv);
             row.appendChild(td);
-
             return row;
         }
 
         function createPromptRow() {
+            const ownershipEl = document.querySelector('[name="ownership"]');
+            const findingsEl = document.querySelector('[name="findings"]');
+
+            const ownership = ownershipEl ? ownershipEl.value : "";
+            const findings = findingsEl ? findingsEl.value : "";
+
+            if (findings !== "No SO Generated") {
+                return null;
+            }
+
             const row = document.createElement("tr");
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivChecklist"; 
+            checklistDiv.className = "form2DivChecklist";
 
-            const header = document.createElement("p");
-            header.textContent = "Mandatory Information";
-            header.className = "requirements-header";
-            checklistDiv.appendChild(header);
+            const mInfo = document.createElement("p");
+            mInfo.textContent = "Mandatory Information:";
+            mInfo.className = "requirements-header";
+            checklistDiv.appendChild(mInfo);
 
-            const ul = document.createElement("ul");
-            ul.className = "checklist";
+            const ulMandaInfo = document.createElement("ul");
+            ulMandaInfo.className = "checklist";
 
             const li1 = document.createElement("li");
             li1.textContent = "The Account is Active";
-            ul.appendChild(li1);
+            ulMandaInfo.appendChild(li1);
 
             const li2 = document.createElement("li");
             li2.textContent = "No pending bill-related issues";
-            ul.appendChild(li2);
+            ulMandaInfo.appendChild(li2);
 
             const li3 = document.createElement("li");
             li3.textContent = "Zero balance MSF";
-            ul.appendChild(li3);
+            ulMandaInfo.appendChild(li3);
 
             const li4 = document.createElement("li");
             li4.textContent = "No open dispute";
-            ul.appendChild(li4);
+            ulMandaInfo.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "Paid unbilled toll charges";
-            ul.appendChild(li5);
+            ulMandaInfo.appendChild(li5);
 
             const li6 = document.createElement("li");
-            li6.textContent = "Paid Pre- Termination Fee if within lock-in (Supersedure with creation of New Account number) for the following:";
-
+            li6.textContent = "Paid Pre-Termination Fee if within lock-in (Supersedure with creation of New Account number) for the following:";
             const nestedUl = document.createElement("ul");
             [
-                "Remaining months of gadget amortization", 
-                "Remaining months of installation fee", 
+                "Remaining months of gadget amortization",
+                "Remaining months of installation fee",
                 "Remaining months of activation fee"
             ].forEach(text => {
-                const subLi1 = document.createElement("li");
-                subLi1.textContent = text;
-                nestedUl.appendChild(subLi1);
+                const li = document.createElement("li");
+                li.textContent = text;
+                nestedUl.appendChild(li);
             });
             li6.appendChild(nestedUl);
-            ul.appendChild(li6);
+            ulMandaInfo.appendChild(li6);
 
             const li7 = document.createElement("li");
-            li7.textContent = "Supersedure with retention of account number and all account-related details shall only be allowed for the following  incoming customer:";
-
+            li7.textContent = "Supersedure with retention of account number and all account-related details shall only be allowed for the following incoming customer:";
             const nestedOl = document.createElement("ol");
             nestedOl.type = "a";
             [
-                "Spouse of the outgoing   customer must submit (PSA) Copy of Marriage Certificate",
+                "Spouse of the outgoing customer must submit (PSA) Copy of Marriage Certificate",
                 "Child of the outgoing customer must submit (PSA) Copy of Birth Certificate",
-                "Sibling of the outgoing customer must submit (PSA) copies of Birth Certificate of both incoming ang outgoing customers"
+                "Sibling of the outgoing customer must submit (PSA) copies of Birth Certificate of both incoming and outgoing customers"
             ].forEach(text => {
-                const subLi2 = document.createElement("li");
-                subLi2.textContent = text;
-                nestedOl.appendChild(subLi2);
+                const li = document.createElement("li");
+                li.textContent = text;
+                nestedOl.appendChild(li);
+            });
+            li7.appendChild(nestedOl);
+            ulMandaInfo.appendChild(li7);
+
+            checklistDiv.appendChild(ulMandaInfo);
+
+            const req = document.createElement("p");
+            req.textContent = "Requirements:";
+            req.className = "customer-talking-points-header";
+            checklistDiv.appendChild(req);
+
+            const ulreq = document.createElement("ul");
+            ulreq.className = "checklist";
+
+            const talkingPoints = [
+                "Service Request Form (if required for the feature being requested)", // index 0
+                "Subscription Certificate (if required for the feature being requested)", // index 1
+                "Refer to PLDT Guidelines in Handling Non-SOR Aftersales Request for the guidelines", // index 2
+                "Signed document should be sent back to proceed with the SO creation", // index 3
+                "Authorization letter signed by the customer on record", // index 4
+                "Valid ID of the customer on record", // index 5
+                "Valid ID of the authorized requestor" // index 6
+            ];
+
+            const liElements = talkingPoints.map(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                return li;
             });
 
-            li7.appendChild(nestedOl);
-            ul.appendChild(li7);
+            if (ownership === "SOR") {
+                ulreq.appendChild(liElements[0]);
+                ulreq.appendChild(liElements[1]);
+            } else {
+                ulreq.appendChild(liElements[2]);
+                ulreq.appendChild(liElements[3]);
+                ulreq.appendChild(liElements[4]);
+                ulreq.appendChild(liElements[5]);
+            }
 
-            checklistDiv.appendChild(header);
-            checklistDiv.appendChild(ul);
+            checklistDiv.appendChild(ulreq);
 
             td.appendChild(checklistDiv);
             row.appendChild(td);
@@ -7390,18 +7439,28 @@ function createForm2() {
             return row;
         }
 
+        let findingsRow = null;
+
+        function updateChecklist() {
+            const existingChecklist = document.querySelector(".form2DivChecklist")?.closest("tr");
+            if (existingChecklist) {
+                existingChecklist.remove();
+            }
+
+            const checklistRow = createPromptRow();
+            if (checklistRow && findingsRow && findingsRow.parentNode) {
+                findingsRow.parentNode.insertBefore(checklistRow, findingsRow.nextSibling);
+            }
+        }
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
-            const primaryFields = ["ffupStatus", "custConcern", "remarks", "srNum", "requestType", "issueResolved", "upsell"];
-            row.style.display = primaryFields.includes(field.name) ? "table-row" : "none";
-
-
             const td = document.createElement("td");
             const divInput = document.createElement("div");
             divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
 
             const label = document.createElement("label");
-            label.textContent = `${field.label}`;
+            label.textContent = field.label;
             label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
             label.setAttribute("for", field.name);
 
@@ -7410,34 +7469,36 @@ function createForm2() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                if (field.name === "ownership" || field.name === "findings") {
+                    input.id = field.name;
+                }
+
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
-
                     if (index === 0) {
                         option.disabled = true;
                         option.selected = true;
                         option.style.fontStyle = "italic";
                     }
-
                     input.appendChild(option);
                 });
+
+                if (field.name === "ownership" || field.name === "findings") {
+                    input.addEventListener("change", updateChecklist);
+                }
             } else if (field.type === "textarea") {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = field.name === "remarks" ? 6 : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
                 input.type = field.type;
                 input.name = field.name;
                 input.className = "form2-input";
-                if (field.step) input.step = field.step;
-                if (field.placeholder) input.placeholder = field.placeholder;
             }
 
             divInput.appendChild(label);
@@ -7447,14 +7508,14 @@ function createForm2() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
-        fields.forEach((field, index) => {
+
+        table.appendChild(createInstructionsRow());
+
+        fields.forEach(field => {
             const row = createFieldRow(field);
             table.appendChild(row);
-
-            if (field.name === "ffupStatus") {
-                table.appendChild(createPromptRow());
+            if (field.name === "findings") {
+                findingsRow = row;
             }
         });
 
@@ -7469,6 +7530,651 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+    //******************** FOLLOW-UP: Change Telephone unit ****************************************************
+    } else if (selectedValue === "formFfupChangeTelUnit") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Status", type: "select", name: "ffupStatus", options: [
+                "", 
+                "Beyond SLA", 
+                "Within SLA"
+            ]},
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer." },
+            { label: "SO/SR #", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createInstructionsRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const instructionsDiv = document.createElement("div");
+            instructionsDiv.className = "form2DivInput";
+
+            const ul = document.createElement("ul");
+            ul.className = "instructions-list";
+
+            ["Please fill out all required fields.",
+            "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.",
+            "Ensure that the information is accurate.",
+            "Please review your inputs before generating the notes."].forEach(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                ul.appendChild(li);
+            });
+
+            instructionsDiv.appendChild(ul);
+            td.appendChild(instructionsDiv);
+            row.appendChild(td);
+            return row;
+        }
+
+        // function createPromptRow() {
+        //     const ownershipEl = document.querySelector('[name="ownership"]');
+        //     const findingsEl = document.querySelector('[name="findings"]');
+
+        //     const ownership = ownershipEl ? ownershipEl.value : "";
+        //     const findings = findingsEl ? findingsEl.value : "";
+
+        //     if (findings !== "No SO Generated") {
+        //         return null;
+        //     }
+
+        //     const row = document.createElement("tr");
+        //     const td = document.createElement("td");
+
+        //     const checklistDiv = document.createElement("div");
+        //     checklistDiv.className = "form2DivChecklist";
+
+        //     const mInfo = document.createElement("p");
+        //     mInfo.textContent = "Mandatory Information:";
+        //     mInfo.className = "requirements-header";
+        //     checklistDiv.appendChild(mInfo);
+
+        //     const ulMandaInfo = document.createElement("ul");
+        //     ulMandaInfo.className = "checklist";
+
+        //     const li1 = document.createElement("li");
+        //     li1.textContent = "The Account is Active";
+        //     ulMandaInfo.appendChild(li1);
+
+        //     const li2 = document.createElement("li");
+        //     li2.textContent = "No pending bill-related issues";
+        //     ulMandaInfo.appendChild(li2);
+
+        //     const li3 = document.createElement("li");
+        //     li3.textContent = "Zero balance MSF";
+        //     ulMandaInfo.appendChild(li3);
+
+        //     const li4 = document.createElement("li");
+        //     li4.textContent = "No open dispute";
+        //     ulMandaInfo.appendChild(li4);
+
+        //     const li5 = document.createElement("li");
+        //     li5.textContent = "Paid unbilled toll charges";
+        //     ulMandaInfo.appendChild(li5);
+
+        //     const li6 = document.createElement("li");
+        //     li6.textContent = "Paid Pre-Termination Fee if within lock-in (Supersedure with creation of New Account number) for the following:";
+        //     const nestedUl = document.createElement("ul");
+        //     [
+        //         "Remaining months of gadget amortization",
+        //         "Remaining months of installation fee",
+        //         "Remaining months of activation fee"
+        //     ].forEach(text => {
+        //         const li = document.createElement("li");
+        //         li.textContent = text;
+        //         nestedUl.appendChild(li);
+        //     });
+        //     li6.appendChild(nestedUl);
+        //     ulMandaInfo.appendChild(li6);
+
+        //     const li7 = document.createElement("li");
+        //     li7.textContent = "Supersedure with retention of account number and all account-related details shall only be allowed for the following incoming customer:";
+        //     const nestedOl = document.createElement("ol");
+        //     nestedOl.type = "a";
+        //     [
+        //         "Spouse of the outgoing customer must submit (PSA) Copy of Marriage Certificate",
+        //         "Child of the outgoing customer must submit (PSA) Copy of Birth Certificate",
+        //         "Sibling of the outgoing customer must submit (PSA) copies of Birth Certificate of both incoming and outgoing customers"
+        //     ].forEach(text => {
+        //         const li = document.createElement("li");
+        //         li.textContent = text;
+        //         nestedOl.appendChild(li);
+        //     });
+        //     li7.appendChild(nestedOl);
+        //     ulMandaInfo.appendChild(li7);
+
+        //     checklistDiv.appendChild(ulMandaInfo);
+
+        //     const req = document.createElement("p");
+        //     req.textContent = "Requirements:";
+        //     req.className = "customer-talking-points-header";
+        //     checklistDiv.appendChild(req);
+
+        //     const ulreq = document.createElement("ul");
+        //     ulreq.className = "checklist";
+
+        //     const talkingPoints = [
+        //         "Service Request Form (if required for the feature being requested)", // index 0
+        //         "Subscription Certificate (if required for the feature being requested)", // index 1
+        //         "Refer to PLDT Guidelines in Handling Non-SOR Aftersales Request for the guidelines", // index 2
+        //         "Signed document should be sent back to proceed with the SO creation", // index 3
+        //         "Authorization letter signed by the customer on record", // index 4
+        //         "Valid ID of the customer on record", // index 5
+        //         "Valid ID of the authorized requestor" // index 6
+        //     ];
+
+        //     const liElements = talkingPoints.map(text => {
+        //         const li = document.createElement("li");
+        //         li.textContent = text;
+        //         return li;
+        //     });
+
+        //     if (ownership === "SOR") {
+        //         ulreq.appendChild(liElements[0]);
+        //         ulreq.appendChild(liElements[1]);
+        //     } else {
+        //         ulreq.appendChild(liElements[2]);
+        //         ulreq.appendChild(liElements[3]);
+        //         ulreq.appendChild(liElements[4]);
+        //         ulreq.appendChild(liElements[5]);
+        //     }
+
+        //     checklistDiv.appendChild(ulreq);
+
+        //     td.appendChild(checklistDiv);
+        //     row.appendChild(td);
+
+        //     return row;
+        // }
+
+        // let findingsRow = null;
+
+        // function updateChecklist() {
+        //     const existingChecklist = document.querySelector(".form2DivChecklist")?.closest("tr");
+        //     if (existingChecklist) {
+        //         existingChecklist.remove();
+        //     }
+        //     const checklistRow = createPromptRow();
+        //     if (findingsRow && findingsRow.parentNode) {
+        //         findingsRow.parentNode.insertBefore(checklistRow, findingsRow.nextSibling);
+        //     }
+        // }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = field.label;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                // if (field.name === "ownership" || field.name === "findings") {
+                //     input.id = field.name;
+                // }
+
+                field.options.forEach((optionText, index) => {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+                    input.appendChild(option);
+                });
+
+                // if (field.name === "ownership" || field.name === "findings") {
+                //     input.addEventListener("change", updateChecklist);
+                // }
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = field.name === "remarks" ? 6 : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        table.appendChild(createInstructionsRow());
+
+        fields.forEach(field => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+            // if (field.name === "findings") {
+            //     findingsRow = row;
+            // }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            fuseButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+
+    //******************** FOLLOW-UP: Disconnection (VAS) ****************************************************
+    }  else if (selectedValue === "formFfupDiscoVas") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Status", type: "select", name: "ffupStatus", options: [
+                "", 
+                "Beyond SLA", 
+                "Within SLA"
+            ]},
+            { label: "Findings", type: "select", name: "findings", options: [
+                "", 
+                "Activation Task",
+                "No SO Generated",
+                "System Task / Stuck SO"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer." },
+            { label: "SO/SR #", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createInstructionsRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const instructionsDiv = document.createElement("div");
+            instructionsDiv.className = "form2DivInput";
+
+            const ul = document.createElement("ul");
+            ul.className = "instructions-list";
+
+            ["Please fill out all required fields.",
+            "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.",
+            "Ensure that the information is accurate.",
+            "Please review your inputs before generating the notes."].forEach(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                ul.appendChild(li);
+            });
+
+            instructionsDiv.appendChild(ul);
+            td.appendChild(instructionsDiv);
+            row.appendChild(td);
+            return row;
+        }
+
+        function createPromptRow() {
+            // const ownershipEl = document.querySelector('[name="ownership"]');
+            const findingsEl = document.querySelector('[name="findings"]');
+
+            // const ownership = ownershipEl ? ownershipEl.value : "";
+            const findings = findingsEl ? findingsEl.value : "";
+
+            if (findings !== "No SO Generated") {
+                return null;
+            }
+
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivChecklist";
+
+            const mInfo = document.createElement("p");
+            mInfo.textContent = "Mandatory Information:";
+            mInfo.className = "requirements-header";
+            checklistDiv.appendChild(mInfo);
+
+            const ulMandaInfo = document.createElement("ul");
+            ulMandaInfo.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "PTF applies if within the lock-in period";
+            ulMandaInfo.appendChild(li1);
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Within 7 calendar days from the date of SO issuance";
+            ulMandaInfo.appendChild(li2);
+
+            checklistDiv.appendChild(ulMandaInfo);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        let findingsRow = null;
+
+        function updateChecklist() {
+            const existingChecklist = document.querySelector(".form2DivChecklist")?.closest("tr");
+            if (existingChecklist) {
+                existingChecklist.remove();
+            }
+            const checklistRow = createPromptRow();
+            if (checklistRow && findingsRow && findingsRow.parentNode) {
+                findingsRow.parentNode.insertBefore(checklistRow, findingsRow.nextSibling);
+            }
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = field.label;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.name === "findings") {
+                    input.id = field.name;
+                }
+
+                field.options.forEach((optionText, index) => {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+                    input.appendChild(option);
+                });
+
+                if (field.name === "findings") {
+                    input.addEventListener("change", updateChecklist);
+                }
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = field.name === "remarks" ? 6 : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        table.appendChild(createInstructionsRow());
+
+        fields.forEach(field => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+            if (field.name === "findings") {
+                findingsRow = row;
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            fuseButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+
+    //******************** FOLLOW-UP: Dispute ****************************************************
+    }  else if (selectedValue === "formFfupDispute") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Dispute Type", type: "select", name: "disputeType", options: [
+                "", 
+                "Rebate Non Service", 
+                "Rentals",
+                "Usage",
+                "Usage MSF"
+            ]},
+            { label: "Approver", type: "select", name: "approver", options: [
+                ""
+            ]},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Status", type: "select", name: "ffupStatus", options: [
+                "", 
+                "Beyond SLA", 
+                "Within SLA"
+            ]},
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer." },
+            { label: "SO/SR #", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createInstructionsRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const instructionsDiv = document.createElement("div");
+            instructionsDiv.className = "form2DivInput";
+
+            const ul = document.createElement("ul");
+            ul.className = "instructions-list";
+
+            ["Please fill out all required fields.",
+            "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.",
+            "Ensure that the information is accurate.",
+            "Please review your inputs before generating the notes."].forEach(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                ul.appendChild(li);
+            });
+
+            instructionsDiv.appendChild(ul);
+            td.appendChild(instructionsDiv);
+            row.appendChild(td);
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = field.label;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                // if (field.name === "findings") {
+                //     input.id = field.name;
+                // }
+
+                field.options.forEach((optionText, index) => {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+                    input.appendChild(option);
+                });
+
+                // if (field.name === "findings") {
+                //     input.addEventListener("change", updateChecklist);
+                // }
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = field.name === "remarks" ? 6 : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        table.appendChild(createInstructionsRow());
+
+        fields.forEach(field => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+            // if (field.name === "findings") {
+            //     findingsRow = row;
+            // }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            fuseButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+
+        const disputeTypeSelect = document.querySelector('select[name="disputeType"]');
+        const approverSelect = document.querySelector('select[name="approver"]');
+
+        const allApproverOptions = [
+            "", 
+            "Account Admin", 
+            "Agent",
+            "Cust Head",
+            "Cust Sup",
+            "Cust TL"
+        ];
+
+        function updateApproverOptions(disputeType) {
+            while (approverSelect.options.length > 0) {
+                approverSelect.remove(0);
+            }
+
+            let filtered = [];
+
+            if (disputeType === "Rebate Non Service") {
+                filtered = allApproverOptions.filter(opt => opt !== "Account Admin");
+            } else if (disputeType === "Usage MSF") {
+                filtered = allApproverOptions.filter(opt => opt === "" || opt === "Account Admin");
+            } else {
+                filtered = [...allApproverOptions];
+            }
+
+            filtered.forEach((text, index) => {
+                const option = document.createElement("option");
+                option.value = text;
+                option.textContent = text;
+                if (index === 0) {
+                    option.disabled = true;
+                    option.selected = true;
+                    option.style.fontStyle = "italic";
+                }
+                approverSelect.appendChild(option);
+            });
+        }
+        disputeTypeSelect.addEventListener("change", () => {
+            updateApproverOptions(disputeTypeSelect.value);
+        });
 
     //******************** FOLLOW-UP:  ****************************************************
     }
@@ -7574,13 +8280,15 @@ function initializeVariables() {
         landmarks: q('[name="landmarks"]'),
         techRepairType: q('[name="techRepairType"]'),
         flmFindings: q('[name="flmFindings"]'),
-        rootCause: q('[name="rootCause"]'),
         paymentChannel: q('[name="paymentChannel"]'),
         personnelType: q('[name="personnelType"]'),
         wocas: q('[name="WOCAS"]'),
         planDetails: q('[name="planDetails"]'),
         ffupStatus: q('[name="ffupStatus"]'),
         requestType: q('[name="requestType"]'),
+        findings: q('[name="findings"]'),
+        disputeType: q('[name="disputeType"]'),
+        approver: q('[name="approver"]'),
     };
 }
 
@@ -7598,7 +8306,7 @@ function optionNotAvailable() {
         if (vars.issueResolved === "") {
             alert('Please indicate whether the issue is resolved or not.');
             return true;
-        } else if (vars.issueResolved.selectedIndex !==2) {
+        } else if (vars.issueResolved !=="No - for Ticket Creation") {
             alert('This option is not available. Please use Salesforce or FUSE/ESA button.');
             return true;
         }
@@ -7770,7 +8478,7 @@ function cepCaseNotes() {
             { name: "outageReference", label: "SOURCE REFERENCE" },
             { name: "connectionMethod", label: "CONNECTED VIA" },
             { name: "onuModel" },
-            { name: "deviceBrandAndModel", label: "DEVICE'S BRAND & MODEL" },
+            { name: "deviceBrandAndModel", label: "DEVICE BRAND & MODEL" },
             { name: "pingTestResult", label: "PING" },
             { name: "speedTestResult", label: "SPEEDTEST RESULT" },
             { name: "meshtype" },
@@ -8552,7 +9260,7 @@ function fuseButtonHandler(showFloating = true) {
             "custConcern": "Concern",
             "ownership": "Ownership",
             "custAuth": "Customer Authentication",
-            "rootCause": "Cause of Misapplied Payment",
+            "findings": "Cause of Misapplied Payment",
             "paymentChannel": "Payment Channel",
             "otherPaymentChannel": "Other Payment Channel",
             "issueResolved": "Issue Resolved",
@@ -8590,6 +9298,7 @@ function fuseButtonHandler(showFloating = true) {
             { name: "custAuth", label: "CUST AUTH" },
             { name: "paymentChannel", label: "PAYMENT CHANNEL" },
             { name: "otherPaymentChannel", label: "PAYMENT CHANNEL" },
+            { name: "flmFindings" },
             { name: "remarks" },
 
         ];
@@ -8666,6 +9375,10 @@ function fuseButtonHandler(showFloating = true) {
     ? `ACC#: ${vars.accountNum}/ ` 
     : "";
 
+    const soSrNum = (isFieldVisible("srNum") && vars.srNum) 
+    ? `${vars.srNum}/ ` 
+    : "";
+
     // ***************************************** FOLLOW UP CONCERN *************************************************
     if (vars.selectedIntent === "formFFUP") {
         if (
@@ -8683,7 +9396,7 @@ function fuseButtonHandler(showFloating = true) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}NON-SERVICE REBATE/ ${vars.custConcern}/ ${vars.srNum}`;
+        concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}NON-SERVICE REBATE/ ${vars.custConcern}/ ${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     // ***************************************** Request: Reconnection *********************************************
@@ -8707,7 +9420,7 @@ function fuseButtonHandler(showFloating = true) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}${vars.selectedIntentText} - ${vars.rootCause}/ ${vars.custConcern}`;
+        concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}${vars.selectedIntentText} - ${vars.findings}/ ${vars.custConcern}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     // ***************************************** Complaint: Unreflected Payment **********************************
@@ -8803,7 +9516,62 @@ function fuseButtonHandler(showFloating = true) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP ${vars.selectedIntentText}/ ${vars.custConcern}/ ${vars.srNum}/ ${vars.ffupStatus} `;
+        concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP ${vars.selectedIntentText}/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+        actionsTakenCopiedText = constructFuseOutput();
+
+    // ***************************************** Follow-Up: Change Telephone number *****************
+    } else if (vars.selectedIntent === "formFfupChangeTelNum") {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP ${vars.selectedIntentText}/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+        actionsTakenCopiedText = constructFuseOutput();
+
+    // ***************************************** Follow-Up: Change Telephone unit *****************
+    } else if (vars.selectedIntent === "formFfupChangeTelUnit") {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP ${vars.selectedIntentText}/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+        actionsTakenCopiedText = constructFuseOutput();
+
+    // ***************************************** Follow-Up: Disconnection (VAS) *****************
+    } else if (vars.selectedIntent === "formFfupDiscoVas") {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP ${vars.selectedIntentText}/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+        actionsTakenCopiedText = constructFuseOutput();
+
+    // ***************************************** Follow-Up:  *****************
+    } else if (vars.selectedIntent === "formFfupDispute") {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        if (vars.disputeType === "Rebate Non Service"){
+            if (vars.approver === "Agent") {
+                concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP ${vars.disputeType} WITH APPROVED AJUSTMENT BY ${vars.approver}/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+            } else {
+                concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP ${vars.disputeType} FOR ${vars.approver} APPROVAL/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+            }
+        } else if (vars.disputeType === "Rentals") {
+            if (vars.approver === "Account Admin") {
+                concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP REBATE FOR ${vars.disputeType} WITH OPEN DISPUTE FOR APPROVAL BY ${vars.approver}/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+            } else if (vars.approver === "Agent") {
+                concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP REBATE FOR ${vars.disputeType} WITH APPROVED AJUSTMENT BY ${vars.approver}/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+            } else {
+                concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP REBATE FOR ${vars.disputeType} WITH OPEN DISPUTE UNDER APPROVAL/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+            }
+        } else if (vars.disputeType === "Usage") {
+            if (vars.approver === "Account Admin") {
+                concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP DISPUTE FOR TOLL ${vars.disputeType}S/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+            } else {
+                concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP DISPUTE FOR ${vars.disputeType}S UNDER APPROVAL/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+            }
+        } else {
+            concernCopiedText = `C: ${vars.channel}/ ${sfCaseNum}${accountNum}FOLLOW-UP DISPUTE FOR ${vars.disputeType}S/ ${vars.custConcern}/ ${soSrNum}${vars.ffupStatus} `;
+        }
+            
         actionsTakenCopiedText = constructFuseOutput();
 
     // ***************************************** Follow-Up:  *****************
@@ -9101,7 +9869,7 @@ function sfTaggingButtonHandler() {
         bauRows = [
             ['VOC:', 'Complaint'],
             ['Case Type:', 'Billing'],
-            ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.rootCause}`]
+            ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.findings}`]
         ];
     } else if (vars.selectedIntent === 'formUnreflectedPayment') {
         bauRows = [
@@ -9185,6 +9953,30 @@ function sfTaggingButtonHandler() {
             ['VOC:', `Follow-up ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.requestType}`]
+        ];
+    } else if (vars.selectedIntent === 'formFfupChangeTelNum') {
+        bauRows = [
+            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['Case Type:', 'Change of Telephone Number'],
+            ['Case Sub-Type:', `Change TelNum - ${vars.findings}`]
+        ];
+    } else if (vars.selectedIntent === 'formFfupChangeTelUnit') {
+        bauRows = [
+            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['Case Type:', 'Change Telephone Unit'],
+            ['Case Sub-Type:', 'Change Tel Unit - Opsim']
+        ];
+    } else if (vars.selectedIntent === 'formFfupDiscoVas') {
+        bauRows = [
+            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['Case Type:', 'Disconnection (VAS)'],
+            ['Case Sub-Type:', `Disconnect -  ${vars.findings}`]
+        ];
+    } else if (vars.selectedIntent === 'formFfupDispute') {
+        bauRows = [
+            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', `${vars.disputeType} - ${vars.approver}`]
         ];
     }
 
@@ -9553,7 +10345,6 @@ function endorsementForm() {
 }
 
 function resetButtonHandler() {
-    
     const userChoice = confirm("Are you sure you want to reset the form?");
 
     if (userChoice) {
@@ -9580,7 +10371,8 @@ function resetButtonHandler() {
             "landline-num-row",
             "service-id-row",
             "option82-row",
-            "intent-wocas-row"
+            "intent-wocas-row",
+            "wocas-row"
         ];
 
         rowsToHide.forEach(id => {
@@ -9805,10 +10597,10 @@ function saveFormData() {
         "formInqBalTransfer",
         "formInqBillInterpret",
         "formFfupChangeOwnership",
-        "",
-        "",
-        "",
-        "",
+        "formFfupChangeTelNum",
+        "formFfupChangeTelUnit",
+        "formFfupDiscoVas",
+        "formFfupDispute",
         "",
         "",
         "",

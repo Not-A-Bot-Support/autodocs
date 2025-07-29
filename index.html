@@ -97,14 +97,6 @@
                         </div>
                     </td> 
                 </tr>
-                <tr>
-                    <td colspan="2">
-                        <label for="wocas" id="wocas-label">WOCAS</label>
-                        <div class="form1DivInput">
-                            <textarea class="notepad" rows="2" id="wocas" name="WOCAS""></textarea>
-                        </div>
-                    </td>
-                </tr>
                 <tr>    
                     <td colspan="2">
                         <label for="account-num">Account #</label>
@@ -144,6 +136,14 @@
                                 <option value="FOLLOW-UP">FOLLOW-UP</option>
                                 <option value="REQUEST">REQUEST</option>
                             </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="wocas-row" style="display: none;">
+                    <td colspan="2">
+                        <label for="wocas" id="wocas-label">WOCAS</label>
+                        <div class="form1DivInput">
+                            <textarea class="notepad" rows="2" id="wocas" name="WOCAS""></textarea>
                         </div>
                     </td>
                 </tr>
@@ -274,9 +274,9 @@
                                 <option data-group="complaint" value="formUnreflectedPayment">Unreflected Payment</option>
                                 <option data-group="follow-up" value="formFfupChangeOwnership">Change Ownership</option>
                                 <option data-group="follow-up" value="formFfupChangeTelNum">Change Telephone Number</option>
-                                <option data-group="follow-up" value="">Change Telephone Unit</option>
-                                <option data-group="follow-up" value="">Disconnection (VAS)</option>
-                                <option data-group="follow-up" value="">Dispute</option>
+                                <option data-group="follow-up" value="formFfupChangeTelUnit">Change Telephone Unit</option>
+                                <option data-group="follow-up" value="formFfupDiscoVas">Disconnection (VAS)</option>
+                                <option data-group="follow-up" value="formFfupDispute">Dispute</option>
                                 <option data-group="follow-up" value="">Downgrade</option>
                                 <option data-group="follow-up" value="">Due Date Extension</option>
                                 <option data-group="follow-up" value="">Inmove</option>
@@ -334,7 +334,7 @@
                     </tr>
                 </table>
             </div>
-            Standard Notes Generator Version 5.2.210725<br> <!--Version #.#.DDMMYY -->
+            Standard Notes Generator Version 5.2.290725<br> <!--Version #.#.DDMMYY -->
             &copy; Developed and designed by: QA Team
         </div>
     </div>
