@@ -1,6 +1,6 @@
 //script.js
 
-// Standard Notes Generator Version 5.2.290725
+// Standard Notes Generator Version 5.2.310725
 // Developed & Designed by: QA Ryan
 
 let lobSelect, vocSelect, intentSelect;
@@ -65,7 +65,7 @@ function handleLobChange() {
     allVocOptions.forEach(option => {
         if (
             (lobSelectedValue === "TECH" && ["REQUEST", "FOLLOW-UP", "COMPLAINT"].includes(option.value)) ||
-            (lobSelectedValue === "NON-TECH" && option.value === "REQUEST")
+            (lobSelectedValue === "NON-TECH" && option.value !== "")
         ) {
             vocSelect.appendChild(option);
         }
@@ -8177,12 +8177,294 @@ function createForm2() {
         });
 
     //******************** FOLLOW-UP:  ****************************************************
+    } else if (selectedValue === "formFfupDowngrade") {
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Status", type: "select", name: "ffupStatus", options: [
+                "", 
+                "Beyond SLA", 
+                "Within SLA"
+            ]},
+            { label: "Findings", type: "select", name: "findings", options: [
+                "", 
+                "Activation Task",
+                "No SO Generated",
+                "Opsim",
+                "RSO Customer",
+                "RSO PLDT",
+                "System Task / Stuck SO"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer." },
+            { label: "SO/SR #", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createInstructionsRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const instructionsDiv = document.createElement("div");
+            instructionsDiv.className = "form2DivInput";
+
+            const ul = document.createElement("ul");
+            ul.className = "instructions-list";
+
+            ["Please fill out all required fields.",
+            "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.",
+            "Ensure that the information is accurate.",
+            "Please review your inputs before generating the notes."].forEach(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                ul.appendChild(li);
+            });
+
+            instructionsDiv.appendChild(ul);
+            td.appendChild(instructionsDiv);
+            row.appendChild(td);
+            return row;
+        }
+
+        function createPromptRow() {
+            // const ownershipEl = document.querySelector('[name="ownership"]');
+            const findingsEl = document.querySelector('[name="findings"]');
+
+            // const ownership = ownershipEl ? ownershipEl.value : "";
+            const findings = findingsEl ? findingsEl.value : "";
+
+            if (findings !== "No SO Generated") {
+                return null;
+            }
+
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivChecklist";
+
+            const mInfo = document.createElement("p");
+            mInfo.textContent = "Mandatory Information:";
+            mInfo.className = "requirements-header";
+            checklistDiv.appendChild(mInfo);
+
+            const ulMandaInfo = document.createElement("ul");
+            ulMandaInfo.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "The Account is Active";
+            ulMandaInfo.appendChild(li1);
+
+            const li2 = document.createElement("li");
+            li2.textContent = "No pending bill-related issues";
+            ulMandaInfo.appendChild(li2);
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Zero balance MSF";
+            ulMandaInfo.appendChild(li3);
+
+            const li4 = document.createElement("li");
+            li4.textContent = "No open dispute";
+            ulMandaInfo.appendChild(li4);
+
+            const li5 = document.createElement("li");
+            li5.textContent = "Paid unbilled toll charges";
+            ulMandaInfo.appendChild(li5);
+
+            const li6 = document.createElement("li");
+            li6.textContent = "Paid Pre-Termination Fee if within lock-in (Supersedure with creation of New Account number) for the following:";
+            const nestedUl = document.createElement("ul");
+            [
+                "Remaining months of gadget amortization",
+                "Remaining months of installation fee",
+                "Remaining months of activation fee"
+            ].forEach(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                nestedUl.appendChild(li);
+            });
+            li6.appendChild(nestedUl);
+            ulMandaInfo.appendChild(li6);
+
+            const li7 = document.createElement("li");
+            li7.textContent = "Supersedure with retention of account number and all account-related details shall only be allowed for the following incoming customer:";
+            const nestedOl = document.createElement("ol");
+            nestedOl.type = "a";
+            [
+                "Spouse of the outgoing customer must submit (PSA) Copy of Marriage Certificate",
+                "Child of the outgoing customer must submit (PSA) Copy of Birth Certificate",
+                "Sibling of the outgoing customer must submit (PSA) copies of Birth Certificate of both incoming and outgoing customers"
+            ].forEach(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                nestedOl.appendChild(li);
+            });
+            li7.appendChild(nestedOl);
+            ulMandaInfo.appendChild(li7);
+
+            checklistDiv.appendChild(ulMandaInfo);
+
+            const req = document.createElement("p");
+            req.textContent = "Requirements:";
+            req.className = "customer-talking-points-header";
+            checklistDiv.appendChild(req);
+
+            const ulreq = document.createElement("ul");
+            ulreq.className = "checklist";
+
+            const talkingPoints = [
+                "Service Request Form (if required for the feature being requested)", // index 0
+                "Subscription Certificate (if required for the feature being requested)", // index 1
+                "Refer to PLDT Guidelines in Handling Non-SOR Aftersales Request for the guidelines", // index 2
+                "Signed document should be sent back to proceed with the SO creation", // index 3
+                "Authorization letter signed by the customer on record", // index 4
+                "Valid ID of the customer on record", // index 5
+                "Valid ID of the authorized requestor" // index 6
+            ];
+
+            const liElements = talkingPoints.map(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                return li;
+            });
+
+            if (ownership === "SOR") {
+                ulreq.appendChild(liElements[0]);
+                ulreq.appendChild(liElements[1]);
+            } else {
+                ulreq.appendChild(liElements[2]);
+                ulreq.appendChild(liElements[3]);
+                ulreq.appendChild(liElements[4]);
+                ulreq.appendChild(liElements[5]);
+            }
+
+            checklistDiv.appendChild(ulreq);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        let findingsRow = null;
+
+        function updateChecklist() {
+            const existingChecklist = document.querySelector(".form2DivChecklist")?.closest("tr");
+            if (existingChecklist) {
+                existingChecklist.remove();
+            }
+
+            const checklistRow = createPromptRow();
+            if (checklistRow && findingsRow && findingsRow.parentNode) {
+                findingsRow.parentNode.insertBefore(checklistRow, findingsRow.nextSibling);
+            }
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = field.label;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.name === "findings") {
+                    input.id = field.name;
+                }
+
+                field.options.forEach((optionText, index) => {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+                    input.appendChild(option);
+                });
+
+                if (field.name === "findings") {
+                    input.addEventListener("change", updateChecklist);
+                }
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = field.name === "remarks" ? 6 : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        table.appendChild(createInstructionsRow());
+
+        fields.forEach(field => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+            if (field.name === "findings") {
+                findingsRow = row;
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            fuseButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+
+    //******************** FOLLOW-UP:  ****************************************************
     }
 }
 
 document.getElementById("selectIntent").addEventListener("change", createForm2);
 
 function createButtons(buttonLabels, buttonHandlers) {
+    const vars = initializeVariables();
+
     const channelField = document.getElementById("channel").value;
     const buttonTable = document.createElement("table");
     let buttonIndex = 0;
@@ -8204,6 +8486,41 @@ function createButtons(buttonLabels, buttonHandlers) {
 
                 if (channelField === "CDT-HOTLINE" && label === "Salesforce") {
                     label = "FUSE/ESA";
+                }
+
+                if (label === "CEP" && vars.selectedIntent !== "formFFUP") {
+                    const dropdown = document.createElement("div");
+                    dropdown.classList.add("dropdown");
+
+                    const mainButton = document.createElement("button");
+                    mainButton.textContent = "CEP ⮝";
+                    mainButton.classList.add("form2-button");
+                    dropdown.appendChild(mainButton);
+
+                    const dropdownContent = document.createElement("div");
+                    dropdownContent.classList.add("dropdown-content");
+
+                    const subOptions = [
+                        { label: "Title", keys: ["Title"] },
+                        { label: "Description", keys: ["Description"] },
+                        { label: "Case Notes", keys: ["Case Notes in Timeline"] },
+                        { label: "Special Instructions", keys: ["Special Instructions"] }
+                        // { label: "All", keys: [] } // default for all
+                    ];
+
+                    subOptions.forEach(option => {
+                        const subBtn = document.createElement("button");
+                        subBtn.textContent = option.label;
+                        subBtn.onclick = () => cepButtonHandler(true, option.keys);
+                        dropdownContent.appendChild(subBtn);
+                    });
+
+                    dropdown.appendChild(dropdownContent);
+                    cell.appendChild(dropdown);
+                    row.appendChild(cell);
+                    buttonIndex++;
+                    hasButton = true;
+                    break;
                 }
 
                 const button = document.createElement("button");
@@ -8230,7 +8547,6 @@ function createButtons(buttonLabels, buttonHandlers) {
 
     return buttonTable;
 }
-
 
 function initializeVariables() {
     const q = (selector) => {
@@ -8385,18 +8701,20 @@ function cepCaseDescription() {
     if (validIntents.includes(vars.selectedIntent)) {
         const selectedValue = vars.selectedIntent;
         const selectedOption = document.querySelector(`#selectIntent option[value="${selectedValue}"]`);
-
         const visibleFields = [];
 
         if (selectedOption) visibleFields.push(selectedOption.textContent);
 
+        const investigation3Index = document.querySelector('[name="investigation3"]');
         if (
             (vars.facility !== "Fiber - Radius" && vars.accountType !== "RADIUS") &&
             isFieldVisible("investigation3") &&
+            investigation3Index &&
+            investigation3Index.selectedIndex > 0 &&
             vars.investigation3 &&
             !vars.investigation3.startsWith("Not Applicable")
         ) {
-            visibleFields.push(vars.investigation3);
+            visibleFields.push(investigation3Index.options[investigation3Index.selectedIndex].textContent);
         }
 
         if (isFieldVisible("Option82") && vars.Option82) {
@@ -8586,27 +8904,6 @@ function specialInstButtonHandler() {
         "formStrmApps_1", "formStrmApps_2", "formStrmApps_3", "formStrmApps_4", "formStrmApps_5"
     ];
 
-    const missingFields = [
-        { name: "specialInstruct" },
-        { name: "contactName", label: "Contact Name" },
-        { name: "cbr", label: "CBR" },
-        { name: "availability", label: "Availability" },
-        { name: "address", label: "Address" },
-        { name: "landmarks", label: "Landmarks" },
-    ].filter(field =>
-        isFieldVisible(field.name) &&
-        (!vars[field.name] || vars[field.name].trim() === "")
-    ).map(field => {
-        if (field.label) return field.label;
-        if (field.name === "specialInstruct") return "Special Instructions";
-        return field.name;
-    });
-
-    if (missingFields.length > 0) {
-        alert(`Please complete ${missingFields.join(", ")}. Don’t forget to fill it out once the information is available, then generate the notes again.`);
-        return;
-    }
-
     const allFields = [
         { name: "specialInstruct" },
         { name: "contactName", label: "Contact Person" },
@@ -8659,17 +8956,20 @@ function specialInstButtonHandler() {
     return specialInstCopiedText;
 }
 
-function validateRequiredFields() {
+function validateRequiredFields(filter = []) {
     const fieldLabels = {
+        // Description
         "Option82": "Option82",
         "investigation3": "Investigation 3",
+
+        // Case Notes in Timeline
         "facility": "Facility",
         "resType": "Residential Type",
+        "outageStatus": "Network Outage Status",
         "accountType": "Account Type",
         "WOCAS": "WOCAS",
         "investigation1": "Investigation 1",
         "investigation2": "Investigation 2",
-        "investigation3": "Investigation 3",
         "investigation4": "Investigation 4",
         "req4retracking": "Request for Retracking",
         "stbSerialNumber": "Set-Top-Box Serial Number",
@@ -8678,7 +8978,14 @@ function validateRequiredFields() {
         "onuSerialNum": "Modem/ONU Serial #",
         "onuRunStats": "NMS Skin ONU Status",
         "cvReading": "Clearview Reading",
-        
+
+        // Special Instructions
+        "specialInstruct": "Special Instructions",
+        "contactName": "Contact Person",
+        "cbr": "CBR",
+        "availability": "Availability",
+        "address": "Complete Address",
+        "landmarks": "Nearest Landmarks"
     };
 
     const emptyFields = [];
@@ -8697,20 +9004,34 @@ function validateRequiredFields() {
         }
     }
 
-    if (emptyFields.length > 0) {
-        alert(`Please complete the following field(s): ${emptyFields.join(", ")}`);
+    let alertFields = [];
+  
+    if (filter.length === 0 || filter.includes("Title")) {
+        // Don't alert for anything
+        alertFields = [];
+    } else if (filter.includes("Description")) {
+        // Only alert for Option82 and Investigation 3 if they're missing
+        const importantKeys = ["Option82", "Investigation 3"];
+        alertFields = emptyFields.filter(field => importantKeys.includes(field));
+    } else if (filter.includes("Case Notes in Timeline")) {
+        const importantKeys = ["Facility", "Residential Type", "Network Outage Status", "Account Type", "WOCAS", "Investigation 1", "Investigation 2", "Investigation 3", "Investigation 4", "Request for Retracking", "Set-Top-Box Serial Number", "Smartcard ID", "Cignal TV Plan", "Modem/ONU Serial #", "NMS Skin ONU Status", "Clearview Reading"];
+        alertFields = emptyFields.filter(field => importantKeys.includes(field));
+    } else if (filter.includes("Special Instructions")) {
+        const importantKeys = ["Network Outage Status", "Special Instructions", "Contact Person", "CBR", "Availability", "Complete Address", "Nearest Landmarks"];
+        alertFields = emptyFields.filter(field => importantKeys.includes(field));
     }
 
-    return emptyFields;
+    if (alertFields.length > 0) {
+        alert(`Please complete the following field(s): ${alertFields.join(", ")}`);
+    }
+
+    return { emptyFields, alertFields };
 }
 
-function cepButtonHandler(showFloating = true) {
+function cepButtonHandler(showFloating = true, filter = []) {
     const vars = initializeVariables();
 
-    let titleCopiedText = "";
-    let descriptionCopiedText = "";
-    let caseNotesCopiedText = "";
-    let specialInstCopiedText = "";
+    if (!vars.selectedIntent) return;
 
     const validIntents = [
         "form100_1", "form100_2", "form100_3", "form100_4", "form100_5", "form100_6", "form100_7",
@@ -8727,40 +9048,36 @@ function cepButtonHandler(showFloating = true) {
         "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7"
     ];
 
-    if (validIntents.includes(vars.selectedIntent)) {
-        const emptyDescriptionFields = validateRequiredFields();
-        if (emptyDescriptionFields.length > 0) return "";
+    if (!validIntents.includes(vars.selectedIntent)) return;
 
-        if (vars.selectedIntent.startsWith("form300")) {
-            if (isFieldVisible("custAuth") && vars.custAuth === "Failed") {
-                alert("This option is not available. Please use the Salesforce or FUSE button.");
-                return "";
-            }
-        }
+    if (optionNotAvailable()) return "";
 
-        if (optionNotAvailable()) return "";
-
-        titleCopiedText = (cepCaseTitle() || "").toUpperCase();
-        descriptionCopiedText = (cepCaseDescription() || "").toUpperCase();
-        caseNotesCopiedText = (cepCaseNotes() || "").toUpperCase();
-        specialInstCopiedText = (specialInstButtonHandler() || "").toUpperCase();
+    if (vars.selectedIntent.startsWith("form300") && vars.custAuth === "Failed") {
+        alert("This option is not available. Please use the Salesforce or FUSE button.");
+        return;
     }
 
-    const textToCopy = [
-        titleCopiedText,
-        descriptionCopiedText,
-        caseNotesCopiedText,
-        specialInstCopiedText
-    ].filter(Boolean);
+    const { emptyFields, alertFields } = validateRequiredFields(filter);
+    if (alertFields.length > 0) return;
+
+    const dataMap = {
+        Title: (cepCaseTitle() || "").toUpperCase(),
+        Description: (cepCaseDescription() || "").toUpperCase(),
+        "Case Notes in Timeline": (cepCaseNotes() || "").toUpperCase(),
+        "Special Instructions": (specialInstButtonHandler() || "").toUpperCase()
+    };
+
+    const filtered = filter.length ? filter : Object.keys(dataMap);
+    const textToCopy = filtered.map(key => dataMap[key]).filter(Boolean);
 
     if (showFloating) {
-        showCepFloatingDiv(textToCopy);
+        showCepFloatingDiv(filtered, textToCopy);
     }
 
     return textToCopy;
 }
 
-function showCepFloatingDiv(textToCopy) {
+function showCepFloatingDiv(labels, textToCopy) {
     const floatingDiv = document.getElementById("floatingDiv");
     const overlay = document.getElementById("overlay");
 
@@ -8772,11 +9089,8 @@ function showCepFloatingDiv(textToCopy) {
     }
 
     floatingDivHeader.textContent = "CASE DOCUMENTATION: Click the text to copy!";
-
     const copiedValues = document.getElementById("copiedValues");
     copiedValues.innerHTML = "";
-
-    const labels = ["Title", "Description", "Case Notes in Timeline", "Special Instructions"];
 
     textToCopy.forEach((text, index) => {
         if (!text) return;
@@ -8797,27 +9111,19 @@ function showCepFloatingDiv(textToCopy) {
         section.style.cursor = "pointer";
         section.style.whiteSpace = "pre-wrap";
         section.style.transition = "background-color 0.2s, transform 0.1s ease";
-
         section.textContent = text;
 
-        section.addEventListener("mouseover", () => {
-        section.style.backgroundColor = "#edf2f7";
-        });
-        section.addEventListener("mouseout", () => {
-        section.style.backgroundColor = "";
-        });
-
+        section.addEventListener("mouseover", () => section.style.backgroundColor = "#edf2f7");
+        section.addEventListener("mouseout", () => section.style.backgroundColor = "");
         section.onclick = () => {
-        section.style.transform = "scale(0.99)";
-        navigator.clipboard.writeText(text).then(() => {
-            section.style.backgroundColor = "#ddebfb";
-            setTimeout(() => {
-            section.style.transform = "scale(1)";
-            section.style.backgroundColor = "";
-            }, 150);
-        }).catch(err => {
-            console.error("Copy failed:", err);
-        });
+            section.style.transform = "scale(0.99)";
+            navigator.clipboard.writeText(text).then(() => {
+                section.style.backgroundColor = "#ddebfb";
+                setTimeout(() => {
+                    section.style.transform = "scale(1)";
+                    section.style.backgroundColor = "";
+                }, 150);
+            });
         };
 
         wrapper.appendChild(section);
@@ -8827,21 +9133,19 @@ function showCepFloatingDiv(textToCopy) {
     overlay.style.display = "block";
     floatingDiv.style.display = "block";
 
-    setTimeout(() => {
-        floatingDiv.classList.add("show");
-    }, 10);
+    setTimeout(() => floatingDiv.classList.add("show"), 10);
 
     const okButton = document.getElementById("okButton");
     okButton.textContent = "Close";
-
     okButton.onclick = () => {
         floatingDiv.classList.remove("show");
         setTimeout(() => {
-        floatingDiv.style.display = "none";
-        overlay.style.display = "none";
+            floatingDiv.style.display = "none";
+            overlay.style.display = "none";
         }, 300);
     };
 }
+
 
 function ffupButtonHandler(showFloating = true, enableValidation = true) {
     const vars = initializeVariables();
@@ -9043,53 +9347,6 @@ function showFfupFloatingDiv(combinedOutput) {
     };
 }
 
-function validateRequiredCaseDocumentationFields() {
-    const vars = initializeVariables(); 
-
-    if (vars.issueResolved === "No - for Ticket Creation") {
-        const fieldLabels = {
-            "facility": "Facility",
-            "resType": "Residential Type",
-            "accountType": "Account Type",
-            "outageStatus": "Network Outage Status",
-            "investigation1": "Investigation 1",
-            "investigation2": "Investigation 2",
-            "investigation3": "Investigation 3",
-            "investigation4": "Investigation 4",
-            "issueResolved": "Issue Resolved",
-            "sla": "SLA",
-            "specialInstruct": "Special Instructions",
-            "req4retracking": "Request for Retracking",
-            "stbSerialNumber": "Set-Top-Box Serial Number",
-            "smartCardID": "Smartcard ID",
-            "cignalPlan": "Cignal TV Plan",
-            "custAuth": "Customer Authentication",
-        };
-
-        const requiredFields = Object.keys(fieldLabels);
-        const emptyFields = [];
-
-        requiredFields.forEach(field => {
-            const inputField = document.querySelector(`[name="${field}"]`);
-            if (isFieldVisible(field)) {
-                if (!inputField || inputField.value.trim() === "" || 
-                    (inputField.tagName === "SELECT" && inputField.selectedIndex === 0)) {
-                    emptyFields.push(fieldLabels[field]);
-                }
-            }
-        });
-
-        if (emptyFields.length > 0) {
-            alert(`Please complete the following field(s): ${emptyFields.join(", ")}`);
-        }
-
-        return emptyFields;
-
-    } else {
-        return [];
-    }
-}
-
 function salesforceButtonHandler(showFloating = true, suppressRestrictions = false) {
     const vars = initializeVariables(); 
 
@@ -9129,8 +9386,31 @@ function salesforceButtonHandler(showFloating = true, suppressRestrictions = fal
 
     // *********************************VOICE AND DATA CONNECTION************************************************
     } else if (validIntents.includes(vars.selectedIntent)) {
-        const emptyDescriptionFields = validateRequiredFields();
-        if (emptyDescriptionFields.length > 0) return "";
+        const fieldLabels = {
+            "WOCAS": "WOCAS",
+            "remarks": "Actions Taken",
+        };
+
+        const emptyFields = [];
+
+        for (const field in fieldLabels) {
+            const inputField = document.querySelector(`[name="${field}"]`);
+            if (isFieldVisible(field)) {
+                const isEmpty =
+                    !inputField ||
+                    inputField.value.trim() === "" ||
+                    (inputField.tagName === "SELECT" && inputField.selectedIndex === 0);
+
+                if (isEmpty) {
+                    emptyFields.push(fieldLabels[field]);
+                }
+            }
+        }
+
+        if (emptyFields.length > 0) {
+            alert(`Please complete the following field(s): ${emptyFields.join(", ")}`);
+            return;
+        }
 
         titleCopiedText = (cepCaseTitle() || "").toUpperCase();
         descriptionCopiedText = (cepCaseDescription() || "").toUpperCase();
@@ -10515,18 +10795,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-let selectedBgColor = "#ffffff"; 
+// let selectedBgColor = "#ffffff"; 
 
-const bgColorPicker = document.getElementById('bgColorPicker');
-const floating2Div = document.getElementById('form3Container');
+// const bgColorPicker = document.getElementById('bgColorPicker');
+// const floating2Div = document.getElementById('form3Container');
 
-function getBrightness(hex) {
-    hex = hex.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    return (0.299 * r + 0.587 * g + 0.114 * b);
-}
+// function getBrightness(hex) {
+//     hex = hex.replace('#', '');
+//     const r = parseInt(hex.substr(0, 2), 16);
+//     const g = parseInt(hex.substr(2, 2), 16);
+//     const b = parseInt(hex.substr(4, 2), 16);
+//     return (0.299 * r + 0.587 * g + 0.114 * b);
+// }
 
 // bgColorPicker.addEventListener('input', function () {
 //     const bgColor = this.value;
@@ -10627,10 +10907,24 @@ function saveFormData() {
 
     if (nonTechIntents.includes(vars.selectedIntent)) {
         combinedNotes = fuseNotes || "";
-    } else if (vars.selectedIntent === "formFFUP" && vars.ticketStatus === "Within SLA") {
-        combinedNotes = ffupNotes || "";
-    } else if (vars.selectedIntent === "formFFUP" && vars.ticketStatus === "Beyond SLA") {
-        combinedNotes = `${fuseNotes || ""}\n\n${ffupNotes || ""}`.trim();
+    } else if (
+        vars.selectedIntent === "formFFUP" &&
+            (
+                vars.ticketStatus === "Within SLA" ||
+                (
+                    vars.ticketStatus === "Beyond SLA" &&
+                    vars.offerALS !== "Offered ALS/Accepted" &&
+                    vars.offerALS !== "Offered ALS/Declined"
+                )
+            )
+        ) {
+            combinedNotes = ffupNotes || "";
+    } else if (
+        vars.selectedIntent === "formFFUP" &&
+        vars.ticketStatus === "Beyond SLA" &&
+            (vars.offerALS === "Offered ALS/Accepted" || vars.offerALS === "Offered ALS/Declined")
+        ) {
+            combinedNotes = `${fuseNotes || ""}\n\n${ffupNotes || ""}`.trim();
     } else {
         combinedNotes = sfNotes || "";
     }
@@ -10693,6 +10987,7 @@ function exportFormData() {
         appendIfValid("LOB", entry.selectLOB);
         appendIfValid("VOC", entry.selectVOC);
         appendIfValid("ACCOUNT #", entry.accountNum);
+        appendIfValid("LANDLINE #", entry.landlineNum);
 
         const lob = entry.selectLOB ? entry.selectLOB : "";
         const voc = entry.selectVOC ? entry.selectVOC : "";
@@ -10701,16 +10996,14 @@ function exportFormData() {
 
         } else {
             if (voc === "COMPLAINT") {
-                appendIfValid("LANDLINE #", entry.landlineNum);
                 appendIfValid("SERVICE ID", entry.serviceID);
                 appendIfValid("OPTION82", entry.Option82);
             } else if (voc === "REQUEST") {
                 appendIfValid("SERVICE ID", entry.serviceID);
                 appendIfValid("OPTION82", entry.Option82);
             } else if (voc === "FOLLOW-UP") {
-
+                // Nothing to Append
             } else {
-                appendIfValid("LANDLINE #", entry.landlineNum);
                 appendIfValid("SERVICE ID", entry.serviceID);
                 appendIfValid("OPTION82", entry.Option82);
             }
