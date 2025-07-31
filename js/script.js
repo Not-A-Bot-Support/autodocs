@@ -65,7 +65,7 @@ function handleLobChange() {
     allVocOptions.forEach(option => {
         if (
             (lobSelectedValue === "TECH" && ["REQUEST", "FOLLOW-UP", "COMPLAINT"].includes(option.value)) ||
-            (lobSelectedValue === "NON-TECH" && option.value !== "")
+            (lobSelectedValue === "NON-TECH" && option.value === "REQUEST")
         ) {
             vocSelect.appendChild(option);
         }
