@@ -250,16 +250,26 @@ function resetAllFields(excludeFields = []) {
 }
 
 function hideSpecificFields(fieldNames) {
+    const allRows = document.querySelectorAll("tr");
     fieldNames.forEach(name => {
-        const fieldRow = document.querySelector(`tr:has([name="${name}"])`);
-        if (fieldRow) fieldRow.style.display = "none";
+        allRows.forEach(row => {
+            const field = row.querySelector(`[name="${name}"]`);
+            if (field) {
+                row.style.display = "none";
+            }
+        });
     });
 }
 
 function showFields(fieldNames) {
+    const allRows = document.querySelectorAll("tr");
     fieldNames.forEach(name => {
-        const fieldRow = document.querySelector(`tr:has([name="${name}"])`);
-        if (fieldRow) fieldRow.style.display = "table-row";
+        allRows.forEach(row => {
+            const field = row.querySelector(`[name="${name}"]`);
+            if (field) {
+                row.style.display = "table-row";
+            }
+        });
     });
 }
 
@@ -402,7 +412,7 @@ function createForm2() {
             { label: "Nominated Mobile Number", type: "number", name: "nomiMobileNum" },
             { label: "No. of Follow-Up(s)", type: "select", name: "ffupCount", options: ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Multiple" ]},
             { label: "Case Age (HH:MM)", type: "text", name: "ticketAge" },
-            { label: "Notes to Tech/ Actions Taken/ Add'l Remarks/ Decline Reason for ALS", type: "textarea", name: "remarks" },
+            { label: "Notes to Tech/ Actions Taken/ Add'l Remarks/ Decline Reason for ALS", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, “CONDUCT BTS”, “CREATE FT”, or “PROVIDE SLA/PLDT TRACKER”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved", type: "select", name: "issueResolved", options: [
                 "", 
                 "Yes", 
@@ -591,6 +601,22 @@ function createForm2() {
             return row;
         }
 
+        function insertPromptRow(fields, relatedFieldName) {
+            fields.splice(
+                fields.findIndex(f => f.name === relatedFieldName) + 1,
+                0,
+                {
+                    type: "promptRow",
+                    name: "defaultEntityQueue",
+                    relatedTo: relatedFieldName
+                }
+            );
+        }
+
+        const enhancedFields = [...fields];
+
+        insertPromptRow(enhancedFields, "queue");
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
             row.style.display = (field.name === "cepCaseNumber" || field.name === "techRepairType" || field.name === "queue") ? "table-row" : "none";
@@ -605,7 +631,38 @@ function createForm2() {
             label.setAttribute("for", field.name);
 
             let input;
-            if (field.type === "select") {
+            if (field.type === "promptRow") {
+                const row = document.createElement("tr");
+                row.classList.add("checklist-prompt-row");
+                row.dataset.relatedTo = field.relatedTo;
+                row.style.display = "none";
+
+                const td = document.createElement("td");
+                const checklistDiv = document.createElement("div");
+                checklistDiv.className = "form2DivChecklist";
+
+                const req = document.createElement("p");
+                req.textContent = "Note:";
+                req.className = "requirements-header";
+                checklistDiv.appendChild(req);
+
+                const ulReq = document.createElement("ul");
+                ulReq.className = "checklist";
+
+                const li1 = document.createElement("li");
+                li1.textContent = "Delete investigation 1 to 4 value and click Save.";
+                ulReq.appendChild(li1);
+
+                const li2 = document.createElement("li");
+                li2.textContent = "Utilize the appropriate tools. Handle customer concern based on What Our Customers Are Saying (WOCAS) and update details of Investigation 1-4.";
+                ulReq.appendChild(li2);
+
+                checklistDiv.appendChild(ulReq);
+                td.appendChild(checklistDiv);
+                row.appendChild(td);
+
+                return row;
+            } else if (field.type === "select") {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
@@ -643,7 +700,7 @@ function createForm2() {
         }
 
         table.appendChild(createInstructionsRow()); 
-        fields.forEach(field => table.appendChild(createFieldRow(field))); 
+        enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
 
         form2Container.appendChild(table);
 
@@ -669,12 +726,22 @@ function createForm2() {
 
         queue.addEventListener("change", () => {
             resetAllFields(["techRepairType", "queue"]);
-            if (queue.value === "FM POLL" || queue.value === "CCARE OFFBOARD" || queue.value === "Default Entity Queue") {
+            if (queue.value === "FM POLL" || queue.value === "CCARE OFFBOARD") {
                 showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "issueResolved"]);
                 hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "specialInstruct", "contactName", "cbr", "availability", "address", "landmarks" ]);
+            }else if (queue.value === "Default Entity Queue") {
+                showFields(["ffupCount", "ticketAge", "remarks", "issueResolved"]);
+                hideSpecificFields(["projRed", "ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "specialInstruct", "contactName", "cbr", "availability", "address", "landmarks" ]);
             } else {
                 showFields(["projRed" ]);
                 hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "specialInstruct", "contactName", "cbr", "availability", "address", "landmarks" ]);
+            }
+
+            const promptRow = document.querySelector(".checklist-prompt-row[data-related-to='queue']");
+            if (queue.value === "Default Entity Queue") {
+                if (promptRow) promptRow.style.display = "table-row";
+            } else {
+                if (promptRow) promptRow.style.display = "none";
             }
         });
 
@@ -1047,7 +1114,7 @@ function createForm2() {
                 ulReq.appendChild(li3);
 
                 const li4 = document.createElement("li");
-                li4.textContent = "If Option 82 in Clearview, NMS Skin (BSMP, EAAA, or SAAA), or CEP is misaligned, this MUST be documented in the ‘Remarks’ field.";
+                li4.textContent = "Any misalignment observed in Clearview, NMS Skin (BSMP, EAAA, or SAAA), or CEP MUST be documented in the “Remarks” field to avoid misdiagnosis.";
                 ulReq.appendChild(li4);
 
                 checklistDiv.appendChild(ulReq);
@@ -8494,8 +8561,7 @@ function createButtons(buttonLabels, buttonHandlers) {
 
                     const mainButton = document.createElement("button");
                     mainButton.textContent = "CEP ⮝";
-                    mainButton.classList.add("form2-button");
-                    dropdown.appendChild(mainButton);
+                    mainButton.classList.add("form2-button", "dropdown-toggle");
 
                     const dropdownContent = document.createElement("div");
                     dropdownContent.classList.add("dropdown-content");
@@ -8505,7 +8571,6 @@ function createButtons(buttonLabels, buttonHandlers) {
                         { label: "Description", keys: ["Description"] },
                         { label: "Case Notes", keys: ["Case Notes in Timeline"] },
                         { label: "Special Instructions", keys: ["Special Instructions"] }
-                        // { label: "All", keys: [] } // default for all
                     ];
 
                     subOptions.forEach(option => {
@@ -8515,9 +8580,29 @@ function createButtons(buttonLabels, buttonHandlers) {
                         dropdownContent.appendChild(subBtn);
                     });
 
+                    dropdown.appendChild(mainButton);
                     dropdown.appendChild(dropdownContent);
                     cell.appendChild(dropdown);
                     row.appendChild(cell);
+
+                    mainButton.addEventListener("click", function (e) {
+                        e.stopPropagation();
+                        dropdownContent.classList.toggle("show");
+                        mainButton.classList.toggle("active");
+                    });
+
+                    dropdown.addEventListener("mouseleave", function () {
+                        dropdownContent.classList.remove("show");
+                        mainButton.classList.remove("active");
+                    });
+
+                    document.addEventListener("click", function (e) {
+                        if (!dropdown.contains(e.target)) {
+                            dropdownContent.classList.remove("show");
+                            mainButton.classList.remove("active");
+                        }
+                    });
+
                     buttonIndex++;
                     hasButton = true;
                     break;
@@ -8721,7 +8806,7 @@ function cepCaseDescription() {
             visibleFields.push(vars.Option82);
         }
 
-        caseDescription = visibleFields.join(" | ");
+        caseDescription = visibleFields.join(" / ");
     }
 
     return caseDescription;
@@ -8924,7 +9009,7 @@ function specialInstButtonHandler() {
         if (!isFieldVisible(field.name)) return "";
         const value = getFieldValueIfVisible(field.name);
         if (!value) return "";
-        const formattedValue = value.replace(/\n/g, " | ");
+        const formattedValue = value.replace(/\n/g, " / ");
         return field.label
             ? `${field.label}: ${formattedValue}`
             : `${formattedValue}`;
@@ -9096,7 +9181,7 @@ function showCepFloatingDiv(labels, textToCopy) {
         if (!text) return;
 
         const wrapper = document.createElement("div");
-        wrapper.style.marginBottom = "20px";
+        wrapper.style.marginBottom = "10px";
 
         const label = document.createElement("strong");
         label.textContent = labels[index];
@@ -9111,6 +9196,7 @@ function showCepFloatingDiv(labels, textToCopy) {
         section.style.cursor = "pointer";
         section.style.whiteSpace = "pre-wrap";
         section.style.transition = "background-color 0.2s, transform 0.1s ease";
+        section.classList.add("noselect");
         section.textContent = text;
 
         section.addEventListener("mouseover", () => section.style.backgroundColor = "#edf2f7");
@@ -9302,6 +9388,7 @@ function showFfupFloatingDiv(combinedOutput) {
         section.style.cursor = "pointer";
         section.style.whiteSpace = "pre-wrap";
         section.style.transition = "background-color 0.2s, transform 0.1s ease";
+        section.classList.add("noselect");
 
         section.textContent = sectionText;
 
@@ -9458,6 +9545,7 @@ function showSalesforceFloatingDiv(textToCopy) {
     section.style.cursor = "pointer";
     section.style.whiteSpace = "pre-wrap";
     section.style.transition = "background-color 0.2s, transform 0.1s ease";
+    section.classList.add("noselect");
 
     section.textContent = textToCopy;
 
@@ -9904,6 +9992,7 @@ function showFuseFloatingDiv(concernCopiedText, actionsTakenCopiedText, ffupCopi
             section.style.cursor = "pointer";
             section.style.whiteSpace = "pre-wrap";
             section.style.transition = "background-color 0.2s, transform 0.1s ease";
+            section.classList.add("noselect");
 
             section.textContent = text;
 
@@ -10794,36 +10883,6 @@ document.addEventListener('DOMContentLoaded', function() {
     registerEventHandlers();
 
 });
-
-// let selectedBgColor = "#ffffff"; 
-
-// const bgColorPicker = document.getElementById('bgColorPicker');
-// const floating2Div = document.getElementById('form3Container');
-
-// function getBrightness(hex) {
-//     hex = hex.replace('#', '');
-//     const r = parseInt(hex.substr(0, 2), 16);
-//     const g = parseInt(hex.substr(2, 2), 16);
-//     const b = parseInt(hex.substr(4, 2), 16);
-//     return (0.299 * r + 0.587 * g + 0.114 * b);
-// }
-
-// bgColorPicker.addEventListener('input', function () {
-//     const bgColor = this.value;
-//     selectedBgColor = bgColor;
-
-//     document.body.style.backgroundColor = bgColor;
-
-//     const brightness = getBrightness(bgColor);
-//     const textColor = brightness < 128 ? '#ffffff' : '#000000';
-
-//     document.body.style.color = textColor;
-
-//     if (floating2Div) {
-//         floating2Div.style.backgroundColor = bgColor;
-//         floating2Div.style.color = textColor;
-//     }
-// });
 
 function saveFormData() {
     const selectedChannel = document.getElementById("channel")?.value?.trim();
