@@ -10,14 +10,9 @@
 <body>
     <div id="overlay" style="display: none;"></div>
 
-    <!-- <div class="color-box" id="colorBox">
-        <div class="color-picker-container">
-            <input type="color" id="bgColorPicker">
-        </div>
-    </div> -->
-
     <div class="divHeader">
-        <header id="headerValue"><span class="version-circle">V5</span>Standard Notes Generator</header>
+        <span class="version-circle">V5</span>
+        <header id="headerValue">Standard Notes Generator</header>
     </div>
 
     <div class="divsContainer">
@@ -259,19 +254,102 @@
                                     <option value="formStrmApps_4">VIU Problem</option>
                                     <option value="formStrmApps_5">HBO Max Problem</option>
                                 </optgroup>
-                                <option data-group="inquiry" value="formInqAccSrvcStatus">Account/Service Status</option>
-                                <option data-group="inquiry" value="formInqRebCredAdj">Approved rebate / Credit Adjustment</option>
-                                <option data-group="inquiry" value="formInqAda">Auto Debit Arrangement (ADA)</option>
-                                <option data-group="inquiry" value="formInqBalTransfer">Balance transfer</option>
-                                <option data-group="inquiry" value="formInqBillInterpret">Bill Interpretation</option>
-                                <option data-group="inquiry" value="formInqLockIn">Contract / Lock In</option>
-                                <option data-group="inquiry" value="formInqCopyOfBill">Copy of Bill</option>
-                                <option data-group="inquiry" value="formInqMyHomeAcc">My Home Account</option>
-                                <option data-group="inquiry" value="formInqPlanDetails">Plan Details</option>
-                                <option data-group="complaint" value="formMyHomeWeb">Cannot Open MyHome Website</option>
-                                <option data-group="complaint" value="formMisappliedPayment">Misapplied Payment</option>
-                                <option data-group="complaint" value="formPersonnelIssue">Personnel Issue</option>
-                                <option data-group="complaint" value="formUnreflectedPayment">Unreflected Payment</option>
+
+                                <!--- Non-Tech Inquiry ---->
+                                <optgroup label="Account">
+                                    <option data-group="inquiry" value="formInqAccSrvcStatus">Account/Service Status</option>
+                                    <option data-group="inquiry" value="formInqLockIn">Contract / Lock In</option>
+                                    <option data-group="inquiry" value="formInqCopyOfBill">Copy of Bill</option>
+                                    <option data-group="inquiry" value="formInqMyHomeAcc">My Home Account</option>
+                                    <option data-group="inquiry" value="formInqPlanDetails">Plan Details</option>
+                                </optgroup>
+                                <optgroup label="Billing">
+                                    <option data-group="inquiry" value="formInqAda">Auto Debit Arrangement (ADA)</option>
+                                    <option data-group="inquiry" value="formInqRebCredAdj">Approved rebate / Credit Adjustment</option>
+                                    <option data-group="inquiry" value="formInqBalTransfer">Balance transfer</option>
+                                    <option data-group="inquiry" value="formInqBillInterpret">Bill Interpretation</option>
+                                    <option data-group="inquiry" value="formInqBrokenPromise">Broken Promise (Recon/DDE)</option>
+                                    <option data-group="inquiry" value="formInqCreditAdj">Credit Adjustment</option>
+                                    <option data-group="inquiry" value="formInqCredLimit">Credit Limit/Volume Base</option>
+                                    <option data-group="inquiry" value="formInqNSR">Dispute on Non Service</option>
+                                    <option data-group="inquiry" value="formInqDdate">Due date</option>
+                                    <option data-group="inquiry" value="formInqBillDdateExt">Due date extension</option>
+                                    <option data-group="inquiry" value="formInqEcaPip">ECA / Payment Installment Plan</option>
+                                    <option data-group="inquiry" value="formInqNewBill">New Bill</option>
+                                    <option data-group="inquiry" value="formInqOneTimeCharges">One Time Charges (PTF, Service Recon Fee)</option>
+                                    <option data-group="inquiry" value="formInqOutsBal">Outstanding Balance</option>
+                                    <option data-group="inquiry" value="formInqOverpay">Overpayment</option>
+                                    <option data-group="inquiry" value="formInqPayChannel">Payment Channel</option>
+                                    <option data-group="inquiry" value="formInqPayPosting">Payment Posting / Details</option>
+                                    <option data-group="inquiry" value="formInqPayRefund">Payment Refund</option>
+                                    <option data-group="inquiry" value="formInqPayUnreflected">Payment Unreflected</option>
+                                    <option data-group="inquiry" value="formInqDdateMod">Permanent Due Date Modification</option>
+                                    <option data-group="inquiry" value="formInqBillRefund">Refund</option>
+                                    <option data-group="inquiry" value="formInqSmsEmailBill">SMS/Email Bill clarification/Bill delivery</option>
+                                    <option data-group="inquiry" value="formInqTollUsage">Usage / Tolls (NDD,IDD,TOP-UP)</option>
+                                </optgroup>
+                                <optgroup label="Change Ownership">
+                                    <option data-group="inquiry" value="formInqCoRetain">Supersedure retain Account number</option>
+                                    <option data-group="inquiry" value="formInqCoChange">Supersedure with change account number</option>
+                                </optgroup>
+                                <optgroup label="Disconnection">
+                                    <option data-group="inquiry" value="formInqPermaDisc">Permanent Disconnection</option>
+                                    <option data-group="inquiry" value="formInqTempDisc">Temporary Disconnection (VTD/HTD)</option>
+                                </optgroup>
+                                <optgroup label="Downgrade">
+                                    <option data-group="inquiry" value="formInqD1299">Plan 1299</option>
+                                    <option data-group="inquiry" value="formInqD1399">Plan 1399</option>
+                                    <option data-group="inquiry" value="formInqD1799">Plan 1799</option>
+                                    <option data-group="inquiry" value="formInqDOthers">Others</option>
+                                </optgroup>
+                                <option data-group="inquiry" value="formInqDdateExt">Permanent/Temporary Due Date Extension</option>
+                                <option data-group="inquiry" value="formInqEntertainment">Entertainment (Lions Gate/HBO Go/Viu/Others)</option>
+                                <option data-group="inquiry" value="formInqInmove">Inmove</option>
+                                <option data-group="inquiry" value="formInqMigration">Migration</option>
+                                <option data-group="inquiry" value="formInqProdAndPromo">Product & Promos</option>
+                                <optgroup label="Referral Program">
+                                    <option data-group="inquiry" value="formInqHomeRefNC">HOME Referral New Connect</option>
+                                    <option data-group="inquiry" value="formInqHomeDisCredit">Inquiry on HOME discount crediting </option>
+                                </optgroup>
+                                <option data-group="inquiry" value="formInqRefund">Refund</option>
+                                <option data-group="inquiry" value="formInqReloc">Relocation</option>
+                                <option data-group="inquiry" value="formInqRewards">Rewards Program</option>
+                                <optgroup label="Special Features">
+                                    <option data-group="inquiry" value="formInqDirectDial">NDD/IDD/DDD (Security Lock)</option>
+                                    <option data-group="inquiry" value="formInqBundle">SUPER BUNLDE / CALLER ID BUNDLE</option>
+                                    <option data-group="inquiry" value="formInqSfOthers">Others</option>
+                                </optgroup>
+                                <option data-group="inquiry" value="formInqSAO500">Speed Add On 500</option>
+                                <optgroup label="UNLI FAM CALL">
+                                    <option data-group="inquiry" value="formInqUfcEnroll">UFC Enrollment</option>
+                                    <option data-group="inquiry" value="formInqUfcPromoMech">UFC Promo Mechanics</option>
+                                </optgroup>
+                                <optgroup label="Upgrade">
+                                    <option data-group="inquiry" value="formInqUpg1399">Plan 1399</option>
+                                    <option data-group="inquiry" value="formInqUpg1599">Plan 1599</option>
+                                    <option data-group="inquiry" value="formInqUpg1799">Plan 1799</option>
+                                    <option data-group="inquiry" value="formInqUpg2099">Plan 2099</option>
+                                    <option data-group="inquiry" value="formInqUpg2499">Plan 2499</option>
+                                    <option data-group="inquiry" value="formInqUpg2699">Plan 2699</option>
+                                    <option data-group="inquiry" value="formInqUpgOthers">Others</option>
+                                </optgroup>
+                                <optgroup label="VAS">
+                                    <option data-group="inquiry" value="formInqVasAO">Always On</option>
+                                    <option data-group="inquiry" value="formInqVasIptv">Cignal/IPTV</option>
+                                    <option data-group="inquiry" value="formInqVasMOW">MyOwnWifi</option>
+                                    <option data-group="inquiry" value="formInqVasSAO">Speed Add On</option>
+                                    <option data-group="inquiry" value="formInqVasWMesh">Wifi Mesh</option>
+                                    <option data-group="inquiry" value="formInqVasOthers">Others</option>
+                                </optgroup>
+                                <option data-group="inquiry" value="formInqWireReRoute">Wire Re-Route</option>
+
+                                <!--- Non-Tech Complaint ---->
+                                <option data-group="complaint" value="formCompMyHomeWeb">Cannot Open MyHome Website</option>
+                                <option data-group="complaint" value="formCompMisappliedPayment">Misapplied Payment</option>
+                                <option data-group="complaint" value="formCompPersonnelIssue">Personnel Issue</option>
+                                <option data-group="complaint" value="formCompUnreflectedPayment">Unreflected Payment</option>
+
+                                <!--- Non-Tech Follow-Up ---->
                                 <option data-group="follow-up" value="formFfupChangeOwnership">Change Ownership</option>
                                 <option data-group="follow-up" value="formFfupChangeTelNum">Change Telephone Number</option>
                                 <option data-group="follow-up" value="formFfupChangeTelUnit">Change Telephone Unit</option>
@@ -334,7 +412,7 @@
                     </tr>
                 </table>
             </div>
-            Standard Notes Generator Version 5.2.030825<br> <!--Version #.#.DDMMYY -->
+            Standard Notes Generator Version 5.2.140825<br> <!--Version #.#.DDMMYY -->
             &copy; Developed and designed by: QA Team
         </div>
     </div>

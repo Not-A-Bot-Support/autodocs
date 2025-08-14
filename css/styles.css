@@ -87,21 +87,32 @@ input[type="color"]::-moz-focus-inner {
     color: white;
     border-radius: 50%;
     font-size: 17.5px;
-    margin-right: 10px; 
+    margin: 5px 10px; /* space on all sides */
     border: solid 2px white;
+    padding: 5px 10px; 
 }
 
 header {
     display: flex;
     width: 100%;
     align-items: center; 
+    justify-content: flex-start;
     font-size: 15px;
     font-weight: bold;
     color: #ffffff;
-    padding: 5px 10px; 
-    text-align: center;
+    text-align: left; 
     cursor: default;
     letter-spacing: 1.5px;
+    margin-right: 10px;
+}
+
+#headerValue {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: clamp(14px, 2vw, 20px);
 }
 
 .divsContainer {
@@ -290,7 +301,44 @@ button.form1-button {
     font-weight: bold;
 }
 
-.form2DivChecklist {
+/* Instructions Div */
+.form2DivInstructions {
+    display: flex;  
+    flex-direction: column;
+    align-items: flex-start;  
+    text-align: left;
+    width: 100%;  
+    box-sizing: border-box;  
+    border-radius: 5px;
+    border: 2px solid #2C3E50;
+    color: #fff;
+    padding: 0;
+    background-color: #2C3E50;
+    margin-top: 10px;
+}
+
+.instructions-header {
+    font-size: 14.5px;
+    font-weight: bold;
+    margin: 15px 0 0 20px;   /* top, right, bottom, left */
+    text-align: left;
+    color: #fff;
+}
+
+.instructions-list {
+    list-style-type: disc; 
+    margin-left: 0; 
+    font-size: 14px; 
+    color: #fff; 
+}
+
+.instructions-list li {
+    line-height: 1.5;
+}
+
+/* Common container styles for definition & checklist */
+.form2DivDefinition,
+.form2DivPrompt {
     display: flex;  
     flex-direction: column;
     align-items: flex-start;  
@@ -303,6 +351,82 @@ button.form1-button {
     padding: 0;
     background-color: #fff;
     margin-top: 10px;
+}
+
+/* Common header styles */
+.definition-header,
+.note-header,
+.esca-checklist-header,
+.checklist-header,
+.requirements-header,
+.customer-talking-points-header {
+    font-size: 14.5px;
+    font-weight: bold;
+    text-align: left;
+    color: #2C3E50;
+}
+
+/* Margin differences for specific headers */
+.definition-header,
+.note-header,
+.esca-checklist-header,
+.requirements-header {
+    margin: 15px 0 0 20px;
+}
+
+.checklist-header,
+.customer-talking-points-header {
+    margin: 0 0 0 20px;
+}
+
+.esca-checklist-instruction {
+    font-size: 14.5px;
+    font-style: italic;
+    font-weight: bold;
+    text-align: left;
+    color: #2C3E50;
+    margin: 0 0 15px 20px;
+}
+
+/* Common list styles */
+.definition,
+.note,
+.checklist,
+.requirements,
+.customer-talking-points {
+    list-style-type: circle; 
+    margin-left: 0; 
+    font-size: 14px; 
+    color: #2C3E50; 
+}
+
+.esca-checklist {
+    margin-left: 0; 
+    font-size: 14px; 
+    color: #2C3E50; 
+}
+
+.definition li,
+.note li,
+.checklist li,
+.requirements li,
+.customer-talking-points li {
+    line-height: 1.5;
+}
+
+.esca-checklist li {
+    line-height: 1.5;
+    list-style: none; 
+    position: relative;
+    padding-left: 1.5em; 
+}
+
+.esca-checklist li::before {
+    content: "✔"; 
+    position: absolute;
+    left: 0;
+    color: green;
+    font-weight: bold;
 }
 
 label.form2-label {
@@ -620,52 +744,6 @@ button.form3-button {
     transition: transform 0.1s ease;  
     margin-top: 7.5px;
     margin-bottom: 15px;
-}
-
-.instructions-list {
-    list-style-type: disc; 
-    margin-left: 0; 
-    font-size: 14px; 
-    color: #fff; 
-}
-
-.instructions-list li {
-    line-height: 1.5;
-}
-
-.checklist {
-    list-style-type: circle; 
-    margin-left: 0; 
-    font-size: 14px; 
-    color: #2C3E50; 
-}
-
-.checklist li {
-    line-height: 1.5;
-}
-
-.requirements-header {
-    font-size: 14.5px;
-    font-weight: bold;
-    margin: 15px 0 0 20px;   /* top, right, bottom, left */
-    text-align: left;
-    color: #2C3E50;
-}
-
-.customer-talking-points-header {
-    font-size: 14.5px;
-    font-weight: bold;
-    margin: 0 0 0 20px;   /* top, right, bottom, left */
-    text-align: left;
-    color: #2C3E50;
-}
-
-.checklist-header {
-    font-size: 14.5px;
-    font-weight: bold;
-    margin: 0 0 0 20px;   /* top, right, bottom, left */
-    text-align: left;
-    color: #2C3E50;
 }
 
 .footer {
