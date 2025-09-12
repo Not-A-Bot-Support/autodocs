@@ -386,6 +386,7 @@ button.form1-button {
     text-align: left;
     color: #2C3E50;
     margin: 0 0 15px 20px;
+    white-space: pre-line;
 }
 
 /* Common list styles */
