@@ -397,6 +397,7 @@ button.form1-button {
 .customer-talking-points {
     list-style-type: circle; 
     margin-left: 0; 
+    margin-right: 15px;  /* 👈 adjust value as needed */
     font-size: 14px; 
     color: #2C3E50; 
 }

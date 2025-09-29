@@ -76,7 +76,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <label for="cust-name">Name/ANI/DNIS</label>
+                        <label for="cust-name">Customer/Caller Name</label>
                         <div class="form1DivInput">
                             <input type="text" class="input-and-button" id="cust-name" name="custName">
                             <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
@@ -112,7 +112,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <label for="lob">LOB*</label>
+                        <label for="lob">Concern Type*</label>
                         <div class="form1DivInput">
                             <select id="lob" name="selectLOB">
                                 <option value="" disabled selected></option>
@@ -130,6 +130,7 @@
                                 <option value="COMPLAINT">COMPLAINT</option>
                                 <option value="FOLLOW-UP">FOLLOW-UP</option>
                                 <option value="REQUEST">REQUEST</option>
+                                <option value="OTHERS">OTHERS</option>
                             </select>
                         </div>
                     </td>
@@ -166,95 +167,89 @@
                         <div class="form1DivInput">
                             <select id="selectIntent" name="slctFrm1">
                                 <option value="" disabled selected>— Please select the correct Intent/WOCAS —</option>
-                                <option value="formFFUP">Follow-Up Repair</option>
+                                <!-- Tech Intents -->
                                 <optgroup label="No Dial Tone and No Internet Connection">
-                                    <option value="form100_1">All Services Down</option>
-                                    <option value="form100_2">Red LOS</option>
-                                    <option value="form100_3">Defective Modem - No Power Light</option>
-                                    <option value="form100_4">Defective/Damaged Modem</option>
-                                    <option value="form100_5">Damaged Modem Cable/Cord</option>
-                                    <option value="form100_6">Uninstalled Modem (Fiber)</option>
-                                    <option value="form100_7">Old Devices Not Working on WiFi6 Modem (Fiber)</option>
+                                    <option data-group="smt_complaint" value="form100_1">All Services Down</option>
+                                    <option data-group="smt_complaint" value="form100_2">Red LOS</option>
+                                    <option data-group="smt_complaint" value="form100_3">Defective Modem - No Power Light</option>
+                                    <option data-group="smt_complaint" value="form100_4">Defective/Damaged Modem</option>
+                                    <option data-group="smt_complaint" value="form100_5">Damaged Modem Cable/Cord</option>
+                                    <option data-group="smt_complaint" value="form100_6">Uninstalled Modem (Fiber)</option>
+                                    <option data-group="smt_complaint" value="form100_7">Old Devices Not Working on WiFi6 Modem (Fiber)</option>
                                 </optgroup>
                                 <optgroup label="No Internet Connection">
-                                    <option value="form500_1">No Internet Connection</option>
-                                    <option value="form500_2">Redirected to PLDT Payment Reminder Portal</option>
-                                    <option value="form500_3">Defective Mesh</option>
-                                    <option value="form500_4">Damaged Mesh</option>
+                                    <option data-group="smt_complaint" value="form500_1">No Internet Connection</option>
+                                    <option data-group="smt_complaint" value="form500_2">Redirected to PLDT Payment Reminder Portal</option>
+                                    <option data-group="smt_complaint" value="form500_3">Defective Mesh</option>
+                                    <option data-group="smt_complaint" value="form500_4">Damaged Mesh</option>
                                 </optgroup>
                                 <optgroup label="Slow Internet/Intermittent Connection">
-                                    <option value="form501_1">Slow Browsing</option>
-                                    <option value="form501_2">Low Download/Upload Speed</option>
-                                    <option value="form501_3">Availed SAO</option>
-                                    <option value="form501_4">Frequent Disconnection</option>
-                                    <option value="form501_5">Gaming High Latency/Lag</option>
+                                    <option data-group="smt_complaint" value="form501_1">Slow Browsing</option>
+                                    <option data-group="smt_complaint" value="form501_2">Low Download/Upload Speed</option>
+                                    <option data-group="smt_complaint" value="form501_3">Availed SAO</option>
+                                    <option data-group="smt_complaint" value="form501_4">Frequent Disconnection</option>
+                                    <option data-group="smt_complaint" value="form501_5">Gaming High Latency/Lag</option>
                                 </optgroup>
                                 <optgroup label="No Dial Tone">
-                                    <option value="form101_1">No Dial Tone</option>
-                                    <option value="form101_2">Fast Busy Tone</option>
-                                    <option value="form101_3">Defective Telset - NDT</option>
-                                    <option value="form101_4">Defective/Damaged Telset</option>
+                                    <option data-group="smt_complaint" value="form101_1">No Dial Tone</option>
+                                    <option data-group="smt_complaint" value="form101_2">Fast Busy Tone</option>
+                                    <option data-group="smt_complaint" value="form101_3">Defective Telset - NDT</option>
+                                    <option data-group="smt_complaint" value="form101_4">Defective/Damaged Telset</option>
                                 </optgroup>
                                 <optgroup label="Poor Call Quality/Noisy Telephone Line">
-                                    <option value="form102_1">Noisy Line</option>
-                                    <option value="form102_2">Cut Calls</option>
-                                    <option value="form102_3">Poor Reception/Transmission</option>
-                                    <option value="form102_4">Defective Telset - Noisy Line</option>
-                                    <option value="form102_5">Defective Telset - Cut Calls</option>
-                                    <option value="form102_6">Defective Telset - Poor Reception/Transmission</option>
-                                    <option value="form102_7">Damaged Telset Cable/Cord</option>
+                                    <option data-group="smt_complaint" value="form102_1">Noisy Line</option>
+                                    <option data-group="smt_complaint" value="form102_2">Cut Calls</option>
+                                    <option data-group="smt_complaint" value="form102_3">Poor Reception/Transmission</option>
+                                    <option data-group="smt_complaint" value="form102_4">Defective Telset - Noisy Line</option>
+                                    <option data-group="smt_complaint" value="form102_5">Defective Telset - Cut Calls</option>
+                                    <option data-group="smt_complaint" value="form102_6">Defective Telset - Poor Reception/Transmission</option>
+                                    <option data-group="smt_complaint" value="form102_7">Damaged Telset Cable/Cord</option>
                                 </optgroup>
                                 <optgroup label="Cannot Make a Call">
-                                    <option value="form103_1">Cannot Make a Call</option>
-                                    <option value="form103_2">No Outgoing Call</option>
-                                    <option value="form103_3">Defective Telset - Number Keys</option>
+                                    <option data-group="smt_complaint" value="form103_1">Cannot Make a Call</option>
+                                    <option data-group="smt_complaint" value="form103_2">No Outgoing Call</option>
+                                    <option data-group="smt_complaint" value="form103_3">Defective Telset - Number Keys</option>
                                 </optgroup>
                                 <optgroup label="Cannot Receive a Call">
-                                    <option value="form103_4">Cannot Receive Calls</option>
-                                    <option value="form103_5">No Incoming Call</option>
+                                    <option data-group="smt_complaint" value="form103_4">Cannot Receive Calls</option>
+                                    <option data-group="smt_complaint" value="form103_5">No Incoming Call</option>
                                 </optgroup>
                                 <optgroup label="Selective Browsing Complaints">
-                                    <option value="form502_1">Selective Browsing</option>
-                                    <option value="form502_2">Cannot Load Specific Website</option>
+                                    <option data-group="smt_complaint" value="form502_1">Selective Browsing</option>
+                                    <option data-group="smt_complaint" value="form502_2">Cannot Load Specific Website</option>
                                 </optgroup>
                                 <optgroup label="No Audio/Video Output">
-                                    <option value="form510_1">No Audio/Video Output</option>
-                                    <option value="form510_2">Cignal TV is Down/No Connection</option>
-                                    <option value="form510_3">Defective Set-Top-Box</option>
-                                    <option value="form510_4">Damaged Set-Top-Box</option>
-                                    <option value="form510_5">Cannot Read Smart Card</option>
-                                    <option value="form510_6">Defective HDMI/RCA</option>
-                                    <option value="form510_7">No Channel</option>
-                                    <option value="form510_8">Channel 001 Only</option>
+                                    <option data-group="smt_complaint" value="form510_1">No Audio/Video Output</option>
+                                    <option data-group="smt_complaint" value="form510_2">Cignal TV is Down/No Connection</option>
+                                    <option data-group="smt_complaint" value="form510_3">Defective Set-Top-Box</option>
+                                    <option data-group="smt_complaint" value="form510_4">Damaged Set-Top-Box</option>
+                                    <option data-group="smt_complaint" value="form510_5">Cannot Read Smart Card</option>
+                                    <option data-group="smt_complaint" value="form510_6">Defective HDMI/RCA</option>
+                                    <option data-group="smt_complaint" value="form510_7">No Channel</option>
+                                    <option data-group="smt_complaint" value="form510_8">Channel 001 Only</option>
                                 </optgroup>
                                 <optgroup label="Poor Audio/Video Quality">
-                                    <option value="form511_1">Poor Audio/Video Quality</option>
-                                    <option value="form511_2">Picture Freezing</option>
-                                    <option value="form511_3">Pixelated Video</option>
-                                    <option value="form511_4">Out-of-Sync</option>
-                                    <option value="form511_5">Loop Back Video</option>
+                                    <option data-group="smt_complaint" value="form511_1">Poor Audio/Video Quality</option>
+                                    <option data-group="smt_complaint" value="form511_2">Picture Freezing</option>
+                                    <option data-group="smt_complaint" value="form511_3">Pixelated Video</option>
+                                    <option data-group="smt_complaint" value="form511_4">Out-of-Sync</option>
+                                    <option data-group="smt_complaint" value="form511_5">Loop Back Video</option>
                                 </optgroup>
                                 <optgroup label="Missing Set-Top-Box Functions">
-                                    <option value="form512_1">Missing Channels</option>
-                                    <option value="form512_2">Cannot Record Video</option>
-                                    <option value="form512_3">Defective Remote Control</option>
-                                </optgroup>
-                                <optgroup label="Modem Request Transactions">
-                                    <option value="form300_1">Change of WiFi Name/Password</option>
-                                    <option value="form300_2">Request for Local User GUI Access</option>
-                                    <option value="form300_3">Request for Super Admin GUI Access</option>
-                                    <option value="form300_4">Change modem set-up from Route to Bridge Mode</option>
-                                    <option value="form300_5">Change modem set-up from Bridge to Route Mode</option>
-                                    <option value="form300_6">LAN Port Activation</option>
-                                    <option value="form300_7">Request for Public IP</option>
+                                    <option data-group="smt_complaint" value="form512_1">Missing Channels</option>
+                                    <option data-group="smt_complaint" value="form512_2">Cannot Record Video</option>
+                                    <option data-group="smt_complaint" value="form512_3">Defective Remote Control</option>
                                 </optgroup>
                                 <optgroup label="Streaming Apps Issues">
-                                    <option value="formStrmApps_1">Eufy is Not Working</option>
-                                    <option value="formStrmApps_2">Stream TV is Not Working</option>
-                                    <option value="formStrmApps_3">NETFLIX Problem</option>
-                                    <option value="formStrmApps_4">VIU Problem</option>
-                                    <option value="formStrmApps_5">HBO Max Problem</option>
+                                    <option data-group="smt_complaint" value="formStrmApps_1">Eufy is Not Working</option>
+                                    <option data-group="smt_complaint" value="formStrmApps_2">Stream TV is Not Working</option>
+                                    <option data-group="smt_complaint" value="formStrmApps_3">NETFLIX Problem</option>
+                                    <option data-group="smt_complaint" value="formStrmApps_4">VIU Problem</option>
+                                    <option data-group="smt_complaint" value="formStrmApps_5">HBO Max Problem</option>
                                 </optgroup>
+
+                                <!-- Tech Follow-Up Intent -->
+                                <option value="formFfupRepair">Repair/Network Outage</option>
 
                                 <!--- Non-Tech Inquiry ---->
                                 <optgroup label="Account">
@@ -357,27 +352,154 @@
                                 <option data-group="follow-up" value="formFfupDiscoVas">Disconnection (VAS)</option>
                                 <option data-group="follow-up" value="formFfupDispute">Dispute</option>
                                 <option data-group="follow-up" value="formFfupDowngrade">Downgrade</option>
-                                <option data-group="follow-up" value="">Due Date Extension</option>
-                                <option data-group="follow-up" value="">Inmove</option>
-                                <option data-group="follow-up" value="">Migration</option>
-                                <option data-group="follow-up" value="">Misapplied Payment</option>
-                                <option data-group="follow-up" value="">New Application</option>
-                                <option data-group="follow-up" value="">Ocular Inspection/AMEND SAM</option>
-                                <option data-group="follow-up" value="">Overpayment</option>
-                                <option data-group="follow-up" value="">Permanent Disconnection</option>
-                                <option data-group="follow-up" value="">Reconnection</option>
-                                <option data-group="follow-up" value="">Refund</option>
-                                <option data-group="follow-up" value="">Relocation</option>
-                                <option data-group="follow-up" value="">Special Features</option>
+                                <option data-group="follow-up" value="formFfupDDE">Due Date Extension</option>
+                                <option data-group="follow-up" value="formFfupInmove">Inmove</option>
+                                <option data-group="follow-up" value="formFfupMigration">Migration</option>
+                                <option data-group="follow-up" value="formFfupMisappPay">Misapplied Payment</option>
+                                <option data-group="follow-up" value="formFfupNewApp">New Application</option>
+                                <option data-group="follow-up" value="formFfupOcular">Ocular Inspection</option>
+                                <option data-group="follow-up" value="formFfupOverpay">Overpayment</option>
+                                <option data-group="follow-up" value="formFfupPermaDisco">Permanent Disconnection</option>
+                                <optgroup label="Reconnection">
+                                    <option data-group="follow-up" value="fomFfupRenew">Reconnection - RENEW</option>
+                                    <option data-group="follow-up" value="fomFfupResume">Reconnection - RESUME</option>
+                                    <option data-group="follow-up" value="fomFfupUnbar">Reconnection - UNBAR</option>
+                                </optgroup>
+                                <!-- <option data-group="follow-up" value="">Refund</option>
+                                <option data-group="follow-up" value="formFfupReloc">Relocation</option> -->
+                                <!-- <option data-group="follow-up" value="">Special Features</option>
                                 <option data-group="follow-up" value="">Speed Add On 500</option>
                                 <option data-group="follow-up" value="">Temporary Disconnection (VTD/HTD)</option>
                                 <option data-group="follow-up" value="">Unreflected Payment</option>
                                 <option data-group="follow-up" value="">Upgrade</option>
                                 <option data-group="follow-up" value="">VAS</option>
                                 <option data-group="follow-up" value="">Wire Re-Route</option>
-                                <option data-group="follow-up" value="">Withholding Tax Adjustment</option>
-                                <option data-group="request" value="formReqNonServiceRebate">Dispute Non-Service</option>
-                                <option data-group="request" value="formReqReconnection">Reconnection</option>
+                                <option data-group="follow-up" value="">Withholding Tax Adjustment</option> -->
+
+                                <!--- Non-Tech Request ---->
+                                <optgroup label="Account">
+                                    <option data-group="request" value="formReqGoGreen">Go Green Registration</option>
+                                    <option data-group="request" value="formReqUpdateContact">Updating Contact Details</option>
+                                    <option data-group="request" value="formReqSrvcRenewal">Service Renewal</option>
+                                </optgroup>
+                                <optgroup label="Address Modification (Record)">
+                                    <option data-group="request" value="formReqBillAdd">Billing Address</option>
+                                    <option data-group="request" value="formReqSrvcAdd">Modify Service Address / AMEND SAM (Physical)</option>
+                                </optgroup>
+                                <optgroup label="Billing">
+                                    <option data-group="request" value="formReqTaxAdj">Withholding Tax Adjustment</option>
+                                </optgroup>
+                                <optgroup label="Change Configuration - Data">
+                                    <option data-group="request" value="form300_1">Change of WiFi Name/Password</option>
+                                    <option data-group="request" value="form300_2">Request for Local User GUI Access</option>
+                                    <option data-group="request" value="form300_3">Request for Super Admin GUI Access</option>
+                                    <option data-group="request" value="form300_4">Change modem set-up from Route to Bridge Mode</option>
+                                    <option data-group="request" value="form300_5">Change modem set-up from Bridge to Route Mode</option>
+                                    <option data-group="request" value="form300_6">LAN Port Activation</option>
+                                    <option data-group="request" value="form300_7">Request for Public IP</option>
+                                </optgroup>
+                                <optgroup label="Change Ownership">
+                                    <option data-group="request" value="formReqSupRetAccNum">Supersedure retain Account number</option>
+                                    <option data-group="request" value="formReqSupChangeAccNum">Supersedure with change account number</option>
+                                </optgroup>
+                                <option data-group="request" value="formReqChgTelUnit">Change Telephone Unit</option>
+                                <optgroup label="Disconnection">
+                                    <option data-group="request" value="formReqDiscoVAS">Disconnection (VAS)</option>
+                                    <option data-group="request" value="formReqPermaDisco">Permanent Disconnection</option>
+                                    <option data-group="request" value="formReqTempDisco">Temporary Disconnection (VTD/HTD)</option>
+                                </optgroup>
+                                <optgroup label="Dispute">
+                                    <option data-group="request" value="formReqNSR">Rebate Non Service</option>
+                                    <option data-group="request" value="formReqRentMSF">Rentals - MSF</option>
+                                    <option data-group="request" value="formReqRentLPN">Rentals - Lionsgate play/Netflix</option>
+                                    <option data-group="request" value="formReqNRC">Rentals - NRC- Cost of Unit/Gadgets</option>
+                                    <option data-group="request" value="formReqSCC">Rentals- Service Connection Charge</option>
+                                    <option data-group="request" value="formReqTollUFC">Usage - Tolls (UnliFam Call)</option>
+                                    <option data-group="request" value="formReqOtherTolls">Usage - Other Tolls</option>
+                                </optgroup>
+                                <!-- <optgroup label="Downgrade">
+                                    <option data-group="request" value="">Plan 1299</option>
+                                    <option data-group="request" value="">Plan 1399</option>
+                                    <option data-group="request" value="">Plan 1799</option>
+                                    <option data-group="request" value="">Others</option>
+                                </optgroup>
+                                <optgroup label="Due Date Extension">
+                                    <option data-group="request" value="">Permanent Due Date Extension</option>
+                                    <option data-group="request" value="">Temporary Due Date Extension</option>
+                                </optgroup>
+                                <optgroup label="Reconnection">
+                                    <option data-group="request" value="">Posted Payment</option>
+                                    <option data-group="request" value="">Posted Payment (DTS)</option>
+                                    <option data-group="request" value="">Promise To Pay</option>
+                                    <option data-group="request" value="">Promise To Pay (DTS)</option>
+                                    <option data-group="request" value="">Renew (PD/OP)</option>
+                                    <option data-group="request" value="">Reported Payment</option>
+                                    <option data-group="request" value="">Reported Payment (DTS)</option>
+                                    <option data-group="request" value="">RESUME (TD)</option>
+                                    <option data-group="request" value="">Tactical</option>
+                                    <option data-group="request" value="">With Stuck Treatment SO (DTS)</option>
+                                </optgroup>
+                                <optgroup label="Refund">
+                                    <option data-group="request" value="">Proactive AMSF (New Connect)</option>
+                                    <option data-group="request" value="">Reactive Final Account</option>
+                                    <option data-group="request" value="">Reactive Overpayment</option>
+                                    <option data-group="request" value="">Reactive Wrong Biller</option>
+                                </optgroup>
+                                <optgroup label="Relocation">
+                                    <option data-group="request" value="">Cancelled SO - Bypass SO</option>
+                                    <option data-group="request" value="">CID Creation</option>
+                                </optgroup>
+                                <optgroup label="Special Features">
+                                    <option data-group="request" value="">DDD Pin Resetting</option>
+                                    <option data-group="request" value="">NDD / IDD / DDD (Security Lock)</option>
+                                    <option data-group="request" value="">Super Bundle / Caller ID Bundle</option>
+                                    <option data-group="request" value="">Others</option>
+                                </optgroup>
+                                <optgroup label="Speed Add On 500">
+                                    <option data-group="request" value="">Create SO - Disconnect</option>
+                                    <option data-group="request" value="">Create SO - Modify Speed</option>
+                                    <option data-group="request" value="">Interested (File MsForm)</option>
+                                </optgroup>
+                                <optgroup label="Unli Fam Call">
+                                    <option data-group="request" value="">UFC Activation/Deactivation</option>
+                                </optgroup>
+                                <optgroup label="Upgrade">
+                                    <option data-group="request" value="">Plan 1399</option>
+                                    <option data-group="request" value="">Plan 1599</option>
+                                    <option data-group="request" value="">Plan 1799</option>
+                                    <option data-group="request" value="">Plan 2099</option>
+                                    <option data-group="request" value="">Plan 2699</option>
+                                    <option data-group="request" value="">Others</option>
+                                </optgroup>
+                                <optgroup label="VAS">
+                                    <option data-group="request" value="">Always On</option>
+                                    <option data-group="request" value="">Cignal/IPTV</option>
+                                    <option data-group="request" value="">MyOwnWifi</option>
+                                    <option data-group="request" value="">Speed Add On</option>
+                                    <option data-group="request" value="">Speed Alignment</option>
+                                    <option data-group="request" value="">Wifi Mesh</option>
+                                    <option data-group="request" value="">Others</option>
+                                </optgroup>
+                                <optgroup label="Wire Re-Route">
+                                    <option data-group="request" value="">Re-Routing Inside / Outside Wire</option>
+                                </optgroup> -->
+
+                                <!--- Others ---->
+                                <option data-group="others" value="othersWebForm">Webform</option>
+                                <option data-group="others" value="others164">Bantay Kable (164)</option>
+                                <option data-group="others" value="othersEntAcc">Enterprise Account</option>
+                                <option data-group="others" value="othersHomeBro">Home Bro</option>
+                                <option data-group="others" value="othersSmart">SMART</option>
+                                <option data-group="others" value="othersSME177">SME-177 Concern</option>
+                                <option data-group="others" value="othersToolsDown">Tools Downtime</option>
+                                <optgroup label="Transfer">
+                                    <option data-group="others" value="othersAO">PHW / Always On</option>
+                                    <option data-group="others" value="othersRepair">Repair</option>
+                                    <option data-group="others" value="othersBillAndAcc">Billing and Accts</option>
+                                </optgroup>
+                                <optgroup label="Unsuccessful Transaction">
+                                    <option data-group="others" value="othersUT">Failed Authentication / Prank Call / Short Call</option>
+                                </optgroup>
                             </select>
                         </div>
                     </td>
@@ -413,7 +535,7 @@
                     </tr>
                 </table>
             </div>
-            Standard Notes Generator Version 5.2.110925<br> <!--Version #.#.DDMMYY -->
+            Standard Notes Generator Version 5.2.290925<br> <!--Version #.#.DDMMYY -->
             &copy; Developed and designed by: QA Team
         </div>
     </div>
