@@ -139,7 +139,7 @@
                     <td colspan="2">
                         <label for="wocas" id="wocas-label">WOCAS</label>
                         <div class="form1DivInput">
-                            <textarea class="notepad" rows="2" id="wocas" name="WOCAS""></textarea>
+                            <textarea class="notepad" rows="2" id="wocas" name="WOCAS"></textarea>
                         </div>
                     </td>
                 </tr>
@@ -168,6 +168,13 @@
                             <select id="selectIntent" name="slctFrm1">
                                 <option value="" disabled selected>— Please select the correct Intent/WOCAS —</option>
                                 <!-- Tech Intents -->
+                                <optgroup label="Always On">
+                                    <option data-group="smt_complaint" value="form500_5">No Internet Connection</option>
+                                    <option data-group="smt_complaint" value="form501_7">Slow Internet Connection</option>
+                                    <option data-group="smt_complaint" value="form101_5">No Dial Tone</option>
+                                    <option data-group="smt_complaint" value="form510_9">No Audio/Video Output</option>
+                                    <option data-group="smt_complaint" value="form500_6">Check back-up Wi-Fi if working (Always On)</option>
+                                </optgroup>
                                 <optgroup label="No Dial Tone and No Internet Connection">
                                     <option data-group="smt_complaint" value="form100_1">All Services Down</option>
                                     <option data-group="smt_complaint" value="form100_2">Red LOS</option>
@@ -184,11 +191,12 @@
                                     <option data-group="smt_complaint" value="form500_4">Damaged Mesh</option>
                                 </optgroup>
                                 <optgroup label="Slow Internet/Intermittent Connection">
-                                    <option data-group="smt_complaint" value="form501_1">Slow Browsing</option>
+                                    <option data-group="smt_complaint" value="form501_1">Slow Internet Connection</option>
                                     <option data-group="smt_complaint" value="form501_2">Low Download/Upload Speed</option>
                                     <option data-group="smt_complaint" value="form501_3">Availed SAO</option>
                                     <option data-group="smt_complaint" value="form501_4">Frequent Disconnection</option>
-                                    <option data-group="smt_complaint" value="form501_5">Gaming High Latency/Lag</option>
+                                    <option data-group="smt_complaint" value="form501_5">Gaming - High Latency</option>
+                                    <option data-group="smt_complaint" value="form501_6">Gaming - Lag</option>
                                 </optgroup>
                                 <optgroup label="No Dial Tone">
                                     <option data-group="smt_complaint" value="form101_1">No Dial Tone</option>
@@ -535,7 +543,7 @@
                     </tr>
                 </table>
             </div>
-            Standard Notes Generator Version 5.2.290925<br> <!--Version #.#.DDMMYY -->
+            Standard Notes Generator Version 5.2.151025<br> <!--Version #.#.DDMMYY -->
             &copy; Developed and designed by: QA Team
         </div>
     </div>
