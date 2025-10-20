@@ -3576,6 +3576,7 @@ function createForm2() {
                 "Network Trouble - Slow Internet Connection",
                 "Network Trouble - Slow/Intermittent Browsing",
                 "Not Applicable [via Store]",
+                "ONU Replacement to Latest Model",
                 "Slow/Intermittent Browsing",
                 "With historical alarms",
                 "Without historical alarms"
@@ -3975,6 +3976,8 @@ function createForm2() {
             updateVisibility(".esca-checklist-row");
         }
 
+        updateToolLabelVisibility();
+
         form2Container.appendChild(table);
 
         const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
@@ -3995,12 +3998,14 @@ function createForm2() {
         const outageStatus = document.querySelector("[name='outageStatus']");
         const connectionMethod = document.querySelector("[name='connectionMethod']");
         const issueResolved = document.querySelector("[name='issueResolved']");
+        const resolution = document.querySelector("[name='resolution']");
 
         facility.addEventListener("change", () => {
             resetAllFields(["facility"]);
             if (facility.value === "Fiber") {
                 showFields(["outageStatus"]);
                 hideSpecificFields(["resType", "planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                updateToolLabelVisibility(); 
             } else if (facility.value === "Fiber - Radius") {
                 showFields(["planDetails", "connectionMethod", "pingTestResult", "speedTestResult", "remarks", "issueResolved"]);
                 hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
@@ -4040,11 +4045,11 @@ function createForm2() {
             } else {
                 if (facility.value === "Fiber") {
                     showFields(["planDetails", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "deviceBrandAndModel", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resolution", "investigation1", "investigation2", "investigation3", "investigation4", "outageReference", "pcNumber", "deviceBrandAndModel", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
 
                 } else {
                     showFields(["planDetails", "connectionMethod", "pingTestResult", "speedTestResult", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "deviceBrandAndModel", "actualExp", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);   
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "deviceBrandAndModel", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);   
                 }
                 updateToolLabelVisibility(); 
             }
@@ -10737,7 +10742,6 @@ function cepCaseDescription(showAddlDetails = true) {
     ];
 
     let caseDescription = "";
-
     if (!techIntents.includes(vars.selectedIntent)) return caseDescription;
 
     const selectedValue = vars.selectedIntent;
@@ -10746,6 +10750,13 @@ function cepCaseDescription(showAddlDetails = true) {
     const selectedOption = document.querySelector(`#selectIntent option[value="${selectedValue}"]`);
     const investigation3Index = document.querySelector('[name="investigation3"]');
     const visibleFields = [];
+
+    const getValueIfVisible = (name) => {
+        const el = document.querySelector(`[name="${name}"]`);
+        if (!el || !isFieldVisible(name)) return "";
+        const val = el.value?.trim();
+        return val ? val : "";
+    };
 
     if (selectedOption) {
         const optionText = selectedValue === "form500_6"
@@ -10769,27 +10780,24 @@ function cepCaseDescription(showAddlDetails = true) {
         visibleFields.push(investigation3Index.options[investigation3Index.selectedIndex].textContent);
     }
 
-    if (isFieldVisible("Option82") && vars.Option82) visibleFields.push(vars.Option82);
-    if (isFieldVisible("rxPower") && vars.rxPower != null) visibleFields.push(`RX: ${vars.rxPower}`);
+    if (getValueIfVisible("Option82")) 
+        visibleFields.push(getValueIfVisible("Option82"));
+
+    if (getValueIfVisible("rxPower"))
+        visibleFields.push(`RX: ${vars.rxPower}`);
 
     if (
         vars.investigation1 === "Blinking/No PON/FIBR/ADSL" &&
         (!vars.investigation2 || vars.investigation2 === "Null Value") &&
-        ["Failed to collect line card information","Without Line Problem Detected"].includes(vars.investigation3) &&
+        ["Failed to collect line card information", "Without Line Problem Detected"].includes(vars.investigation3) &&
         vars.investigation4 === "Individual Trouble" &&
         vars.onuSerialNum
     ) visibleFields.push(vars.onuSerialNum);
 
-    if (isFieldVisible("contactName") && vars.contactName) visibleFields.push("CONTACT PERSON: " + vars.contactName);
-    if (isFieldVisible("cbr") && vars.cbr) visibleFields.push("CBR: " + vars.cbr);
-
     const pushFormFields = (fields) => {
         fields.forEach(f => {
-            const el = document.querySelector(`[name="${f.name}"]`);
-            const val = el ? el.value.trim() : "";
-            if (isFieldVisible(f.name) && val) {
-                visibleFields.push(f.label ? `${f.label}: ${val}` : val);
-            }
+            const val = getValueIfVisible(f.name);
+            if (val) visibleFields.push(f.label ? `${f.label}: ${val}` : val);
         });
     };
 
@@ -10804,13 +10812,14 @@ function cepCaseDescription(showAddlDetails = true) {
                     { name: "onuSerialNum", label: "SN" },
                     { name: "dmsWifiState", label: "DMS Wifi Status" }
                 ]);
-            } else if (selectedIntent === "form501_1") {
+            } else if (selectedIntent === "form501_1" || selectedIntent === "form501_2") {
                 pushFormFields([
                     { name: "dmsStatus", label: "DMS Internet Status" },
                     { name: "connectedDevices", label: "No of devices connected" },
                     { name: "dmsSelfHeal", label: "Self Heal Result" },
                     { name: "onuModel", label: "ONU Model" },
                     { name: "onuSerialNum", label: "SN" },
+                    { name: "speedTestResult", label: "Initial Speedtest Result" },
                     { name: "bandsteering", label: "Bandsteering" },
                     { name: "saaaBandwidthCode", label: "NMS Skin BW Code" }
                 ]);
@@ -10828,18 +10837,26 @@ function cepCaseDescription(showAddlDetails = true) {
                     { name: "itRemarks", label: "IT Support Remarks" }
                 ]);
             }
-        } else {
-            pushFormFields([
-                { name: "address" },
-                { name: "landmarks", label: "LANDMARK" },
-                { name: "availability", label: "PREFERRED DATE & TIME" },
-                { name: "rptCount", label: "REPEATER" }
-            ]);
         }
     }
 
+    if (getValueIfVisible("contactName"))
+        visibleFields.push("CONTACT PERSON: " + vars.contactName);
 
-    if (isFieldVisible("WOCAS") && vars.WOCAS) visibleFields.push("WOCAS: " + vars.WOCAS);
+    if (getValueIfVisible("cbr"))
+        visibleFields.push("CBR: " + vars.cbr);
+
+    if (showAddlDetails && reso !== "Tested Ok") {
+        pushFormFields([
+            { name: "availability", label: "PREFERRED DATE AND TIME" },
+            { name: "address" },
+            { name: "landmarks", label: "LANDMARK" },
+            { name: "rptCount", label: "REPEATER" }
+        ]);
+    }
+
+    if (getValueIfVisible("WOCAS"))
+        visibleFields.push("WOCAS: " + vars.WOCAS);
 
     caseDescription = visibleFields.join("/ ");
     return caseDescription;
@@ -11306,6 +11323,7 @@ function techNotesButtonHandler(showFloating = true) {
     ];
 
     const optTextIntents = [
+        "form101_1", "form101_2", "form101_3", "form101_4",
         "form102_1", "form102_2", "form102_3", "form102_4", "form102_5", "form102_6", "form102_7",
         "form103_1", "form103_2", "form103_3", "form103_4", "form103_5",
         "form500_1", "form500_2", "form500_3", "form500_4",
@@ -13060,14 +13078,13 @@ function sfTaggingButtonHandler() {
 
 function endorsementForm() {
     const vars = initializeVariables();
-    
-    // 🔹 NEW CONDITION — open link if selectedIntent is form500_5 or form501_7
+
     if (vars.selectedIntent === "form500_5" || vars.selectedIntent === "form501_7") {
         window.open(
             "https://forms.office.com/pages/responsepage.aspx?id=UzSk3GO58U-fTXXA3_2oOdfxlbG-2mJDqefhFxYwjdNUNVpIMTVMU0VLWU1OVFg2Q04wSEhGQjc0Ry4u&route=shorturl",
             "_blank"
         );
-        return; // ⛔ Stop execution — don’t build the endorsement form
+        return;
     }
     
     const overlay = document.getElementById("overlay");
@@ -13173,7 +13190,6 @@ function endorsementForm() {
         { source: "sfCaseNum", target: "sfCaseNum2" },
         { source: "accountNum", target: "accountNum2" },
         { source: "landlineNum", target: "landlineNum2" },
-        // { source: "specialInstruct", target: "specialInstruct2" },
         { source: "contactName", target: "contactName2" },
         { source: "cbr", target: "cbr2" },
         { source: "availability", target: "availability2" },
@@ -13288,50 +13304,31 @@ function endorsementForm() {
             if (vars.selectedIntent === "formFfupRepair") {
                 showFields(["WOCAS2", "accOwnerName", "accountNum2", "landlineNum2", "contactName2", "cbr2", "availability2", "address2", "landmarks2", "cepCaseNumber2", "queue2", "ticketStatus2", "agentName2", "teamLead2", "date", "remarks2"]);
                 hideSpecificFields(["specialInstruct2", "refNumber2", "paymentChannel2", "amountPaid2"]);
-
-                if (vars.channel === "CDT-SOCMED") {
-                    showFields(["sfCaseNum2"]);
-                } else if (vars.channel === "CDT-HOTLINE") {
-                    hideSpecificFields(["sfCaseNum2"]);
-                }
             } else {
                 showFields(["WOCAS2", "accOwnerName", "accountNum2", "landlineNum2", "contactName2", "cbr2", "availability2", "address2", "landmarks2", "cepCaseNumber2", "agentName2", "teamLead2", "date", "remarks2"]);
                 hideSpecificFields(["queue2", "ticketStatus2", "specialInstruct2", "refNumber2", "paymentChannel2", "amountPaid2"]);
-                
-                if (vars.channel === "CDT-SOCMED") {
-                    showFields(["sfCaseNum2"]);
-                } else if (vars.channel === "CDT-HOTLINE") {
-                    hideSpecificFields(["sfCaseNum2"]);
-                }
+            }
+
+            if (vars.channel === "CDT-SOCMED") {
+                showFields(["sfCaseNum2"]);
+            } else if (vars.channel === "CDT-HOTLINE") {
+                hideSpecificFields(["sfCaseNum2"]);
             }
         } else if (endorsementType.value === "Sup Call") {
             if (vars.selectedIntent === "formFfupRepair") {
                 showFields(["WOCAS2", "accOwnerName", "accountNum2", "landlineNum2", "contactName2", "cbr2", "availability2", "address2", "landmarks2", "cepCaseNumber2", "queue2", "ticketStatus2", "remarks2"]);
                 hideSpecificFields(["specialInstruct2", "agentName2", "teamLead2", "date", "refNumber2", "paymentChannel2", "amountPaid2"]);
-                
-                if (vars.channel === "CDT-SOCMED") {
-                    showFields(["sfCaseNum2"]);
-                } else if (vars.channel === "CDT-HOTLINE") {
-                    hideSpecificFields(["sfCaseNum2"]);
-                }
             } else {
                 showFields(["WOCAS2", "accOwnerName", "accountNum2", "landlineNum2", "contactName2", "cbr2", "availability2", "address2", "landmarks2", "cepCaseNumber2", "remarks2"]);
                 hideSpecificFields(["specialInstruct2", "queue2", "ticketStatus2", "agentName2", "teamLead2", "date", "refNumber2","paymentChannel2", "amountPaid2"]);
+            }
 
-                if (vars.channel === "CDT-SOCMED") {
-                    showFields(["sfCaseNum2"]);
-                } else if (vars.channel === "CDT-HOTLINE") {
-                    hideSpecificFields(["sfCaseNum2"]);
-                }
+            if (vars.channel === "CDT-SOCMED") {
+                showFields(["sfCaseNum2"]);
+            } else if (vars.channel === "CDT-HOTLINE") {
+                hideSpecificFields(["sfCaseNum2"]);
             }
         }
-        
-        // else if (endorsementType.value === "Unbar Request") {
-        //     if (vars.channel === "CDT-SOCMED" || vars.channel === "CDT-HOTLINE") {
-        //         showFields(["WOCAS2", "accountNum2", "refNumber2", "paymentChannel2", "amountPaid2", "date", "remarks2"]);
-        //         hideSpecificFields(["sfCaseNum2", "accOwnerName", "landlineNum2", "specialInstruct2", "contactName2", "cbr2", "availability", "address2", "landmarks2", "cepCaseNumber2", "queue2", "ticketStatus2", "agentName2", "teamLead2"]);
-        //     }
-        // }
     });
 }
 
