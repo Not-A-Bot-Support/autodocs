@@ -1,8 +1,13 @@
 /* styles.css */
+html, body {
+    width: 100%;
+    overflow-x: hidden; /* ✅ prevents horizontal scrollbar */
+}
 
 body {
     margin: 0;
     padding: 0;
+    padding-bottom: 50px;
     font-family: 'Calibri', sans-serif;
     font-size: 12.5px;
     letter-spacing: 1.5px;
@@ -64,17 +69,26 @@ input[type="color"]::-moz-focus-inner {
 
 .divHeader {
     position: fixed; 
-    top: 0px;
+    top: 0;
     left: 0;
     right: 0;
     display: flex;
-    justify-content: center; 
+    justify-content: flex-start;
     align-items: center;
+    padding-left: 10px;
     z-index: 20; 
-    transition: top 0.3s ease;
     background-color: #2C3E50;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: border-radius 0.3s ease, background-color 0.3s ease; 
+    transition: top 0.3s ease, border-radius 0.3s ease, background-color 0.3s ease; 
+}
+
+.formDivHeader {
+    width: 470px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    /* removed margin: 0 auto; */
 }
 
 .version-circle {
@@ -87,7 +101,7 @@ input[type="color"]::-moz-focus-inner {
     color: white;
     border-radius: 50%;
     font-size: 17.5px;
-    margin: 5px 10px; /* space on all sides */
+    margin: 5px 0; /* space on all sides */
     border: solid 2px white;
     padding: 5px 10px; 
 }
@@ -115,13 +129,85 @@ header {
     font-size: clamp(14px, 2vw, 20px);
 }
 
+.mainContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: 55px;
+    gap: 20px;
+    padding: 10px 5px;
+    box-sizing: border-box;
+}
+
 .divsContainer {
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
-    width: 100%; 
-    margin: 55px 0 0 0; 
+    display: flex;
+    flex-direction: column;
+
+    background-color: #f4f6f8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 5px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+/* Updates Div */
+.updatesDiv {
+    position: fixed;
+    left: 495px;
+    top: 65px;
+    width: 600px;
+    background-color: #f4f6f8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+
+.updatesDiv h3 {
+    margin-top: 0;
+    color: #2C3E50;
+}
+
+.updateItem {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.updateItem h3 {
+  color: #2C3E50;
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+
+.updateItem ul {
+  list-style-type: disc;
+  list-style-position: outside;
+  margin: 6px 0 6px 1.5em;
+  padding-left: 1.5em;
+}
+
+.updateItem li {
+  display: list-item !important;
+  margin-bottom: 2px;
+}
+
+#updatesContainer {
+  background-color: #f4f6f8;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  line-height: 1.4;
 }
 
 table {
@@ -154,7 +240,7 @@ td:last-child {
 }
 
 .form1Div {
-    width: 470px; 
+    width: 455px; 
 }
 
 .form1DivHeader {
@@ -265,8 +351,8 @@ button.form1-button {
 }
 
 .form2Div {
-    width: 470px; 
-    margin-bottom: 50px;
+    width: 455px; 
+    margin-bottom: 5px;
 }
 
 .buttonDiv {
@@ -934,10 +1020,62 @@ button:active {
     transform: scale(0.95); 
 }
 
-/* Prevent Users from highlighting the text */
 .noselect {
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+}
+
+/* Ticket Creation Timer */
+.floating-timer {
+    position: fixed;
+    top: 100px;
+    left: 50px;
+    background-color: #F5F7FA;
+    border: 2.5px solid #2C3E50;
+    border-radius: 10px;
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.25),   /* existing dark shadow */
+        0 0 10px rgba(255, 255, 255, 0.5); /* new light outer glow for dark backgrounds */
+    z-index: 9999;
+    width: 180px;
+    text-align: center;
+    cursor: move;
+}
+
+#ticketTimerHeader {
+    background-color: #2C3E50;
+    color: white;
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 7px 7px 0 0;
+    cursor: grab;
+}
+
+#ticketTimerDisplay {
+    font-family: 'Courier New', monospace;
+    font-size: 1.4em;
+    color: #2C3E50;
+    padding: 5px;
+}
+
+.timerButtons {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding-bottom: 7.5px;
+}
+
+#ticketTimerReset {
+    background-color: #1E90FF;
+    border: solid 2px #2C3E50;
+    border-radius: 5px;
+    color: white;
+    width: 70px;
+    cursor: pointer;
+}
+
+#ticketTimerReset:hover {
+    background-color: #1C86EE; 
 }

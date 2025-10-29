@@ -1,6 +1,6 @@
 //script.js
 
-// Standard Notes Generator Version 5.2.151025
+// Standard Notes Generator Version 5.2.291025
 // Developed & Designed by: QA Ryan
 
 let lobSelect, vocSelect, intentSelect;
@@ -365,7 +365,7 @@ function getFieldValueIfVisible(fieldName) {
     let value = field.value.trim();
 
     if (field.tagName.toLowerCase() === "textarea") {
-        value = value.replace(/\n/g, " / ");
+        value = value.replace(/\n/g, "/ ");
     }
 
     return value;
@@ -516,7 +516,7 @@ function createForm2() {
     ]
 
     const mrtForms = [
-        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7"
+        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7", "form300_8"
     ];
 
     const streamAppsForms = [
@@ -774,28 +774,28 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
 
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
+            // const li1 = document.createElement("li");
+            // li1.textContent = "Please fill out all required fields.";
+            // ul.appendChild(li1);
 
-            const li2 = document.createElement("li");
-            li2.textContent = "Click the correct button to ensure the proper formatting is applied based on the tool you're using to create your notes.";
-            ul.appendChild(li2);
+            // const li2 = document.createElement("li");
+            // li2.textContent = "Click the correct button to ensure the proper formatting is applied based on the tool you're using to create your notes.";
+            // ul.appendChild(li2);
 
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
+            // const li3 = document.createElement("li");
+            // li3.textContent = "Ensure that the information is accurate.";
+            // ul.appendChild(li3);
 
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
+            // const li4 = document.createElement("li");
+            // li4.textContent = "Please review your inputs before generating the notes.";
+            // ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -1155,28 +1155,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -1512,7 +1496,7 @@ function createForm2() {
                 "CEP Affected Services Tab"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Also available in DMS."},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
             { label: "Modem Lights Status", type: "select", name: "modemLights", options: [
                 "", 
                 "Red Power Light", 
@@ -1521,6 +1505,9 @@ function createForm2() {
                 "Red LOS",
                 "NO LOS light / Power and PON Lights Steady Green"
             ]},
+            // BSMP/Clearview
+            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
+            { label: "Latest Real-Time Request (L2)", type: "text", name: "rtaRequest"},
             // NMS Skin
             { label: "ONU Status/RUNSTAT", type: "select", name: "onuRunStats", options: [
                 "", 
@@ -1532,7 +1519,7 @@ function createForm2() {
                 "Power is Down",
                 "/N/A"
             ]},
-            { label: "RX Power (L2)", type: "number", name: "rxPower", step: "any"},
+            { label: "RX Power", type: "number", name: "rxPower", step: "any"},
             { label: "VLAN (L2)", type: "text", name: "vlan"},
             { label: "Option82 Config", type: "select", name: "option82Config", options: [
                 "", 
@@ -1540,8 +1527,6 @@ function createForm2() {
                 "Misaligned"
             ]},
             { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Leave this field blank if no action was taken." },
-            // BSMP/Clearview
-            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Without FTTH Line Problem - OLT to LCP, LCP to NAP, NAP to ONU" },
             { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “NDT-NIC with red LOS” DO NOT input the WOCAS!"},
             { label: "Troubleshooting/ Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
@@ -1652,28 +1637,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -2008,10 +1977,10 @@ function createForm2() {
             if (facility.value === "Fiber") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
                     showFields(["onuSerialNum", "modemLights", "actualExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "issueResolved"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "issueResolved"]);
 
                     if (channelField.value === "CDT-SOCMED") {
                         showFields(["resolution"]);
@@ -2020,15 +1989,15 @@ function createForm2() {
                     }
                 } else {
                     showFields(["onuSerialNum", "modemLights", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 }
             } else if (facility.value === "Fiber - Radius") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
                     showFields(["remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "cvReading", "actualExp", "issueResolved"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "cvReading", "rtaRequest", "actualExp", "issueResolved"]);
 
                     if (channelField.value === "CDT-SOCMED") {
                         showFields(["resolution"]);
@@ -2037,7 +2006,7 @@ function createForm2() {
                     }
                 } else {
                     alert("This form is currently unavailable for customers with Fiber - Radius service.");
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
 
                     const facilityField = document.querySelector('[name="facility"]');
                     if (facilityField) facilityField.value = "";
@@ -2045,10 +2014,10 @@ function createForm2() {
                 }
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "issueResolved", "resolution", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "issueResolved", "resolution", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             }
             updateToolLabelVisibility();
         });
@@ -2058,13 +2027,13 @@ function createForm2() {
             if (resType.value === "Yes") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else {
                     alert("This form is currently unavailable for customers with Fiber - DSL service.");
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
 
                     const resTypeField = document.querySelector('[name="resType"]');
                     if (resTypeField) resTypeField.value = "";
@@ -2072,7 +2041,7 @@ function createForm2() {
                 }
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             }
             updateToolLabelVisibility();
         });
@@ -2081,7 +2050,7 @@ function createForm2() {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "actualExp", "issueResolved", "availability", "address", "landmarks"]);
+                hideSpecificFields(["onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "issueResolved", "availability", "address", "landmarks"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -2090,10 +2059,10 @@ function createForm2() {
                 }
             } else {
                 if (facility.value === "Fiber") {
-                    showFields(["onuSerialNum", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "actualExp", "remarks", "issueResolved"]);
+                    showFields(["onuSerialNum", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved"]);
                     hideSpecificFields(["outageReference", "pcNumber", "option82Config", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else {
-                    showFields(["onuSerialNum", "modemLights", "cvReading", "remarks", "issueResolved"]);
+                    showFields(["onuSerialNum", "modemLights", "cvReading", "rtaRequest", "remarks", "issueResolved"]);
                     hideSpecificFields(["outageReference", "pcNumber", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "option82Config", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 }
                 
@@ -2164,7 +2133,7 @@ function createForm2() {
                 "CEP Affected Services Tab"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum"},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
             { label: "Modem Lights Status", type: "select", name: "modemLights", options: [
                 "", 
                 "Red Power Light", 
@@ -2300,28 +2269,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -2702,32 +2655,43 @@ function createForm2() {
                 "Clearview"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
-            { label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
+            // { label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
+            //     "", 
+            //     "FEOL", 
+            //     "HUOL"
+            // ]},
+            // { label: "Modem Brand", type: "select", name: "modemBrand", options: [
+            //     "", 
+            //     "FHTT", 
+            //     "HWTC", 
+            //     "ZTEG",
+            //     "AZRD",
+            //     "PRLN",
+            //     "Other Brands"
+            // ]},
+            // { label: "ONU Connection Type", type: "select", name: "onuConnectionType", options: [
+            //     "", 
+            //     "InterOp", 
+            //     "Non-interOp"
+            // ]},
+            { label: "ONU Model (L2)", type: "text", name: "onuModel", placeholder: "Available in DMS."},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
+            { label: "Internet Light Status", type: "select", name: "intLightStatus", options: [
                 "", 
-                "FEOL", 
-                "HUOL"
+                "Steady Green", 
+                "Blinking Green",
+                "No Light",
+                "No Internet Light Indicator"
             ]},
-            { label: "Modem Brand", type: "select", name: "modemBrand", options: [
-                "", 
-                "FHTT", 
-                "HWTC", 
-                "ZTEG",
-                "AZRD",
-                "PRLN",
-                "Other Brands"
-            ]},
-            { label: "ONU Connection Type", type: "select", name: "onuConnectionType", options: [
-                "", 
-                "InterOp", 
-                "Non-interOp"
-            ]},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Also available in DMS."},
-            { label: "Internet/WAN Light Status", type: "select", name: "intWanLightStatus", options: [
+            { label: "WAN Light Status", type: "select", name: "wanLightStatus", options: [
                 "", 
                 "Steady Green", 
                 "Blinking Green",
                 "No Light"
             ]},
+            // Clearview
+            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
+            { label: "Latest Real-Time Request (L2)", type: "text", name: "rtaRequest"},
             // NMS Skin
             { label: "ONU Status/RUNSTAT", type: "select", name: "onuRunStats", options: [
                 "", 
@@ -2739,43 +2703,40 @@ function createForm2() {
                 "Power is Down",
                 "/N/A"
             ]},
-            { label: "RX Power/OPTICSRXPOWER", type: "number", name: "rxPower", step: "any"},
-            { label: "VLAN", type: "text", name: "vlan"},
-            { label: "IP Address", type: "text", name: "ipAddress"},
-            { label: "No. of Connected Devices", type: "text", name: "connectedDevices", placeholder: "e.g. 2 on 2.4G, 3 on 5G"},
-            { label: "Option82 Config", type: "select", name: "option82Config", options: [
+            { label: "RX Power", type: "number", name: "rxPower", step: "any", placeholder: "Also available in DMS"},
+            { label: "VLAN (L2)", type: "text", name: "vlan", placeholder: "Also available in DMS"},
+            { label: "IP Address (L2)", type: "text", name: "ipAddress", placeholder: "Also available in DMS"},
+            { label: "No. of Conn. Devices (L2)", type: "text", name: "connectedDevices", placeholder: "Also available in DMS"},
+            { label: "Option82 Config (L2)", type: "select", name: "option82Config", options: [
                 "", 
                 "Aligned", 
                 "Misaligned"
             ]},
             { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Leave this field blank if no action was taken." },
-            // Clearview
-            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Without FTTH Line Problem - OLT to LCP, LCP to NAP, NAP to ONU" },
             // DMS
-            { label: "DMS Internet Status (L2)", type: "select", name: "dmsStatus", options: ["", "Online", "Offline" ]},
-            { label: "ONU Model (L2)", type: "text", name: "onuModel"},
-            { label: "WiFi State", type: "select", name: "dmsWifiState", options: [
-                "", 
-                "On", 
-                "Off"
-            ]},
-            { label: "LAN Port Status", type: "select", name: "dmsLanPortStatus", options: [
-                "", 
-                "Disabled", 
-                "Enabled"
-            ]},
+            { label: "Internet/Data Status(L2)", type: "select", name: "dmsInternetStatus", options: ["", "Online", "Offline" ]},
             { label: "Performed Self Heal?", type: "select", name: "dmsSelfHeal", options: [
                 "", 
-                "Yes - Resolved", 
-                "Yes - Unresolved", 
+                "Yes/Resolved", 
+                "Yes/Unresolved", 
                 "No"
             ]},
-            { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken." },
+            { label: "Other Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken." },
             // Probing
             { label: "Connection Method", type: "select", name: "connectionMethod", options: [
                 "", 
                 "WiFi", 
                 "LAN"
+            ]},
+            { label: "WiFi State (DMS)", type: "select", name: "dmsWifiState", options: [
+                "", 
+                "On", 
+                "Off"
+            ]},
+            { label: "LAN Port Status (DMS)", type: "select", name: "dmsLanPortStatus", options: [
+                "", 
+                "Disabled", 
+                "Enabled"
             ]},
             { label: "Mesh Type", type: "select", name: "meshtype", options: [
                 "", 
@@ -2814,6 +2775,11 @@ function createForm2() {
                 "Zone",
                 "Network / Outage"
             ]},
+            { label: "Tested Ok? (Y/N)", type: "select", name: "testedOk", options: [
+                "", 
+                "Yes", 
+                "No"
+            ] },
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
                 "— Modem Light Status —",
@@ -2899,28 +2865,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -3030,7 +2980,7 @@ function createForm2() {
         insertToolLabel(enhancedFields, "NMS Skin", ["onuRunStats", "nmsSkinRemarks"]);
         insertNoteRow(enhancedFields, "toolLabel-nms-skin");
         insertToolLabel(enhancedFields, "BSMP/Clearview", "cvReading");
-        insertToolLabel(enhancedFields, "DMS", ["dmsStatus", "dmsRemarks"]);
+        insertToolLabel(enhancedFields, "DMS", "dmsInternetStatus");
         insertToolLabel(enhancedFields, "Probe & Troubleshoot", ["connectionMethod", "meshtype"]);
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
@@ -3069,17 +3019,17 @@ function createForm2() {
                 const ulNote = document.createElement("ul");
                 ulNote.className = "note";
 
+                const li1 = document.createElement("li");
+                li1.textContent = "For the InterOp ONU connection type, only the Running ONU Statuses and RX parameters have values on the NMS Skin while VLAN, IP Address and Connected Users/Online Devices normally have no values. However, these parameters can be checked using DMS.";
+                ulNote.appendChild(li1);
+
                 const li2 = document.createElement("li");
-                li2.textContent = "For the InterOp ONU connection type, only the Running ONU Statuses and RX parameters have values on the NMS Skin while VLAN, IP Address and Connected Users/Online Devices normally have no values. However, these parameters can be checked using DMS.";
+                li2.textContent = "If the ONU Status/RUNSTAT is not “Up” or “Active,” proceed with the No Dial Tone and No Internet Connection intent and follow the corresponding work instructions.";
                 ulNote.appendChild(li2);
 
                 const li3 = document.createElement("li");
-                li3.textContent = "If the ONU Status/RUNSTAT is not “Up” or “Active,” proceed with the No Dial Tone and No Internet Connection intent and follow the corresponding work instructions.";
+                li3.textContent = "Check Option82 configuration in NMS Skin (BMSP, SAAA and EAAA), Clearview, CEP, and FUSE.";
                 ulNote.appendChild(li3);
-
-                const li1 = document.createElement("li");
-                li1.textContent = "Check Option82 configuration in NMS Skin (BMSP, SAAA and EAAA), Clearview, CEP, and FUSE.";
-                ulNote.appendChild(li1);
 
                 checklistDiv.appendChild(ulNote);
 
@@ -3279,40 +3229,40 @@ function createForm2() {
         const resType = document.querySelector("[name='resType']");
         const outageStatus = document.querySelector("[name='outageStatus']");
         const onuRunStats = document.querySelector("[name='onuRunStats']");
-        const equipmentBrand = document.querySelector("[name='equipmentBrand']");
+        // const equipmentBrand = document.querySelector("[name='equipmentBrand']");
         const modemBrand = document.querySelector("[name='modemBrand']");
         const onuConnectionType = document.querySelector("[name='onuConnectionType']");
         const connectionMethod = document.querySelector("[name='connectionMethod']");
         const issueResolved = document.querySelector("[name='issueResolved']");
         const resolution = document.querySelector("[name='resolution']");
+        const testedOk = document.querySelector("[name='testedOk']");
 
         facility.addEventListener("change", () => {
             resetAllFields(["facility"]);
             if (facility.value === "Fiber") {
                 if (selectedValue === "form500_1") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else if (selectedValue === "form500_2") {
                     showFields(["nmsSkinRemarks", "dmsRemarks", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "connectionMethod", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "connectionMethod", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 }
 
-                
                 updateToolLabelVisibility();
             } else if (facility.value === "Fiber - Radius") {
                 if (selectedValue === "form500_1") {
                     showFields(["connectionMethod", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "meshtype", "meshOwnership", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else if (selectedValue === "form500_3" || selectedValue === "form500_4") {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else {
                     alert("This form is currently unavailable for customers with Fiber - Radius service.");
                     resetAllFields([]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
 
                     const facilityField = document.querySelector('[name="facility"]');
                     if (facilityField) facilityField.value = "";
@@ -3322,10 +3272,10 @@ function createForm2() {
                 updateToolLabelVisibility();
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             }
 
             updateToolLabelVisibility();
@@ -3336,19 +3286,19 @@ function createForm2() {
             if (resType.value === "Yes") {
                 if (selectedValue=== "form500_1") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else if (selectedValue === "form500_2") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 }
                 
                 updateToolLabelVisibility();
             } else {
                 showFields(["remarks", "issueResolved"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             }
 
             updateToolLabelVisibility();
@@ -3357,14 +3307,14 @@ function createForm2() {
         outageStatus.addEventListener("change", () => {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (selectedValue === "form500_1" && facility.value === "Fiber" && outageStatus.value === "No") {
-                showFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "onuRunStats", "rxPower", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "vlan", "ipAddress", "connectedDevices", "option82Config", "dmsWifiState", "dmsLanPortStatus", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "remarks", "issueResolved"]);
+                hideSpecificFields(["outageReference", "pcNumber", "option82Config", "dmsWifiState", "dmsLanPortStatus", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else if (selectedValue === "form500_1" && facility.value === "Copper VDSL" && outageStatus.value === "No") {
-                showFields(["onuSerialNum", "intWanLightStatus", "connectionMethod", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["onuSerialNum", "intLightStatus", "wanLightStatus", "connectionMethod", "remarks", "issueResolved"]);
+                hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intWanLightStatus", "onuRunStats", "option82Config", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "dmsStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "issueResolved", "availability", "address", "landmarks"]);
+                hideSpecificFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "onuRunStats", "option82Config", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks"]);
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
                 } else {
@@ -3383,47 +3333,47 @@ function createForm2() {
             updateToolLabelVisibility();
         });
 
-        function updateONUConnectionType() {
-            if (!equipmentBrand.value || !modemBrand.value) {
-                onuConnectionType.value = ""; 
-                onuConnectionType.dispatchEvent(new Event("change")); 
-                return;
-            }
+        // function updateONUConnectionType() {
+        //     if (!equipmentBrand.value || !modemBrand.value) {
+        //         onuConnectionType.value = ""; 
+        //         onuConnectionType.dispatchEvent(new Event("change")); 
+        //         return;
+        //     }
 
-            const newValue =
-                (equipmentBrand.value === "FEOL" && modemBrand.value === "FHTT") ||
-                (equipmentBrand.value === "HUOL" && modemBrand.value === "HWTC")
-                    ? "Non-interOp"
-                    : "InterOp";
+        //     const newValue =
+        //         (equipmentBrand.value === "FEOL" && modemBrand.value === "FHTT") ||
+        //         (equipmentBrand.value === "HUOL" && modemBrand.value === "HWTC")
+        //             ? "Non-interOp"
+        //             : "InterOp";
 
-            if (onuConnectionType.value !== newValue) {
-                onuConnectionType.value = ""; 
-                onuConnectionType.dispatchEvent(new Event("change")); 
+        //     if (onuConnectionType.value !== newValue) {
+        //         onuConnectionType.value = ""; 
+        //         onuConnectionType.dispatchEvent(new Event("change")); 
 
-                setTimeout(() => {
-                    onuConnectionType.value = newValue; 
-                    onuConnectionType.dispatchEvent(new Event("change")); 
-                }, 0);
-            }
-        }
+        //         setTimeout(() => {
+        //             onuConnectionType.value = newValue; 
+        //             onuConnectionType.dispatchEvent(new Event("change")); 
+        //         }, 0);
+        //     }
+        // }
 
-        onuConnectionType.addEventListener("mousedown", (event) => {
-            event.preventDefault();
-        });
+        // onuConnectionType.addEventListener("mousedown", (event) => {
+        //     event.preventDefault();
+        // });
 
-        equipmentBrand.addEventListener("change", updateONUConnectionType);
-        modemBrand.addEventListener("change", updateONUConnectionType);
+        // equipmentBrand.addEventListener("change", updateONUConnectionType);
+        // modemBrand.addEventListener("change", updateONUConnectionType);
 
-        updateONUConnectionType();
+        // updateONUConnectionType();
 
-        onuConnectionType.addEventListener("change", () => {
-            if (onuConnectionType.value === "Non-interOp") {
-                showFields(["vlan", "ipAddress", "connectedDevices"]);
-            } else {
-                hideSpecificFields(["vlan", "ipAddress", "connectedDevices"]);
-            }
-            updateToolLabelVisibility();
-        });
+        // onuConnectionType.addEventListener("change", () => {
+        //     if (onuConnectionType.value === "Non-interOp") {
+        //         showFields(["vlan", "ipAddress", "connectedDevices"]);
+        //     } else {
+        //         hideSpecificFields(["vlan", "ipAddress", "connectedDevices"]);
+        //     }
+        //     updateToolLabelVisibility();
+        // });
     
         connectionMethod.addEventListener("change", () => {
             if (connectionMethod.value === "WiFi") {
@@ -3440,30 +3390,40 @@ function createForm2() {
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+
+                if (channelField.value === "CDT-SOCMED") {
+                    showFields(["resolution"]);
+                    hideSpecificFields(["testedOk"]);
+                } else {
+                    showFields(["testedOk"]);
+                    hideSpecificFields(["resolution"]);
+                }
             } else {
                 showFields(["upsell"]);
-                hideSpecificFields(["resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
-            }
+                hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
 
-            if (channelField.value === "CDT-SOCMED") {
-                showFields(["resolution"]);
-            } else {
-                hideSpecificFields(["resolution"]);
+                if (channelField.value === "CDT-SOCMED") {
+                    showFields(["resolution"]);
+                } else {
+                    hideSpecificFields(["resolution"]);
+                }
             }
             updateToolLabelVisibility();
         });
 
-        resolution.addEventListener("change", () => {
-            if (resolution.value === "Tested Ok") {
+        function testedOkReso() {
+            if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
                 hideSpecificFields(["availability", "address", "landmarks"]);
             } else {
                 showFields(["availability", "address", "landmarks"]);
             }
             updateToolLabelVisibility();
-        });
+        }
+
+        resolution.addEventListener("change", testedOkReso);
+        testedOk.addEventListener("change", testedOkReso);
 
         updateToolLabelVisibility();
-
     } else if (sicForms.includes(selectedValue)) { 
         const table = document.createElement("table");
 
@@ -3491,20 +3451,30 @@ function createForm2() {
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
             { label: "Plan Details (L2)", type: "textarea", name: "planDetails", placeholder: "Please specify the plan details as indicated in FUSE.\ne.g. “Plan 2699 at 1GBPS”" },
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Also available in DMS."},
+            { label: "ONU Model (L2)", type: "text", name: "onuModel", placeholder: "Available in DMS."},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
             // NMS Skin
-            { label: "RX Power/OPTICSRXPOWER", type: "number", name: "rxPower", step: "any", placeholder: "Also available in Clearview."},
+            { label: "RX Power", type: "number", name: "rxPower", step: "any", placeholder: "Also available in Clearview."},
+            { label: "Option82 Config", type: "select", name: "option82Config", options: [
+                "", 
+                "Aligned", 
+                "Misaligned"
+            ]},
             { label: "SAAA Bandwidth Code (L2)", type: "text", name: "saaaBandwidthCode"},
             { label: "Connected Devices (L2)", type: "text", name: "connectedDevices", placeholder: "e.g. 2 on 2.4G, 3 on 5G, 2 LAN(Desktop/Laptop and Mesh)"},
             { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Leave this field blank if no action was taken." },
-            // BSMP/Clearview
-            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Without FTTH Line Problem - OLT to LCP, LCP to NAP, NAP to ONU" },
             // DMS
-            { label: "ONU Model", type: "text", name: "onuModel"},
-            { label: "DMS Internet Status (L2)", type: "select", name: "dmsStatus", options: ["", "Online", "Offline" ]},
-            { label: "WiFi Band of the Device (L2)", type: "text", name: "deviceWifiBand", placeholder: "e.g. Device used found in 5G WiFi" },
-            { label: "Bandsteering (L2)", type: "select", name: "bandsteering", options: ["", "Yes - Single Band", "No - Dual Band"]},
+            { label: "Internet/Data Status(L2)", type: "select", name: "dmsInternetStatus", options: ["", "Online", "Offline" ]},
+            { label: "WiFi Band of the Device (L2)", type: "select", name: "deviceWifiBand", options: [
+                "", 
+                "Device Found in 2.4G Wi-Fi", 
+                "Device Found in 5G Wi-Fi" 
+            ]},
+            { label: "Bandsteering (L2)", type: "select", name: "bandsteering", options: ["", "Enabled", "Disabled"]},
             { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken." },
+            // BSMP/Clearview
+            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
+            { label: "Latest Real-Time Request (L2)", type: "text", name: "rtaRequest"},
             // Probing
             { label: "Connection Method", type: "select", name: "connectionMethod", options: [
                 "", 
@@ -3537,6 +3507,11 @@ function createForm2() {
                 "Zone",
                 "Network / Outage"
             ]},
+            { label: "Tested Ok? (Y/N)", type: "select", name: "testedOk", options: [
+                "", 
+                "Yes", 
+                "No"
+            ] },
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
                 "— Modem Light Status —",
@@ -3608,28 +3583,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -3731,7 +3690,7 @@ function createForm2() {
         insertToolLabel(enhancedFields, "NMS Skin", "rxPower");
         insertNoteRow(enhancedFields, "toolLabel-nms-skin");
         insertToolLabel(enhancedFields, "BSMP/Clearview", "cvReading");
-        insertToolLabel(enhancedFields, "DMS", "onuModel");
+        insertToolLabel(enhancedFields, "DMS", "dmsInternetStatus");
         insertToolLabel(enhancedFields, "Probe & Troubleshoot", "connectionMethod");
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
@@ -3999,22 +3958,23 @@ function createForm2() {
         const connectionMethod = document.querySelector("[name='connectionMethod']");
         const issueResolved = document.querySelector("[name='issueResolved']");
         const resolution = document.querySelector("[name='resolution']");
+        const testedOk = document.querySelector("[name='testedOk']");
 
         facility.addEventListener("change", () => {
             resetAllFields(["facility"]);
             if (facility.value === "Fiber") {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["resType", "planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 updateToolLabelVisibility(); 
             } else if (facility.value === "Fiber - Radius") {
                 showFields(["planDetails", "connectionMethod", "pingTestResult", "speedTestResult", "remarks", "issueResolved"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks","issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks","issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution" ,"issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "testedOk" ,"issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             }
             updateToolLabelVisibility(); 
         });
@@ -4023,10 +3983,10 @@ function createForm2() {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             }
             updateToolLabelVisibility(); 
         });
@@ -4035,7 +3995,7 @@ function createForm2() {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["planDetails", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "availability", "address", "landmarks"]);
+                hideSpecificFields(["planDetails", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -4044,12 +4004,12 @@ function createForm2() {
                 }
             } else {
                 if (facility.value === "Fiber") {
-                    showFields(["planDetails", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resolution", "investigation1", "investigation2", "investigation3", "investigation4", "outageReference", "pcNumber", "deviceBrandAndModel", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    showFields(["planDetails", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved"]);
+                    hideSpecificFields(["resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "outageReference", "pcNumber", "deviceBrandAndModel", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
 
                 } else {
                     showFields(["planDetails", "connectionMethod", "pingTestResult", "speedTestResult", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "rxPower", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "onuModel", "dmsStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "deviceBrandAndModel", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);   
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);   
                 }
                 updateToolLabelVisibility(); 
             }
@@ -4068,30 +4028,40 @@ function createForm2() {
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+
+                if (channelField.value === "CDT-SOCMED") {
+                    showFields(["resolution"]);
+                    hideSpecificFields(["testedOk"]);
+                } else {
+                    showFields(["testedOk"]);
+                    hideSpecificFields(["resolution"]);
+                }
             } else {
                 showFields(["upsell"]);
-                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
-            }
+                hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
 
-            if (channelField.value === "CDT-SOCMED") {
-                showFields(["resolution"]);
-            } else {
-                hideSpecificFields(["resolution"]);
+                if (channelField.value === "CDT-SOCMED") {
+                    showFields(["resolution"]);
+                } else {
+                    hideSpecificFields(["resolution"]);
+                }
             }
-            updateToolLabelVisibility(); 
+            updateToolLabelVisibility();
         });
 
-        resolution.addEventListener("change", () => {
-            if (resolution.value === "Tested Ok") {
+        function testedOkReso() {
+            if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
                 hideSpecificFields(["availability", "address", "landmarks"]);
             } else {
                 showFields(["availability", "address", "landmarks"]);
             }
             updateToolLabelVisibility();
-        });
+        }
+
+        resolution.addEventListener("change", testedOkReso);
+        testedOk.addEventListener("change", testedOkReso);
 
         updateToolLabelVisibility();
-
     } else if (selectedValue === "form501_5" || selectedValue === "form501_6") { 
         const table = document.createElement("table");
 
@@ -4105,11 +4075,12 @@ function createForm2() {
                 "Clearview"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Also available in DMS."},
-            // NMS Skin
-            { label: "RX Power/OPTICSRXPOWER", type: "number", name: "rxPower", step: "any"},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
             // BSMP/Clearview
-            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Without FTTH Line Problem - OLT to LCP, LCP to NAP, NAP to ONU" },
+            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
+            { label: "Latest Real-Time Request (L2)", type: "text", name: "rtaRequest"},
+            // NMS Skin
+            { label: "RX Power", type: "number", name: "rxPower", step: "any"},
             // Probing & Remote Troubleshooting
             { label: "Specific Timeframe", type: "text", name: "specificTimeframe", placeholder: "High latency/lag is being experienced."},
             { label: "Ping Test Result", type: "text", name: "pingTestResult", placeholder: "Speedtest"},
@@ -4191,28 +4162,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -4606,7 +4561,7 @@ function createForm2() {
             resetAllFields(["outageStatus"]);
             if (outageStatus.value === "Yes") {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["onuSerialNum", "rxPower", "cvReading", "specificTimeframe", "pingTestResult", "gameNameAndServer", "gameServerIP", "pingTestResult2", "traceroutePLDT", "tracerouteExt", "issueResolved", "availability", "address", "landmarks"]);
+                hideSpecificFields(["onuSerialNum", "rxPower", "cvReading", "rtaRequest", "specificTimeframe", "pingTestResult", "gameNameAndServer", "gameServerIP", "pingTestResult2", "traceroutePLDT", "tracerouteExt", "issueResolved", "availability", "address", "landmarks"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -4614,7 +4569,7 @@ function createForm2() {
                     hideSpecificFields(["resolution"]);
                 }
             } else if (outageStatus.value === "No") {
-                showFields(["onuSerialNum", "rxPower", "cvReading", "specificTimeframe", "pingTestResult", "gameNameAndServer", "gameServerIP", "pingTestResult2", "traceroutePLDT", "tracerouteExt", "remarks", "issueResolved"]);
+                showFields(["onuSerialNum", "rxPower", "cvReading", "rtaRequest", "specificTimeframe", "pingTestResult", "gameNameAndServer", "gameServerIP", "pingTestResult2", "traceroutePLDT", "tracerouteExt", "remarks", "issueResolved"]);
                 hideSpecificFields(["outageReference", "pcNumber", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             }
             updateToolLabelVisibility();
@@ -4667,7 +4622,7 @@ function createForm2() {
             { label: "RX Power (L2)", type: "number", name: "rxPower", step: "any"},
             { label: "IP Address (L2)", type: "text", name: "ipAddress"},
             // DMS
-            { label: "DMS Internet Status (L2)", type: "select", name: "dmsStatus", options: ["", "Online", "Offline" ]},
+            { label: "Internet/Data Status(L2)", type: "select", name: "dmsInternetStatus", options: ["", "Online", "Offline" ]},
             { label: "Connected Devices (L2)", type: "text", name: "connectedDevices"},
             // Probe & Troubleshoot
             { label: "Website/App/VPN Name", type: "textarea", name: "websiteURL", placeholder: "Complete site address or name of Application or VPN"}, 
@@ -4719,6 +4674,11 @@ function createForm2() {
                 "Request Timed Out",
                 "Webpage Not Loading"
             ]},
+            { label: "Tested Ok? (Y/N)", type: "select", name: "testedOk", options: [
+                "", 
+                "Yes", 
+                "No"
+            ] },
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
                 "— Modem Light Status —",
@@ -4771,28 +4731,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -4881,7 +4825,7 @@ function createForm2() {
         insertToolLabel(enhancedFields, "Visual Audit", "facility");
         insertEscaChecklistRow(enhancedFields, "outageStatus");
         insertToolLabel(enhancedFields, "NMS Skin", "rxPower");
-        insertToolLabel(enhancedFields, "DMS", "dmsStatus");
+        insertToolLabel(enhancedFields, "DMS", "dmsInternetStatus");
         insertToolLabel(enhancedFields, "Probe & Troubleshoot", "websiteURL");
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
@@ -5049,15 +4993,17 @@ function createForm2() {
         const outageStatus = document.querySelector("[name='outageStatus']");
         const itSupport = document.querySelector("[name='itSupport']");
         const issueResolved = document.querySelector("[name='issueResolved']");
+        const resolution = document.querySelector("[name='resolution']");
+        const testedOk = document.querySelector("[name='testedOk']");
 
         facility.addEventListener("change", () => {
             resetAllFields(["facility"]);
             if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else if (facility.value === "Copper HDSL/NGN") {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -5066,7 +5012,7 @@ function createForm2() {
                 }
             } else {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["resType", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             }
             updateToolLabelVisibility();
         });
@@ -5075,10 +5021,10 @@ function createForm2() {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["outageReference", "pcNumber", "rxPower", "ipAddress", "dmsStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -5094,7 +5040,7 @@ function createForm2() {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["rxPower", "ipAddress", "dmsStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "availability", "address", "landmarks"]);
+                hideSpecificFields(["rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "testedOk", "availability", "address", "landmarks"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -5102,11 +5048,11 @@ function createForm2() {
                     hideSpecificFields(["resolution"]);
                 }
             } else if (facility.value === "Fiber" && outageStatus.value === "No") {
-                showFields(["rxPower", "ipAddress", "dmsStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "itRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "remarks", "issueResolved"]);
+                hideSpecificFields(["outageReference", "pcNumber", "itRemarks", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else if ((facility.value === "Fiber - Radius" || facility.value === "Copper VDSL") && outageStatus.value === "No") {
                 showFields(["websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "rxPower", "ipAddress", "dmsStatus", "connectedDevices", "itRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "itRemarks", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             }
             updateToolLabelVisibility();
         });
@@ -5122,30 +5068,40 @@ function createForm2() {
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+
+                if (channelField.value === "CDT-SOCMED") {
+                    showFields(["resolution"]);
+                    hideSpecificFields(["testedOk"]);
+                } else {
+                    showFields(["testedOk"]);
+                    hideSpecificFields(["resolution"]);
+                }
             } else {
                 showFields(["upsell"]);
-                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
-            }
+                hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
 
-            if (channelField.value === "CDT-SOCMED") {
-                showFields(["resolution"]);
-            } else {
-                hideSpecificFields(["resolution"]);
+                if (channelField.value === "CDT-SOCMED") {
+                    showFields(["resolution"]);
+                } else {
+                    hideSpecificFields(["resolution"]);
+                }
             }
             updateToolLabelVisibility();
         });
 
-        resolution.addEventListener("change", () => {
-            if (resolution.value === "Tested Ok") {
+        function testedOkReso() {
+            if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
                 hideSpecificFields(["availability", "address", "landmarks"]);
             } else {
                 showFields(["availability", "address", "landmarks"]);
             }
             updateToolLabelVisibility();
-        });
+        }
+
+        resolution.addEventListener("change", testedOkReso);
+        testedOk.addEventListener("change", testedOkReso);
 
         updateToolLabelVisibility();
-
     } else if (iptvForms.includes(selectedValue)) { 
         const table = document.createElement("table");
 
@@ -5182,7 +5138,7 @@ function createForm2() {
                 "InterOp", 
                 "Non-interOp"
             ]},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Also available in DMS."},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
             // NMS Skin
             { label: "ONU Status/RUNSTAT", type: "select", name: "onuRunStats", options: [
                 "", 
@@ -5194,7 +5150,7 @@ function createForm2() {
                 "Power is Down",
                 "/N/A"
             ]},
-            { label: "RX Power/OPTICSRXPOWER", type: "number", name: "rxPower", step: "any"},
+            { label: "RX Power", type: "number", name: "rxPower", step: "any"},
             { label: "WAN NAME_3", type: "text", name: "wanName_3"},
             { label: "SRVCTYPE_3", type: "text", name: "srvcType_3"},
             { label: "CONNTYPE_3", type: "text", name: "connType_3"},
@@ -5269,6 +5225,7 @@ function createForm2() {
                 "FCR - Too long to Boot Up",
                 "Freeze",
                 "Loop Back",
+                "No Audio/Video Output w/ Test Channel",
                 "No Audio/Video Output w/o Test Channel",
                 "Not Applicable [via Store]",
                 "Out-of-Sync",
@@ -5306,28 +5263,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -5830,28 +5771,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -6106,6 +6031,7 @@ function createForm2() {
                 "Change set-up Route to Bridge and Vice Versa",
                 "Change set-up Route to Bridge and Vice Versa [InterOP]",
                 "Data Bind Port",
+                "Device and Website IP Configuration",
                 "FCR - Change WiFi SSID UN/PW",
                 "Not Applicable [via Store]",
                 "Request Modem/ONU GUI Access",
@@ -6146,28 +6072,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -6289,7 +6199,7 @@ function createForm2() {
                         optionsToUse = [field.options[0], field.options[1], field.options[2], field.options[3]];
                     } else if (["form300_3"].includes(selectedValue)) {
                         optionsToUse = [field.options[0], field.options[3]];
-                    } else if (["form300_4", "form300_5", "form300_7"].includes(selectedValue)) {
+                    } else if (["form300_4", "form300_5", "form300_7", "form300_8"].includes(selectedValue)) {
                         optionsToUse = [field.options[0], field.options[1], field.options[3]];
                     } else if (["form300_6"].includes(selectedValue)) {
                         optionsToUse = [field.options[0], field.options[1], field.options[3]];
@@ -6515,46 +6425,6 @@ function createForm2() {
             ]}
         ];
 
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions";
-            
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(header);
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
-
         function createDefinitionRow() {
             const row = document.createElement("tr");
             const td = document.createElement("td");
@@ -6731,8 +6601,7 @@ function createForm2() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
+
         fields.forEach((field, index) => {
             if (field.name === "custConcern") {
                 table.appendChild(createDefinitionRow());
@@ -6802,45 +6671,6 @@ function createForm2() {
                 "NA - Not Eligible"
             ]}
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
 
         function createDefinitionRow() {
             const row = document.createElement("tr");
@@ -7044,7 +6874,6 @@ function createForm2() {
             return row;
         }
         
-        table.appendChild(createInstructionsRow()); 
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -7108,45 +6937,6 @@ function createForm2() {
                 "NA - Not Eligible"
             ]}
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
 
         function createDefinitionRow() {
             const row = document.createElement("tr");
@@ -7308,8 +7098,6 @@ function createForm2() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow());
-
         fields.forEach(field => {
             if (field.name === "custConcern") {
                 table.appendChild(createDefinitionRow());
@@ -7361,45 +7149,6 @@ function createForm2() {
                 "NA - Not Eligible"
             ]}
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
 
         function createPromptRow() {
             const row = document.createElement("tr");
@@ -7502,8 +7251,7 @@ function createForm2() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
+
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -7549,45 +7297,6 @@ function createForm2() {
                 "NA - Not Eligible"
             ]}
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
@@ -7646,8 +7355,7 @@ function createForm2() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
+
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -7682,36 +7390,6 @@ function createForm2() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions";
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            ["Please fill out all required fields.",
-            "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.",
-            "Ensure that the information is accurate.",
-            "Please review your inputs before generating the notes."].forEach(text => {
-            const li = document.createElement("li");
-            li.textContent = text;
-            ul.appendChild(li);
-            });
-
-            instructionsDiv.appendChild(ul);
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-            return row;
-        }
 
         function createPromptRow() {
             const ownershipEl = document.querySelector('[name="ownership"]');
@@ -7853,8 +7531,6 @@ function createForm2() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow());
-
         fields.forEach(field => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -7888,35 +7564,6 @@ function createForm2() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions";
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            ["Please fill out all required fields.",
-            "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.",
-            "Ensure that the information is accurate.",
-            "Please review your inputs before generating the notes."].forEach(text => {
-            const li = document.createElement("li");
-            li.textContent = text;
-            ul.appendChild(li);
-            });
-
-            instructionsDiv.appendChild(ul);
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-            return row;
-        }
 
         function createPromptRow() {
             const ownershipEl = document.querySelector('[name="ownership"]');
@@ -8067,8 +7714,6 @@ function createForm2() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow());
-
         fields.forEach(field => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -8113,35 +7758,6 @@ function createForm2() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions";
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            ["Please fill out all required fields.",
-            "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.",
-            "Ensure that the information is accurate.",
-            "Please review your inputs before generating the notes."].forEach(text => {
-            const li = document.createElement("li");
-            li.textContent = text;
-            ul.appendChild(li);
-            });
-
-            instructionsDiv.appendChild(ul);
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-            return row;
-        }
 
         function createPromptRow() {
             const ownershipEl = document.querySelector('[name="personnelType"]');
@@ -8248,8 +7864,6 @@ function createForm2() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow());
-
         fields.forEach(field => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -8295,46 +7909,6 @@ function createForm2() {
                 "NA - Not Eligible"
             ]}
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions";
-            
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(header);
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
 
         function createDefinitionRow() {
             const row = document.createElement("tr");
@@ -8483,8 +8057,7 @@ function createForm2() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
+
         fields.forEach((field, index) => {
             if (field.name === "custConcern") {
                 table.appendChild(createDefinitionRow());
@@ -8530,45 +8103,6 @@ function createForm2() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
 
         function createDefinitionRow() {
             const row = document.createElement("tr");
@@ -8668,8 +8202,6 @@ function createForm2() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow());
-
         fields.forEach(field => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -8714,45 +8246,6 @@ function createForm2() {
                 "NA - Not Eligible"
             ]}
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
 
         function createDefinitionRow() {
             const row = document.createElement("tr");
@@ -8894,8 +8387,6 @@ function createForm2() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow());
-
         fields.forEach(field => {
             if (field.name === "custConcern") {
                 table.appendChild(createDefinitionRow());
@@ -8942,45 +8433,6 @@ function createForm2() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
 
         function createDefinitionRow() {
             const row = document.createElement("tr");
@@ -9082,8 +8534,6 @@ function createForm2() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow());
-
         fields.forEach(field => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -9122,45 +8572,6 @@ function createForm2() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
 
         function createDefinitionRow() {
             const row = document.createElement("tr");
@@ -9258,8 +8669,6 @@ function createForm2() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow());
-
         fields.forEach(field => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -9335,35 +8744,6 @@ function createForm2() {
                 "NA - Not Eligible"
             ]}
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions";
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            ["Please fill out all required fields.",
-            "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.",
-            "Ensure that the information is accurate.",
-            "Please review your inputs before generating the notes."].forEach(text => {
-                const li = document.createElement("li");
-                li.textContent = text;
-                ul.appendChild(li);
-            });
-
-            instructionsDiv.appendChild(ul);
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-            return row;
-        }
 
         function createDefinitionRow() {
             const row = document.createElement("tr");
@@ -9475,7 +8855,6 @@ function createForm2() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow());
         table.appendChild(createDefinitionRow());
         fields.forEach(field => {
             const row = createFieldRow(field);
@@ -9683,46 +9062,6 @@ function createForm2() {
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
         ];
 
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions";
-            
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(header);
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
-
         function createDefinitionRow() {
             const row = document.createElement("tr");
             const td = document.createElement("td");
@@ -9817,8 +9156,7 @@ function createForm2() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
+
         fields.forEach((field, index) => {
             if (field.name === "custConcern") {
                 table.appendChild(createDefinitionRow());
@@ -9857,45 +9195,6 @@ function createForm2() {
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "E-Solve/Snow Ticket #", type: "text", name: "eSnowTicketNum"},
         ];
-
-        function createInstructionsRow() {
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
-
-            const header = document.createElement("p");
-            header.textContent = "Instructions";
-            header.className = "instructions-header";
-            instructionsDiv.appendChild(header);
-
-            const ul = document.createElement("ul");
-            ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
-
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
 
         function createDefinitionRow() {
             const row = document.createElement("tr");
@@ -9996,7 +9295,6 @@ function createForm2() {
             return row;
         }
         
-        table.appendChild(createInstructionsRow()); 
         table.appendChild(createDefinitionRow()); 
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -10084,28 +9382,12 @@ function createForm2() {
             instructionsDiv.className = "form2DivInstructions"; 
 
             const header = document.createElement("p");
-            header.textContent = "Instructions";
+            header.textContent = "Reference Link";
             header.className = "instructions-header";
             instructionsDiv.appendChild(header);
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Please fill out all required fields.";
-            ul.appendChild(li1);
-
-            const li2 = document.createElement("li");
-            li2.textContent = "If a field is not required, please leave it blank. Avoid entering 'NA' or any unnecessary details.";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Ensure that the information is accurate.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Please review your inputs before generating the notes.";
-            ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -10465,7 +9747,7 @@ function ffupButtonHandler(
             seenFields.add(field.name);
 
             if (fieldElement && fieldElement.tagName.toLowerCase() === "textarea") {
-                value = value.replace(/\n/g, " / ");
+                value = value.replace(/\n/g, "/ ");
             }
 
             switch (field.name) {
@@ -10665,23 +9947,24 @@ function cepCaseTitle() {
         group6: { intents: ["form500_1", "form500_2"], title: "NO INTERNET CONNECTION" },
         group7: { intents: ["form500_3", "form500_4"], title: () => vars.meshtype.toUpperCase() },
         group8: { intents: ["form501_1", "form501_2", "form501_3"], title: "SLOW INTERNET CONNECTION" },
-        group8_1: { intents: ["form501_4"], title: "FREQUENT DISCONNECTION" },
-        group8_2: { intents: ["form501_5"], title: "" },
-        group9: { intents: ["form502_1", "form502_2"], title: "SELECTIVE BROWSING" },
-        group10: { intents: ["form510_1", "form510_2", "form510_3", "form510_4", "form510_5", "form510_6", "form510_7", "form510_8"], title: "IPTV NO AUDIO VIDEO OUTPUT", useAccountType: true },
-        group11: { intents: ["form511_1", "form511_2", "form511_3", "form511_4", "form511_5"], title: "IPTV POOR AUDIO VIDEO QUALITY", useAccountType: true },
-        group12: { intents: ["form512_1", "form512_2", "form512_3"], title: "IPTV MISSING SET-TOP-BOX FUNCTIONS", useAccountType: true },
-        group13: { intents: ["form300_1", "form300_2", "form300_3"], title: "REQUEST MODEM/ONU GUI ACCESS", useAccountType: true },
-        group14: { intents: ["form300_4", "form300_5"], title: "REQUEST CHANGE MODEM ONU CONNECTION MODE", useAccountType: true },
-        group15: { intents: ["form300_6"], title: "REQUEST DATA BIND PORT", useAccountType: true },
-        group16: { intents: ["form300_7"], title: "REQUEST FOR PUBLIC IP", useAccountType: true },
-        group17: { intents: ["formStrmApps_1"], title: "EUFY", useGamma: false },
-        group18: { intents: ["formStrmApps_2"], title: "STREAM TV", useGamma: false },
-        group19: { intents: ["formStrmApps_3"], title: "NETFLIX", useGamma: false },
-        group20: { intents: ["formStrmApps_4"], title: "VIU", useGamma: false },
-        group21: { intents: ["formStrmApps_5"], title: "HBO MAX", useGamma: false },
-        // Always On - Defective modem
-        group22: { intents: ["form500_6"], title: "NO SIM LIGHT", alwaysOn: true },
+        group9: { intents: ["form501_4"], title: "FREQUENT DISCONNECTION" },
+        group10: { intents: ["form501_5"], title: "Gaming - High Latency" },
+        group11: { intents: ["form501_5"], title: "Gaming - Lag" },
+        group12: { intents: ["form502_1", "form502_2"], title: "SELECTIVE BROWSING" },
+        group13: { intents: ["form510_1", "form510_2", "form510_3", "form510_4", "form510_5", "form510_6", "form510_7", "form510_8"], title: "IPTV NO AUDIO VIDEO OUTPUT", useAccountType: true },
+        group14: { intents: ["form511_1", "form511_2", "form511_3", "form511_4", "form511_5"], title: "IPTV POOR AUDIO VIDEO QUALITY", useAccountType: true },
+        group15: { intents: ["form512_1", "form512_2", "form512_3"], title: "IPTV MISSING SET-TOP-BOX FUNCTIONS", useAccountType: true },
+        group16: { intents: ["form300_1", "form300_2", "form300_3"], title: "REQUEST MODEM/ONU GUI ACCESS", useAccountType: true },
+        group17: { intents: ["form300_4", "form300_5"], title: "REQUEST CHANGE MODEM ONU CONNECTION MODE", useAccountType: true },
+        group18: { intents: ["form300_6"], title: "REQUEST DATA BIND PORT", useAccountType: true },
+        group19: { intents: ["form300_7"], title: "REQUEST FOR PUBLIC IP", useAccountType: true },
+        group20: { intents: ["form300_8"], title: "REQUEST FOR PRIVATE IP", useAccountType: true },
+        group21: { intents: ["formStrmApps_1"], title: "EUFY", useGamma: false },
+        group22: { intents: ["formStrmApps_2"], title: "STREAM TV", useGamma: false },
+        group23: { intents: ["formStrmApps_3"], title: "NETFLIX", useGamma: false },
+        group24: { intents: ["formStrmApps_4"], title: "VIU", useGamma: false },
+        group25: { intents: ["formStrmApps_5"], title: "HBO MAX", useGamma: false },
+        group26: { intents: ["form500_6"], title: "NO SIM LIGHT", alwaysOn: true },
     };
 
     for (const group of Object.values(intentGroups)) {
@@ -10691,7 +9974,7 @@ function cepCaseTitle() {
                 : (group.useGamma === false ? "" : (vars.facility === "Fiber - Radius" ? "GAMMA " : ""));
 
             let title;
-            if (vars.selectedIntent === "form501_5") {
+            if (vars.selectedIntent === "form501_5" || vars.selectedIntent === "form501_6") {
                 if ([
                     "Individual Trouble", 
                     "Network Trouble - High Latency", 
@@ -10738,7 +10021,7 @@ function cepCaseDescription(showAddlDetails = true) {
         "form511_1","form511_2","form511_3","form511_4","form511_5",
         "form512_1","form512_2","form512_3",
         "formStrmApps_1","formStrmApps_2","formStrmApps_3","formStrmApps_4","formStrmApps_5",
-        "form300_1","form300_2","form300_3","form300_4","form300_5","form300_6","form300_7"
+        "form300_1","form300_2","form300_3","form300_4","form300_5","form300_6","form300_7", "form300_8"
     ];
 
     let caseDescription = "";
@@ -10747,6 +10030,7 @@ function cepCaseDescription(showAddlDetails = true) {
     const selectedValue = vars.selectedIntent;
     const selectedIntent = document.querySelector("#selectIntent")?.value.trim() || "";
     const reso = document.querySelector('[name="resolution"]')?.value.trim() || "";
+    const testedOk = document.querySelector('[name="testedOk"]')?.value.trim() || "";
     const selectedOption = document.querySelector(`#selectIntent option[value="${selectedValue}"]`);
     const investigation3Index = document.querySelector('[name="investigation3"]');
     const visibleFields = [];
@@ -10802,10 +10086,10 @@ function cepCaseDescription(showAddlDetails = true) {
     };
 
     if (showAddlDetails) {
-        if (reso === "Tested Ok") {
+        if (reso === "Tested Ok" || testedOk === "Yes") {
             if (selectedIntent === "form500_1") {
                 pushFormFields([
-                    { name: "dmsStatus", label: "DMS Internet Status" },
+                    { name: "dmsInternetStatus", label: "DMS Internet/Data Status" },
                     { name: "connectedDevices", label: "No of devices connected" },
                     { name: "dmsSelfHeal", label: "Self Heal Result" },
                     { name: "onuModel", label: "ONU Model" },
@@ -10814,7 +10098,7 @@ function cepCaseDescription(showAddlDetails = true) {
                 ]);
             } else if (selectedIntent === "form501_1" || selectedIntent === "form501_2") {
                 pushFormFields([
-                    { name: "dmsStatus", label: "DMS Internet Status" },
+                    { name: "dmsInternetStatus", label: "DMS Internet/Data Status" },
                     { name: "connectedDevices", label: "No of devices connected" },
                     { name: "dmsSelfHeal", label: "Self Heal Result" },
                     { name: "onuModel", label: "ONU Model" },
@@ -10826,7 +10110,7 @@ function cepCaseDescription(showAddlDetails = true) {
             } else if (selectedIntent === "form502_1") {
                 pushFormFields([
                     { name: "ipAddress", label: "IP Address" },
-                    { name: "dmsStatus", label: "DMS Internet Status" },
+                    { name: "dmsInternetStatus", label: "DMS Internet/Data Status" },
                     { name: "connectedDevices", label: "No of devices connected" },
                     { name: "websiteURL", label: "Affected Site, Application or VPN" },
                     { name: "errMsg", label: "Error" },
@@ -10846,7 +10130,7 @@ function cepCaseDescription(showAddlDetails = true) {
     if (getValueIfVisible("cbr"))
         visibleFields.push("CBR: " + vars.cbr);
 
-    if (showAddlDetails && reso !== "Tested Ok") {
+    if ((showAddlDetails && reso !== "Tested Ok") || testedOk === "No") {
         pushFormFields([
             { name: "availability", label: "PREFERRED DATE AND TIME" },
             { name: "address" },
@@ -10870,7 +10154,7 @@ function cepCaseNotes() {
         "form101_1", "form101_2", "form101_3", "form101_4",
         "form102_1", "form102_2", "form102_3", "form102_4", "form102_5", "form102_6", "form102_7",
         "form103_1", "form103_2", "form103_3", "form103_4", "form103_5",
-        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7",
+        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7", "form300_8",
         "form500_1", "form500_2", "form500_3", "form500_4", "form500_6",
         "form501_1", "form501_2", "form501_3", "form501_4", "form501_5",
         "form502_1", "form502_2",
@@ -10886,98 +10170,102 @@ function cepCaseNotes() {
 
     function constructCaseNotes() {
         const fields = [
+            // CEP Investigation Tagging
             { name: "investigation1", label: "Investigation 1" },
             { name: "investigation2", label: "Investigation 2" },
             { name: "investigation3", label: "Investigation 3" },
             { name: "investigation4", label: "Investigation 4" },
+
+            // Other Details
             { name: "sfCaseNum", label: "SF" },
+            { name: "outageStatus", label: "Outage" },
+            { name: "outageReference", label: "Source Reference" },
+            { name: "custAuth", label: "Cust Auth" },
+            { name: "simLight", label: "Sim Light Status" },
             { name: "minNumber", label: "MIN" },
-            { name: "onuSerialNum" },
+            { name: "onuSerialNum", label: "ONU SN" },
+            { name: "onuModel", label: "ONU Model"  },
             { name: "Option82" },
+            { name: "modemLights"},
+            { name: "intLightStatus", label: "Internet Light Status" },
+            { name: "wanLightStatus", label: "WAN Light Status" },
             { name: "onuConnectionType" },
 
+            // Clearview
+            { name: "cvReading", label: "CV" },
+            { name: "rtaRequest", label: "Real-time Request" },
+
             //NMS Skin
-            { name: "onuRunStats", label: "NMS SKIN ONU STATUS" },
+            { name: "onuRunStats", label: "NMS Skin ONU Status" },
             { name: "rxPower", label: "RX" },
             { name: "vlan", label: "VLAN" },
-            { name: "ipAddress", label: "IP ADDRESS" },
-            { name: "connectedDevices", label: "CONNECTED DEVICES" },
+            { name: "ipAddress", label: "IP Address" },
+            { name: "connectedDevices", label: "No. of Connected Devices" },
             { name: "fsx1Status", label: "FXS1" },
             { name: "wanName_3", label: "WAN NAME_3" },
             { name: "srvcType_3", label: "SRVCTYPE_3" },
             { name: "connType_3", label: "CONNTYPE_3" },
             { name: "vlan_3", label: "WANVLAN_3" },
             { name: "saaaBandwidthCode" },
-            { name: "routingIndex", label: "ROUTING INDEX" },
-            { name: "callSource", label: "CALL SOURCE" },
-            { name: "ldnSet", label: "LDN SET" },
+            { name: "routingIndex", label: "Routing Index" },
+            { name: "callSource", label: "Call Source" },
+            { name: "ldnSet", label: "LDN Set" },
+            { name: "option82Config", label: "Option82 Config" },
             { name: "nmsSkinRemarks" },
-
-            // Clearview
-            { name: "cvReading", label: "CV" },
             
             // DMS
-            { name: "dmsStatus", label: "DMS" },
+            { name: "dmsInternetStatus", label: "DMS Internet/Data Status" },
             { name: "deviceWifiBand"},
-            { name: "bandsteering", label: "BANDSTEERING" },
-            { name: "dmsVoipServiceStatus", label: "DMS VOICE STATUS" },
-            { name: "dmsLanPortStatus", label: "DMS LAN PORT STATUS" },
-            { name: "dmsWifiState", label: "DMS WIFI STATUS" },
-            { name: "dmsLan4Status", label: "DMS LAN STATUS - LAN 4" },
-            { name: "dmsSelfHeal", label: "SELF HEAL RESULT" },
+            { name: "bandsteering", label: "Bandsteering" },
+            { name: "dmsVoipServiceStatus", label: "VoIP Status in DMS" },
+            { name: "dmsLanPortStatus", label: "LAN Port Status in DMS" },
+            { name: "dmsWifiState", label: "Wi-Fi State in DMS" },
+            { name: "dmsLan4Status", label: "LAN Port Status in DMS" },
+            { name: "dmsSelfHeal"},
             { name: "dmsRemarks" },
 
             // Probe & Troubleshoot
-            { name: "custAuth", label: "CUST AUTH" },
-            { name: "modemLights"},
-            { name: "simLight", label: "SIM LIGHT STATUS" },
-            { name: "callType", label: "CALL TYPE" },
-            { name: "lanPortNum", label: "LAN PORT NUMBER" },
-            { name: "serviceStatus", label: "VOICE SERVICE STATUS" },
-            { name: "services", label: "SERVICE(S)" },
-            { name: "outageStatus", label: "OUTAGE" },
-            { name: "outageReference", label: "SOURCE REFERENCE" },
-            { name: "intWanLightStatus", label: "INTERNET/WAN LIGHT STATUS" },
-            { name: "option82Config", label: "OPTION82 CONFIG" },
-            { name: "connectionMethod", label: "CONNECTED VIA" },
-            { name: "onuModel" },
-            { name: "deviceBrandAndModel", label: "DEVICE BRAND & MODEL" },
+            { name: "callType", label: "Call Type" },
+            { name: "lanPortNum", label: "LAN Port Number" },
+            { name: "serviceStatus", label: "Voice Service Status" },
+            { name: "services", label: "Service(s)" },
+            { name: "connectionMethod", label: "Connected via" },
+            { name: "deviceBrandAndModel", label: "Device Brand and Model" },
             { name: "specificTimeframe"},
-            { name: "pingTestResult", label: "PING" },
+            { name: "speedTestResult", label: "Initial Speedtest Result" },
+            { name: "pingTestResult", label: "Ping" },
             { name: "gameNameAndServer"},
-            { name: "gameServerIP", label: "GAME SERVER IP ADDRESS" },
-            { name: "pingTestResult2", label: "GAME SERVER IP ADDRESS PING" },
-            { name: "traceroutePLDT", label: "TRACEROUTE PLDT" },
-            { name: "tracerouteExt", label: "TRACEROUTE EXTERNAL" },
-            { name: "speedTestResult", label: "SPEEDTEST RESULT" },
+            { name: "gameServerIP", label: "Game Server IP Address" },
+            { name: "pingTestResult2", label: "Game Server IP Address Ping Test Result" },
+            { name: "traceroutePLDT", label: "Tracerout PLDT" },
+            { name: "tracerouteExt", label: "Tracerout External" },
             { name: "meshtype" },
-            { name: "meshOwnership", label: "MESH" },
-            { name: "websiteURL", label: "URL" },
-            { name: "errMsg", label: "ERROR" },
-            { name: "otherDevice", label: "TESTED ON OTHER DEVICES OR BROWSERS" },
-            { name: "vpnBlocking", label: "POSSIBLE VPN BLOCKING ISSUE" },
-            { name: "vpnBlocking", label: "VPN REQUIRED WHEN ACCESSING SITE OR APP" },
-            { name: "otherISP", label: "RESULT USING OTHER ISP" },
-            { name: "itSupport", label: "WITH IT SUPPORT" },
-            { name: "itRemarks", label: "IT SUPPORT REMARKS" },
+            { name: "meshOwnership", label: "Mesh" },
+            { name: "websiteURL", label: "Website Address" },
+            { name: "errMsg", label: "Error Message" },
+            { name: "otherDevice", label: "Tested on Other Devices or Browsers" },
+            { name: "vpnBlocking", label: "Possible VPN Blocking Issue" },
+            { name: "vpnBlocking", label: "VPN Required When Accessing Website or App" },
+            { name: "otherISP", label: "Result Using Other ISP" },
+            { name: "itSupport", label: "Has IT Support" },
+            { name: "itRemarks", label: "IT Support Remarks" },
 
-            { name: "actualExp", label: "ACTUAL EXP"},
-            { name: "remarks", label: "ACTIONS TAKEN" },
+            { name: "actualExp", label: "Actual Experience"},
+            { name: "remarks", label: "Actions Taken" },
 
             // Ticket Details
-            { name: "pcNumber", label: "PARENT CASE" },
+            { name: "pcNumber", label: "Parent Case" },
             { name: "cepCaseNumber" },
             { name: "sla" },
 
             // For Retracking
-            { name: "stbID", label: "STB SERIAL #" },
-            { name: "smartCardID", label: "SMARTCARD ID" },
-            { name: "accountNum", label: "PLDT ACCOUNT #" },
-            { name: "cignalPlan", label: "CIGNAL TV PLAN" },
-            { name: "stbIpAddress", label: "STB IP ADDRESS"}, 
-            { name: "tsMulticastAddress", label: "TUNED SERVICE MULTICAST ADDRESS"}, 
-            { name: "exactExp", label: "EXACT EXPERIENCE"}, 
-
+            { name: "stbID", label: "STB Serial Number" },
+            { name: "smartCardID", label: "Smartcard ID" },
+            { name: "accountNum", label: "PLDT Account Number" },
+            { name: "cignalPlan", label: "CIGNAL TV Plan" },
+            { name: "stbIpAddress", label: "STB IP Address"}, 
+            { name: "tsMulticastAddress", label: "Tuned Service Multicast Address"}, 
+            { name: "exactExp", label: "Exact Experience"}, 
         ];
 
         const seenFields = new Set();
@@ -11007,19 +10295,30 @@ function cepCaseNotes() {
             if (value && !seenFields.has(field.name)) {
                 seenFields.add(field.name);
 
-                if (field.name === "pingTestResult") value += "MS";
+                if (field.name === "pingTestResult") value += " MS";
                 if (field.name === "speedTestResult") value += " MBPS";
 
                 if (field.name.startsWith("investigation")) {
                     output += `${field.label}: ${value}\n`;
-                } else if (field.name === "outageStatus" && value === "Yes") {
-                    actionsTakenParts.push("Affected by a network outage");
-                } else if (field.name === "outageStatus" && value === "No") {
-                    actionsTakenParts.push("Not part of network outage");
-                }  else {
+                } else if (field.name === "outageStatus") {
+                    if (value === "Yes") {
+                        actionsTakenParts.push("Affected by a network outage");
+                    } else if (value === "No") {
+                        actionsTakenParts.push("Not part of network outage");
+                    }
+                } else if (field.name === "dmsSelfHeal") {
+                    if (value === "Yes/Resolved") {
+                        actionsTakenParts.push("Performed Self Heal and the Issue was Resolved");
+                    } else if (value === "Yes/Unresolved") {
+                        actionsTakenParts.push("Performed Self Heal but Issue was still Unresolved");
+                    } else {
+                        actionsTakenParts.push("Unable to Perform Self Heal");
+                    }
+                } else {
                     actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
                 }
             }
+
         });
 
         if (req4retrackingValue === "Yes") {
@@ -11034,16 +10333,22 @@ function cepCaseNotes() {
         }
 
         const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
-        if (issueResolvedValue === "Yes") actionsTakenParts.push("Resolved");
-        else if (issueResolvedValue === "No - Customer is Unresponsive") actionsTakenParts.push("Customer is Unresponsive");
-        else if (issueResolvedValue === "No - Customer is Not At Home") actionsTakenParts.push("Customer is Not At Home");
-        else if (issueResolvedValue === "No - Customer Declined Further Assistance") actionsTakenParts.push("Customer Declined Further Assistance");
-        else if (issueResolvedValue === "No - System Ended Chat") actionsTakenParts.push("System Ended Chat");
+        if (issueResolvedValue === "Yes") 
+            actionsTakenParts.push("Resolved");
+        else if (issueResolvedValue === "No - Customer is Unresponsive") 
+            actionsTakenParts.push("Customer is Unresponsive");
+        else if (issueResolvedValue === "No - Customer is Not At Home") 
+            actionsTakenParts.push("Customer is Not At Home");
+        else if (issueResolvedValue === "No - Customer Declined Further Assistance") 
+            actionsTakenParts.push("Customer Declined Further Assistance");
+        else if (issueResolvedValue === "No - System Ended Chat") 
+            actionsTakenParts.push("System Ended Chat");
 
         const facilityValue = document.querySelector('[name="facility"]')?.value || "";
-        if (facilityValue === "Copper VDSL") actionsTakenParts.push("Copper");
+        if (facilityValue === "Copper VDSL") 
+            actionsTakenParts.push("Copper");
 
-        const actionsTaken = actionsTakenParts.join(" / ");
+        const actionsTaken = actionsTakenParts.join("/ ");
 
         const finalNotes = [output.trim(), retrackingOutput.trim(), actionsTaken.trim()]
             .filter(section => section)
@@ -11092,11 +10397,11 @@ function specialInstButtonHandler(includeWocas = true) {
         if (!isFieldVisible(field.name)) return "";
         const value = getFieldValueIfVisible(field.name);
         if (!value) return "";
-        const formattedValue = value.replace(/\n/g, " / ");
+        const formattedValue = value.replace(/\n/g, "/ ");
         return `${field.label}: ${formattedValue}`;
     }).filter(Boolean);
 
-    let specialInstCopiedText = parts.join(" / ");
+    let specialInstCopiedText = parts.join("/ ");
 
     return specialInstCopiedText.toUpperCase();
 }
@@ -11190,7 +10495,7 @@ function cepButtonHandler(showFloating = true, filter = []) {
         "form511_1", "form511_2", "form511_3", "form511_4", "form511_5",
         "form512_1", "form512_2", "form512_3",
         "formStrmApps_1", "formStrmApps_2", "formStrmApps_3", "formStrmApps_4", "formStrmApps_5",
-        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7"
+        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7", "form300_8"
     ];
 
     if (!techIntents.includes(vars.selectedIntent)) return;
@@ -11332,7 +10637,7 @@ function techNotesButtonHandler(showFloating = true) {
         "form511_1", "form511_2", "form511_3", "form511_4", "form511_5",
         "form512_1", "form512_2", "form512_3",
         "formStrmApps_1", "formStrmApps_2", "formStrmApps_3", "formStrmApps_4", "formStrmApps_5",
-        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7"
+        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7", "form300_8"
     ];
 
     const alwaysOnIntents = [
@@ -11383,6 +10688,7 @@ function techNotesButtonHandler(showFloating = true) {
             { name: "sla", label: "SLA" },
 
             // Alternative Services
+            { name: "offerALS"},
             { name: "alsPackOffered"},
             { name: "effectiveDate", label: "Effectivity Date" },
             { name: "nomiMobileNum", label: "MOBILE #" },
@@ -11481,75 +10787,86 @@ function techNotesButtonHandler(showFloating = true) {
             { name: "investigation2", label: "INV_2" },
             { name: "investigation3", label: "INV_3" },
             { name: "investigation4", label: "INV_4" },
-            { name: "onuSerialNum", label: "SN" },
+
+            // Other Details
+            { name: "simLight", label: "Sim Light Status" },
+            { name: "minNumber", label: "MIN" },
+            { name: "onuSerialNum", label: "ONU SN" },
+            { name: "onuModel" },
             { name: "Option82" },
+            { name: "modemLights"},
+            { name: "intLightStatus", label: "Internet Light Status" },
+            { name: "wanLightStatus", label: "WAN Light Status" },
             { name: "onuConnectionType" },
 
+            // Clearview
+            { name: "cvReading", label: "CV" },
+            { name: "rtaRequest", label: "Real-time Request" },
+
             //NMS Skin
-            { name: "onuRunStats", label: "NMS SKIN ONU STATUS" },
+            { name: "onuRunStats", label: "NMS Skin ONU Status" },
             { name: "rxPower", label: "RX" },
             { name: "vlan", label: "VLAN" },
-            { name: "ipAddress", label: "IP ADDRESS" },
-            { name: "connectedDevices", label: "CONNECTED DEVICES" },
+            { name: "ipAddress", label: "IP Address" },
+            { name: "connectedDevices", label: "No. of Connected Devices" },
             { name: "fsx1Status", label: "FXS1" },
             { name: "wanName_3", label: "WAN NAME_3" },
             { name: "srvcType_3", label: "SRVCTYPE_3" },
             { name: "connType_3", label: "CONNTYPE_3" },
             { name: "vlan_3", label: "WANVLAN_3" },
             { name: "saaaBandwidthCode" },
-            { name: "routingIndex", label: "ROUTING INDEX" },
-            { name: "callSource", label: "CALL SOURCE" },
-            { name: "ldnSet", label: "LDN SET" },
-
-            // Clearview
-            { name: "cvReading", label: "CV" },
+            { name: "routingIndex", label: "Routing Index" },
+            { name: "callSource", label: "Call Source" },
+            { name: "ldnSet", label: "LDN Set" },
+            { name: "option82Config", label: "Option82 Configuration" },
             
             // DMS
-            { name: "dmsStatus", label: "DMS" },
-            { name: "deviceWifiBand"},
-            { name: "bandsteering", label: "BANDSTEERING" },
-            { name: "dmsVoipServiceStatus", label: "DMS VOICE STATUS" },
-            { name: "dmsLanPortStatus", label: "DMS LAN PORT STATUS" },
-            { name: "dmsWifiState", label: "DMS WIFI STATUS" },
-            { name: "dmsLan4Status", label: "DMS LAN STATUS - LAN 4" },
-            { name: "dmsSelfHeal", label: "SELF HEAL RESULT" },
+            { name: "dmsInternetStatus", label: "DMS Internet/Data Status" },
+            { name: "deviceWifiBand", label: "Device used found in"},
+            { name: "bandsteering", label: "Bandsteering" },
+            { name: "dmsVoipServiceStatus", label: "VoIP Status in DMS" },
+            { name: "dmsLanPortStatus", label: "LAN Port Status in DMS" },
+            { name: "dmsWifiState", label: "Wi-Fi State in DMS" },
+            { name: "dmsLan4Status", label: "LAN Port Status in DMS" },
+            { name: "dmsSelfHeal", label: "Performed Self Heal" },
 
             // Probe & Troubleshoot
-            { name: "modemLights", label: "MODEM LIGHTS STATUS"},
-            { name: "callType", label: "CALL TYPE" },
-            { name: "lanPortNum", label: "LAN PORT NUMBER" },
-            { name: "serviceStatus", label: "VOICE SERVICE STATUS" },
-            { name: "services", label: "SERVICE(S)" },
-            { name: "outageReference", label: "OUTAGE SOURCE REFERENCE" },
-            { name: "intWanLightStatus", label: "INTERNET/WAN LIGHT STATUS" },
-            { name: "option82Config", label: "OPTION82 CONFIG" },
-            { name: "connectionMethod", label: "CONNECTED VIA" },
-            { name: "onuModel", label: "ONU MODEL" },
-            { name: "deviceBrandAndModel", label: "DEVICE BRAND & MODEL" },
-            { name: "specificTimeframe", label: "SPECIFIC TIME OF THE DAY ISSUE OCCURS"},
-            { name: "pingTestResult", label: "PING" },
+            { name: "callType", label: "Call Type" },
+            { name: "lanPortNum", label: "LAN Port Number" },
+            { name: "serviceStatus", label: "Voice Service Status" },
+            { name: "services", label: "Service(s)" },
+            { name: "outageStatus", label: "Outage" },
+            { name: "outageReference", label: "Source Reference" },
+            { name: "connectionMethod", label: "Connected via" },
+            { name: "deviceBrandAndModel", label: "Device Brand and Model" },
+            { name: "specificTimeframe"},
+            { name: "speedTestResult", label: "Initial Speedtest Result" },
+            { name: "pingTestResult", label: "Ping" },
             { name: "gameNameAndServer"},
-            { name: "gameServerIP", label: "GAME SERVER IP ADDRESS" },
-            { name: "pingTestResult2", label: "GAME SERVER IP ADDRESS PING" },
-            { name: "traceroutePLDT", label: "TRACEROUTE PLDT" },
-            { name: "tracerouteExt", label: "TRACEROUTE EXTERNAL" },
-            { name: "speedTestResult", label: "SPEEDTEST RESULT" },
-            { name: "meshtype", label: "MESH TYPE" },
-            { name: "meshOwnership", label: "MESH" },
-            { name: "websiteURL", label: "URL" },
-            { name: "errMsg", label: "ERROR" },
-            { name: "otherDevice", label: "TESTED ON OTHER DEVICES OR BROWSERS" },
-            { name: "vpnBlocking", label: "POSSIBLE VPN BLOCKING ISSUE" },
-            { name: "vpnBlocking", label: "VPN REQUIRED WHEN ACCESSING SITE OR APP" },
-            { name: "otherISP", label: "RESULT USING OTHER ISP" },
-            { name: "itSupport", label: "WITH IT SUPPORT" },
-            { name: "itRemarks", label: "IT SUPPORT REMARKS" },
-            { name: "actualExp", label: "ACTUAL EXPERIENCE"},
-            { name: "stbID", label: "STB ID" },
-            { name: "smartCardID", label: "SMARTCARD ID" },
-            { name: "accountNum", label: "PLDT ACCOUNT #" },
-            { name: "cignalPlan", label: "CIGNAL TV PLAN" },
-            { name: "exactExp", label: "EXACT EXPERIENCE"}
+            { name: "gameServerIP", label: "Game Server IP Address" },
+            { name: "pingTestResult2", label: "Game Server IP Address Ping Test Result" },
+            { name: "traceroutePLDT", label: "Tracerout PLDT" },
+            { name: "tracerouteExt", label: "Tracerout External" },
+            { name: "meshtype" },
+            { name: "meshOwnership", label: "Mesh" },
+            { name: "websiteURL", label: "Website Address" },
+            { name: "errMsg", label: "Error Message" },
+            { name: "otherDevice", label: "Tested on Other Devices or Browsers" },
+            { name: "vpnBlocking", label: "Possible VPN Blocking Issue" },
+            { name: "vpnBlocking", label: "VPN Required When Accessing Website or App" },
+            { name: "otherISP", label: "Result Using Other ISP" },
+            { name: "itSupport", label: "Has IT Support" },
+            { name: "itRemarks", label: "IT Support Remarks" },
+            { name: "actualExp", label: "Actual Experience"},
+
+            // For Retracking
+            { name: "stbID", label: "STB Serial Number" },
+            { name: "smartCardID", label: "Smartcard ID" },
+            { name: "accountNum", label: "PLDT Account Number" },
+            { name: "cignalPlan", label: "CIGNAL TV Plan" },
+            { name: "stbIpAddress", label: "STB IP Address"}, 
+            { name: "tsMulticastAddress", label: "Tuned Service Multicast Address"}, 
+            { name: "exactExp", label: "Exact Experience"}, 
         ];
 
         const seenFields = new Set();
@@ -12417,7 +11734,7 @@ function sfTaggingButtonHandler() {
     ]
 
     const mrtForms = [
-        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7"
+        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7", "form300_8"
     ];
 
     const streamAppsForms = [
@@ -12615,7 +11932,7 @@ function sfTaggingButtonHandler() {
             } 
         } else if (['form300_3'].includes(vars.selectedIntent)) {
             caseSubType = `GUI Access (Super Admin) - ${vars.resolution}`;
-        } else if (['form300_4', 'form300_5', 'form300_7'].includes(vars.selectedIntent)) {
+        } else if (['form300_4', 'form300_5', 'form300_7', 'form300_8'].includes(vars.selectedIntent)) {
             if (vars.resolution === "NMS Configuration") {
                 caseSubType = `Mode Set-Up - ${vars.resolution} (Route to Bridge or Bridge to Route - indicate in remarks)`;  
             } else {
@@ -13332,6 +12649,38 @@ function endorsementForm() {
     });
 }
 
+function resetForm2ContainerAndRebuildButtons() {
+    const form2Container = document.getElementById("form2Container");
+    form2Container.innerHTML = "";
+
+    const buttonTable = document.createElement("table");
+    buttonTable.id = "form2ButtonTable";
+
+    const row = document.createElement("tr");
+
+    const buttonData = [
+        { label: "💾 Save", handler: saveFormData },
+        { label: "🔄 Reset", handler: resetButtonHandler },
+        { label: "📄 Export", handler: exportFormData },
+        { label: "🗑️ Delete All", handler: deleteAllData }
+    ];
+
+    buttonData.forEach(({ label, handler }) => {
+        const td = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "form1-button";
+        btn.tabIndex = -1;
+        btn.innerHTML = label;
+        btn.addEventListener("click", handler);
+        td.appendChild(btn);
+        row.appendChild(td);
+    });
+
+    buttonTable.appendChild(row);
+    form2Container.appendChild(buttonTable);
+}
+
 function resetButtonHandler() {
     const userChoice = confirm("Are you sure you want to reset the form?");
 
@@ -13390,118 +12739,27 @@ function resetButtonHandler() {
         notepad.rows = 10;
         notepad.style.height = "";
 
+        const ticketTimer = document.getElementById("ticketTimer");
+
+        if (ticketTimer) ticketTimer.style.display = "none";
+
+        if (typeof window.resetTicketTimer === "function") {
+            window.resetTicketTimer();
+        } else if (typeof window.stopTicketTimer === "function") {
+            window.stopTicketTimer();
+            const ticketDisplay = document.getElementById("ticketTimerDisplay");
+            if (ticketDisplay) ticketDisplay.textContent = "00:00:00";
+        }
+
         setTimeout(function() {
             window.scrollTo({
                 top: 0,
                 left: 0,
                 behavior: 'smooth'
             });
-        }, 100);  
+        }, 100);
     }
 }
-
-function resetForm2ContainerAndRebuildButtons() {
-    const form2Container = document.getElementById("form2Container");
-    form2Container.innerHTML = "";
-
-    const buttonTable = document.createElement("table");
-    buttonTable.id = "form2ButtonTable";
-
-    const row = document.createElement("tr");
-
-    const buttonData = [
-        { label: "💾 Save", handler: saveFormData },
-        { label: "🔄 Reset", handler: resetButtonHandler },
-        { label: "📄 Export", handler: exportFormData },
-        { label: "🗑️ Delete All", handler: deleteAllData }
-    ];
-
-    buttonData.forEach(({ label, handler }) => {
-        const td = document.createElement("td");
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "form1-button";
-        btn.tabIndex = -1;
-        btn.innerHTML = label;
-        btn.addEventListener("click", handler);
-        td.appendChild(btn);
-        row.appendChild(td);
-    });
-
-    buttonTable.appendChild(row);
-    form2Container.appendChild(buttonTable);
-}
-
-document.addEventListener('DOMContentLoaded', function() { 
-    let timerInterval;
-    let startTime;
-    let elapsedTime = 0;
-    let isRunning = false;
-
-    document.getElementById('timerDisplay').textContent = formatTime(0);
-
-    function formatTime(seconds) {
-        const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
-        const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-        const secs = String(seconds % 60).padStart(2, '0');
-        return `${hrs}:${mins}:${secs}`;
-    }
-
-    function updateDisplay() {
-        const now = Date.now();
-        const totalElapsedSeconds = Math.floor((now - startTime + elapsedTime) / 1000);
-        document.getElementById('timerDisplay').textContent = formatTime(totalElapsedSeconds);
-    }
-
-    function handleTimer(action) {
-        if (action === 'start' && !isRunning) {
-            startTime = Date.now();
-            timerInterval = setInterval(updateDisplay, 1000);
-            isRunning = true;
-            document.getElementById('timerToggleButton').textContent = 'Pause';
-        } else if (action === 'pause' && isRunning) {
-            clearInterval(timerInterval);
-            elapsedTime += Date.now() - startTime;
-            isRunning = false;
-            document.getElementById('timerToggleButton').textContent = 'Resume';
-        } else if (action === 'reset') {
-            const confirmReset = confirm("Are you sure you want to reset the timer?");
-            if (confirmReset) {
-                clearInterval(timerInterval);
-                elapsedTime = 0;
-                document.getElementById('timerDisplay').textContent = formatTime(0);
-                isRunning = false;
-                document.getElementById('timerToggleButton').textContent = 'Start';
-            }
-        }
-    }
-
-    document.getElementById('timerToggleButton').addEventListener('click', function() {
-        if (isRunning) {
-            handleTimer('pause');
-        } else {
-            handleTimer('start');
-        }
-    });
-
-    document.getElementById('timerResetButton').addEventListener('click', function() {
-        handleTimer('reset');
-    });
-
-    const channelSelect = document.getElementById("channel");
-    const sfCaseNumRow = document.getElementById("case-num-row");
-
-    channelSelect.addEventListener("change", function () {
-        const channelSelectedValue = channelSelect.value;
-        const shouldShow = channelSelectedValue === "CDT-SOCMED";
-
-        sfCaseNumRow.style.display = shouldShow ? "" : "none";
-    });
-
-    initializeFormElements();
-    registerEventHandlers();
-
-});
 
 function saveFormData() {
     const selectedChannel = document.getElementById("channel")?.value?.trim();
@@ -13759,4 +13017,304 @@ const primaryButtons = {
 
 Object.entries(primaryButtons).forEach(([id, handler]) => {
   document.getElementById(id)?.addEventListener("click", handler);
+});
+
+// ----------------------
+// UPDATES + INSTRUCTIONS
+// ----------------------
+const updatesContainer = document.getElementById("updatesContainer");
+
+const instructions = [
+  "Fill out all required fields.",
+  "If a field is not required (i.e. L2 fields), leave it blank. Avoid entering 'NA' or any unnecessary details.",
+  "Ensure that the information is accurate.",
+  "Review your inputs before generating the notes."
+];
+
+const updates = [
+  {
+    title: "Removed fields",
+    items: [
+      "Equipment Brand, Modem Brand, and ONU Connection Type (NIC)"
+    ]
+  },
+  {
+    title: "Added Intents",
+    items: ["Request for Private IP", "Gaming - High Latency/Lag"]
+  },
+  {
+    title: "Added fields",
+    items: [
+      "Clearview Latest real-time request completion date",
+      "Tested OK for Hotline Agents (NIC/SIC/Selective Browsing intents)"
+    ]
+  },
+  {
+    title: "Added CEP Investigation 4 tagging",
+    items: [
+      "Device and Website IP Configuration (Request for Public/Private IP)",
+      "No Audio/Video Output w/ Test Channel (IPTV Intents)"
+    ]
+  },
+  {
+    title: "Updated field labels",
+    items: ["'DMS Status' to 'Internet/Data Status'", "'RX Power/OPTICSRXPOWER' to 'RX Power'", "'No. of Connected Devices (L2)' to 'No. of Conn. Devices (L2)'"]
+  },
+  {
+    title: "Fix",
+    items: ["Resolved Offer ALS notation bug"]
+  },
+  {
+    title: "UI Enhancements",
+    items: ["Slight tweaks for a fresher, more modern feel.",
+        "New Instructions and Updates section: Your quick guide to staying informed!"
+    ]
+  },
+];
+
+// --- Instructions Section ---
+const instructionsItem = document.createElement("div");
+instructionsItem.classList.add("updateItem");
+instructionsItem.innerHTML = `
+  <h3>Instructions</h3>
+  <ul>
+    ${instructions.map(item => `<li>${item}</li>`).join("")}
+  </ul>
+`;
+updatesContainer.appendChild(instructionsItem);
+
+// --- Updates Section ---
+const updatesItem = document.createElement("div");
+updatesItem.classList.add("updateItem");
+updatesItem.innerHTML = `<h3>V5.2.291025 Update</h3>`;
+
+updates.forEach((section, index) => {
+  const sectionDiv = document.createElement("div");
+  sectionDiv.innerHTML = `
+    <strong>${index + 1}. ${section.title}</strong>
+    <ul>
+      ${section.items.map(i => `<li>${i}</li>`).join("")}
+    </ul>
+  `;
+  updatesItem.appendChild(sectionDiv);
+});
+
+updatesContainer.appendChild(updatesItem);
+
+document.addEventListener('DOMContentLoaded', function() { 
+    // ================================
+    // SECTION 1: MAIN TIMER
+    // ================================
+    let timerInterval;
+    let startTime;
+    let elapsedTime = 0;
+    let isRunning = false;
+
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerToggleButton = document.getElementById('timerToggleButton');
+    const timerResetButton = document.getElementById('timerResetButton');
+
+    if (timerDisplay) timerDisplay.textContent = formatTime(0);
+
+    function formatTime(seconds) {
+        const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(seconds % 60).padStart(2, '0');
+        return `${hrs}:${mins}:${secs}`;
+    }
+
+    function updateDisplay() {
+        const now = Date.now();
+        const totalElapsedSeconds = Math.floor((now - startTime + elapsedTime) / 1000);
+        timerDisplay.textContent = formatTime(totalElapsedSeconds);
+    }
+
+    function handleTimer(action) {
+        if (action === 'start' && !isRunning) {
+            startTime = Date.now();
+            timerInterval = setInterval(updateDisplay, 1000);
+            isRunning = true;
+            timerToggleButton.textContent = 'Pause';
+        } else if (action === 'pause' && isRunning) {
+            clearInterval(timerInterval);
+            elapsedTime += Date.now() - startTime;
+            isRunning = false;
+            timerToggleButton.textContent = 'Resume';
+        } else if (action === 'reset') {
+            const confirmReset = confirm("Are you sure you want to reset the timer?");
+            if (confirmReset) {
+                clearInterval(timerInterval);
+                elapsedTime = 0;
+                timerDisplay.textContent = formatTime(0);
+                isRunning = false;
+                timerToggleButton.textContent = 'Start';
+            }
+        }
+    }
+
+    timerToggleButton?.addEventListener('click', function() {
+        if (isRunning) {
+            handleTimer('pause');
+        } else {
+            handleTimer('start');
+        }
+    });
+
+    timerResetButton?.addEventListener('click', function() {
+        handleTimer('reset');
+    });
+
+    const channelSelect = document.getElementById("channel");
+    const sfCaseNumRow = document.getElementById("case-num-row");
+
+    channelSelect?.addEventListener("change", function () {
+        const shouldShow = channelSelect.value === "CDT-SOCMED";
+        sfCaseNumRow.style.display = shouldShow ? "" : "none";
+    });
+
+    if (typeof initializeFormElements === "function") initializeFormElements();
+    if (typeof registerEventHandlers === "function") registerEventHandlers();
+
+    // ================================
+    // SECTION 2: TICKET CREATION TIMER
+    // ================================
+    let ticketTimerInterval = null;
+    let ticketSeconds = 0;
+
+    const ticketTimer = document.getElementById("ticketTimer");
+    const ticketDisplay = document.getElementById("ticketTimerDisplay");
+
+    function formatTicketTime(sec) {
+        const h = String(Math.floor(sec / 3600)).padStart(2, "0");
+        const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+        const s = String(sec % 60).padStart(2, "0");
+        return `${h}:${m}:${s}`;
+    }
+
+    function startTicketTimer() {
+        if (ticketTimerInterval) return;
+        ticketTimerInterval = setInterval(() => {
+            ticketSeconds++;
+            if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(ticketSeconds);
+        }, 1000);
+        console.log("▶️ Ticket Timer started");
+    }
+
+    function stopTicketTimer() {
+        clearInterval(ticketTimerInterval);
+        ticketTimerInterval = null;
+        console.log("⏸ Ticket Timer stopped");
+    }
+
+    function resetTicketTimer() {
+        clearInterval(ticketTimerInterval);
+        ticketTimerInterval = null;
+        ticketSeconds = 0;
+        if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(0);
+        console.log("♻️ Ticket Timer reset");
+    }
+
+    window.stopTicketTimer = stopTicketTimer;
+    window.resetTicketTimer = resetTicketTimer;
+    window.startTicketTimer = startTicketTimer;
+
+    function isVisible(el) {
+        if (!el) return false;
+        let cur = el;
+        while (cur && cur.nodeType === 1) {
+            const cs = window.getComputedStyle(cur);
+            if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) {
+                return false;
+            }
+            cur = cur.parentElement;
+        }
+        const rect = el.getBoundingClientRect();
+        return !(rect.width === 0 && rect.height === 0);
+    }
+
+    function checkStopConditions() {
+        const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
+        const cbr = document.querySelector("input[name='cbr'], textarea[name='cbr'], #cbr");
+
+        const landmarksVisible = isVisible(landmarks);
+        const landmarksHasValue = landmarks && landmarks.value.trim() !== "";
+        const cbrHasValue = cbr && cbr.value.trim() !== "";
+
+        if (landmarksVisible) {
+            if (landmarksHasValue) stopTicketTimer();
+        } else {
+            if (cbrHasValue) stopTicketTimer();
+        }
+    }
+
+    document.addEventListener("change", function (e) {
+        const t = e.target;
+
+        if (t.matches("select[name='issueResolved'], #issueResolved") ||
+            t.matches("select[name='outageStatus'], #outageStatus")) {
+
+            const issueResolved = document.querySelector("select[name='issueResolved']")?.value || "";
+            const outageStatus = document.querySelector("select[name='outageStatus']")?.value || "";
+
+            if (issueResolved === "No - for Ticket Creation" || outageStatus === "Yes") {
+                if (ticketTimer) ticketTimer.style.display = "block";
+                startTicketTimer();
+            } else {
+                stopTicketTimer();
+                resetTicketTimer();
+                if (ticketTimer) {
+                    ticketTimer.style.display = "none";
+                }
+            }
+        }
+
+        if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
+        if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
+            const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
+            if (!isVisible(landmarks)) checkStopConditions();
+        }
+    });
+
+    document.addEventListener("input", function (e) {
+        const t = e.target;
+
+        if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
+        if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
+            const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
+            if (!isVisible(landmarks)) checkStopConditions();
+        }
+    });
+
+    (function makeDraggable(el) {
+        if (!el) return;
+        let offsetX = 0, offsetY = 0, isDown = false;
+        const header = el.querySelector("#ticketTimerHeader") || el;
+        header.style.cursor = "grab";
+
+        header.addEventListener("mousedown", dragMouseDown);
+        document.addEventListener("mouseup", closeDragElement);
+        document.addEventListener("mousemove", elementDrag);
+
+        function dragMouseDown(e) {
+            e.preventDefault();
+            isDown = true;
+            offsetX = e.clientX - el.offsetLeft;
+            offsetY = e.clientY - el.offsetTop;
+            header.style.cursor = "grabbing";
+        }
+
+        function elementDrag(e) {
+            if (!isDown) return;
+            e.preventDefault();
+            el.style.left = (e.clientX - offsetX) + "px";
+            el.style.top = (e.clientY - offsetY) + "px";
+        }
+
+        function closeDragElement() {
+            isDown = false;
+            header.style.cursor = "grab";
+        }
+    })(ticketTimer);
+
+    window.__checkTicketStop = checkStopConditions;
 });
