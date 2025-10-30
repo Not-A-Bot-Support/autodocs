@@ -1,13 +1,12 @@
 /* styles.css */
 html, body {
     width: 100%;
-    overflow-x: hidden; /* ✅ prevents horizontal scrollbar */
+    overflow-x: hidden;
 }
 
 body {
     margin: 0;
     padding: 0;
-    padding-bottom: 50px;
     font-family: 'Calibri', sans-serif;
     font-size: 12.5px;
     letter-spacing: 1.5px;
@@ -141,22 +140,9 @@ header {
     box-sizing: border-box;
 }
 
-.divsContainer {
-    display: flex;
-    flex-direction: column;
-
-    background-color: #f4f6f8;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 5px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
-}
-
-/* Updates Div */
 .updatesDiv {
     position: fixed;
-    left: 495px;
+    left: 505px;
     top: 65px;
     width: 600px;
     background-color: #f4f6f8;
@@ -164,15 +150,56 @@ header {
     border-radius: 10px;
     padding: 15px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    height: fit-content;
-    overflow-y: auto;
+    max-height: 487.5px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
     z-index: 100;
 }
 
+.updatesDiv.expanded {
+    max-height: 86.5%;
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none; 
+}
+
+.updatesDiv.expanded::-webkit-scrollbar {
+    display: none;
+}
+
+.updatesHeader {
+    align-items: baseline;
+    margin-bottom: 10px;
+}
 
 .updatesDiv h3 {
-    margin-top: 0;
+    font-size: 18px;
+    margin: 0;
     color: #2C3E50;
+    line-height: 1.4;
+}
+
+.toggleUpdatesBtn {
+    position: absolute;
+    top: 12.5px;
+    right: 15px;
+    width: 20px;
+    height: 20px;
+    font-size: 12.5px;
+    font-weight: bold;
+    background-color: transparent;
+    color: #2C3E50;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggleUpdatesBtn:hover {
+    background-color: #e0e0e0;
 }
 
 .updateItem {
@@ -210,6 +237,55 @@ header {
   line-height: 1.4;
 }
 
+.scrollWrapper {
+    position: relative;
+    max-height: 86.5vh;
+    width: 480px;
+    overflow: hidden;
+    gap: 20px;
+}
+
+.divsContainer {
+    display: flex;
+    flex-direction: column;
+    background-color: #f4f6f8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+
+    max-height: 86.5vh;
+    overflow-y: scroll;
+}
+
+.divsContainer::-webkit-scrollbar { display: none; }
+.divsContainer { scrollbar-width: none; }
+
+.customScrollbar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 50px; 
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    cursor: pointer;
+}
+
+.customScrollbar.active,
+.customScrollbar:hover {
+    opacity: 1;
+}
+
+.customScrollbar {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+
 table {
     width: 100%;
     border: none;
@@ -240,7 +316,7 @@ td:last-child {
 }
 
 .form1Div {
-    width: 455px; 
+    width: 100%; 
 }
 
 .form1DivHeader {
@@ -351,7 +427,7 @@ button.form1-button {
 }
 
 .form2Div {
-    width: 455px; 
+    width: 100%; 
     margin-bottom: 5px;
 }
 
