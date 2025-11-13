@@ -1,6 +1,6 @@
 //script.js
 
-// Standard Notes Generator Version 5.2.301025
+// Standard Notes Generator Version 5.2.131125
 // Developed & Designed by: QA Ryan
 
 // Channel, Concern Type, and VOC Options
@@ -458,6 +458,8 @@ function initializeVariables() {
         onuSerialNum: q('[name="onuSerialNum"]'),
         rxPower: q('[name="rxPower"]'),
         affectedTool: q('[name="affectedTool"]'),
+        requestType: q('[name="requestType"]'),
+        vasProduct: q('[name="vasProduct"]'),
     };
 }
 
@@ -550,7 +552,7 @@ function createForm2() {
     ]
 
     const ffupForms = [
-        "formFfupChangeOwnership", "formFfupChangeTelNum", "formFfupChangeTelUnit", "formFfupDiscoVas", "formFfupDispute", "formFfupDowngrade", "formFfupDDE", "formFfupInmove", "formFfupMigration", "formFfupMisappPay", "formFfupNewApp", "formFfupOcular", "formFfupOverpay", "formFfupPermaDisco", "fomFfupRenew", "fomFfupResume", "fomFfupUnbar"
+        "formFfupChangeOwnership", "formFfupChangeTelNum", "formFfupChangeTelUnit", "formFfupDiscoVas", "formFfupDispute", "formFfupDowngrade", "formFfupDDE", "formFfupInmove", "formFfupMigration", "formFfupMisappPay", "formFfupNewApp", "formFfupOcular", "formFfupOverpay", "formFfupPermaDisco", "fomFfupRenew", "fomFfupResume", "fomFfupUnbar", "formFfupCustDependency", "formFfupAMSF", "formFfupFinalAcc", "formFfupOverpayment", "formFfupWrongBiller", "formFfupReloc", "formFfupRelocCid", "formFfupSpecialFeat", "formFfupSAO", "formFfupTempDisco", "formFfupUP", "formFfupUpgrade", "formFfupVasAct", "formFfupVasDel", "formFfupReroute", "formFfupWT"
     ]
 
     const alwaysOnForms = [
@@ -8669,9 +8671,7 @@ function createForm2() {
 
         const fields = [
             { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Supersedure retain Account number",
-                "Supersedure with change account number"
+                ""
             ] },
             { label: "Dispute Type", type: "select", name: "disputeType", options: [
                 "", 
@@ -8703,6 +8703,7 @@ function createForm2() {
             { label: "Findings", type: "select", name: "findings", options: [
                 ""
             ] },
+            { label: "VAS Product", type: "text", name: "vasProduct" },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "SO/SR #", type: "text", name: "srNum"},
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
@@ -8751,19 +8752,58 @@ function createForm2() {
                 fomFfupRenew: "Follow-up on Reconnection from PD requests: considered within SLA if made within 5 calendar days from SO issuance, and beyond SLA if made after 5 calendar days",
                 fomFfupResume: "Follow-up on Reconnection from TD requests: considered within SLA if made within 24-48 hours for churn or within 2 hours for regular payment, and beyond SLA if made after 48 hours for churn or after 2 hours for regular payment",
                 fomFfupUnbar: "Follow-up on Reconnection from CK requests: considered within SLA if made within 2 hours upon SO issuance and beyond SLA if made after 2 hours",
+                formFfupCustDependency: "Follow up on refund requests from customers who choose not to proceed with their application. Requests are considered within SLA if made within 15 days from the MS Form submission date; otherwise, tag as beyond SLA.",
+                formFfupAMSF: "Follow up on refund requests for cancelled new applications. Requests are considered within SLA if made within 15 days from the MS Form submission date; otherwise, tag as beyond SLA.",
+                formFfupFinalAcc: "Follow up on refund requests with visible disputes on the account (Final Account). Requests are considered within SLA if made within 15 days; otherwise, tag as beyond SLA.",
+                formFfupOverpayment: "Follow up on refund requests where the account shows a payment equal to or greater than the MSF. Requests are considered within SLA if made within 15 days; otherwise, tag as beyond SLA.",
+                formFfupWrongBiller: "Follow up on refund requests for payments made to PLDT Inc. by mistake under the wrong biller. Requests are considered within SLA if made within 15 days; otherwise, tag as beyond SLA.",
+                formFfupReloc: {
+                    main: "Follow-up on relocation requests.",
+                    sub: [
+                        "For activation cases, requests are considered within SLA if the service has been installed and is awaiting activation within 24 to 48 hours, and beyond SLA if over 5 calendar days.",
+                        "For all other findings, requests are considered within SLA if made within 5 calendar days; otherwise, tag as beyond SLA."
+                    ]
+                },
+                formFfupRelocCid: "Follow-up on relocation requests (CID Creation or address validation). Considered within SLA if made within 5 calendar days; otherwise, tag as beyond SLA.",
+                formFfupSpecialFeat: "Follow-up on special features activation or deactivation requests. Considered within SLA if made within 24 to 48 hours; otherwise, tag as beyond SLA.",
+                formFfupSAO: "Follow-up on SAO 500 activation requests.",
+                formFfupTempDisco: "Follow-up on temporary disconnection (VTD/HTD) requests. Considered within SLA if made within 24 to 48 hours; otherwise, tag as beyond SLA.",
+                formFfupUP: "Follow-up on unreflected or unposted payments on the account. Requests are considered within SLA if made within 5 calendar days, and beyond SLA if more than 15 business days have passed (for cases with a created payment dispute for unreflected payments).",
+                formFfupUpgrade: "Follow-up on upgrade requests. Considered within SLA if made within 24 to 48 hours for regular upgrades or within 3 to 5 working days for upgrades with Cignal inclusion; otherwise, tag as beyond SLA.",
+                formFfupVasAct: "Follow-up on VAS activation requests. Considered within SLA if made within 48 hours; otherwise, tag as beyond SLA.",
+                formFfupVasDel: "Follow-up on VAS delivery requests. Refer to the applicable SLA for proper status tagging.",
+                formFfupReroute: "Follow-up on wire re-routing requests already handled by a technician. Within SLA if made within 5 calendar days; otherwise, beyond SLA.",
+                formFfupWT: "Follow-up on withholding tax adjustment requests on the account if already created. Tag as beyond SLA if over one billing cycle, with a processed dispute for tax adjustment."
             };
 
             const ul = document.createElement("ul");
             ul.className = "checklist";
 
             if (definitions[selectedValue]) {
+                const definition = definitions[selectedValue];
                 const li = document.createElement("li");
-                li.textContent = definitions[selectedValue];
+
+                if (typeof definition === "string") {
+                    li.textContent = definition;
+                } else if (typeof definition === "object" && definition.main && Array.isArray(definition.sub)) {
+                    li.textContent = definition.main;
+
+                    const subUl = document.createElement("ul");
+                    subUl.className = "checklist-sub"; // optional, for styling
+
+                    definition.sub.forEach(subItem => {
+                        const subLi = document.createElement("li");
+                        subLi.textContent = subItem;
+                        subUl.appendChild(subLi);
+                    });
+
+                    li.appendChild(subUl);
+                }
+
                 ul.appendChild(li);
             }
 
             descriptionDiv.appendChild(ul);
-
             td.appendChild(descriptionDiv);
             row.appendChild(td);
 
@@ -8772,7 +8812,7 @@ function createForm2() {
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
-            if (["requestType", "ownership", "custAuth", "findings", "disputeType", "approver"].includes(field.name)) {
+            if (["requestType", "ownership", "custAuth", "findings", "disputeType", "approver", "vasProduct"].includes(field.name)) {
                 row.style.display = "none";
             } else {
                 row.style.display = "table-row";
@@ -8849,8 +8889,9 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
+        // Hide/Show Fields
         const selectFieldsToShow = [
-            "formFfupDiscoVas", "formFfupDowngrade", "formFfupInmove", "formFfupMigration", "formFfupNewApp", "formFfupPermaDisco", "fomFfupRenew", "fomFfupResume", "fomFfupUnbar"
+            "formFfupDiscoVas", "formFfupDowngrade", "formFfupInmove", "formFfupMigration", "formFfupNewApp", "formFfupPermaDisco", "fomFfupRenew", "fomFfupResume", "fomFfupUnbar", "formFfupReloc", "formFfupTempDisco", "formFfupUpgrade"
         ];
 
         if (selectedValue === "formFfupChangeOwnership") {
@@ -8863,8 +8904,64 @@ function createForm2() {
             showFields(["disputeType", "approver"]);
         } else if (selectedValue === "formFfupOcular") {
             showFields(["findings"]);
+        } else if (selectedValue === "formFfupSpecialFeat") {
+            showFields(["requestType", "custAuth"]);
+        } else if (selectedValue === "formFfupSAO") {
+            showFields(["custAuth", "findings"]);
+            hideSpecificFields(["ffupStatus"])
+        } else if (selectedValue === "formFfupVasDel") {
+            showFields(["vasProduct"]);
         }
 
+        // Request Type options based on selectedValue
+        const reqTypeSelect = document.querySelector('select[name="requestType"]');
+
+        const reqTypeOptions = [
+            "",
+            "Activation", 
+            "Deactivation", 
+            "Supersedure retain Account number",
+            "Supersedure with change account number"
+        ];
+
+        function updateReqTypeOptions() {
+            while (reqTypeSelect.options.length > 0) {
+                reqTypeSelect.remove(0);
+            }
+
+            let filteredReqType = [];
+
+            const mapping = {
+                "formFfupChangeOwnership": [
+                    "Supersedure retain Account number",
+                    "Supersedure with change account number"
+                ],
+                "formFfupSpecialFeat": [
+                    "Activation",
+                    "Deactivation"
+                ],
+            };
+
+            if (mapping[selectedValue]) {
+                filteredReqType = reqTypeOptions.filter(opt => mapping[selectedValue].includes(opt) || opt === "");
+            } else {
+                filteredReqType = [...reqTypeOptions];
+            }
+
+            filteredReqType.forEach((text, index) => {
+                const option = document.createElement("option");
+                option.value = text;
+                option.textContent = text;
+                if (index === 0) {
+                    option.disabled = true;
+                    option.selected = true;
+                    option.style.fontStyle = "italic";
+                }
+                reqTypeSelect.appendChild(option);
+            });
+        }
+
+        updateReqTypeOptions(reqTypeSelect.value);
 
         // Approver options based on Dispute Type
         const disputeTypeSelect = document.querySelector('select[name="disputeType"]');
@@ -8919,6 +9016,8 @@ function createForm2() {
             "Activation", 
             "Activation Task", 
             "Activation Task (DTS)",
+            "CCAM (Processing)",
+            "DeActivation Task",
             "No SO Generated", 
             "No SO Generated (DTS)",
             "Opsim",
@@ -8926,7 +9025,8 @@ function createForm2() {
             "RSO Customer", 
             "RSO PLDT", 
             "System Task / Stuck SO",
-            "System Task / Stuck SO (DTS)"
+            "System Task / Stuck SO (DTS)",
+            "Tech Repair - Data"
         ];
 
         function updateFindingsOptions() {
@@ -9003,6 +9103,34 @@ function createForm2() {
                     "Activation Task (DTS)",
                     "No SO Generated (DTS)",
                     "System Task / Stuck SO (DTS)"
+                ],
+                "formFfupReloc": [
+                    "Activation",
+                    "No SO Generated",
+                    "Opsim",
+                    "PMA",
+                    "RSO Customer",
+                    "RSO PLDT",
+                    "System Task / Stuck SO"
+                ],
+                "formFfupSAO": [
+                    "Activation",
+                    "System Task / Stuck SO",
+                    "Tech Repair - Data"
+                ],
+                "formFfupTempDisco": [
+                    "CCAM (Processing)",
+                    "DeActivation Task",
+                    "No SO Generated",
+                    "System Task / Stuck SO"
+                ],
+                "formFfupUpgrade": [
+                    "Activation",
+                    "No SO Generated",
+                    "Opsim",
+                    "RSO Customer",
+                    "RSO PLDT",
+                    "System Task / Stuck SO"
                 ],
             };
 
@@ -11305,8 +11433,8 @@ function nontechNotesButtonHandler(showFloating = true) {
     }
 
     const custName = formatField("CUST NAME", "custName", "");
-    const sfCaseNum = formatField("SF", "sfCaseNum");
-    const accountNum = formatField("ACC#", "accountNum");
+    const sfCaseNum = formatField("", "sfCaseNum");
+    const accountNum = formatField("", "accountNum");
     const soSrNum = formatField("", "srNum");
 
     const inquiryForms = [
@@ -11318,16 +11446,20 @@ function nontechNotesButtonHandler(showFloating = true) {
     ];
 
     const ffupForms = [
-        "formFfupChangeOwnership", "formFfupChangeTelUnit", "formFfupDDE"
+        "formFfupChangeOwnership", "formFfupChangeTelUnit", "formFfupDDE",, "formFfupRelocCid", "formFfupReroute", "formFfupWT"
     ];
 
     const ffupFormsBasedOnFindings = [
-        "formFfupChangeTelNum", "formFfupDowngrade", "formFfupInmove", "formFfupMigration", "formFfupNewApp", "formFfupOcular", "formFfupDiscoVas", "formFfupPermaDisco", "fomFfupRenew", "fomFfupResume", "fomFfupUnbar"
+        "formFfupChangeTelNum", "formFfupDowngrade", "formFfupInmove", "formFfupMigration", "formFfupNewApp", "formFfupOcular", "formFfupDiscoVas", "formFfupPermaDisco", "fomFfupRenew", "fomFfupResume", "fomFfupUnbar", "formFfupReloc", "formFfupSAO", "formFfupUpgrade"
     ];
 
     const ffupFormsDisputes = [
         "formFfupMisappPay", "formFfupOverpay"
-    ]
+    ];
+
+    const ffupFormsRefund = [
+        "formFfupCustDependency", "formFfupAMSF", "formFfupFinalAcc", "formFfupOverpayment", "formFfupWrongBiller"
+    ];
 
     const othersForms = [
         "othersWebForm", "othersEntAcc", "othersHomeBro", "othersSmart", "othersSME177", "othersToolsDown", "othersAO", "othersRepair", "othersBillAndAcc", "othersUT"
@@ -11400,7 +11532,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}${soSrNum}/ ${vars.ffupStatus}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupDispute") {
@@ -11433,7 +11565,7 @@ function nontechNotesButtonHandler(showFloating = true) {
             disputeNotes = `DISPUTE FOR ${vars.disputeType}S`;
         }
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${disputeNotes}${insertCustConcern(vars.custConcern)}${soSrNum}/ ${vars.ffupStatus}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${disputeNotes}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
     } else if (ffupFormsBasedOnFindings.includes(vars.selectedIntent)) {
         const emptyFields = validateRequiredFields();
@@ -11454,14 +11586,64 @@ function nontechNotesButtonHandler(showFloating = true) {
         };
 
         if (vars.findings && findingsMap[vars.findings]) {
-            concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}${soSrNum}/ ${vars.ffupStatus}`;
+            concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         }
         actionsTakenCopiedText = constructFuseOutput();
     } else if (ffupFormsDisputes.includes(vars.selectedIntent)) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP DISPUTE FOR ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}${soSrNum}/ ${vars.ffupStatus}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP DISPUTE FOR ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        actionsTakenCopiedText = constructFuseOutput();
+
+    } else if (ffupFormsRefund.includes(vars.selectedIntent)) {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP REFUND - ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        actionsTakenCopiedText = constructFuseOutput();
+
+    } else if (vars.selectedIntent === "formFfupSpecialFeat") {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} (${vars.requestType})${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        actionsTakenCopiedText = constructFuseOutput();
+
+    } else if (vars.selectedIntent === "formFfupTempDisco") {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        const findingsMap = {
+            "CCAM (Processing)": "FOR PROCESSING",
+            "DeActivation Task": "DEACTIVATION",
+            "No SO Generated": "- NO SO PROCESSED",
+            "System Task / Stuck SO": "STUCK OR PROLONGED SO"
+        };
+
+        if (vars.findings && findingsMap[vars.findings]) {
+            concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP TEMPORARY DISCONNECTION ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        }
+        actionsTakenCopiedText = constructFuseOutput();
+    } else if (vars.selectedIntent === "formFfupUP") {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} FOR VALIDATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        actionsTakenCopiedText = constructFuseOutput();
+
+    } else if (vars.selectedIntent === "formFfupVasAct") {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ACTIVATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        actionsTakenCopiedText = constructFuseOutput();
+
+    } else if (vars.selectedIntent === "formFfupVasDel") {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ${vars.vasProduct} DELIVERY${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -11832,13 +12014,17 @@ function sfTaggingButtonHandler() {
 
     const othTransfer = ["othersAO", "othersRepair", "othersBillAndAcc"]
 
-    const ffupBasedOnFindings = ["formFfupDowngrade", "formFfupInmove", "formFfupMigration"];
+    const ffupBasedOnFindings = ["formFfupDowngrade", "formFfupInmove", "formFfupMigration", "formFfupReloc", "formFfupUpgrade"];
 
     const ffupDisputes = ["formFfupMisappPay", "formFfupOverpay"];
 
     const ffupDisco = ["formFfupDiscoVas", "formFfupPermaDisco"];
 
     const ffupRecon = ["fomFfupRenew", "fomFfupResume", "fomFfupUnbar"];
+
+    const ffupRefund = ["formFfupCustDependency", "formFfupAMSF", "formFfupFinalAcc", "formFfupOverpayment", "formFfupWrongBiller"];
+
+    const ffupVAS =["formFfupVasAct", "formFfupVasDel"];
 
     const alwaysOn = ["form500_5", "form501_7", "form101_5", "form510_9", "form500_6"];
 
@@ -12192,25 +12378,25 @@ function sfTaggingButtonHandler() {
     // Non-Tech Follow-up
     else if (vars.selectedIntent === 'formFfupChangeOwnership') {
         bauRows = [
-            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.requestType}`]
         ];
     } else if (vars.selectedIntent === 'formFfupChangeTelNum') {
         bauRows = [
-            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', 'Change of Telephone Number'],
             ['Case Sub-Type:', `Change TelNum - ${vars.findings}`]
         ];
     } else if (vars.selectedIntent === 'formFfupChangeTelUnit') {
         bauRows = [
-            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', 'Change Telephone Unit'],
             ['Case Sub-Type:', 'Change Tel Unit - Opsim']
         ];
     } else if (ffupDisco.includes(vars.selectedIntent)) {
         bauRows = [
-            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `Disconnect -  ${vars.findings}`]
         ];
@@ -12218,41 +12404,103 @@ function sfTaggingButtonHandler() {
         const cleanApprvr = vars.approver ? vars.approver.replace(/\s*\([^)]*\)/, '') : '';
 
         bauRows = [
-            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.disputeType} - ${cleanApprvr}`]
         ];
     } else if (ffupBasedOnFindings.includes(vars.selectedIntent)) {
         bauRows = [
-            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.findings}`]
         ];
     } else if (vars.selectedIntent === 'formFfupDDE') {
         bauRows = [
-            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Due Date Ext (CCAM)']
         ];
     } else if (ffupDisputes.includes(vars.selectedIntent)) {
         bauRows = [
-            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.selectedIntentText} - Payman`]
         ];
     } else if (vars.selectedIntent === 'formFfupOcular') {
         bauRows = [
-            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}/AMEND SAM`],
             ['Case Sub-Type:', `Ocular/Amend - ${vars.findings}`]
         ];
     } else if (ffupRecon.includes(vars.selectedIntent)) {
         bauRows = [
-            ['VOC:', `Follow-up ${vars.ffupStatus}`],
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `Reconnection - ${vars.findings}`]
         ];
-    }
+    } else if (ffupRefund.includes(vars.selectedIntent)) {
+        bauRows = [
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', `Refund - ${vars.findings}`]
+        ];
+    } else if (vars.selectedIntent === 'formFfupRelocCid') {
+        bauRows = [
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', 'Relocation - PMA']
+        ];
+    } else if (vars.selectedIntent === 'formFfupSpecialFeat') {
+        bauRows = [
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', 'Special Features - Activation/Deactivation	']
+        ];
+    } else if (vars.selectedIntent === 'formFfupSAO') {
+        bauRows = [
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', `${vars.findings}`]
+        ];
+    } else if (vars.selectedIntent === 'formFfupTempDisco') {
+        let caseSubType = "";
+
+        if (vars.findings === "CCAM (Processing)") {
+            caseSubType = `Temp Disconnect - ${vars.findings}`;
+        } else {
+            caseSubType = `VTD - ${vars.findings}`;
+        }
+
+        bauRows = [
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', caseSubType]
+        ];
+    } else if (vars.selectedIntent === 'formFfupUP') {
+        bauRows = [
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', `${vars.selectedIntentText} - Payman`]
+        ];
+    } else if (ffupVAS.includes(vars.selectedIntent)) {
+        bauRows = [
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
+            ['Case Type:', 'VAS'],
+            ['Case Sub-Type:', `${vars.selectedIntentText}`]
+        ];
+    } else if (vars.selectedIntent === 'formFfupReroute') {
+        bauRows = [
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', 'Re-Route/OW - Opsim']
+        ];
+    }  else if (vars.selectedIntent === 'formFfupWT') {
+        bauRows = [
+            ['VOC:', `Follow-up - ${vars.ffupStatus}`],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', 'Withholding Tax (CCAM)']
+        ];
+    } 
     
     // For validation
     else if (vars.selectedIntent === 'formFfupRepairRecon') {
@@ -12919,6 +13167,22 @@ function saveFormData() {
         "fomFfupRenew",
         "fomFfupResume",
         "fomFfupUnbar",
+        "formFfupCustDependency",
+        "formFfupAMSF",
+        "formFfupFinalAcc",
+        "formFfupOverpayment",
+        "formFfupWrongBiller",
+        "formFfupReloc",
+        "formFfupRelocCid",
+        "formFfupSpecialFeat",
+        "formFfupSAO",
+        "formFfupTempDisco",
+        "formFfupUP",
+        "formFfupUpgrade",
+        "formFfupVasAct",
+        "formFfupVasDel",
+        "formFfupReroute",
+        "formFfupWT",
         
         // Request
         "formReqGoGreen",
@@ -12967,7 +13231,9 @@ function saveFormData() {
         combinedNotes = [fuseNotes, cepNotes].filter(Boolean).join("\n\n");
     }
 
-    combinedNotes = combinedNotes.trim();
+    // combinedNotes = combinedNotes.trim();
+    combinedNotes = (combinedNotes || "").toString().trim();
+    //console.log(typeof combinedNotes, combinedNotes);
 
     const now = new Date();
     const timestamp = now.toLocaleString();
@@ -13208,12 +13474,18 @@ function renderUpdates(containerId, instructions, versions) {
 
 const instructions = [
     "Fill out all required fields.",
-    "If a field is not required (i.e. L2 fields), leave it blank. Avoid entering 'NA' or any unnecessary details.",
+    "If a field is not required (e.g. L2 fields), leave it blank. Avoid entering 'NA' or any unnecessary details.",
     "Ensure that the information is accurate.",
     "Review your inputs before generating the notes."
 ];
 
 const versions = [
+    {
+        version: "V5.2.131125",
+        updates: [
+        { title: "Added Non-Tech Follow-up Intents", items: ["Refund", "Relocation", "Relocation - CID Creation", "Special Features", "Speed Add On 500", "Temporary Disconnection (VTD/HTD)", "Unreflected Payment", "Upgrade", "VAS", "Wire Re-Route", "Withholding Tax Adjustment"] }
+        ]
+    },
     {
         version: "V5.2.301025",
         updates: [
