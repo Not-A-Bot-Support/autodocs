@@ -1,6 +1,6 @@
 //script.js
 
-// Standard Notes Generator Version 5.2.131125
+// Standard Notes Generator Version 5.2.101225
 // Developed & Designed by: QA Ryan
 
 // Channel, Concern Type, and VOC Options
@@ -475,19 +475,19 @@ function createForm2() {
     var form = document.createElement("form");
     form.setAttribute("id", "Form2");
 
-    if (!channelField) {
-        selectIntent.selectedIndex = 0; 
-        alert("Please select your designated channel.");
+    // if (!channelField) {
+    //     selectIntent.selectedIndex = 0; 
+    //     alert("Please select your designated channel.");
         
-        const header = document.getElementById("headerValue");
-        typeWriter("Standard Notes Generator", header, 50);
+    //     const footer = document.getElementById("footerValue");
+    //     typeWriter("Standard Notes Generator Version 5.2.101225", footer, 50);
         
-        resetForm2ContainerAndRebuildButtons();
-        return; 
-    }
+    //     resetForm2ContainerAndRebuildButtons();
+    //     return; 
+    // }
     
     const selectedOption = selectIntent.options[selectIntent.selectedIndex];
-    let headerText = selectedOption.textContent;
+    let footerText = selectedOption.textContent;
 
     const lobValue = document.getElementById("lob").value;
 
@@ -495,12 +495,12 @@ function createForm2() {
         const optgroupElement = selectedOption.parentElement;
         if (optgroupElement.tagName === "OPTGROUP") {
             const optgroupLabel = optgroupElement.label;
-            headerText = `${optgroupLabel} - ${headerText}`;
+            footerText = `${optgroupLabel} - ${footerText}`;
         }
     }
 
-    const header = document.getElementById("headerValue");
-    typeWriter(headerText, header, 50);
+    const footer = document.getElementById("footerValue");
+    typeWriter(footerText, footer, 50);
 
     const voiceAndDataForms = [
         "form100_1", "form100_2", "form100_3", "form100_4", "form100_5", "form100_6", "form100_7"
@@ -639,7 +639,7 @@ function createForm2() {
             { label: "Nominated Mobile Number", type: "number", name: "nomiMobileNum" },
             { label: "No. of Follow-Up(s)", type: "select", name: "ffupCount", options: ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Multiple" ]},
             { label: "Case Age (HH:MM)", type: "text", name: "ticketAge" },
-            { label: "Notes to Tech/ Actions Taken/ Add'l Remarks/ Decline Reason for ALS", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "Notes to Tech/ Actions Taken/ Decline Reason for ALS", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved", type: "select", name: "issueResolved", options: [
                 "", 
                 "Yes", 
@@ -796,22 +796,6 @@ function createForm2() {
 
             const ul = document.createElement("ul");
             ul.className = "instructions-list";
-
-            // const li1 = document.createElement("li");
-            // li1.textContent = "Please fill out all required fields.";
-            // ul.appendChild(li1);
-
-            // const li2 = document.createElement("li");
-            // li2.textContent = "Click the correct button to ensure the proper formatting is applied based on the tool you're using to create your notes.";
-            // ul.appendChild(li2);
-
-            // const li3 = document.createElement("li");
-            // li3.textContent = "Ensure that the information is accurate.";
-            // ul.appendChild(li3);
-
-            // const li4 = document.createElement("li");
-            // li4.textContent = "Please review your inputs before generating the notes.";
-            // ul.appendChild(li4);
 
             const li5 = document.createElement("li");
             li5.textContent = "See ";
@@ -1135,7 +1119,7 @@ function createForm2() {
                 "CEP Affected Services Tab"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
             { label: "Modem Lights Status", type: "select", name: "modemLights", options: [
                 "", 
                 "Red Power Light", 
@@ -1146,7 +1130,7 @@ function createForm2() {
             ]},
             // BSMP/Clearview
             { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
-            { label: "Latest Real-Time Request (L2)", type: "text", name: "rtaRequest"},
+            { label: "Latest RTA Request (L2)", type: "text", name: "rtaRequest"},
             // NMS Skin
             { label: "ONU Status/RUNSTAT", type: "select", name: "onuRunStats", options: [
                 "", 
@@ -1165,7 +1149,7 @@ function createForm2() {
                 "Aligned", 
                 "Misaligned"
             ]},
-            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Leave this field blank if no action was taken." },
+            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank." },
             { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “NDT-NIC with red LOS” DO NOT input the WOCAS!"},
             { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
@@ -1772,7 +1756,7 @@ function createForm2() {
                 "CEP Affected Services Tab"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
             { label: "Modem Lights Status", type: "select", name: "modemLights", options: [
                 "", 
                 "Red Power Light", 
@@ -1792,7 +1776,7 @@ function createForm2() {
                 "International"
             ]},
             // NMS Skin
-            { label: "OLT and ONU Connection Type", type: "select", name: "oltAndOnuConnectionType", options: [
+            { label: "OLT & ONU Conn. Type", type: "select", name: "oltAndOnuConnectionType", options: [
                 "", 
                 "FEOL - InterOp", 
                 "FEOL - Non-interOp", 
@@ -1803,11 +1787,11 @@ function createForm2() {
             { label: "Routing Index", type: "text", name: "routingIndex" },
             { label: "Call Source", type: "text", name: "callSource" },
             { label: "LDN Set", type: "text", name: "ldnSet" },
-            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Leave this field blank if no action was taken." },
+            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank." },
             // DMS
             { label: "Voice Status", type: "text", name: "dmsVoipServiceStatus" },
             { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken." },
-            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “Busy tone only when dialing”. DO NOT input the WOCAS!"},
+            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “Busy tone when dialing”. DO NOT input the WOCAS!"},
             { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
                 "", 
@@ -2291,7 +2275,8 @@ function createForm2() {
                 "— Network Outage Source —", 
                 "FUSE Outage Tab", 
                 "Lit365 Downtime Advisory",
-                "Clearview"
+                "Clearview",
+                "CEP Affected Services Tab"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
             // { label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
@@ -2314,7 +2299,7 @@ function createForm2() {
             //     "Non-interOp"
             // ]},
             { label: "ONU Model (L2)", type: "text", name: "onuModel", placeholder: "Available in DMS."},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
             { label: "Internet Light Status", type: "select", name: "intLightStatus", options: [
                 "", 
                 "Steady Green", 
@@ -2330,7 +2315,7 @@ function createForm2() {
             ]},
             // Clearview
             { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
-            { label: "Latest Real-Time Request (L2)", type: "text", name: "rtaRequest"},
+            { label: "Latest RTA Request (L2)", type: "text", name: "rtaRequest"},
             // NMS Skin
             { label: "ONU Status/RUNSTAT", type: "select", name: "onuRunStats", options: [
                 "", 
@@ -2351,7 +2336,7 @@ function createForm2() {
                 "Aligned", 
                 "Misaligned"
             ]},
-            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Leave this field blank if no action was taken." },
+            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank." },
             // DMS
             { label: "Internet/Data Status(L2)", type: "select", name: "dmsInternetStatus", options: ["", "Online", "Offline" ]},
             { label: "Performed Self Heal?", type: "select", name: "dmsSelfHeal", options: [
@@ -3091,7 +3076,7 @@ function createForm2() {
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
             { label: "Plan Details (L2)", type: "textarea", name: "planDetails", placeholder: "Please specify the plan details as indicated in FUSE.\ne.g. “Plan 2699 at 1GBPS”" },
             { label: "ONU Model (L2)", type: "text", name: "onuModel", placeholder: "Available in DMS."},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
             // NMS Skin
             { label: "RX Power", type: "number", name: "rxPower", step: "any", placeholder: "Also available in Clearview."},
             { label: "Option82 Config", type: "select", name: "option82Config", options: [
@@ -3099,12 +3084,12 @@ function createForm2() {
                 "Aligned", 
                 "Misaligned"
             ]},
-            { label: "SAAA Bandwidth Code (L2)", type: "text", name: "saaaBandwidthCode"},
+            { label: "SAAA BW Code (L2)", type: "text", name: "saaaBandwidthCode"},
             { label: "Connected Devices (L2)", type: "text", name: "connectedDevices", placeholder: "e.g. 2 on 2.4G, 3 on 5G, 2 LAN(Desktop/Laptop and Mesh)"},
-            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Leave this field blank if no action was taken." },
+            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank." },
             // DMS
             { label: "Internet/Data Status(L2)", type: "select", name: "dmsInternetStatus", options: ["", "Online", "Offline" ]},
-            { label: "WiFi Band of the Device (L2)", type: "select", name: "deviceWifiBand", options: [
+            { label: "Device's WiFi Band (L2)", type: "select", name: "deviceWifiBand", options: [
                 "", 
                 "Device Found in 2.4G Wi-Fi", 
                 "Device Found in 5G Wi-Fi" 
@@ -3113,7 +3098,7 @@ function createForm2() {
             { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken." },
             // BSMP/Clearview
             { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
-            { label: "Latest Real-Time Request (L2)", type: "text", name: "rtaRequest"},
+            { label: "Latest RTA Request (L2)", type: "text", name: "rtaRequest"},
             // Probing
             { label: "Connection Method", type: "select", name: "connectionMethod", options: [
                 "", 
@@ -3184,6 +3169,7 @@ function createForm2() {
                 "FCR - Low BW profile",
                 "FCR - Slow/Intermittent Browsing",
                 "High Latency",
+                "High Utilization OLT/PON Port",
                 "Individual Trouble",
                 "Misaligned Record",
                 "Network Trouble - High Latency",
@@ -3711,13 +3697,14 @@ function createForm2() {
                 "— Network Outage Source —", 
                 "FUSE Outage Tab", 
                 "Lit365 Downtime Advisory",
-                "Clearview"
+                "Clearview",
+                "CEP Affected Services Tab"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
             // BSMP/Clearview
             { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
-            { label: "Latest Real-Time Request (L2)", type: "text", name: "rtaRequest"},
+            { label: "Latest RTA Request (L2)", type: "text", name: "rtaRequest"},
             // NMS Skin
             { label: "RX Power", type: "number", name: "rxPower", step: "any"},
             // Probing & Remote Troubleshooting
@@ -4254,7 +4241,8 @@ function createForm2() {
                 "— Network Outage Source —", 
                 "FUSE Outage Tab", 
                 "Lit365 Downtime Advisory",
-                "Clearview"
+                "Clearview",
+                "CEP Affected Services Tab"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
             // NMS Skin
@@ -4284,7 +4272,7 @@ function createForm2() {
                 "Yes", 
                 "No"
             ] },
-            { label: "Result Using Other ISP? (L2)", type: "select", name: "otherISP", options: [
+            { label: "Result w/ Other ISP (L2)", type: "select", name: "otherISP", options: [
                 "", 
                 "Yes - Working", 
                 "Yes - Not Working", 
@@ -4755,7 +4743,9 @@ function createForm2() {
             { label: "Source Reference", type: "select", name: "outageReference", options: [
                 "— Network Outage Source —", 
                 "FUSE Outage Tab", 
-                "Lit365 Downtime Advisory"
+                "Lit365 Downtime Advisory",
+                "Clearview",
+                "CEP Affected Services Tab"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
             { label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
@@ -4777,7 +4767,7 @@ function createForm2() {
                 "InterOp", 
                 "Non-interOp"
             ]},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/Clearview/DMS."},
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
             // NMS Skin
             { label: "ONU Status/RUNSTAT", type: "select", name: "onuRunStats", options: [
                 "", 
@@ -4794,7 +4784,7 @@ function createForm2() {
             { label: "SRVCTYPE_3", type: "text", name: "srvcType_3"},
             { label: "CONNTYPE_3", type: "text", name: "connType_3"},
             { label: "WANVLAN_3/LAN 4 Unicast", type: "text", name: "vlan_3"},
-            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Leave this field blank if no action was taken." },
+            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank." },
             // DMS
             { label: "LAN 4 Status", type: "text", name: "dmsLan4Status"},
             { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken." }, 
@@ -9720,7 +9710,7 @@ function createButtons(buttonLabels, buttonHandlers) {
                         { label: "Title", keys: ["Title"] },
                         { label: "Description", keys: ["Description"] },
                         { label: "Case Notes", keys: ["Case Notes in Timeline"] },
-                        { label: "Special Instructions", keys: ["Special Instructions"] }
+                        { label: "Special Inst.", keys: ["Special Instructions"] }
                     ];
 
                     subOptions.forEach(option => {
@@ -9797,7 +9787,7 @@ function optionNotAvailable() {
         if (vars.issueResolved === "") {
             alert('Please indicate whether the issue is resolved or not.');
             return true;
-        } else if (vars.issueResolved !=="No - for Ticket Creation") {5
+        } else if (vars.issueResolved !=="Yes" && vars.issueResolved !=="No - for Ticket Creation") {
             alert('This option is not available. Please use Salesforce or FUSE button.');
             return true;
         }
@@ -13016,14 +13006,14 @@ function resetButtonHandler() {
         const blankLobOption = document.createElement("option");
         blankLobOption.value = "";
         blankLobOption.textContent = "";
-        blankLobOption.disabled = true;  // cannot select
-        blankLobOption.selected = true;  // default visible
+        blankLobOption.disabled = true;
+        blankLobOption.selected = true;
         lobSelect.appendChild(blankLobOption);
 
         // Only repopulate LOB if channel already has a value
         if (Channel.value !== "") {
             allLobOptions.forEach(optData => {
-                if (optData.value !== "") { // skip blank
+                if (optData.value !== "") {
                     const opt = document.createElement("option");
                     opt.value = optData.value;
                     opt.textContent = optData.text;
@@ -13045,10 +13035,9 @@ function resetButtonHandler() {
             }
         });
 
-        const header = document.getElementById("headerValue");
-        header.innerHTML = '<span class="version-circle">V5</span>Standard Notes Generator';
-
-        typeWriter("Standard Notes Generator", header, 50);
+        const footerElement = document.getElementById("footerValue");
+        const footerText = "Standard Notes Generator Version 5.2.101225";
+        typeWriter(footerText, footerElement, 50);
 
         const notepad = document.getElementById("notepad");
         notepad.rows = 10;
@@ -13473,6 +13462,8 @@ function renderUpdates(containerId, instructions, versions) {
 }
 
 const instructions = [
+    "Open the tool using the provided link. Avoid using ‘Duplicate Tab’ to ensure the DOM scripts load properly.",
+    "Always utilize the LIT365 work instructions to ensure accurate, consistent, and up-to-date handling of every intent. These guidelines outline the correct process flow and required checks, so make sure to utilize them before completing any action.",
     "Fill out all required fields.",
     "If a field is not required (e.g. L2 fields), leave it blank. Avoid entering 'NA' or any unnecessary details.",
     "Ensure that the information is accurate.",
@@ -13480,6 +13471,14 @@ const instructions = [
 ];
 
 const versions = [
+    {
+        version: "V5.2.101225",
+        updates: [
+        { title: "Added", items: ["Instructions to always utilize LIT365 work instructions for proper guidance", "Investigation 4 options for SIC (High Utilization OLT/PON Port)", "DC and RA Exec status fields in the NMS skin"] },
+        { title: "Improvements", items: ["UI enhancements for better usability", "Save and Export function enhancements to ensure accurate notation is saved and exported", "Special Instructions functionality", "Case Notes timeline formatting", "Enabled FCR notation for CEP tool"] },
+        { title: "Bug Fixes", items: ["Fixed minor bugs in generated notes", "Resolved SF Tagging issue for SOCMED agents"] }
+        ]
+    },
     {
         version: "V5.2.131125",
         updates: [
