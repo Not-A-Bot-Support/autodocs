@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Standard Notes Generator V5.2</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -15,7 +12,8 @@
 
     <div class="divHeader">
         <div class="formDivHeader">
-            <img src="images/header.png" alt="Logo" class="header-logo">
+            <span class="version-circle">V5</span>
+            <header id="headerValue">Standard Notes Generator</header>
         </div>
     </div>
 
@@ -557,27 +555,23 @@
     </div>
     
     <div class="footer">
-        <div class="footer-content">
-            <div class="timer">
-                <table id="timerTable">
-                    <tr>
-                        <td id="timerDisplay" colspan="2">00:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <button id="timerToggleButton">Start</button>
-                        </td>
-                        <td>
-                            <button id="timerResetButton">Reset</button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div class="footer-text">
-                <span id="footerValue">Standard Notes Generator Version 5.2.101225</span>
-                <span>&copy; Developed and designed by: QA Team</span>
-            </div>
+        <div class="timer">
+            <table id="timerTable">
+                <tr>
+                    <td id="timerDisplay" colspan="2">00:00:00</td>
+                </tr>
+                <tr>
+                    <td>
+                        <button id="timerToggleButton">Start</button>
+                    </td>
+                    <td>
+                        <button id="timerResetButton">Reset</button>
+                    </td>
+                </tr>
+            </table>
         </div>
+        Standard Notes Generator Version 5.2.131125<br> <!--Version #.#.DDMMYY -->
+        &copy; Developed and designed by: QA Team
     </div>
 
     <div id="floatingDiv" style="display: none;">

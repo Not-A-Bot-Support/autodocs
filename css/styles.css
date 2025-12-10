@@ -7,28 +7,63 @@ html, body {
 body {
     margin: 0;
     padding: 0;
-    font-family: "Inter", sans-serif;
-    font-size: 12px;
+    font-family: 'Calibri', sans-serif;
+    font-size: 12.5px;
     letter-spacing: 1.5px;
     background-color: #F5F7FA;
-    background-image: url("../images/bg.png");
-    background-size: cover;        /* makes the image fill the screen */
-    background-repeat: no-repeat;  /* prevents tiling */
-    background-position: center;   /* centers the image */
-    background-attachment: fixed;
     color: #2C3E50;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-@font-face {
-    font-family: 'E1234';
-    src: url('fonts/E1234.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+    transition: background-color 0.3s ease, color 0.3s ease; 
 }
 
 * {
     box-sizing: border-box; 
+}
+
+.color-box {
+    position: fixed;
+    top: 9px;
+    right: 10px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 5px;
+    z-index: 50;
+}
+
+.color-picker-container {
+    display: flex;
+    align-items: center;
+}
+
+input[type="color"] {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: 50%;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+input[type="color"]::-moz-focus-inner {
+    border: 0;
 }
 
 .divHeader {
@@ -39,12 +74,11 @@ body {
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    padding-left: 10px;
     z-index: 20; 
     background-color: #2C3E50;
-    height: 75px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: top 0.3s ease, border-radius 0.3s ease, background-color 0.3s ease; 
-    border-bottom: 5px solid #92a6bb;
 }
 
 .formDivHeader {
@@ -53,12 +87,22 @@ body {
     align-items: center;
     justify-content: flex-start;
     gap: 10px;
+    /* removed margin: 0 auto; */
 }
 
-.header-logo {
-    height: 55px;
-    width: auto;
-    object-fit: contain;
+.version-circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45px;
+    height: 45px;
+    background-color: #1E90FF; 
+    color: white;
+    border-radius: 50%;
+    font-size: 17.5px;
+    margin: 5px 0; /* space on all sides */
+    border: solid 2px white;
+    padding: 5px 10px; 
 }
 
 header {
@@ -75,13 +119,22 @@ header {
     margin-right: 10px;
 }
 
+#headerValue {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: clamp(14px, 2vw, 20px);
+}
+
 .mainContainer {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
     justify-content: flex-start;
     width: 100%;
-    margin-top: 75px;
+    margin-top: 55px;
     gap: 20px;
     padding: 10px 5px;
     box-sizing: border-box;
@@ -90,21 +143,21 @@ header {
 .updatesDiv {
     position: fixed;
     left: 505px;
-    top: 85px;
+    top: 65px;
     width: 600px;
     background-color: #f4f6f8;
     border: 1px solid #ccc;
     border-radius: 10px;
     padding: 15px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    max-height: 70vh;
+    max-height: 50vh;
     overflow: hidden;
     transition: max-height 0.3s ease;
     z-index: 100;
 }
 
 .updatesDiv.expanded {
-    max-height: 84vh;
+    max-height: 85vh;
     overflow: auto;
     scrollbar-width: none;
     -ms-overflow-style: none; 
@@ -120,7 +173,7 @@ header {
 }
 
 .updatesDiv h3 {
-    font-size: 15px;
+    font-size: 18px;
     margin: 0;
     color: #2C3E50;
     line-height: 1.4;
@@ -132,7 +185,7 @@ header {
     right: 15px;
     width: 20px;
     height: 20px;
-    font-size: 11px;
+    font-size: 12.5px;
     font-weight: bold;
     background-color: transparent;
     color: #2C3E50;
@@ -186,7 +239,7 @@ header {
 
 .scrollWrapper {
     position: relative;
-    max-height: 84vh;
+    max-height: 85vh;
     width: 480px;
     overflow: hidden;
     gap: 20px;
@@ -195,13 +248,14 @@ header {
 .divsContainer {
     display: flex;
     flex-direction: column;
-    background-color: rgba(244, 246, 248, 0.75); /* 0 = fully transparent, 1 = solid */
+    background-color: #f4f6f8;
     border: 1px solid #ccc;
     border-radius: 10px;
     padding: 5px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     box-sizing: border-box;
-    max-height: 84vh;
+
+    max-height: 85vh;
     overflow-y: scroll;
 }
 
@@ -276,7 +330,6 @@ td:last-child {
     text-align: center;
     cursor: default;
     border-radius: 5px;
-    letter-spacing: 2px;
 }
 
 .form1DivInput {
@@ -437,8 +490,7 @@ button.form1-button {
 .instructions-list {
     list-style-type: disc; 
     margin-left: 0; 
-    padding-right: 5px;
-    font-size: 12px; 
+    font-size: 14px; 
     color: #fff; 
 }
 
@@ -490,7 +542,7 @@ button.form1-button {
 }
 
 .esca-checklist-instruction {
-    font-size: 12px;
+    font-size: 14.5px;
     font-style: italic;
     font-weight: bold;
     text-align: left;
@@ -508,13 +560,13 @@ button.form1-button {
     list-style-type: circle; 
     margin-left: 0; 
     margin-right: 15px;  /* 👈 adjust value as needed */
-    font-size: 12px; 
+    font-size: 14px; 
     color: #2C3E50; 
 }
 
 .esca-checklist {
     margin-left: 0; 
-    font-size: 12px; 
+    font-size: 14px; 
     color: #2C3E50; 
 }
 
@@ -608,8 +660,8 @@ input, select {
 }
 
 input, select, textarea, button {
-    font-family: "Inter", sans-serif;
-    font-size: 12px;
+    font-family: 'Calibri', sans-serif;
+    font-size: 12.5px;
     letter-spacing: 1.5px;
 }
 
@@ -860,7 +912,7 @@ button.form3-button {
 
 .footer {
     display: flex; 
-    justify-content: center;
+    justify-content: center; 
     align-items: center; 
     padding: 4px;
     background-color: #2C3E50; 
@@ -877,32 +929,6 @@ button.form3-button {
     z-index: 100;
 }
 
-.footer-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 380px;
-}
-
-.footer-text {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.footer-text span {
-    display: block;
-    text-align: left;
-}
-
-#footerValue {
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .timer {
     display: flex;
     justify-content: center; 
@@ -912,7 +938,6 @@ button.form3-button {
     height: 45px; 
     border: solid 2px white;
     box-sizing: border-box; 
-    flex-shrink: 0;
 }
 
 #timerTable {
@@ -942,9 +967,9 @@ button.form3-button {
 }
 
 #timerDisplay {
-    font-size: 1.2em;
-    letter-spacing: 2.5px;
-    /* font-weight: normal; */
+    font-size: 1.5em;
+    letter-spacing: 5px;
+    font-weight: bold;
     text-align: center;
     padding: 0;
     height: 20px; 
@@ -952,14 +977,14 @@ button.form3-button {
     background-color: #2C3E50;
     border-radius: 8px 8px 0 0;
     cursor: default;
-    font-family: "E1234", monospace;
+    font-family: 'Courier New', Courier, monospace; 
 }
 
 #timerToggleButton,
 #timerResetButton {
     width: 100%; 
     height: 20px; 
-    font-size: 1em; 
+    font-size: 1.2em; 
     padding: 0;
     box-sizing: border-box;
     border: none;
@@ -1087,8 +1112,8 @@ button:active {
     border: 2.5px solid #2C3E50;
     border-radius: 10px;
     box-shadow:
-        0 4px 8px rgba(0, 0, 0, 0.25), 
-        0 0 10px rgba(255, 255, 255, 0.5);
+        0 4px 8px rgba(0, 0, 0, 0.25),   /* existing dark shadow */
+        0 0 10px rgba(255, 255, 255, 0.5); /* new light outer glow for dark backgrounds */
     z-index: 9999;
     width: 180px;
     text-align: center;
@@ -1105,8 +1130,8 @@ button:active {
 }
 
 #ticketTimerDisplay {
-    font-family: "E1234", monospace;
-    font-size: 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.4em;
     color: #2C3E50;
     padding: 5px;
 }
