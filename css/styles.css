@@ -104,7 +104,7 @@ header {
 }
 
 .updatesDiv.expanded {
-    max-height: 84vh;
+    max-height: calc(100dvh - 150px);
     overflow: auto;
     scrollbar-width: none;
     -ms-overflow-style: none; 
@@ -186,7 +186,7 @@ header {
 
 .scrollWrapper {
     position: relative;
-    max-height: 84vh;
+    max-height: calc(100dvh - 150px);
     width: 480px;
     overflow: hidden;
     gap: 20px;
@@ -201,7 +201,7 @@ header {
     padding: 5px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     box-sizing: border-box;
-    max-height: 84vh;
+    max-height: calc(100dvh - 150px);
     overflow-y: scroll;
 }
 
@@ -763,7 +763,6 @@ input, select, textarea, button {
     text-align: left;
     background-color: #2C3E50;
     color: white;
-    font-weight: bold;
     padding: 10px;
     box-sizing: border-box;
     margin: 0;
@@ -1129,4 +1128,45 @@ button:active {
 
 #ticketTimerReset:hover {
     background-color: #1C86EE; 
+}
+
+/* Endorsement Generated Notes Div */
+#floating3Div {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    border: 2.5px solid #2C3E50;
+    border-radius: 7.5px;
+    background-color: #F5F7FA;
+    padding: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    width: 460px;
+    min-height: 15%; 
+    max-height: 95%; 
+    font-weight: normal;
+    box-sizing: border-box;
+    overflow-y: auto; 
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+#floating3Div.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+#floating3Div::-webkit-scrollbar {
+    display: none; 
+}
+
+#floating3DivHeader {
+    width: 100%;
+    text-align: left;
+    background-color: #2C3E50;
+    color: white;
+    padding: 10px;
+    box-sizing: border-box;
+    margin: 0;
 }

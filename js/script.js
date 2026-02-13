@@ -1,6 +1,6 @@
 //script.js
 
-// Standard Notes Generator Version 5.2.101225
+// Standard Notes Generator Version 5.2.140226
 // Developed & Designed by: QA Ryan
 
 // Channel, Concern Type, and VOC Options
@@ -460,9 +460,11 @@ function initializeVariables() {
         affectedTool: q('[name="affectedTool"]'),
         requestType: q('[name="requestType"]'),
         vasProduct: q('[name="vasProduct"]'),
+        reconType: q('[name="reconType"]'),
     };
 }
 
+// Create the dynamic forms
 function createForm2() {
     const selectIntent = document.getElementById("selectIntent");
     const form2Container = document.getElementById("form2Container");
@@ -475,17 +477,6 @@ function createForm2() {
     var form = document.createElement("form");
     form.setAttribute("id", "Form2");
 
-    // if (!channelField) {
-    //     selectIntent.selectedIndex = 0; 
-    //     alert("Please select your designated channel.");
-        
-    //     const footer = document.getElementById("footerValue");
-    //     typeWriter("Standard Notes Generator Version 5.2.101225", footer, 50);
-        
-    //     resetForm2ContainerAndRebuildButtons();
-    //     return; 
-    // }
-    
     const selectedOption = selectIntent.options[selectIntent.selectedIndex];
     let footerText = selectedOption.textContent;
 
@@ -544,7 +535,7 @@ function createForm2() {
     ]
 
     const requestForms = [
-        "formReqGoGreen", "formReqUpdateContact", "formReqSrvcRenewal", "formReqBillAdd", "formReqSrvcAdd", "formReqTaxAdj", "formReqChgTelUnit", "formReqDiscoVAS", "formReqTempDisco", "formReqNSR", "formReqRentMSF", "formReqRentLPN", "formReqNRC", "formReqSCC", "formReqTollUFC", "formReqOtherTolls" 
+        "formReqGoGreen", "formReqUpdateContact", "formReqSrvcRenewal", "formReqBillAdd", "formReqSrvcAdd", "formReqTaxAdj", "formReqChgTelUnit", "formReqDiscoVAS", "formReqTempDisco", "formReqNSR", "formReqRentMSF", "formReqRentLPN", "formReqNRC", "formReqSCC", "formReqTollUFC", "formReqOtherTolls", "formReqDowngradeOthers", "formReqDowngrade1299", "formReqDowngrade1399", "formReqDowngrade1799"
     ]
 
     const othersForms = [
@@ -632,7 +623,8 @@ function createForm2() {
                 "Offered ALS/Accepted", 
                 "Offered ALS/Declined", 
                 "Offered ALS/No Confirmation", 
-                "Previous Agent Already Offered ALS"
+                "Previous Agent Already Offered ALS",
+                "Not Applicable" // Tickets beyond 24 hrs but still within the 36 hrs threshold for offering ALS.
             ]},
             { label: "Alternative Services Package Offered", type: "textarea", name: "alsPackOffered", placeholder: "(i.e. 10GB Open Access data, 5GB/day for Youtube, NBA, Cignal and iWantTFC, Unlimited call to Smart/TNT/SUN, Unlimited text to all network and 500MB of data for Viber, Messenger, WhatsApp and Telegram valid for 7 days)" },
             { label: "Effectivity Date", type: "date", name: "effectiveDate" },
@@ -771,6 +763,7 @@ function createForm2() {
             { label: "Preferred Date & Time", type: "text", name: "availability" },
             { label: "Address", type: "textarea", name: "address" },
             { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             { label: "Re-Open Status Reason", type: "textarea", name: "reOpenStatsReason", placeholder: "Indicate the reason for re-opening the ticket (Dispatched to Field Technician - Re-Open or Escalated to Network - Re-Open)." },
             // Cross Sell/Upsell
             { label: "Cross Sell/Upsell", type: "select", name: "upsell", options: [
@@ -1001,19 +994,19 @@ function createForm2() {
             resetAllFields(["subject1", "statusReason","subStatus", "queue"]);
             if (queue.value === "FM POLL" || queue.value === "CCARE OFFBOARD") {
                 showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "issueResolved", "upsell" ]);
-                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "reOpenStatsReason" ]);
+                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason" ]);
 
                 updateToolLabelVisibility();
 
             }else if (queue.value === "Default Entity Queue") {
                 showFields(["ffupCount", "ticketAge", "remarks", "issueResolved", "upsell"]);
-                hideSpecificFields(["projRed", "ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "reOpenStatsReason" ]);
+                hideSpecificFields(["projRed", "ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason" ]);
 
                 updateToolLabelVisibility();
 
             } else {
                 showFields(["projRed" ]);
-                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "reOpenStatsReason", "upsell" ]);
+                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "upsell" ]);
 
                 updateToolLabelVisibility();
             }
@@ -1032,10 +1025,10 @@ function createForm2() {
             resetAllFields(["subject1", "statusReason","subStatus", "queue", "projRed"]);
             if (projRed.value === "Yes") {
                 if (queue.value === "SDM CHILD" || queue.value ==="SDM" || queue.value ==="FSMG" || queue.value ==="L2 RESOLUTION" ) {
-                    showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "upsell" ]);
-                        hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "availability", "address", "landmarks", "reOpenStatsReason" ]);
+                    showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "rptCount", "upsell" ]);
+                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "availability", "address", "landmarks", "reOpenStatsReason" ]);
                 } else {
-                    showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "availability", "address", "landmarks", "upsell" ]);
+                    showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell" ]);
                     hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "reOpenStatsReason" ]);
                 }
 
@@ -1043,12 +1036,12 @@ function createForm2() {
 
             } else if (projRed.value === "No"){
                 showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "upsell" ]);
-                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "reOpenStatsReason" ]);
+                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason" ]);
 
                 updateToolLabelVisibility();
 
             } else {
-                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "reOpenStatsReason", "upsell" ]);
+                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "upsell" ]);
 
                 updateToolLabelVisibility();
             }
@@ -1079,10 +1072,10 @@ function createForm2() {
 
         issueResolved.addEventListener("change", () => {
             if (issueResolved.value === "No") {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "reOpenStatsReason" ]);
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason" ]);
                 updateToolLabelVisibility();
             } else {
-                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "reOpenStatsReason" ]);
+                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason" ]);
                 updateToolLabelVisibility();
             }
             updateToolLabelVisibility();
@@ -6422,6 +6415,11 @@ function createForm2() {
                 formReqSCC: "Requests for dispute on rental adjustment for service connection charges (e.g., relocation, reconnection, in-move fees)",
                 formReqTollUFC: "To be updated.",
                 formReqOtherTolls: "To be updated.",
+                formReqDowngradeOthers: "Requests for downgrade to a lower subscription plan.",
+                formReqDowngrade1299: "Processing of SO for downgrade from a higher plan to Fiber Unli Plan 1299.",
+                formReqDowngrade1399: "Processing of SO for downgrade from a higher plan to Plan 1399 with Cignal subscription.",
+                formReqDowngrade1799: "Processing of SO for downgrade from a higher plan to Plan 1799 with Cignal subscription.",
+                
             };
 
             const ul = document.createElement("ul");
@@ -6486,6 +6484,15 @@ function createForm2() {
             const li9 = document.createElement("li");
             li9.textContent = "Zero outstanding balance at the time of request";
 
+            const li10 = document.createElement("li");
+            li10.textContent = "A ₱500 downgrade fee applies. 36 months lock-in period will refresh.";
+
+            const li11 = document.createElement("li");
+            li11.textContent = "Signed Subscription Certificate";
+
+            const li12 = document.createElement("li");
+            li12.textContent = "Signed LOA of the customer with copy of Valid ID of requestor & SOR ";
+
             if (selectedValue === "formReqTaxAdj") {
                 [li1, li2, li3].forEach(li => ulReq.appendChild(li));
             } else if (selectedValue === "formReqChgTelUnit") {
@@ -6494,6 +6501,8 @@ function createForm2() {
                 ulReq.appendChild(li6);
             } else if (selectedValue === "formReqTempDisco") {
                 [li7, li8, li9].forEach(li => ulReq.appendChild(li));
+            } else if (selectedValue === "formReqDowngradeOthers") {
+                [li10, li11, li12].forEach(li => ulReq.appendChild(li));
             }
 
             checklistDiv.appendChild(ulReq);
@@ -6587,7 +6596,8 @@ function createForm2() {
             "formReqTaxAdj",
             "formReqChgTelUnit",
             "formReqDiscoVAS",
-            "formReqTempDisco"
+            "formReqTempDisco",
+            "formReqDowngradeOthers"
         ];
 
         if (checklistForms.includes(selectedValue)) {
@@ -7085,104 +7095,145 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
     
-    } else if (selectedValue === "formReqReconnection") { 
+    } else if (selectedValue === "formReqReconnect") {
         const table = document.createElement("table");
 
         const fields = [
             { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
-            { label: "Ownership", type: "select", name: "ownership", options: [
-                "", 
-                "SOR", 
-                "Non-SOR"
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: ["", "Failed", "Passed", "NA"] },
+            { label: "Request Type", type: "select", name: "reconType", options: [
+                "",
+                "Posted Payment",
+                "Posted Payment (DTS)",
+                "Promise To Pay",
+                "Renew (PD/OP)",
+                "Reported Payment",
+                "Reported Payment (DTS)",
+                "Resume (TD)",
+                "Tactical"
             ]},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”, “PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
+                "",
                 "Yes",
                 "No - Customer is Unresponsive",
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
-            ] },
+            ]},
             { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
+                "",
+                "Yes - Accepted",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
             ]}
         ];
 
-        function createPromptRow() {
+        const reconRequirements = {
+            "Posted Payment": "Processing of reconnection request from a restricted account with payment already posted.",
+            "Posted Payment (DTS)": "Reconnection request processed via NMS Skin.",
+            "Promise To Pay": "Processing of immediate reconnection request with subscriber’s verbal commitment to settle the outstanding balance from the date of request.",
+            "Renew (PD/OP)": "Processing of reconnection request for a PD account upon full settlement of the remaining balance.",
+            "Reported Payment": "Processing of reconnection request with reported payment or upon receipt of payment proof (e.g., screenshot).",
+            "Reported Payment (DTS)": "Processing of reconnection request with reported payment requiring reconnection via NMS.",
+            "Resume (TD)": "Processing of reconnection request for a TD account upon full settlement of the outstanding bill.",
+            "Tactical": "Processing of reconnection request with an approved churn offer."
+        };
+
+        let reconTypeRow = null;
+        let checklistRowRef = null;
+
+        function createDefinitionRow() {
             const row = document.createElement("tr");
             const td = document.createElement("td");
 
-            const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
 
             const header = document.createElement("p");
-            header.textContent = "Checklist:";
-            header.className = "requirements-header";
-            checklistDiv.appendChild(header);
+            header.textContent = "Definition";
+            header.className = "definition-header";
 
             const ul = document.createElement("ul");
             ul.className = "checklist";
 
-            const li1 = document.createElement("li");
-            li1.textContent = "Verify full payment of the total amount due.";
-            ul.appendChild(li1);
+            const li = document.createElement("li");
+            li.textContent = "Requests for service reconnection.";
+            ul.appendChild(li);
 
-            const li2 = document.createElement("li");
-            li2.textContent = "Check SLA (2 hours).";
-            ul.appendChild(li2);
-
-            const li3 = document.createElement("li");
-            li3.textContent = "Confirm if the service is working after completing all reconnection steps. If not, provide the 2-hour SLA spiel.";
-            ul.appendChild(li3);
-
-            const li4 = document.createElement("li");
-            li4.textContent = "Verify eligibility for PTP based on credit rating and past broken promises.";
-            ul.appendChild(li4);
-
-            const li5 = document.createElement("li");
-            li5.textContent = "Verify if there is an open Unbar SO.";
-            ul.appendChild(li5);
-
-            checklistDiv.appendChild(header);
-            checklistDiv.appendChild(ul);
-
-            td.appendChild(checklistDiv);
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
             row.appendChild(td);
 
             return row;
         }
 
+        function createChecklistRow(reconType) {
+            if (!reconType || !reconRequirements[reconType]) return null;
+
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivPrompt";
+
+            const header = document.createElement("p");
+            header.textContent = "Request Type Description:";
+            header.className = "requirements-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = reconRequirements[reconType];
+
+            ul.appendChild(li);
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function updateChecklist() {
+            const reconTypeSelect = document.getElementById("reconType");
+            const value = reconTypeSelect ? reconTypeSelect.value : "";
+
+            if (checklistRowRef) {
+                checklistRowRef.remove();
+                checklistRowRef = null;
+            }
+
+            const newRow = createChecklistRow(value);
+            if (newRow && reconTypeRow) {
+                reconTypeRow.parentNode.insertBefore(newRow, reconTypeRow.nextSibling);
+                checklistRowRef = newRow;
+            }
+        }
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
-            const primaryFields = ["custConcern", "ownership", "custAuth", "ticketStatus", "remarks", "upsell", "issueResolved"];
-            row.style.display = primaryFields.includes(field.name) ? "table-row" : "none";
-
-
             const td = document.createElement("td");
-            const divInput = document.createElement("div");
-            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const div = document.createElement("div");
+            div.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
 
             const label = document.createElement("label");
-            label.textContent = `${field.label}`;
+            label.textContent = field.label;
             label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
             label.setAttribute("for", field.name);
 
             let input;
+
             if (field.type === "select") {
                 input = document.createElement("select");
                 input.name = field.name;
+                input.id = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -7195,37 +7246,46 @@ function createForm2() {
 
                     input.appendChild(option);
                 });
+
+                if (field.name === "reconType") {
+                    input.addEventListener("change", updateChecklist);
+                }
+
             } else if (field.type === "textarea") {
                 input = document.createElement("textarea");
                 input.name = field.name;
+                input.id = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = field.name === "remarks" ? 6 : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
+
             } else {
                 input = document.createElement("input");
                 input.type = field.type;
                 input.name = field.name;
+                input.id = field.name;
                 input.className = "form2-input";
-                if (field.step) input.step = field.step;
                 if (field.placeholder) input.placeholder = field.placeholder;
             }
 
-            divInput.appendChild(label);
-            divInput.appendChild(input);
-            td.appendChild(divInput);
+            div.appendChild(label);
+            div.appendChild(input);
+            td.appendChild(div);
             row.appendChild(td);
 
             return row;
         }
 
-        fields.forEach((field, index) => {
+        fields.forEach((field) => {
+            if (field.name === "custConcern") {
+                table.appendChild(createDefinitionRow());
+            }
+
             const row = createFieldRow(field);
             table.appendChild(row);
 
-            if (field.name === "custAuth") {
-                table.appendChild(createPromptRow());
+            if (field.name === "reconType") {
+                reconTypeRow = row;
             }
         });
 
@@ -7238,10 +7298,11 @@ function createForm2() {
             saveFormData,
             resetButtonHandler,
         ];
+
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+    }
 
-    } 
 
     // Non-Tech Complaints
     else if (selectedValue === "formCompMyHomeWeb") { 
@@ -9796,12 +9857,7 @@ function optionNotAvailable() {
     return false;
 }
 
-function ffupButtonHandler(
-    showFloating = true,
-    enableValidation = true,
-    includeSpecialInst = true,  
-    showSpecialInstSection = true 
-) {
+function ffupButtonHandler(showFloating = true, enableValidation = true, includeSpecialInst = true, showSpecialInstSection = true) {
     const vars = initializeVariables();
 
     const missingFields = [];
@@ -10015,10 +10071,10 @@ function showFfupFloatingDiv(sections, sectionLabels) {
         floatingDiv.classList.add("show");
     }, 10);
 
-    const okButton = document.getElementById("okButton");
-    okButton.textContent = "Close";
+    const closeButton = document.getElementById("okButton");
+    closeButton.textContent = "Close";
 
-    okButton.onclick = () => {
+    closeButton.onclick = () => {
         floatingDiv.classList.remove("show");
         setTimeout(() => {
         floatingDiv.style.display = "none";
@@ -10693,9 +10749,9 @@ function showCepFloatingDiv(labels, textToCopy) {
 
     setTimeout(() => floatingDiv.classList.add("show"), 10);
 
-    const okButton = document.getElementById("okButton");
-    okButton.textContent = "Close";
-    okButton.onclick = () => {
+    const closeButton = document.getElementById("okButton");
+    closeButton.textContent = "Close";
+    closeButton.onclick = () => {
         floatingDiv.classList.remove("show");
         setTimeout(() => {
             floatingDiv.style.display = "none";
@@ -10721,6 +10777,7 @@ function getSfFieldValueIfVisible(fieldName) {
     return value;
 }
 
+// Tech Notes in Salesforce and/or FUSE
 function techNotesButtonHandler(showFloating = true) {
     const vars = initializeVariables(); 
 
@@ -10812,17 +10869,15 @@ function techNotesButtonHandler(showFloating = true) {
                 seenFields.add(field.name);
 
                 if (field.name === "offerALS") {
-                    let alsValue = "";
+                    const alsMessages = {
+                        "Offered ALS/Accepted": `Customer Accepted ${alsPackValue || "ALS"} Offer`,
+                        "Offered ALS/Declined": "Offered ALS But Customer Declined",
+                        "Offered ALS/No Confirmation": "Offered ALS But No Confirmation",
+                        "Previous Agent Already Offered ALS": "Previous Agent Already Offered ALS"
+                        // "Not Applicable" intentionally omitted to skip
+                    };
 
-                    if (offerALS === "Offered ALS/Accepted") {
-                        alsValue = `Customer Accepted ${alsPackValue || "ALS"} Offer`;
-                    } else if (offerALS === "Offered ALS/Declined") {
-                        alsValue = "Offered ALS But Customer Declined";
-                    } else if (offerALS === "Offered ALS/No Confirmation") {
-                        alsValue = "Offered ALS But No Confirmation";
-                    } else if (offerALS === "Previous Agent Already Offered ALS") {
-                        alsValue = "Previous Agent Already Offered ALS";
-                    }
+                    const alsValue = alsMessages[offerALS];
 
                     if (alsValue) actionsTakenParts.push(alsValue);
                 } else {
@@ -11123,6 +11178,7 @@ function techNotesButtonHandler(showFloating = true) {
 
 }
 
+// Split FUSE notes into sections for Hotline agents
 function splitIntoSections(text, maxChars = 250) {
     const sections = [];
     let currentSection = "";
@@ -11141,6 +11197,7 @@ function splitIntoSections(text, maxChars = 250) {
     return sections;
 }
 
+// Show generated notes in a new window
 function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
 
     const vars = initializeVariables();
@@ -11232,9 +11289,9 @@ function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
     floatingDiv.style.display = "block";
     setTimeout(() => floatingDiv.classList.add("show"), 10);
 
-    const okButton = document.getElementById("okButton");
-    okButton.textContent = "Close";
-    okButton.onclick = () => {
+    const closeButton = document.getElementById("okButton");
+    closeButton.textContent = "Close";
+    closeButton.onclick = () => {
         floatingDiv.classList.remove("show");
         setTimeout(() => {
             floatingDiv.style.display = "none";
@@ -11432,7 +11489,7 @@ function nontechNotesButtonHandler(showFloating = true) {
     ];
 
     const requestForms = [
-        "formReqGoGreen", "formReqUpdateContact", "formReqSrvcRenewal", "formReqBillAdd", "formReqSrvcAdd", "formReqTaxAdj", "formReqChgTelUnit", "formReqDiscoVAS", "formReqPermaDisco", "formReqTempDisco", "formReqNSR", "formReqRentMSF", "formReqRentLPN", "formReqNRC", "formReqSCC", "formReqTollUFC", "formReqOtherTolls", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
+        "formReqGoGreen", "formReqUpdateContact", "formReqSrvcRenewal", "formReqBillAdd", "formReqSrvcAdd", "formReqTaxAdj", "formReqChgTelUnit", "formReqDiscoVAS", "formReqPermaDisco", "formReqTempDisco", "formReqNSR", "formReqRentMSF", "formReqRentLPN", "formReqNRC", "formReqSCC", "formReqTollUFC", "formReqOtherTolls", "formReqDowngradeOthers", "formReqDowngrade1299", "formReqDowngrade1399", "formReqDowngrade1799", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
     ];
 
     const ffupForms = [
@@ -11646,6 +11703,13 @@ function nontechNotesButtonHandler(showFloating = true) {
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}${soSrNum}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
+    } else if (vars.selectedIntent === "formReqReconnect") {
+        const emptyFields = validateRequiredFields();
+        if (emptyFields.length > 0) return;
+
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/${vars.selectedIntentText}-${vars.reconType}${soSrNum}${insertCustConcern(vars.custConcern)}`;
+        actionsTakenCopiedText = constructFuseOutput();
+
     }
 
     // Others
@@ -11748,10 +11812,10 @@ function showFuseFloatingDiv(concernCopiedText, actionsTakenCopiedText) {
         floatingDiv.classList.add("show");
     }, 10);
 
-    const okButton = document.getElementById("okButton");
-    okButton.textContent = "Close";
+    const closeButton = document.getElementById("okButton");
+    closeButton.textContent = "Close";
 
-    okButton.onclick = () => {
+    closeButton.onclick = () => {
         floatingDiv.classList.remove("show");
         setTimeout(() => {
             floatingDiv.style.display = "none";
@@ -11903,9 +11967,9 @@ function showBantayKableFloatingDiv(sections, sectionLabels) {
         floatingDiv.classList.add("show");
     }, 10);
 
-    const okButton = document.getElementById("okButton");
-    okButton.textContent = "Close";
-    okButton.onclick = () => {
+    const closeButton = document.getElementById("okButton");
+    closeButton.textContent = "Close";
+    closeButton.onclick = () => {
         floatingDiv.classList.remove("show");
         setTimeout(() => {
             floatingDiv.style.display = "none";
@@ -12017,6 +12081,8 @@ function sfTaggingButtonHandler() {
     const ffupVAS =["formFfupVasAct", "formFfupVasDel"];
 
     const alwaysOn = ["form500_5", "form501_7", "form101_5", "form510_9", "form500_6"];
+
+    const reqDowngrade = ["formReqDowngradeOthers", "formReqDowngrade1299", "formReqDowngrade1399", "formReqDowngrade1799"];
 
     // Tech
     if (vars.selectedIntent === 'formFfupRepair') {
@@ -12544,6 +12610,18 @@ function sfTaggingButtonHandler() {
             ['Case Type:', 'Dispute'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+    } else if (reqDowngrade.includes(vars.selectedIntent)) {
+        bauRows = [
+            ['VOC:', 'Request'],
+            ['Case Type:', 'Downgrade'],
+            ['Case Sub-Type:', `${vars.selectedIntentText}`]
+        ];
+    } else if (vars.selectedIntent === 'formReqReconnect') {
+        bauRows = [
+            ['VOC:', 'Request'],
+            ['Case Type:', 'Reconnection'],
+            ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.reconType}`]
+        ];
     }
 
     // Others
@@ -12676,6 +12754,7 @@ function sfTaggingButtonHandler() {
     };
 }
 
+// Generate Endorsement form
 function endorsementForm() {
     const vars = initializeVariables();
 
@@ -12727,7 +12806,7 @@ function endorsementForm() {
         { label: "Payment Channel", type: "", name: "paymentChannel2"},
         { label: "Amount Paid", type: "", name: "amountPaid2"},
         { label: "Date", type: "date", name: "date" },
-        { label: "Escalation Remarks", type: "textarea", name: "remarks2" },
+        { label: "Escalation Remarks", type: "textarea", name: "remarks2", placeholder: "Please indicate the specific reason for escalation. Do NOT include actions taken in this field." },
     ];
 
     formFields.forEach(field => {
@@ -12752,7 +12831,6 @@ function endorsementForm() {
             input.name = field.name;
             input.className = "form3-input";
             
-            
             field.options.forEach(optionValue => {
                 const option = document.createElement("option");
                 option.value = optionValue;
@@ -12764,6 +12842,10 @@ function endorsementForm() {
             input.name = field.name;
             input.className = "form3-textarea";
             input.rows = field.name === "remarks2" ? 4 : 2;
+
+            if (field.placeholder) {
+                input.placeholder = field.placeholder;
+            }
         } else {
             input = document.createElement("input");
             input.type = field.type;
@@ -12804,7 +12886,7 @@ function endorsementForm() {
 
     autofillMappings.forEach(({ source, target }) => {
         const sourceElement = document.querySelector(`#form1Container [name='${source}']`) ||
-                            document.querySelector(`#form2Container [name='${source}']`);
+                              document.querySelector(`#form2Container [name='${source}']`);
         const targetElement = table.querySelector(`[name='${target}']`);
 
         if (sourceElement && targetElement) {
@@ -12815,64 +12897,63 @@ function endorsementForm() {
 
     const buttonsRow = document.createElement("tr");
 
-    const copyTd = document.createElement("td");
-    copyTd.style.paddingLeft = "5px";  
-    copyTd.style.paddingRight = "5px"; 
+    const buttonsTd = document.createElement("td");
+    buttonsTd.colSpan = 2;
+    buttonsTd.style.padding = "10px";
 
-    const copyButton = document.createElement("button");
-    copyButton.className = "form3-button";
-    copyButton.innerText = "📋 Copy";
-    copyButton.onclick = () => {
-    const textToCopy = [];
+    const buttonContainer = document.createElement("div");
+    buttonContainer.style.display = "flex";
+    buttonContainer.style.justifyContent = "flex-end"; // align right
+    buttonContainer.style.gap = "10px"; // space between buttons
 
-    const endorsementTypeInput = table.querySelector('select[name="endorsementType"]');
-    const endorsementTypeLabel = table.querySelector('label[for="endorsementType"]');
+    // Generate Button
+    const generateButton = document.createElement("button");
+    generateButton.className = "form3-button";
+    generateButton.innerText = "Generate Notes";
+
+    generateButton.onclick = () => {
+
+    floating2Div.classList.remove("show");
+
+    setTimeout(() => {
+        floating2Div.style.display = "none";
+    }, 300);
+
+        const textParts = [];
+
+        const endorsementTypeInput = table.querySelector('select[name="endorsementType"]');
+        const endorsementTypeLabel = table.querySelector('label[for="endorsementType"]');
+
         if (endorsementTypeInput && endorsementTypeLabel) {
-            const endorsementTypeText = endorsementTypeLabel.textContent.trim();
-            const endorsementTypeValue = endorsementTypeInput.value || "Not Provided";
-            textToCopy.push(`${endorsementTypeText.toUpperCase()}: ${endorsementTypeValue.toUpperCase()}`);
+            const labelText = endorsementTypeLabel.textContent.trim().toUpperCase();
+            const valueText = (endorsementTypeInput.value || "NOT PROVIDED").toUpperCase();
+            textParts.push(`${labelText}: ${valueText}`);
         }
 
-        const otherFields = Array.from(table.querySelectorAll("textarea, input"))
-            .filter(input => input.offsetWidth > 0 && input.offsetHeight > 0) 
-            .map(input => {
-                
-                const label = table.querySelector(`label[for="${input.name}"]`);
-                const labelText = label ? label.textContent.trim() : "Unknown Field";
-                const valueText = (input.value || "").toUpperCase();
-                
-                if (labelText.trim().toLowerCase() === "contact details, complete address, & landmarks") {
-                    const replacedValue = valueText.replace(/ \| /g, "\n");
-                    return `${labelText.toUpperCase()}:\n${replacedValue}`;
-                } else {
-                    return `${labelText.toUpperCase()}: ${valueText}`;
-                }
-            });
+        const visibleFields = Array.from(table.querySelectorAll("textarea, input"))
+            .filter(input => input.offsetParent !== null);
 
-            textToCopy.push(...otherFields);
+        visibleFields.forEach(input => {
+            const label = table.querySelector(`label[for="${input.name}"]`);
+            if (!label) return;
 
-            const finalText = textToCopy.join("\n");
+            const labelText = label.textContent.trim().toUpperCase();
+            const valueText = (input.value || "").toUpperCase();
+            if (!valueText) return;
 
-            navigator.clipboard.writeText(finalText)
-            .then(() => {
-                alert("Endorsement details copied! You can now paste them into the designated GC or Salesforce Chatter for further processing.");
-                console.log("Copied to clipboard:", finalText);
-            })
-            .catch(err => {
-                console.error("Error copying to clipboard:", err);
-            });
-    }    
+            textParts.push(`${labelText}: ${valueText}`);
+        });
 
-    copyTd.appendChild(copyButton);
+        const finalText = textParts.join("\n");
+        showFloating3Div(finalText, floating2Div);
+    };
 
-    const okTd = document.createElement("td");
-    okTd.style.paddingLeft = "5px";  
-    okTd.style.paddingRight = "5px"; 
+    // Close Button
+    const closeButton = document.createElement("button");
+    closeButton.className = "form3-button";
+    closeButton.innerText = "Close";
 
-    const okButton = document.createElement("button");
-    okButton.className = "form3-button";
-    okButton.innerText = "Close";
-    okButton.onclick = function () {
+    closeButton.onclick = function () {
         floating2Div.classList.remove("show");
         setTimeout(() => {
             floating2Div.style.display = "none";
@@ -12881,10 +12962,10 @@ function endorsementForm() {
         }, 300);
     };
 
-    okTd.appendChild(okButton);
-
-    buttonsRow.appendChild(copyTd);
-    buttonsRow.appendChild(okTd);
+    buttonContainer.appendChild(generateButton);
+    buttonContainer.appendChild(closeButton);
+    buttonsTd.appendChild(buttonContainer);
+    buttonsRow.appendChild(buttonsTd);
 
     table.appendChild(buttonsRow);
 
@@ -12894,42 +12975,158 @@ function endorsementForm() {
         floating2Div.classList.add("show");
     }, 10);
 
-    const endorsementType = document.querySelector("[name='endorsementType']");
+    const endorsementType = table.querySelector("[name='endorsementType']");
 
     endorsementType.addEventListener("change", () => {
-        const selectedValue = vars.selectedIntent;
-        const selectedOption = document.querySelector(`#selectIntent option[value="${selectedValue}"]`);
+        const value = endorsementType.value;
+        const isFfupRepair = vars.selectedIntent === "formFfupRepair";
+        const isZoneType = ["Zone", "Network", "Potential Crisis"].includes(value);
+        const isSupCall = value === "Sup Call";
 
-        if (endorsementType.value === "Zone" || endorsementType.value === "Network" || endorsementType.value === "Potential Crisis" ) {
-            if (vars.selectedIntent === "formFfupRepair") {
-                showFields(["WOCAS2", "accOwnerName", "accountNum2", "landlineNum2", "contactName2", "cbr2", "availability2", "address2", "landmarks2", "cepCaseNumber2", "queue2", "ticketStatus2", "agentName2", "teamLead2", "date", "remarks2"]);
-                hideSpecificFields(["specialInstruct2", "refNumber2", "paymentChannel2", "amountPaid2"]);
+        if (!isZoneType && !isSupCall) return;
+
+        // Base fields always shown
+        const baseFields = [
+            "WOCAS2", "accOwnerName", "accountNum2", "landlineNum2",
+            "contactName2", "cbr2", "availability2", "cepCaseNumber2"
+        ];
+
+        let showList = [...baseFields];
+        let hideList = ["specialInstruct2", "refNumber2", "paymentChannel2", "amountPaid2"];
+
+        if (isZoneType) {
+            if (isFfupRepair) {
+                showList.push("address2", "landmarks2", "queue2", "ticketStatus2", "agentName2", "teamLead2", "date", "remarks2");
             } else {
-                showFields(["WOCAS2", "accOwnerName", "accountNum2", "landlineNum2", "contactName2", "cbr2", "availability2", "address2", "landmarks2", "cepCaseNumber2", "agentName2", "teamLead2", "date", "remarks2"]);
-                hideSpecificFields(["queue2", "ticketStatus2", "specialInstruct2", "refNumber2", "paymentChannel2", "amountPaid2"]);
-            }
-
-            if (vars.channel === "CDT-SOCMED") {
-                showFields(["sfCaseNum2"]);
-            } else if (vars.channel === "CDT-HOTLINE") {
-                hideSpecificFields(["sfCaseNum2"]);
-            }
-        } else if (endorsementType.value === "Sup Call") {
-            if (vars.selectedIntent === "formFfupRepair") {
-                showFields(["WOCAS2", "accOwnerName", "accountNum2", "landlineNum2", "contactName2", "cbr2", "availability2", "address2", "landmarks2", "cepCaseNumber2", "queue2", "ticketStatus2", "remarks2"]);
-                hideSpecificFields(["specialInstruct2", "agentName2", "teamLead2", "date", "refNumber2", "paymentChannel2", "amountPaid2"]);
-            } else {
-                showFields(["WOCAS2", "accOwnerName", "accountNum2", "landlineNum2", "contactName2", "cbr2", "availability2", "address2", "landmarks2", "cepCaseNumber2", "remarks2"]);
-                hideSpecificFields(["specialInstruct2", "queue2", "ticketStatus2", "agentName2", "teamLead2", "date", "refNumber2","paymentChannel2", "amountPaid2"]);
-            }
-
-            if (vars.channel === "CDT-SOCMED") {
-                showFields(["sfCaseNum2"]);
-            } else if (vars.channel === "CDT-HOTLINE") {
-                hideSpecificFields(["sfCaseNum2"]);
+                showList.push("address2", "landmarks2", "agentName2", "teamLead2", "date", "remarks2");
+                hideList.push("queue2", "ticketStatus2");
             }
         }
+
+        if (isSupCall) {
+            showList.push("remarks2");
+
+            if (isFfupRepair) {
+                showList.push("address2", "landmarks2", "queue2", "ticketStatus2");
+            } else {
+                hideList.push("address2", "landmarks2", "queue2", "ticketStatus2");
+            }
+
+            hideList.push("agentName2", "teamLead2", "date");
+        }
+
+        showFields(showList);
+        hideSpecificFields(hideList);
+
+        // Channel handling (shared logic)
+        if (vars.channel === "CDT-SOCMED") {
+            showFields(["sfCaseNum2"]);
+        } else if (vars.channel === "CDT-HOTLINE") {
+            hideSpecificFields(["sfCaseNum2"]);
+        }
     });
+}
+
+// Endorsement form floating div
+function showFloating3Div(finalText, floating2Div) {
+
+    const overlay = document.getElementById("overlay");
+    if (overlay) overlay.style.display = "block";
+
+    const existing = document.getElementById("floating3Div");
+    if (existing) existing.remove();
+
+    const floating3Div = document.createElement("div");
+    floating3Div.id = "floating3Div";
+
+    const header = document.createElement("div");
+    header.id = "floating3DivHeader";
+    header.innerText = "ENDORSEMENT SUMMARY: Click the text to copy!";
+    floating3Div.appendChild(header);
+
+    const contentWrapper = document.createElement("div");
+    contentWrapper.style.padding = "15px 15px 5px 15px";
+    contentWrapper.style.display = "flex";
+    contentWrapper.style.flexDirection = "column";
+    contentWrapper.style.gap = "12px"; // consistent spacing
+
+    const copiedValues = document.createElement("div");
+
+    const sections = finalText.split(/\n\s*\n/);
+
+    sections.forEach((sectionText, index) => {
+
+        const section = document.createElement("div");
+        section.style.padding = "10px";
+        section.style.border = "1px solid #ccc";
+        section.style.borderRadius = "4px";
+        section.style.cursor = "pointer";
+        section.style.whiteSpace = "pre-wrap";
+        section.style.transition = "background-color 0.2s ease, transform 0.1s ease";
+        section.classList.add("noselect");
+
+        section.textContent = sectionText;
+
+        section.addEventListener("mouseover", () => {
+            section.style.backgroundColor = "#edf2f7";
+        });
+
+        section.addEventListener("mouseout", () => {
+            section.style.backgroundColor = "";
+        });
+
+        section.onclick = () => {
+            section.style.transform = "scale(0.99)";
+
+            navigator.clipboard.writeText(sectionText)
+                .then(() => {
+                    section.style.backgroundColor = "#ddebfb";
+
+                    setTimeout(() => {
+                        section.style.transform = "scale(1)";
+                        section.style.backgroundColor = "";
+                    }, 150);
+                })
+                .catch(err => console.error("Copy failed:", err));
+        };
+
+        copiedValues.appendChild(section);
+    });
+
+    // Close button
+    const closeButton = document.createElement("button");
+    closeButton.className = "form3-button";
+    closeButton.innerText = "Close";
+
+    closeButton.style.width = "auto";
+    closeButton.style.textTransform = "none";
+    closeButton.style.padding = "0 16px";
+
+    closeButton.onclick = () => {
+        floating3Div.classList.remove("show");
+
+        setTimeout(() => {
+            floating3Div.remove();
+
+            // Restore floating2Div smoothly
+            floating2Div.style.display = "block";
+            setTimeout(() => {
+                floating2Div.classList.add("show");
+            }, 10);
+
+        }, 300);
+    };
+
+    contentWrapper.appendChild(copiedValues);
+    contentWrapper.appendChild(closeButton);
+    floating3Div.appendChild(contentWrapper);
+
+    document.body.appendChild(floating3Div);
+
+    // Trigger animation
+    setTimeout(() => {
+        floating3Div.classList.add("show");
+    }, 10);
 }
 
 function resetForm2ContainerAndRebuildButtons() {
@@ -13036,7 +13233,7 @@ function resetButtonHandler() {
         });
 
         const footerElement = document.getElementById("footerValue");
-        const footerText = "Standard Notes Generator Version 5.2.101225";
+        const footerText = "Standard Notes Generator Version 5.2.140226";
         typeWriter(footerText, footerElement, 50);
 
         const notepad = document.getElementById("notepad");
@@ -13193,7 +13390,12 @@ function saveFormData() {
         "formReqSCC",
         "formReqTollUFC",
         "formReqOtherTolls",
-
+        "formReqDowngradeOthers",
+        "formReqDowngrade1299",
+        "formReqDowngrade1399",
+        "formReqDowngrade1799",
+        "formReqReconnect",
+        
         // Others
         "othersToolsDown",
         "othersWebForm",
@@ -13472,6 +13674,23 @@ const instructions = [
 
 const versions = [
     {
+        version: "V5.2.140226",
+        updates: [
+        { title: "Improvements", items: [
+            "Enhanced Endorsement Form UI", 
+            "Improved generating endorsement notes" ]},
+        { title: "Added", items: [
+            "Non-Tech Request intents: <strong>Downgrade</strong> and <strong>Reconnection</strong>.", 
+            "<strong>Repeater count</strong> field under FFUP intent.", 
+            "<strong>“Not Applicable”</strong> option for ALS offering. This applies to tickets beyond the 24-hour SLA but still within the 36-hour ALS eligibility threshold." ]},
+        { title: "Bug Fixes", items: [
+            "Resolved layout overflow issue" ]},
+        { title: "Removed", items: [
+            "ALS Offering notation from the CEP tool. ALS details will be available exclusively in FUSE or Salesforce (SF) notation.",
+            "Ticket creation timer" ]}
+        ]
+    },
+    {
         version: "V5.2.101225",
         updates: [
         { title: "Added", items: ["Instructions to always utilize LIT365 work instructions for proper guidance", "Investigation 4 options for SIC (High Utilization OLT/PON Port)", "DC and RA Exec status fields in the NMS skin"] },
@@ -13594,143 +13813,143 @@ document.addEventListener('DOMContentLoaded', function() {
     // ================================
     // SECTION 2: TICKET CREATION TIMER
     // ================================
-    let ticketTimerInterval = null;
-    let ticketSeconds = 0;
+    // let ticketTimerInterval = null;
+    // let ticketSeconds = 0;
 
-    const ticketTimer = document.getElementById("ticketTimer");
-    const ticketDisplay = document.getElementById("ticketTimerDisplay");
+    // const ticketTimer = document.getElementById("ticketTimer");
+    // const ticketDisplay = document.getElementById("ticketTimerDisplay");
 
-    function formatTicketTime(sec) {
-        const h = String(Math.floor(sec / 3600)).padStart(2, "0");
-        const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
-        const s = String(sec % 60).padStart(2, "0");
-        return `${h}:${m}:${s}`;
-    }
+    // function formatTicketTime(sec) {
+    //     const h = String(Math.floor(sec / 3600)).padStart(2, "0");
+    //     const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+    //     const s = String(sec % 60).padStart(2, "0");
+    //     return `${h}:${m}:${s}`;
+    // }
 
-    function startTicketTimer() {
-        if (ticketTimerInterval) return;
-        ticketTimerInterval = setInterval(() => {
-            ticketSeconds++;
-            if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(ticketSeconds);
-        }, 1000);
-        console.log("▶️ Ticket Timer started");
-    }
+    // function startTicketTimer() {
+    //     if (ticketTimerInterval) return;
+    //     ticketTimerInterval = setInterval(() => {
+    //         ticketSeconds++;
+    //         if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(ticketSeconds);
+    //     }, 1000);
+    //     console.log("▶️ Ticket Timer started");
+    // }
 
-    function stopTicketTimer() {
-        clearInterval(ticketTimerInterval);
-        ticketTimerInterval = null;
-        console.log("⏸ Ticket Timer stopped");
-    }
+    // function stopTicketTimer() {
+    //     clearInterval(ticketTimerInterval);
+    //     ticketTimerInterval = null;
+    //     console.log("⏸ Ticket Timer stopped");
+    // }
 
-    function resetTicketTimer() {
-        clearInterval(ticketTimerInterval);
-        ticketTimerInterval = null;
-        ticketSeconds = 0;
-        if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(0);
-        console.log("♻️ Ticket Timer reset");
-    }
+    // function resetTicketTimer() {
+    //     clearInterval(ticketTimerInterval);
+    //     ticketTimerInterval = null;
+    //     ticketSeconds = 0;
+    //     if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(0);
+    //     console.log("♻️ Ticket Timer reset");
+    // }
 
-    window.stopTicketTimer = stopTicketTimer;
-    window.resetTicketTimer = resetTicketTimer;
-    window.startTicketTimer = startTicketTimer;
+    // window.stopTicketTimer = stopTicketTimer;
+    // window.resetTicketTimer = resetTicketTimer;
+    // window.startTicketTimer = startTicketTimer;
 
-    function isVisible(el) {
-        if (!el) return false;
-        let cur = el;
-        while (cur && cur.nodeType === 1) {
-            const cs = window.getComputedStyle(cur);
-            if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) {
-                return false;
-            }
-            cur = cur.parentElement;
-        }
-        const rect = el.getBoundingClientRect();
-        return !(rect.width === 0 && rect.height === 0);
-    }
+    // function isVisible(el) {
+    //     if (!el) return false;
+    //     let cur = el;
+    //     while (cur && cur.nodeType === 1) {
+    //         const cs = window.getComputedStyle(cur);
+    //         if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) {
+    //             return false;
+    //         }
+    //         cur = cur.parentElement;
+    //     }
+    //     const rect = el.getBoundingClientRect();
+    //     return !(rect.width === 0 && rect.height === 0);
+    // }
 
-    function checkStopConditions() {
-        const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
-        const cbr = document.querySelector("input[name='cbr'], textarea[name='cbr'], #cbr");
+    // function checkStopConditions() {
+    //     const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
+    //     const cbr = document.querySelector("input[name='cbr'], textarea[name='cbr'], #cbr");
 
-        const landmarksVisible = isVisible(landmarks);
-        const landmarksHasValue = landmarks && landmarks.value.trim() !== "";
-        const cbrHasValue = cbr && cbr.value.trim() !== "";
+    //     const landmarksVisible = isVisible(landmarks);
+    //     const landmarksHasValue = landmarks && landmarks.value.trim() !== "";
+    //     const cbrHasValue = cbr && cbr.value.trim() !== "";
 
-        if (landmarksVisible) {
-            if (landmarksHasValue) stopTicketTimer();
-        } else {
-            if (cbrHasValue) stopTicketTimer();
-        }
-    }
+    //     if (landmarksVisible) {
+    //         if (landmarksHasValue) stopTicketTimer();
+    //     } else {
+    //         if (cbrHasValue) stopTicketTimer();
+    //     }
+    // }
 
-    document.addEventListener("change", function (e) {
-        const t = e.target;
+    // document.addEventListener("change", function (e) {
+    //     const t = e.target;
 
-        if (t.matches("select[name='issueResolved'], #issueResolved") ||
-            t.matches("select[name='outageStatus'], #outageStatus")) {
+    //     if (t.matches("select[name='issueResolved'], #issueResolved") ||
+    //         t.matches("select[name='outageStatus'], #outageStatus")) {
 
-            const issueResolved = document.querySelector("select[name='issueResolved']")?.value || "";
-            const outageStatus = document.querySelector("select[name='outageStatus']")?.value || "";
+    //         const issueResolved = document.querySelector("select[name='issueResolved']")?.value || "";
+    //         const outageStatus = document.querySelector("select[name='outageStatus']")?.value || "";
 
-            if (issueResolved === "No - for Ticket Creation" || outageStatus === "Yes") {
-                if (ticketTimer) ticketTimer.style.display = "block";
-                startTicketTimer();
-            } else {
-                stopTicketTimer();
-                resetTicketTimer();
-                if (ticketTimer) {
-                    ticketTimer.style.display = "none";
-                }
-            }
-        }
+    //         if (issueResolved === "No - for Ticket Creation" || outageStatus === "Yes") {
+    //             if (ticketTimer) ticketTimer.style.display = "block";
+    //             startTicketTimer();
+    //         } else {
+    //             stopTicketTimer();
+    //             resetTicketTimer();
+    //             if (ticketTimer) {
+    //                 ticketTimer.style.display = "none";
+    //             }
+    //         }
+    //     }
 
-        if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
-        if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
-            const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
-            if (!isVisible(landmarks)) checkStopConditions();
-        }
-    });
+    //     if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
+    //     if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
+    //         const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
+    //         if (!isVisible(landmarks)) checkStopConditions();
+    //     }
+    // });
 
-    document.addEventListener("input", function (e) {
-        const t = e.target;
+    // document.addEventListener("input", function (e) {
+    //     const t = e.target;
 
-        if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
-        if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
-            const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
-            if (!isVisible(landmarks)) checkStopConditions();
-        }
-    });
+    //     if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
+    //     if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
+    //         const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
+    //         if (!isVisible(landmarks)) checkStopConditions();
+    //     }
+    // });
 
-    (function makeDraggable(el) {
-        if (!el) return;
-        let offsetX = 0, offsetY = 0, isDown = false;
-        const header = el.querySelector("#ticketTimerHeader") || el;
-        header.style.cursor = "grab";
+    // (function makeDraggable(el) {
+    //     if (!el) return;
+    //     let offsetX = 0, offsetY = 0, isDown = false;
+    //     const header = el.querySelector("#ticketTimerHeader") || el;
+    //     header.style.cursor = "grab";
 
-        header.addEventListener("mousedown", dragMouseDown);
-        document.addEventListener("mouseup", closeDragElement);
-        document.addEventListener("mousemove", elementDrag);
+    //     header.addEventListener("mousedown", dragMouseDown);
+    //     document.addEventListener("mouseup", closeDragElement);
+    //     document.addEventListener("mousemove", elementDrag);
 
-        function dragMouseDown(e) {
-            e.preventDefault();
-            isDown = true;
-            offsetX = e.clientX - el.offsetLeft;
-            offsetY = e.clientY - el.offsetTop;
-            header.style.cursor = "grabbing";
-        }
+    //     function dragMouseDown(e) {
+    //         e.preventDefault();
+    //         isDown = true;
+    //         offsetX = e.clientX - el.offsetLeft;
+    //         offsetY = e.clientY - el.offsetTop;
+    //         header.style.cursor = "grabbing";
+    //     }
 
-        function elementDrag(e) {
-            if (!isDown) return;
-            e.preventDefault();
-            el.style.left = (e.clientX - offsetX) + "px";
-            el.style.top = (e.clientY - offsetY) + "px";
-        }
+    //     function elementDrag(e) {
+    //         if (!isDown) return;
+    //         e.preventDefault();
+    //         el.style.left = (e.clientX - offsetX) + "px";
+    //         el.style.top = (e.clientY - offsetY) + "px";
+    //     }
 
-        function closeDragElement() {
-            isDown = false;
-            header.style.cursor = "grab";
-        }
-    })(ticketTimer);
+    //     function closeDragElement() {
+    //         isDown = false;
+    //         header.style.cursor = "grab";
+    //     }
+    // })(ticketTimer);
 
-    window.__checkTicketStop = checkStopConditions;
+    // window.__checkTicketStop = checkStopConditions;
 });

@@ -174,13 +174,6 @@
                                     <select id="selectIntent" name="slctFrm1">
                                         <option value="" disabled selected>— Please select the correct Intent/WOCAS —</option>
                                         <!-- Tech Intents -->
-                                        <optgroup label="Always On">
-                                            <option data-group="smt_complaint" value="form500_5">No Internet Connection</option>
-                                            <option data-group="smt_complaint" value="form501_7">Slow Internet Connection</option>
-                                            <option data-group="smt_complaint" value="form101_5">No Dial Tone</option>
-                                            <option data-group="smt_complaint" value="form510_9">No Audio/Video Output</option>
-                                            <option data-group="smt_complaint" value="form500_6">Check back-up Wi-Fi if working (Always On)</option>
-                                        </optgroup>
                                         <optgroup label="No Dial Tone and No Internet Connection">
                                             <option data-group="smt_complaint" value="form100_1">All Services Down</option>
                                             <option data-group="smt_complaint" value="form100_2">Red LOS</option>
@@ -209,6 +202,13 @@
                                             <option data-group="smt_complaint" value="form101_2">Fast Busy Tone</option>
                                             <option data-group="smt_complaint" value="form101_3">Defective Telset - NDT</option>
                                             <option data-group="smt_complaint" value="form101_4">Defective/Damaged Telset</option>
+                                        </optgroup>
+                                        <optgroup label="Always On">
+                                            <option data-group="smt_complaint" value="form500_5">No Internet Connection</option>
+                                            <option data-group="smt_complaint" value="form501_7">Slow Internet Connection</option>
+                                            <option data-group="smt_complaint" value="form101_5">No Dial Tone</option>
+                                            <option data-group="smt_complaint" value="form510_9">No Audio/Video Output</option>
+                                            <option data-group="smt_complaint" value="form500_6">Check back-up Wi-Fi if working (Always On)</option>
                                         </optgroup>
                                         <optgroup label="Poor Call Quality/Noisy Telephone Line">
                                             <option data-group="smt_complaint" value="form102_1">Noisy Line</option>
@@ -442,13 +442,14 @@
                                             <option data-group="request" value="formReqTollUFC">Usage - Tolls (UnliFam Call)</option>
                                             <option data-group="request" value="formReqOtherTolls">Usage - Other Tolls</option>
                                         </optgroup>
-                                        <!-- <optgroup label="Downgrade">
-                                            <option data-group="request" value="">Plan 1299</option>
-                                            <option data-group="request" value="">Plan 1399</option>
-                                            <option data-group="request" value="">Plan 1799</option>
-                                            <option data-group="request" value="">Others</option>
+                                        <optgroup label="Downgrade">
+                                            <option data-group="request" value="formReqDowngradeOthers">Others</option>
+                                            <option data-group="request" value="formReqDowngrade1299">Plan 1299</option>
+                                            <option data-group="request" value="formReqDowngrade1399">Plan 1399</option>
+                                            <option data-group="request" value="formReqDowngrade1799">Plan 1799</option>
                                         </optgroup>
-                                        <optgroup label="Due Date Extension">
+                                        <option data-group="request" value="formReqReconnect">Reconnection</option>
+                                        <!-- <optgroup label="Due Date Extension">
                                             <option data-group="request" value="">Permanent Due Date Extension</option>
                                             <option data-group="request" value="">Temporary Due Date Extension</option>
                                         </optgroup>
@@ -574,7 +575,7 @@
                 </table>
             </div>
             <div class="footer-text">
-                <span id="footerValue">Standard Notes Generator Version 5.2.101225</span>
+                <span id="footerValue">Standard Notes Generator Version 5.2.140226</span>
                 <span>&copy; Developed and designed by: QA Team</span>
             </div>
         </div>
