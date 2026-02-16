@@ -1,6 +1,6 @@
 //script.js
 
-// Standard Notes Generator Version 5.2.140226
+// Standard Notes Generator Version 5.2.160226
 // Developed & Designed by: QA Ryan
 
 // Channel, Concern Type, and VOC Options
@@ -12977,53 +12977,78 @@ function endorsementForm() {
 
     const endorsementType = table.querySelector("[name='endorsementType']");
 
-    endorsementType.addEventListener("change", () => {
-        const value = endorsementType.value;
-        const isFfupRepair = vars.selectedIntent === "formFfupRepair";
-        const isZoneType = ["Zone", "Network", "Potential Crisis"].includes(value);
-        const isSupCall = value === "Sup Call";
+    // ALWAYS visible fields
+    const alwaysVisibleFields = [
+        "WOCAS2",
+        "accOwnerName",
+        "accountNum2",
+        "landlineNum2",
+        "contactName2",
+        "cbr2",
+        "availability2",
+        "agentName2",
+        "teamLead2",
+        "date",
+        "remarks2"
+    ];
 
-        if (!isZoneType && !isSupCall) return;
+    // CONDITIONAL fields (mirror previous form visibility)
+    const visibilityMap = {
+        sfCaseNum2: "sfCaseNum",
+        address2: "address",
+        landmarks2: "landmarks",
+        cepCaseNumber2: "cepCaseNumber",
+        queue2: "queue",
+        ticketStatus2: "ticketStatus",
+        refNumber2: "refNumber",
+        paymentChannel2: "paymentChannel",
+        amountPaid2: "amountPaid",
+    };
 
-        // Base fields always shown
-        const baseFields = [
-            "WOCAS2", "accOwnerName", "accountNum2", "landlineNum2",
-            "contactName2", "cbr2", "availability2", "cepCaseNumber2"
-        ];
+    function syncFieldVisibility() {
 
-        let showList = [...baseFields];
-        let hideList = ["specialInstruct2", "refNumber2", "paymentChannel2", "amountPaid2"];
+        // ALWAYS visible fields
+        alwaysVisibleFields.forEach(fieldName => {
 
-        if (isZoneType) {
-            if (isFfupRepair) {
-                showList.push("address2", "landmarks2", "queue2", "ticketStatus2", "agentName2", "teamLead2", "date", "remarks2");
+            const input = table.querySelector(`[name="${fieldName}"]`);
+            if (!input) return;
+
+            const row = input.closest("tr");
+            if (row) row.style.display = "table-row";
+
+        });
+
+        // CONDITIONAL fields
+        Object.entries(visibilityMap).forEach(([targetName, sourceName]) => {
+
+            const sourceElement =
+                document.querySelector(`#form1Container [name="${sourceName}"]`) ||
+                document.querySelector(`#form2Container [name="${sourceName}"]`);
+
+            const targetElement =
+                table.querySelector(`[name="${targetName}"]`);
+
+            if (!targetElement) return;
+
+            const row = targetElement.closest("tr");
+            if (!row) return;
+
+            if (sourceElement && sourceElement.offsetParent !== null) {
+                row.style.display = "table-row";
             } else {
-                showList.push("address2", "landmarks2", "agentName2", "teamLead2", "date", "remarks2");
-                hideList.push("queue2", "ticketStatus2");
-            }
-        }
-
-        if (isSupCall) {
-            showList.push("remarks2");
-
-            if (isFfupRepair) {
-                showList.push("address2", "landmarks2", "queue2", "ticketStatus2");
-            } else {
-                hideList.push("address2", "landmarks2", "queue2", "ticketStatus2");
+                row.style.display = "none";
             }
 
-            hideList.push("agentName2", "teamLead2", "date");
-        }
+        });
 
-        showFields(showList);
-        hideSpecificFields(hideList);
+    }
 
-        // Channel handling (shared logic)
-        if (vars.channel === "CDT-SOCMED") {
-            showFields(["sfCaseNum2"]);
-        } else if (vars.channel === "CDT-HOTLINE") {
-            hideSpecificFields(["sfCaseNum2"]);
-        }
+    endorsementType.addEventListener("change", function () {
+
+        if (!this.value) return;
+
+        requestAnimationFrame(syncFieldVisibility);
+
     });
 }
 
@@ -13052,46 +13077,43 @@ function showFloating3Div(finalText, floating2Div) {
 
     const copiedValues = document.createElement("div");
 
-    const sections = finalText.split(/\n\s*\n/);
+    const section = document.createElement("div");
+    section.style.padding = "10px";
+    section.style.border = "1px solid #ccc";
+    section.style.borderRadius = "4px";
+    section.style.cursor = "pointer";
+    section.style.whiteSpace = "pre-wrap";
+    section.style.transition = "background-color 0.2s ease, transform 0.1s ease";
+    section.classList.add("noselect");
 
-    sections.forEach((sectionText, index) => {
+    // normalize line endings (important)
+    finalText = finalText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-        const section = document.createElement("div");
-        section.style.padding = "10px";
-        section.style.border = "1px solid #ccc";
-        section.style.borderRadius = "4px";
-        section.style.cursor = "pointer";
-        section.style.whiteSpace = "pre-wrap";
-        section.style.transition = "background-color 0.2s ease, transform 0.1s ease";
-        section.classList.add("noselect");
+    section.textContent = finalText;
 
-        section.textContent = sectionText;
-
-        section.addEventListener("mouseover", () => {
-            section.style.backgroundColor = "#edf2f7";
-        });
-
-        section.addEventListener("mouseout", () => {
-            section.style.backgroundColor = "";
-        });
-
-        section.onclick = () => {
-            section.style.transform = "scale(0.99)";
-
-            navigator.clipboard.writeText(sectionText)
-                .then(() => {
-                    section.style.backgroundColor = "#ddebfb";
-
-                    setTimeout(() => {
-                        section.style.transform = "scale(1)";
-                        section.style.backgroundColor = "";
-                    }, 150);
-                })
-                .catch(err => console.error("Copy failed:", err));
-        };
-
-        copiedValues.appendChild(section);
+    section.addEventListener("mouseover", () => {
+        section.style.backgroundColor = "#edf2f7";
     });
+
+    section.addEventListener("mouseout", () => {
+        section.style.backgroundColor = "";
+    });
+
+    section.onclick = () => {
+        section.style.transform = "scale(0.99)";
+
+        navigator.clipboard.writeText(finalText)
+            .then(() => {
+                section.style.backgroundColor = "#ddebfb";
+
+                setTimeout(() => {
+                    section.style.transform = "scale(1)";
+                    section.style.backgroundColor = "";
+                }, 150);
+            });
+    };
+
+    copiedValues.appendChild(section);
 
     // Close button
     const closeButton = document.createElement("button");
@@ -13233,7 +13255,7 @@ function resetButtonHandler() {
         });
 
         const footerElement = document.getElementById("footerValue");
-        const footerText = "Standard Notes Generator Version 5.2.140226";
+        const footerText = "Standard Notes Generator Version 5.2.160226";
         typeWriter(footerText, footerElement, 50);
 
         const notepad = document.getElementById("notepad");
@@ -13673,6 +13695,15 @@ const instructions = [
 ];
 
 const versions = [
+    {
+        version: "V5.2.160226",
+        updates: [
+        { title: "Fixed", items: [
+            "Formatting issue causing generated endorsement notes to be incorrectly split into multiple sections." ]},
+        { title: "Improvements", items: [
+            "Enhanced the Endorsement Form to dynamically display only relevant fields based on the selected endorsement type, improving clarity and reducing unnecessary inputs." ]}
+        ]
+    },
     {
         version: "V5.2.140226",
         updates: [
