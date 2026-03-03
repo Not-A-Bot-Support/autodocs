@@ -1,6 +1,6 @@
 //script.js
 
-// Standard Notes Generator Version 5.2.160226
+// Standard Notes Generator Version 5.2.040326
 // Developed & Designed by: QA Ryan
 
 // Channel, Concern Type, and VOC Options
@@ -429,6 +429,7 @@ function initializeVariables() {
         ticketStatus: q('[name="ticketStatus"]'),
         offerALS: q('[name="offerALS"]'),
         accountNum: q('[name="accountNum"]'),
+        landlineNum: q('[name="landlineNum"]'),
         remarks: q('[name="remarks"]'),
         cepCaseNumber: q('[name="cepCaseNumber"]'),
         specialInstruct: q('[name="specialInstruct"]'),
@@ -460,7 +461,6 @@ function initializeVariables() {
         affectedTool: q('[name="affectedTool"]'),
         requestType: q('[name="requestType"]'),
         vasProduct: q('[name="vasProduct"]'),
-        reconType: q('[name="reconType"]'),
     };
 }
 
@@ -534,10 +534,6 @@ function createForm2() {
         "formInqAccSrvcStatus", "formInqLockIn", "formInqCopyOfBill", "formInqMyHomeAcc", "formInqPlanDetails", "formInqAda", "formInqRebCredAdj", "formInqBalTransfer", "formInqBrokenPromise", "formInqCreditAdj", "formInqCredLimit", "formInqNSR", "formInqDdate", "formInqBillDdateExt", "formInqEcaPip", "formInqNewBill", "formInqOneTimeCharges", "formInqOverpay", "formInqPayChannel", "formInqPayPosting", "formInqPayRefund", "formInqPayUnreflected", "formInqDdateMod", "formInqBillRefund", "formInqSmsEmailBill", "formInqTollUsage", "formInqCoRetain", "formInqCoChange", "formInqTempDisc", "formInqD1299", "formInqD1399", "formInqD1799", "formInqDOthers", "formInqDdateExt", "formInqEntertainment", "formInqInmove", "formInqMigration", "formInqProdAndPromo", "formInqHomeRefNC", "formInqHomeDisCredit", "formInqReloc", "formInqRewards", "formInqDirectDial", "formInqBundle", "formInqSfOthers", "formInqSAO500", "formInqUfcEnroll", "formInqUfcPromoMech", "formInqUpg1399", "formInqUpg1599", "formInqUpg1799", "formInqUpg2099", "formInqUpg2499", "formInqUpg2699", "formInqUpgOthers", "formInqVasAO", "formInqVasIptv", "formInqVasMOW", "formInqVasSAO", "formInqVasWMesh", "formInqVasOthers", "formInqWireReRoute"
     ]
 
-    const requestForms = [
-        "formReqGoGreen", "formReqUpdateContact", "formReqSrvcRenewal", "formReqBillAdd", "formReqSrvcAdd", "formReqTaxAdj", "formReqChgTelUnit", "formReqDiscoVAS", "formReqTempDisco", "formReqNSR", "formReqRentMSF", "formReqRentLPN", "formReqNRC", "formReqSCC", "formReqTollUFC", "formReqOtherTolls", "formReqDowngradeOthers", "formReqDowngrade1299", "formReqDowngrade1399", "formReqDowngrade1799"
-    ]
-
     const othersForms = [
         "othersWebForm", "othersEntAcc", "othersHomeBro", "othersSmart", "othersSME177", "othersAO", "othersRepair", "othersBillAndAcc", "othersUT"
     ]
@@ -548,6 +544,10 @@ function createForm2() {
 
     const alwaysOnForms = [
         "form500_5", "form501_7", "form101_5", "form510_9", "form500_6"
+    ]
+
+    const requestForms = [
+        "formReqTaxAdj", "formReqChgTelUnit"
     ]
 
     // Tech Follow-Up
@@ -971,7 +971,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler,
@@ -1569,7 +1569,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler, 
@@ -2090,7 +2090,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler,
@@ -2829,7 +2829,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler,
@@ -3557,7 +3557,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler,
@@ -4160,7 +4160,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler,
@@ -4595,7 +4595,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler,
@@ -5177,7 +5177,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler,
@@ -5564,7 +5564,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler, 
@@ -5850,7 +5850,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler,
@@ -6221,7 +6221,7 @@ function createForm2() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "Salesforce", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [
             ffupButtonHandler, 
             techNotesButtonHandler, 
@@ -6358,7 +6358,196 @@ function createForm2() {
     }
 
     // Non-Tech Requests
-    else if (requestForms.includes(selectedValue)) { 
+     else if (selectedValue === "formReqAccMgt") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Go Green Registration",
+                "Service Renewal",
+                "Updating Contact Details"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO/SR", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to account management such as enrollment in programs, updating account contact details, and renewing existing services.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Requests for enrollment in the Go Green program";
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Requests for renewal of a service (subscription, contract, or add-on)";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Requests to update the account's contact information (Primary or Secondary)";
+
+            if (requestType === "Go Green Registration") {
+                ul.appendChild(li1);
+            } else if (requestType === "Service Renewal") {
+                ul.appendChild(li2);
+            } else {
+                ul.appendChild(li3);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+    } else if (requestForms.includes(selectedValue)) { 
         const table = document.createElement("table");
 
         const fields = [
@@ -6402,8 +6591,6 @@ function createForm2() {
                 formReqGoGreen: "Requests for enrollment in the Go Green program",
                 formReqUpdateContact: "Requests to update the account's contact information (Primary or Secondary)",
                 formReqSrvcRenewal: "Requests for renewal of a service (subscription, contract, or add-on)",
-                formReqBillAdd: "Requests for modification of the billing address (without SO creation)",
-                formReqSrvcAdd: "Requests for modification of the service address with SO creation for AMEND SAM",
                 formReqTaxAdj: "Requests for a tax adjustment (typically for Microbusiness accounts)",
                 formReqChgTelUnit: "Requests for change of telephone unit (SO creation)",
                 formReqDiscoVAS: "Requests for the disconnection of Value-Added Services (VAS) such as Mesh, Cignal Add-on, Always-On, etc.",
@@ -6616,6 +6803,190 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
+    } else if (selectedValue === "formReqAddressMod") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Billing Address",
+                "Modify Service Address / AMEND SAM (Physical)"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to modification or updating of customer billing or service address.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Requests for modification of the billing address (without SO creation)";
+            
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Requests for modification of the service address with SO creation for AMEND SAM";
+
+            if (requestType === "Billing Address") {
+                ul.appendChild(li1);
+            } else {
+                ul.appendChild(li2);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
     } else if (selectedValue === "formReqSupRetAccNum" || selectedValue === "formReqSupChangeAccNum") { 
         const table = document.createElement("table");
 
@@ -6756,7 +7127,7 @@ function createForm2() {
             checklistDiv.appendChild(ul);
 
             const clHeader = document.createElement("p");
-            clHeader.textContent = requestType;
+            clHeader.textContent = "Requirements";
             clHeader.className = "checklist-header";
             checklistDiv.appendChild(clHeader);
 
@@ -6887,19 +7258,25 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-    } else if (selectedValue === "formReqPermaDisco") {
+    } else if (selectedValue === "formReqDisconnection") { 
         const table = document.createElement("table");
 
         const fields = [
             { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
-            { label: "Ownership", type: "select", name: "ownership", options: ["", "SOR", "Non-SOR"] },
             { label: "Customer Authentication", type: "select", name: "custAuth", options: [
                 "", 
                 "Failed", 
                 "Passed",
                 "NA"
             ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Disconnection (VAS)",
+                "Permanent Disconnection",
+                "Temporary Disconnection (VTD/HTD)"
+            ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
                 "", 
                 "Yes",
@@ -6920,109 +7297,148 @@ function createForm2() {
             const row = document.createElement("tr");
             const td = document.createElement("td");
 
-            const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivDefinition"; 
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
             header.className = "definition-header";
-            instructionsDiv.appendChild(header);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to account or VAS disconnection.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
 
             const ul = document.createElement("ul");
             ul.className = "checklist";
 
             const li1 = document.createElement("li");
-            li1.textContent = "Requests for the permanent disconnection of the account";
-            ul.appendChild(li1);
-
-            instructionsDiv.appendChild(ul);
-
-            td.appendChild(instructionsDiv);
-            row.appendChild(td);
-
-            return row;
-        }
-
-        function createPromptRow() {
-            const ownershipEl = document.querySelector('[name="ownership"]');
-            const ownership = ownershipEl ? ownershipEl.value : "";
-
-            const row = document.createElement("tr");
-            const td = document.createElement("td");
-
-            const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt";
-
-            const req = document.createElement("p");
-            req.textContent = "Requirements:";
-            req.className = "requirements-header";
-            checklistDiv.appendChild(req);
-
-            const ulReq = document.createElement("ul");
-            ulReq.className = "checklist";
-
-            const li1 = document.createElement("li");
-            li1.textContent = "Paid Pre-Termination Fee (PTF) and any remaining gadget amortization (if applicable)";
-            ulReq.appendChild(li1);
+            li1.textContent = "Requests for the disconnection of Value-Added Services (VAS) such as Mesh, Cignal Add-on, Always-On, etc.";
+            
 
             const li2 = document.createElement("li");
-            li2.textContent = "Paid all unbilled toll charges";
-            ulReq.appendChild(li2);
+            li2.textContent = "Requests for the permanent disconnection of the account.";
 
             const li3 = document.createElement("li");
-            li3.textContent = "No open disputes";
-            ulReq.appendChild(li3);
+            li3.textContent = "Requests for the temporary disconnection of the account.";
 
-            const li4 = document.createElement("li");
-            li4.textContent = "No pending bill-related concerns";
-            ulReq.appendChild(li4);
-
-            const li5 = document.createElement("li");
-            li5.textContent = "Zero balance on Monthly Service Fee (MSF)";
-            ulReq.appendChild(li5);
-
-            const li6 = document.createElement("li");
-            li6.textContent = "Picture of Valid ID";
-
-            const li7 = document.createElement("li");
-            li7.textContent = "Proof of Payment-Final Amount";
-
-            const li8 = document.createElement("li");
-            li8.textContent = "Duly signed Letter of Undertaking (LOU)";
-
-            const li9 = document.createElement("li");
-            li9.textContent = "LOA (Letter of Authorization signed by the SOR)";
-
-            const li10 = document.createElement("li");
-            li10.textContent = "One (1) valid ID of the representative";
-
-            const li11 = document.createElement("li");
-            li11.textContent = "For Deceased SOR: Death Certificate and Valid ID of requestor";
-
-            if (ownership === "SOR") {
-                [li6, li7, li8].forEach(li => ulReq.appendChild(li));
-            } else if (ownership === "Non-SOR") {
-                [li9, li10, li11].forEach(li => ulReq.appendChild(li));
+            if (requestType === "Disconnection (VAS)") {
+                ul.appendChild(li1);
+            } else if (requestType === "Permanent Disconnection") {
+                ul.appendChild(li2);
+            } else {
+                ul.appendChild(li3);
             }
 
-            checklistDiv.appendChild(ulReq);
+            checklistDiv.appendChild(ul);
+
+            const clHeader = document.createElement("p");
+            clHeader.textContent = "Requirements";
+            clHeader.className = "checklist-header";
+            checklistDiv.appendChild(clHeader);
+
+            const reqTypeUl = document.createElement("ul");
+            reqTypeUl.className = "checklist";
+
+            const li4 = document.createElement("li");
+            li4.textContent = "If the account is still within the lock-in period, advise the customer to settle the Pre-Termination Fee (PTF) at the Smart/PLDT Sales and Service Center (SSC) and then proceed with the request for disconnection of the Value-Added Service (VAS)";
+
+            const li5 = document.createElement("li");
+            li5.textContent = "Paid Pre-Termination Fee (PTF) and any remaining gadget amortization (if applicable)";
+
+            const li6 = document.createElement("li");
+            li6.textContent = "Paid all unbilled toll charges";
+
+            const li8 = document.createElement("li");
+            li8.textContent = "No open disputes";
+
+            const li9 = document.createElement("li");
+            li9.textContent = "No pending bill-related concerns";
+
+            const li10 = document.createElement("li");
+            li10.textContent = "Zero balance on Monthly Service Fee (MSF)";
+
+            const li11 = document.createElement("li");
+            li11.textContent = "SOR:";
+
+            const sorUl = document.createElement("ul");
+
+            // SOR Requirements
+            [
+                "Picture of Valid ID",
+                "Proof of Payment – Final Amount",
+                "Duly signed Letter of Undertaking (LOU)"
+            ].forEach(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                sorUl.appendChild(li);
+            });
+
+            li11.appendChild(sorUl);
+
+            const li12 = document.createElement("li");
+            li12.textContent = "Non-SOR:";
+
+            const nonSorUl = document.createElement("ul");
+
+            // Non-SOR Requirements
+            [
+                "LOA (Letter of Authorization signed by the SOR)",
+                "One (1) valid ID of the representative",
+                "For Deceased SOR: Death Certificate and Valid ID of requestor"
+            ].forEach(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                nonSorUl.appendChild(li);
+            });
+
+            li12.appendChild(nonSorUl);
+
+            const li13 = document.createElement("li");
+            li13.textContent = "At least 1 year in tenure";
+
+            const li14 = document.createElement("li");
+            li14.textContent = "Paid maintenance fee";
+
+            const li15 = document.createElement("li");
+            li15.textContent = "Zero outstanding balance at the time of request";
+
+            if (requestType === "Disconnection (VAS)") {
+                reqTypeUl.appendChild(li4);
+            } else if (requestType === "Permanent Disconnection"){
+                [li5, li6, li8, li9, li10, li11, li12].forEach(li => reqTypeUl.appendChild(li));
+            } else {
+                [li13, li14, li15].forEach(li => reqTypeUl.appendChild(li));
+            }
+
+            checklistDiv.appendChild(reqTypeUl);
+
             td.appendChild(checklistDiv);
             row.appendChild(td);
 
             return row;
-        }
-
-        let ownershipRow = null;
-
-        function updateChecklist() {
-            const existingChecklist = document.querySelector(".form2DivPrompt")?.parentElement?.parentElement;
-            if (existingChecklist) {
-                existingChecklist.remove();
-            }
-            const checklistRow = createPromptRow();
-            if (ownershipRow && ownershipRow.parentNode) {
-                ownershipRow.parentNode.insertBefore(checklistRow, ownershipRow.nextSibling);
-            }
         }
 
         function createFieldRow(field) {
@@ -7032,7 +7448,7 @@ function createForm2() {
             divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
 
             const label = document.createElement("label");
-            label.textContent = field.label;
+            label.textContent = `${field.label}`;
             label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
             label.setAttribute("for", field.name);
 
@@ -7041,30 +7457,33 @@ function createForm2() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                if (field.name === "ownership") {
-                    input.id = field.name;
-                }
-
-                field.options.forEach((optionText, index) => {
+                field.options.forEach((optionText, index)=> {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
+
                     if (index === 0) {
-                    option.disabled = true;
-                    option.selected = true;
-                    option.style.fontStyle = "italic";
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
                     }
+
                     input.appendChild(option);
                 });
-
-                if (field.name === "ownership") {
-                    input.addEventListener("change", updateChecklist);
-                }
             } else if (field.type === "textarea") {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = field.name === "remarks" ? 6 : 2;
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
                 if (field.placeholder) input.placeholder = field.placeholder;
             }
 
@@ -7075,33 +7494,480 @@ function createForm2() {
 
             return row;
         }
-
-        fields.forEach(field => {
-            if (field.name === "custConcern") {
-                table.appendChild(createDefinitionRow());
-            }
-
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
             const row = createFieldRow(field);
             table.appendChild(row);
-            if (field.name === "ownership") {
-                ownershipRow = row;
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
             }
         });
 
         form2Container.appendChild(table);
 
         const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
-        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-    
+    } else if (selectedValue === "formReqDispute") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Rebate Non Service",
+                "Rentals - MSF",
+                "Rentals - Lionsgate play/Netflix",
+                "Rentals - NRC- Cost of Unit/Gadgets",
+                "Rentals- Service Connection Charge",
+                "Usage - Tolls (UnliFam Call)",
+                "Usage - Other Tolls"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO/SR", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to disputes or rebate processing for charges involving non-service periods, Monthly Service Fees (MSF), Value-Added Services (VAS), and toll usage.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Requests for bill adjustment related to rebate on non-service";
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Requests for dispute on rental adjustment for Monthly Service Fee (MSF)";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Requests for dispute on rental adjustment for Value-Added Services (VOD such as Netflix, LGP, VIU)";
+
+            const li4 = document.createElement("li");
+            li4.textContent = "Requests for dispute on rental adjustment for non-recurring charges and one-time device costs (e.g., remaining device balance)";
+
+            const li5 = document.createElement("li");
+            li5.textContent = "Requests for dispute on rental adjustment for service connection charges (e.g., relocation, reconnection, in-move fees)";
+
+            const li6 = document.createElement("li");
+            li6.textContent = "Processing of Dispute for account that has been billed for their Unli Fam Call";
+
+            const li7 = document.createElement("li");
+            li7.textContent = "Customer requested for adjustment of toll usages (IDD/NDD)";
+
+            if (requestType === "Rebate Non Service") {
+                ul.appendChild(li1);
+            } else if (requestType === "Rentals - MSF") {
+                ul.appendChild(li2);
+            } else if (requestType === "Rentals - Lionsgate play/Netflix") {
+                ul.appendChild(li3);
+            } else if (requestType === "Rentals - NRC- Cost of Unit/Gadgets") {
+                ul.appendChild(li4);
+            } else if (requestType === "Rentals- Service Connection Charge") {
+                ul.appendChild(li5);
+            } else if (requestType === "Usage - Tolls (UnliFam Call)") {
+                ul.appendChild(li6);
+            } else {
+                ul.appendChild(li7);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+    } else if (selectedValue === "formReqDowngrade") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Plan 1299",
+                "Plan 1399",
+                "Plan 1799",
+                "Others"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Processing of service orders (SO) for subscription plan downgrades from a higher-tier plan to a lower-tier plan, including Fiber Unli and bundled plans with Cignal subscription.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Processing of SO for downgrade from a higher plan to Fiber Unli Plan 1299.";
+            
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Processing of SO for downgrade from a higher plan to Plan 1399 with Cignal subscription.";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Processing of SO for downgrade from a higher plan to Plan 1799 with Cignal subscription.";
+
+            const li4 = document.createElement("li");
+            li4.textContent = "Requests for downgrade to a lower subscription plan.";
+
+            if (requestType === "Plan 1299") {
+                ul.appendChild(li1);
+            } else if (requestType === "Plan 1399") {
+                ul.appendChild(li2);
+            } else if (requestType === "Plan 1799") {
+                ul.appendChild(li3);
+            } else {
+                ul.appendChild(li4);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            if (requestType === "Others") {
+                const clHeader = document.createElement("p");
+                clHeader.textContent = "Requirements";
+                clHeader.className = "checklist-header";
+                checklistDiv.appendChild(clHeader);
+
+                const reqTypeUl = document.createElement("ul");
+                reqTypeUl.className = "checklist";
+
+                const li5 = document.createElement("li");
+                li5.textContent = "A ₱500 downgrade fee applies. 36 months lock-in period will refresh.";
+
+                const li6 = document.createElement("li");
+                li6.textContent = "Signed Subscription Certificate";
+
+                const li7 = document.createElement("li");
+                li7.textContent = "Signed LOA of the customer with copy of Valid ID of requestor & SOR";
+
+                [li5, li6, li7].forEach(li => reqTypeUl.appendChild(li));
+
+                checklistDiv.appendChild(reqTypeUl);
+            }
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
     } else if (selectedValue === "formReqReconnect") {
         const table = document.createElement("table");
 
         const fields = [
             { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
             { label: "Customer Authentication", type: "select", name: "custAuth", options: ["", "Failed", "Passed", "NA"] },
-            { label: "Request Type", type: "select", name: "reconType", options: [
+            { label: "Request Type", type: "select", name: "requestType", options: [
                 "",
                 "Posted Payment",
                 "Posted Payment (DTS)",
@@ -7129,7 +7995,7 @@ function createForm2() {
             ]}
         ];
 
-        const reconRequirements = {
+        const reconSpecificDefinition = {
             "Posted Payment": "Processing of reconnection request from a restricted account with payment already posted.",
             "Posted Payment (DTS)": "Reconnection request processed via NMS Skin.",
             "Promise To Pay": "Processing of immediate reconnection request with subscriber’s verbal commitment to settle the outstanding balance from the date of request.",
@@ -7140,7 +8006,7 @@ function createForm2() {
             "Tactical": "Processing of reconnection request with an approved churn offer."
         };
 
-        let reconTypeRow = null;
+        let requestTypeRow = null;
         let checklistRowRef = null;
 
         function createDefinitionRow() {
@@ -7169,8 +8035,8 @@ function createForm2() {
             return row;
         }
 
-        function createChecklistRow(reconType) {
-            if (!reconType || !reconRequirements[reconType]) return null;
+        function createChecklistRow(requestType) {
+            if (!requestType || !reconSpecificDefinition[requestType]) return null;
 
             const row = document.createElement("tr");
             const td = document.createElement("td");
@@ -7186,7 +8052,7 @@ function createForm2() {
             ul.className = "checklist";
 
             const li = document.createElement("li");
-            li.textContent = reconRequirements[reconType];
+            li.textContent = reconSpecificDefinition[requestType];
 
             ul.appendChild(li);
             div.appendChild(header);
@@ -7198,8 +8064,8 @@ function createForm2() {
         }
 
         function updateChecklist() {
-            const reconTypeSelect = document.getElementById("reconType");
-            const value = reconTypeSelect ? reconTypeSelect.value : "";
+            const requestTypeSelect = document.getElementById("requestType");
+            const value = requestTypeSelect ? requestTypeSelect.value : "";
 
             if (checklistRowRef) {
                 checklistRowRef.remove();
@@ -7207,8 +8073,8 @@ function createForm2() {
             }
 
             const newRow = createChecklistRow(value);
-            if (newRow && reconTypeRow) {
-                reconTypeRow.parentNode.insertBefore(newRow, reconTypeRow.nextSibling);
+            if (newRow && requestTypeRow) {
+                requestTypeRow.parentNode.insertBefore(newRow, requestTypeRow.nextSibling);
                 checklistRowRef = newRow;
             }
         }
@@ -7247,7 +8113,7 @@ function createForm2() {
                     input.appendChild(option);
                 });
 
-                if (field.name === "reconType") {
+                if (field.name === "requestType") {
                     input.addEventListener("change", updateChecklist);
                 }
 
@@ -7284,8 +8150,8 @@ function createForm2() {
             const row = createFieldRow(field);
             table.appendChild(row);
 
-            if (field.name === "reconType") {
-                reconTypeRow = row;
+            if (field.name === "requestType") {
+                requestTypeRow = row;
             }
         });
 
@@ -7299,6 +8165,1718 @@ function createForm2() {
             resetButtonHandler,
         ];
 
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+    } else if (selectedValue === "formReqRefund") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Proactive AMSF (New Connect)",
+                "Reactive Final Account",
+                "Reactive Overpayment",
+                "Reactive Wrong Biller"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Refund-Related Concerns";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Processing of refund request related to advance payment for a cancelled new application.";
+            
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Processing of refund request related to overpayment in a final account.";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Processing of refund request related to account overpayment, provided that the excess amount is at least equivalent to one (1) Monthly Service Fee (MSF).";
+
+            const li4 = document.createElement("li");
+            li4.textContent = "Processing of refund request related to payment erroneously made to PLDT Inc.";
+
+            if (requestType === "Proactive AMSF (New Connect)") {
+                ul.appendChild(li1);
+            } else if (requestType === "Reactive Final Account") {
+                ul.appendChild(li2);
+            } else if (requestType === "Reactive Overpayment") {
+                ul.appendChild(li3);
+            } else {
+                ul.appendChild(li4);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            const clHeader = document.createElement("p");
+            clHeader.textContent = "Requirements";
+            clHeader.className = "checklist-header";
+            checklistDiv.appendChild(clHeader);
+
+            const reqTypeUl = document.createElement("ul");
+            reqTypeUl.className = "checklist";
+
+            const li5 = document.createElement("li");
+            li5.textContent = "Closed SO for new application";
+
+            const li6 = document.createElement("li");
+            li6.textContent = "With reflected payment of 1AMSF on the account";
+
+            const li7 = document.createElement("li");
+            li7.textContent = "Letter of Request (LOR for SOR)/Letter of Authorization (LOA for Non-SOR) with three (3) specimen signatures by the subscriber on record (SOR)";
+
+            const li8 = document.createElement("li");
+            li8.textContent = "Proof of Payment ";
+
+            const li9 = document.createElement("li");
+            li9.textContent = "Valid ID with specimen signature";
+
+            const li10 = document.createElement("li");
+            li10.textContent = "For Non-SOR - Valid ID of SOR and ID of the authorized representative";
+            
+            if (requestType === "Proactive AMSF (New Connect)") {
+                [li5, li6].forEach(li => reqTypeUl.appendChild(li));
+            } else {
+                [li7, li8, li9, li10].forEach(li => reqTypeUl.appendChild(li));
+            }
+
+            checklistDiv.appendChild(reqTypeUl);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+    } else if (selectedValue === "formReqRelocation") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Cancelled SO - Bypass SO",
+                "CID Creation",
+                "Relocation - SO Creation"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to service relocation.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Request for reprocessing of relocation due to cancelled SO related to Bypass SO";
+            
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Request for the CID creation process through Geocoder";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Request for the process of relocation SO (Non-Simultaneous & Simultaneous)";
+
+            if (requestType === "Cancelled SO - Bypass SO") {
+                ul.appendChild(li1);
+            } else if (requestType === "CID Creation") {
+                ul.appendChild(li2);
+            } else {
+                ul.appendChild(li3);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            if (requestType === "Relocation - SO Creation") {
+                const clHeader = document.createElement("p");
+                clHeader.textContent = "Requirements";
+                clHeader.className = "checklist-header";
+                checklistDiv.appendChild(clHeader);
+
+                const reqTypeUl = document.createElement("ul");
+                reqTypeUl.className = "checklist";
+
+                const li4 = document.createElement("li");
+                li4.textContent = "Service Request form and Subscert for Non-SOR";
+                reqTypeUl.appendChild(li4);
+
+                checklistDiv.appendChild(reqTypeUl);
+            }
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+    } else if (selectedValue === "formReqSpecFeat") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "DDD Pin Resetting",
+                "NDD / IDD / DDD (Security Lock)",
+                "Super Bundle / Caller ID Bundle",
+                "Others"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO/SR", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to landline features, including PIN reset, security code retrieval, activation of bundled features, and addition of other special features.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Customer requesting for PIN resetting";
+            
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Customer requesting for the security code of the telephone related to special features (IDD, NDD, or DDD)";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Customer requested to process super bundle/caller ID bundle feature on the account";
+
+            const li4 = document.createElement("li");
+            li4.textContent = "Other special features request such as adding special feature on the telephone";
+
+            if (requestType === "DDD Pin Resetting") {
+                ul.appendChild(li1);
+            } else if (requestType === "NDD / IDD / DDD (Security Lock)") {
+                ul.appendChild(li2);
+            } else if (requestType === "Super Bundle / Caller ID Bundle") {
+                ul.appendChild(li3);
+            } else {
+                ul.appendChild(li4);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            const clHeader = document.createElement("p");
+            clHeader.textContent = "Requirements";
+            clHeader.className = "checklist-header";
+            checklistDiv.appendChild(clHeader);
+
+            const reqTypeUl = document.createElement("ul");
+            reqTypeUl.className = "checklist";
+
+            if (requestType === "DDD Pin Resetting") {
+                const li5 = document.createElement("li");
+                li5.textContent = "No Account Treatment";
+                reqTypeUl.appendChild(li5);
+
+                const li6 = document.createElement("li");
+                li6.textContent = "No open SO";
+                reqTypeUl.appendChild(li6);
+            } else {
+                const li5 = document.createElement("li");
+                li5.textContent = "No outstanding balance";
+                reqTypeUl.appendChild(li5);
+
+                const li6 = document.createElement("li");
+                li6.textContent = "No Account Treatment";
+                reqTypeUl.appendChild(li6);
+
+                const li7 = document.createElement("li");
+                li7.textContent = "Subscription Certificate (For New Customer)";
+                reqTypeUl.appendChild(li7);
+
+                const li8 = document.createElement("li");
+                li8.textContent = "Customer Application Form (For New Customer)";
+                reqTypeUl.appendChild(li8);
+            }
+
+            checklistDiv.appendChild(reqTypeUl);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+    } else if (selectedValue === "formReqSpeedAddOn") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Create SO - Disconnect",
+                "Create SO - Modify Speed",
+                "Interested (File MsForm)"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to the enrollment, removal, or documented interest in the Speed Add-On 500.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Customer requested for the disconnection of the speed add-on 500 on the account";
+            
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Customer requested for the speed add-on to be added on the account";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Customer was asking for the speed add-on 500, was just interested and the agent logged the request in the MS Form";
+
+            if (requestType === "Create SO - Disconnect") {
+                ul.appendChild(li1);
+            } else if (requestType === "Create SO - Modify Speed") {
+                ul.appendChild(li2);
+            } else {
+                ul.appendChild(li3);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+    } else if (selectedValue === "formReqUfc") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Activation",
+                "Deactivation"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to the Unli Fam Call feature on the account.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Requirement";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Ensure that the plan originally includes the UFC";
+            ul.appendChild(li1);
+
+            checklistDiv.appendChild(ul);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+    } else if (selectedValue === "formReqUpgrade") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Plan 1399",
+                "Plan 1599",
+                "Plan 1799",
+                "Plan 2099",
+                "Plan 2699",
+                "Others"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to service plan upgrades, including changes to Plan 1399, 1599, 1799, 2099, 2699, or other eligible plans.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Customer was requesting for the upgrade of service into plan 1399.";
+            
+            const li2 = document.createElement("li");
+            li2.textContent = "Customer was requesting for the upgrade of service into plan 1599.";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Customer was requesting for the upgrade of service into plan 1799.";
+
+            const li4 = document.createElement("li");
+            li4.textContent = "Customer was requesting for the upgrade of service into plan 2099.";
+
+            const li5 = document.createElement("li");
+            li5.textContent = "Customer was requesting for the upgrade of service into plan 2699.";
+
+            const li6 = document.createElement("li");
+            li6.textContent = "Customer was requesting for the upgrade of service into other plans aside from 1399, 1599, 1799, 2099, and 2699.";
+
+            if (requestType === "Plan 1399") {
+                ul.appendChild(li1);
+            } else if (requestType === "Plan 1599") {
+                ul.appendChild(li2);
+            } else if (requestType === "Plan 1799") {
+                ul.appendChild(li3);
+            } else if (requestType === "Plan 2099") {
+                ul.appendChild(li4);
+            } else if (requestType === "Plan 2699") {
+                ul.appendChild(li5);
+            } else {
+                ul.appendChild(li6);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            const clHeader = document.createElement("p");
+            clHeader.textContent = "Requirements";
+            clHeader.className = "checklist-header";
+            checklistDiv.appendChild(clHeader);
+
+            const reqTypeUl = document.createElement("ul");
+            reqTypeUl.className = "checklist";
+
+            const li7 = document.createElement("li");
+            li7.textContent = "Letter of Authorization (Non-SOR)";
+
+            const li8 = document.createElement("li");
+            li8.textContent = "Signed Subscription Certificate (Non-SOR and Social Media agent)";
+
+            [li7, li8].forEach(li => reqTypeUl.appendChild(li));
+
+            checklistDiv.appendChild(reqTypeUl);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+    } else if (selectedValue === "formReqVAS") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "",
+                "Always On",
+                "Cignal/IPTV",
+                "MyOwnWifi",
+                "Speed Add On",
+                "Speed Alignment",
+                "Wifi Mesh",
+                "Others"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to the activation, adjustment, or processing of add-ons and value-added services (VAS) on the account.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Customer requesting for the Always On add-on on the account";
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Customer requesting for the Cignal add-on on the account";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Customer requesting for the MyOwn Wifi add-on on the account";
+
+            const li4 = document.createElement("li");
+            li4.textContent = "Customer requesting for the speed add-on";
+
+            const li5 = document.createElement("li");
+            li5.textContent = "Customer requesting for the speed alignment on the account";
+
+            const li6 = document.createElement("li");
+            li6.textContent = "Customer requesting for the Wifi Mesh add-on in the account";
+
+            const li7 = document.createElement("li");
+            li7.textContent = "Customer requesting for the other VAS add-on on the account";
+            
+            if (requestType === "Always On") {
+                ul.appendChild(li1);
+            } else if (requestType === "Cignal/IPTV") {
+                ul.appendChild(li2);
+            } else if (requestType === "MyOwnWifi") {
+                ul.appendChild(li3);
+            } else if (requestType === "Speed Add On") {
+                ul.appendChild(li4);
+            } else if (requestType === "Speed Alignment") {
+                ul.appendChild(li5);
+            } else if (requestType === "Wifi Mesh") {
+                ul.appendChild(li6);
+            } else if (requestType === "Others") {
+                ul.appendChild(li7);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            const clHeader = document.createElement("p");
+            clHeader.textContent = "Requirements";
+            clHeader.className = "checklist-header";
+
+            const reqTypeUl = document.createElement("ul");
+            reqTypeUl.className = "checklist";
+
+            const li8 = document.createElement("li");
+            li8.textContent = "ID";
+
+            const li9 = document.createElement("li");
+            li9.textContent = "Cignal Privacy Policy";
+
+            const li10 = document.createElement("li");
+            li10.textContent = "Letter of Authorization (Non-SOR)";
+
+            const li11 = document.createElement("li");
+            li11.textContent = "Signed Subscription Certificate (Non-SOR and Social Media agent)";
+
+            let hasItems = false;
+
+            if (requestType === "Always On" || requestType === "Wifi Mesh") {
+                [li10, li11].forEach(li => reqTypeUl.appendChild(li));
+                hasItems = true;
+
+            } else if (requestType === "Cignal/IPTV") {
+                [li9, li10, li11].forEach(li => reqTypeUl.appendChild(li));
+                hasItems = true;
+
+            } else if (requestType === "MyOwnWifi") {
+                [li8, li11].forEach(li => reqTypeUl.appendChild(li));
+                hasItems = true;
+            }
+
+            if (hasItems) {
+                checklistDiv.appendChild(clHeader);
+                checklistDiv.appendChild(reqTypeUl);
+            }
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+    } else if (selectedValue === "formReqWireReroute") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Re-Routing Inside Wire",
+                "Re-Routing Outside Wire"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]}
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Request related to rerouting or relocation of wiring.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Customer request for rerouting or relocation of inside wiring.";
+            
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Customer request for rerouting or relocation of outside wiring.";
+
+            if (requestType === "Re-Routing Inside Wire") {
+                ul.appendChild(li1);
+            } else {
+                ul.appendChild(li2);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            const clHeader = document.createElement("p");
+            clHeader.textContent = "Requirements";
+            clHeader.className = "checklist-header";
+            checklistDiv.appendChild(clHeader);
+
+            const reqTypeUl = document.createElement("ul");
+            reqTypeUl.className = "checklist";
+
+            const li5 = document.createElement("li");
+            li5.textContent = "No Open SO";
+            reqTypeUl.appendChild(li5);
+
+            const li6 = document.createElement("li");
+            li6.textContent = "No Account Restriction";
+            reqTypeUl.appendChild(li6);
+
+            checklistDiv.appendChild(reqTypeUl);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
     }
@@ -9728,6 +12306,7 @@ function createButtons(buttonLabels, buttonHandlers) {
     const vars = initializeVariables();
 
     const channelField = document.getElementById("channel").value;
+    const lobField = document.getElementById("lob").value;
     const buttonTable = document.createElement("table");
     let buttonIndex = 0;
 
@@ -9742,18 +12321,30 @@ function createButtons(buttonLabels, buttonHandlers) {
                 let label = buttonLabels[buttonIndex];
 
                 const isHotline = channelField === "CDT-HOTLINE";
+                const isTech = lobField === "TECH";
 
                 if (isHotline) {
-                    if (label === "Salesforce") {
+                    if (label === "SF/FUSE") {
                         label = "FUSE";
                     }
 
-                    if (label === "SF Tagging" || label === "Endorse") {
+                    if (label === "SF Tagging") {
+                        label = "ESA Tagging";
+                    }
+
+                    if (label === "Endorse") {
                         buttonIndex++;
                         continue;
                     }
-                } else if (vars.selectedIntent === "formFfupRepair" && label === "Salesforce") {
+                }
+                
+                if (vars.selectedIntent === "formFfupRepair" && label === "SF/FUSE") {
                     label = "SF & FUSE";
+                }
+
+                if (isHotline && isTech && label === "ESA Tagging") {
+                    buttonIndex++;
+                    continue;
                 }
 
                 if (label === "CEP" && vars.selectedIntent !== "formFfupRepair") {
@@ -9857,6 +12448,7 @@ function optionNotAvailable() {
     return false;
 }
 
+// Generating Follow-up Notes
 function ffupButtonHandler(showFloating = true, enableValidation = true, includeSpecialInst = true, showSpecialInstSection = true) {
     const vars = initializeVariables();
 
@@ -10083,6 +12675,7 @@ function showFfupFloatingDiv(sections, sectionLabels) {
     };
 }
 
+// Generating CEP Notes
 function cepCaseTitle() {
     const vars = initializeVariables();
 
@@ -10760,6 +13353,7 @@ function showCepFloatingDiv(labels, textToCopy) {
     };
 }
 
+// Generate FUSE and SF notes for Tech Intents
 function getSfFieldValueIfVisible(fieldName) {
     const vars = initializeVariables();
     
@@ -10777,7 +13371,6 @@ function getSfFieldValueIfVisible(fieldName) {
     return value;
 }
 
-// Tech Notes in Salesforce and/or FUSE
 function techNotesButtonHandler(showFloating = true) {
     const vars = initializeVariables(); 
 
@@ -11197,7 +13790,6 @@ function splitIntoSections(text, maxChars = 250) {
     return sections;
 }
 
-// Show generated notes in a new window
 function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
 
     const vars = initializeVariables();
@@ -11300,6 +13892,7 @@ function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
     };
 }
 
+// Generate FUSE notes for Non-Tech Intents
 function getFuseFieldValueIfVisible(fieldName) {
     const vars = initializeVariables();
     
@@ -11482,14 +14075,11 @@ function nontechNotesButtonHandler(showFloating = true) {
     const custName = formatField("CUST NAME", "custName", "");
     const sfCaseNum = formatField("", "sfCaseNum");
     const accountNum = formatField("", "accountNum");
+    const landlineNum = formatField("", "landlineNum");
     const soSrNum = formatField("", "srNum");
 
     const inquiryForms = [
         "formInqAccSrvcStatus", "formInqLockIn", "formInqCopyOfBill", "formInqMyHomeAcc", "formInqPlanDetails", "formInqAda", "formInqRebCredAdj", "formInqBalTransfer", "formInqBrokenPromise", "formInqCreditAdj", "formInqCredLimit", "formInqNSR", "formInqDdate", "formInqBillDdateExt", "formInqEcaPip", "formInqNewBill", "formInqOneTimeCharges", "formInqOverpay", "formInqPayChannel", "formInqPayPosting", "formInqPayRefund", "formInqPayUnreflected", "formInqDdateMod", "formInqBillRefund", "formInqSmsEmailBill", "formInqTollUsage", "formInqCoRetain", "formInqCoChange", "formInqPermaDisc", "formInqTempDisc", "formInqD1299", "formInqD1399", "formInqD1799", "formInqDOthers", "formInqDdateExt", "formInqEntertainment", "formInqInmove", "formInqMigration", "formInqProdAndPromo", "formInqHomeRefNC", "formInqHomeDisCredit", "formInqReloc", "formInqRewards", "formInqDirectDial", "formInqBundle", "formInqSfOthers", "formInqSAO500", "formInqUfcEnroll", "formInqUfcPromoMech", "formInqUpg1399", "formInqUpg1599", "formInqUpg1799", "formInqUpg2099", "formInqUpg2499", "formInqUpg2699", "formInqUpgOthers", "formInqVasAO", "formInqVasIptv", "formInqVasMOW", "formInqVasSAO", "formInqVasWMesh", "formInqVasOthers", "formInqWireReRoute"
-    ];
-
-    const requestForms = [
-        "formReqGoGreen", "formReqUpdateContact", "formReqSrvcRenewal", "formReqBillAdd", "formReqSrvcAdd", "formReqTaxAdj", "formReqChgTelUnit", "formReqDiscoVAS", "formReqPermaDisco", "formReqTempDisco", "formReqNSR", "formReqRentMSF", "formReqRentLPN", "formReqNRC", "formReqSCC", "formReqTollUFC", "formReqOtherTolls", "formReqDowngradeOthers", "formReqDowngrade1299", "formReqDowngrade1399", "formReqDowngrade1799", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
     ];
 
     const ffupForms = [
@@ -11511,34 +14101,42 @@ function nontechNotesButtonHandler(showFloating = true) {
     const othersForms = [
         "othersWebForm", "othersEntAcc", "othersHomeBro", "othersSmart", "othersSME177", "othersToolsDown", "othersAO", "othersRepair", "othersBillAndAcc", "othersUT"
     ];
+
+    const requestForms = [
+        "formReqGoGreen", "formReqUpdateContact", "formReqSrvcRenewal", "formReqTaxAdj", "formReqChgTelUnit", "formReqRelocation", "formReqSpecFeat", "formReqSpeedAddOn", "formReqUfc", "formReqUpgrade", "formReqWireReroute"
+    ];
+
+    const requestFormsBasedReqType = [
+        "formReqAccMgt", "formReqAddressMod", "formReqDisconnection", "formReqDispute", "formReqDowngrade", "formReqReconnect", "formReqRefund", "formReqVAS"
+    ];
     
     // non-Tech Complaints
     if (vars.selectedIntent === "formCompMyHomeWeb") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompMisappliedPayment") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ ${vars.selectedIntentText} - ${vars.findings}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText} - ${vars.findings}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompUnreflectedPayment") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompPersonnelIssue") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ ${vars.personnelType} COMPLAINT${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.personnelType} COMPLAINT${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -11548,28 +14146,28 @@ function nontechNotesButtonHandler(showFloating = true) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqBillInterpret") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ BILL INTERPRETATION - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ BILL INTERPRETATION - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqOutsBal") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ OUTSTANDING BALANCE - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ OUTSTANDING BALANCE - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqRefund") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ REFUND - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ REFUND - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -11579,7 +14177,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupDispute") {
@@ -11612,7 +14210,7 @@ function nontechNotesButtonHandler(showFloating = true) {
             disputeNotes = `DISPUTE FOR ${vars.disputeType}S`;
         }
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${disputeNotes}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${disputeNotes}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
     } else if (ffupFormsBasedOnFindings.includes(vars.selectedIntent)) {
         const emptyFields = validateRequiredFields();
@@ -11633,28 +14231,28 @@ function nontechNotesButtonHandler(showFloating = true) {
         };
 
         if (vars.findings && findingsMap[vars.findings]) {
-            concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+            concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         }
         actionsTakenCopiedText = constructFuseOutput();
     } else if (ffupFormsDisputes.includes(vars.selectedIntent)) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP DISPUTE FOR ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP DISPUTE FOR ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (ffupFormsRefund.includes(vars.selectedIntent)) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP REFUND - ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP REFUND - ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupSpecialFeat") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} (${vars.requestType})${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} (${vars.requestType})${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupTempDisco") {
@@ -11669,28 +14267,28 @@ function nontechNotesButtonHandler(showFloating = true) {
         };
 
         if (vars.findings && findingsMap[vars.findings]) {
-            concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP TEMPORARY DISCONNECTION ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+            concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP TEMPORARY DISCONNECTION ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         }
         actionsTakenCopiedText = constructFuseOutput();
     } else if (vars.selectedIntent === "formFfupUP") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} FOR VALIDATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} FOR VALIDATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupVasAct") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ACTIVATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ACTIVATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupVasDel") {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ${vars.vasProduct} DELIVERY${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ${vars.vasProduct} DELIVERY${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -11700,14 +14298,14 @@ function nontechNotesButtonHandler(showFloating = true) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}${soSrNum}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/${vars.selectedIntentText}${soSrNum}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
-    } else if (vars.selectedIntent === "formReqReconnect") {
+    } else if (requestFormsBasedReqType.includes(vars.selectedIntent)) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}/${vars.selectedIntentText}-${vars.reconType}${soSrNum}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/${vars.requestType}${soSrNum}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -11717,7 +14315,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}\nC: ${vars.channel}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -11824,6 +14422,7 @@ function showFuseFloatingDiv(concernCopiedText, actionsTakenCopiedText) {
     };
 }
 
+// Generate Bantay Kable notes
 function bantayKableButtonHandler(showFloating = true) {
     const vars = initializeVariables();
 
@@ -11978,6 +14577,7 @@ function showBantayKableFloatingDiv(sections, sectionLabels) {
     };
 }
 
+// Generate SF Tagging
 function sfTaggingButtonHandler() {
     const vars = initializeVariables();
 
@@ -12042,27 +14642,9 @@ function sfTaggingButtonHandler() {
 
     const inqUfc = ["formInqUfcEnroll", "formInqUfcPromoMech"];
 
-    const inqUpgrade = [
-        "formInqUpg1399", "formInqUpg1599", "formInqUpg1799", "formInqUpg2099", "formInqUpg2499", "formInqUpg2699", "formInqUpgOthers"
-    ];
+    const inqUpgrade = ["formInqUpg1399", "formInqUpg1599", "formInqUpg1799", "formInqUpg2099", "formInqUpg2499", "formInqUpg2699", "formInqUpgOthers"];
 
-    const inqVAS = [
-        "formInqVasAO", "formInqVasIptv", "formInqVasMOW", "formInqVasSAO", "formInqVasWMesh", "formInqVasOthers"
-    ];
-
-    const reqAccounts = ["formReqGoGreen", "formReqUpdateContact", "formReqSrvcRenewal"];
-
-    const reqAddressMod = ["formReqBillAdd", "formReqSrvcAdd"];
-
-    const reqBilling = ["formReqTaxAdj"];
-
-    const reqChngOwnership = ["formReqSupRetAccNum", "formReqSupChangeAccNum"];
-
-    const reqChngTelUnit = ["formReqChgTelUnit"];
-
-    const reqDisco = ["formReqDiscoVAS", "formReqPermaDisco", "formReqTempDisco"];
-
-    const reqDispute = ["formReqNSR", "formReqRentMSF", "formReqRentLPN", "formReqNRC", "formReqSCC", "formReqTollUFC", "formReqOtherTolls"];
+    const inqVAS = ["formInqVasAO", "formInqVasIptv", "formInqVasMOW", "formInqVasSAO", "formInqVasWMesh", "formInqVasOthers"];
 
     const othHotline = ["others164", "othersEntAcc", "othersHomeBro", "othersSmart", "othersSME177"];
 
@@ -12082,7 +14664,11 @@ function sfTaggingButtonHandler() {
 
     const alwaysOn = ["form500_5", "form501_7", "form101_5", "form510_9", "form500_6"];
 
-    const reqDowngrade = ["formReqDowngradeOthers", "formReqDowngrade1299", "formReqDowngrade1399", "formReqDowngrade1799"];
+    const reqFormat1 = ["formReqSupRetAccNum", "formReqSupChangeAccNum"];
+
+    const reqFormat2 = ["formReqAddressMod", "formReqDisconnection", "formReqDispute", "formReqDowngrade", "formReqSpecFeat", "formReqSpeedAddOn", "formReqUpgrade", "formReqVAS"];
+
+    const reqFormat3 = ["formReqReconnect", "formReqRefund", "formReqRelocation"];
 
     // Tech
     if (vars.selectedIntent === 'formFfupRepair') {
@@ -12568,59 +15154,53 @@ function sfTaggingButtonHandler() {
     } 
 
     // Non-Tech Request
-    else if (reqAccounts.includes(vars.selectedIntent)) {
+    else if (vars.selectedIntent === 'formReqAccMgt') {
         bauRows = [
             ['VOC:', 'Request'],
             ['Case Type:', 'Account'],
-            ['Case Sub-Type:', `${vars.selectedIntentText}`]
+            ['Case Sub-Type:', vars.requestType]
         ];
-    } else if (reqAddressMod.includes(vars.selectedIntent)) {
+    } else if (reqFormat1.includes(vars.selectedIntent)) {
         bauRows = [
             ['VOC:', 'Request'],
-            ['Case Type:', 'Address Modification (Record)'],
-            ['Case Sub-Type:', `${vars.selectedIntentText}`]
+            ['Case Type:', vars.selectedOptGroupLabel],
+            ['Case Sub-Type:', vars.selectedIntentText]
         ];
-    } else if (reqBilling.includes(vars.selectedIntent)) {
+    } else if (vars.selectedIntent === 'formReqTaxAdj') {
         bauRows = [
             ['VOC:', 'Request'],
             ['Case Type:', 'Billing'],
-            ['Case Sub-Type:', `${vars.selectedIntentText}`]
+            ['Case Sub-Type:', vars.selectedIntentText]
         ];
-    } else if (reqChngOwnership.includes(vars.selectedIntent)) {
-        bauRows = [
-            ['VOC:', 'Request'],
-            ['Case Type:', 'Change of Ownership'],
-            ['Case Sub-Type:', `${vars.selectedIntentText}`]
-        ];
-    } else if (reqChngTelUnit.includes(vars.selectedIntent)) {
+    } else if (vars.selectedIntent === 'formReqChgTelUnit') {
         bauRows = [
             ['VOC:', 'Request'],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Customer Initiated']
         ];
-    } else if (reqDisco.includes(vars.selectedIntent)) {
+    } else if (reqFormat2.includes(vars.selectedIntent)) {
         bauRows = [
             ['VOC:', 'Request'],
-            ['Case Type:', 'Disconnection'],
-            ['Case Sub-Type:', `${vars.selectedIntentText}`]
+            ['Case Type:', vars.selectedIntentText],
+            ['Case Sub-Type:', vars.requestType]
         ];
-    } else if (reqDispute.includes(vars.selectedIntent)) {
+    } else if (reqFormat3.includes(vars.selectedIntent)) {
         bauRows = [
             ['VOC:', 'Request'],
-            ['Case Type:', 'Dispute'],
-            ['Case Sub-Type:', `${vars.selectedIntentText}`]
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.requestType}`]
         ];
-    } else if (reqDowngrade.includes(vars.selectedIntent)) {
+    } else if (vars.selectedIntent === 'formReqUfc') {
         bauRows = [
             ['VOC:', 'Request'],
-            ['Case Type:', 'Downgrade'],
-            ['Case Sub-Type:', `${vars.selectedIntentText}`]
+            ['Case Type:', 'UNLI FAM CALL'],
+            ['Case Sub-Type:', 'UFC Activation/Deactivation']
         ];
-    } else if (vars.selectedIntent === 'formReqReconnect') {
+    } else if (vars.selectedIntent === 'formReqWireReroute') {
         bauRows = [
             ['VOC:', 'Request'],
-            ['Case Type:', 'Reconnection'],
-            ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.reconType}`]
+            ['Case Type:', 'Wire Re-Route'],
+            ['Case Sub-Type:', 'Re-Routing Inside / Outside Wire']
         ];
     }
 
@@ -12666,7 +15246,7 @@ function sfTaggingButtonHandler() {
         floating1DivHeader.id = "floating1DivHeader";
         floating1Div.appendChild(floating1DivHeader);
     }
-    floating1DivHeader.textContent = "SALESFORCE CASE TAGGING";
+    floating1DivHeader.textContent = "CASE TAGGING";
 
     const sfTaggingValues = document.getElementById("sfTaggingValues");
     sfTaggingValues.innerHTML = '';  
@@ -12754,7 +15334,7 @@ function sfTaggingButtonHandler() {
     };
 }
 
-// Generate Endorsement form
+// Generate Endorsement form and notes
 function endorsementForm() {
     const vars = initializeVariables();
 
@@ -13052,7 +15632,6 @@ function endorsementForm() {
     });
 }
 
-// Endorsement form floating div
 function showFloating3Div(finalText, floating2Div) {
 
     const overlay = document.getElementById("overlay");
@@ -13151,6 +15730,7 @@ function showFloating3Div(finalText, floating2Div) {
     }, 10);
 }
 
+// Reset form and rebuild buttons and show Export and Dellete All buttons
 function resetForm2ContainerAndRebuildButtons() {
     const form2Container = document.getElementById("form2Container");
     form2Container.innerHTML = "";
@@ -13183,6 +15763,7 @@ function resetForm2ContainerAndRebuildButtons() {
     form2Container.appendChild(buttonTable);
 }
 
+// Reset forms
 function resetButtonHandler() {
     const userChoice = confirm("Are you sure you want to reset the form?");
 
@@ -13255,7 +15836,7 @@ function resetButtonHandler() {
         });
 
         const footerElement = document.getElementById("footerValue");
-        const footerText = "Standard Notes Generator Version 5.2.160226";
+        const footerText = "Standard Notes Generator Version 5.2.040326";
         typeWriter(footerText, footerElement, 50);
 
         const notepad = document.getElementById("notepad");
@@ -13284,6 +15865,7 @@ function resetButtonHandler() {
     }
 }
 
+// Save generated notes to localStorage
 function saveFormData() {
     const selectedChannel = document.getElementById("channel")?.value?.trim();
     const sfCaseNumberElement = document.querySelector('[name="sfCaseNum"]');
@@ -13393,30 +15975,24 @@ function saveFormData() {
         "formFfupWT",
         
         // Request
-        "formReqGoGreen",
-        "formReqUpdateContact",
-        "formReqSrvcRenewal",
-        "formReqBillAdd",
-        "formReqSrvcAdd",
+        "formReqAccMgt",
+        "formReqAddressMod",
         "formReqTaxAdj",
         "formReqSupRetAccNum",
         "formReqSupChangeAccNum",
         "formReqChgTelUnit",
-        "formReqDiscoVAS",
-        "formReqPermaDisco",
-        "formReqTempDisco",
-        "formReqNSR",
-        "formReqRentMSF",
-        "formReqRentLPN",
-        "formReqNRC",
-        "formReqSCC",
-        "formReqTollUFC",
-        "formReqOtherTolls",
-        "formReqDowngradeOthers",
-        "formReqDowngrade1299",
-        "formReqDowngrade1399",
-        "formReqDowngrade1799",
+        "formReqDisconnection",
+        "formReqDispute",
+        "formReqDowngrade",
         "formReqReconnect",
+        "formReqRefund",
+        "formReqRelocation",
+        "formReqSpecFeat",
+        "formReqSpeedAddOn",
+        "formReqUfc",
+        "formReqUpgrade",
+        "formReqVAS",
+        "formReqWireReroute",
         
         // Others
         "othersToolsDown",
@@ -13474,6 +16050,7 @@ function saveFormData() {
     alert("All set! Your notes have been saved.");
 }
 
+// Export saved notes as a text file, sorted by timestamp
 function exportFormData() {
     const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
     
@@ -13545,6 +16122,7 @@ function exportFormData() {
     alert("Notes exported successfully!");
 }
 
+// Delete all saved data in localStorage
 function deleteAllData() {
     const userChoice = confirm("Are you sure you want to delete all saved data?");
     
@@ -13554,6 +16132,7 @@ function deleteAllData() {
     }
 }
 
+// Show appropriate buttons based on form state
 const primaryButtons = {
   saveButton: saveFormData,
   resetButton: resetButtonHandler,
@@ -13695,6 +16274,16 @@ const instructions = [
 ];
 
 const versions = [
+    {
+        version: "V5.2.040326",
+        updates: [
+        { title: "Added", items: [
+            "Non-Tech Request intents: <strong>Address Modification (Record), Disconnection, Dispute, Refund, Relocation, Special Features, Speed Add On 500, Unli Fam Call, Upgrade, VAS, Withholding Tax Adjustment,</strong> and <strong>Wire Re-Route</strong>.",
+            "<strong>Service ID</strong> is now included in the generated notes for Non-Tech intents.",
+            "Enabled <strong>ESA tagging</strong> for all Non-Tech intents (Hotline agents).",
+        ]},
+        ]
+    },
     {
         version: "V5.2.160226",
         updates: [
