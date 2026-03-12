@@ -17327,6 +17327,11 @@ function nontechNotesButtonHandler(showFloating = true) {
             { name: "otherPaymentChannel", label: "PAYMENT CHANNEL" },
             { name: "resolution" },
             { name: "remarks" },
+
+            // Upsell
+            { name: "productsOffered", label: "OFFERED" },
+            { name: "declineReason", label: "DECLINE REASON" },
+            { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL DUE TO" }
         ];
 
         const seenFields = new Set();
@@ -17358,7 +17363,12 @@ function nontechNotesButtonHandler(showFloating = true) {
 
             if (value && !seenFields.has(field.name)) {
                 seenFields.add(field.name);
-                actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
+                // actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
+                if (field.name === "productsOffered" || field.name === "notEligibleReason") {
+                    actionsTakenParts.push((field.label ? `${field.label} ` : "") + value);
+                } else {
+                    actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
+                }
             }
         });
 
@@ -17418,7 +17428,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         }
 
         if (otNote) {
-            actionsTaken += "\n" + otNote;
+            actionsTaken += " " + otNote;
         }
 
         const eSnowTicketNum = getFuseFieldValueIfVisible("eSnowTicketNum");
@@ -19678,19 +19688,22 @@ const versions = [
     {
         version: "V5.2.130326",
         updates: [
-        { title: "Enhancements", items: [
-            "Main form behavior updated to display the correct fields based on the selected agent channel.",
-            "Improved <strong>Updates</strong> section for better visuals.",
-            "Expanded <strong>Notepad</strong> section to provide more space for notes and improve usability.",
-            "Improved Upsell Notes integration to capture reasons for declined and ineligible offers for <strong>NIC-NDT</strong>, <strong>NIC</strong>, <strong>SIC</strong> and all <strong>Non-Tech</strong> intents."
-        ]},
-        { title: "Added", items: [
-            "Ordertake option for NSR and Relocation added for tracking purposes.",
-            "Upsell <strong>Pending Req. (For callback)</strong> option added.",
-            "Non-Tech request intents(<strong>Inmove</strong>, <strong>DDE</strong>, <strong>Migration</strong>, <strong>Misapplied Payment</strong>, <strong>Occular Inspection/Amend SAM</strong>, <strong>Proof of PLDT Subscription</strong>, and <strong>Unreflected Payment</strong>).",
-            "<strong>NIC Intent</strong>: Reintroduced Equipment and Modem Brand fields to enable easier identification of the ONU connection type (InterOp vs. Non-InterOp).",
-            "Added NIC Investigation 4 options for NIC-NDT intent."
-        ]},
+            { title: "Enhancements", items: [
+                "Main form behavior updated to display the correct fields based on the selected agent channel.",
+                "Improved <strong>Updates</strong> section for better visuals.",
+                "Expanded <strong>Notepad</strong> section to provide more space for notes and improve usability.",
+                "Improved Upsell Notes integration to capture reasons for declined and ineligible offers for <strong>NIC-NDT</strong>, <strong>NIC</strong>, <strong>SIC</strong> and all <strong>Non-Tech</strong> intents."
+            ]},
+            { title: "Added", items: [
+                "Ordertake option for NSR and Relocation added for tracking purposes.",
+                "Upsell <strong>Pending Req. (For callback)</strong> option added.",
+                "Non-Tech request intents(<strong>Inmove</strong>, <strong>DDE</strong>, <strong>Migration</strong>, <strong>Misapplied Payment</strong>, <strong>Occular Inspection/Amend SAM</strong>, <strong>Proof of PLDT Subscription</strong>, and <strong>Unreflected Payment</strong>).",
+                "<strong>NIC Intent</strong>: Reintroduced Equipment and Modem Brand fields to enable easier identification of the ONU connection type (InterOp vs. Non-InterOp).",
+                "Added NIC Investigation 4 options for NIC-NDT intent."
+            ]},
+            { title: "Fixes", items: [
+                "Resolved a bug causing decline and ineligibility reasons to not display in the generated notes for all non-technical intents.",
+            ]},
         ]
     },
     {
