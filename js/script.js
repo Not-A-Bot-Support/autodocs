@@ -1,6 +1,6 @@
 //script.js
 
-// Standard Notes Generator Version 5.2.040326
+// Standard Notes Generator Version 5.2.130326
 // Developed & Designed by: QA Ryan
 
 // Channel, Concern Type, and VOC Options
@@ -323,6 +323,251 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// Timers & Show/Hide rows based on channel selection
+document.addEventListener('DOMContentLoaded', function() { 
+    // ================================
+    // SHOW/HIDE ROWS BASED ON CHANNEL
+    // ================================
+    const channelSelect = document.getElementById("channel");
+
+    const rows = {
+        caseAccountHeader: document.getElementById("case-and-account-header-row"),
+        custName: document.getElementById("cust-name-row"),
+        caseNum: document.getElementById("case-num-row"),
+        accNum: document.getElementById("acc-num-row"),
+        phoneNum: document.getElementById("phone-num-row"),
+        lobVoc: document.getElementById("lob-and-voc-row"),
+        buttonsRow: document.getElementById("buttons-row")
+    };
+
+    function updateChannelRows() {
+        if (!channelSelect.value) return;
+
+        const isSocMed = channelSelect.value === "CDT-SOCMED";
+
+        rows.caseAccountHeader.style.display = "";
+        rows.custName.style.display = "";
+        rows.accNum.style.display = "";
+        rows.phoneNum.style.display = "";
+        rows.lobVoc.style.display = "";
+        rows.caseNum.style.display = isSocMed ? "" : "none";
+        rows.buttonsRow.style.display = "";
+    }
+
+    channelSelect?.addEventListener("change", updateChannelRows);
+
+    // Run once on load
+    updateChannelRows();
+
+    if (typeof initializeFormElements === "function") initializeFormElements();
+    if (typeof registerEventHandlers === "function") registerEventHandlers();
+
+    // ================================
+    // MAIN TIMER
+    // ================================
+    let timerInterval;
+    let startTime;
+    let elapsedTime = 0;
+    let isRunning = false;
+
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerToggleButton = document.getElementById('timerToggleButton');
+    const timerResetButton = document.getElementById('timerResetButton');
+
+    if (timerDisplay) timerDisplay.textContent = formatTime(0);
+
+    function formatTime(seconds) {
+        const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(seconds % 60).padStart(2, '0');
+        return `${hrs}:${mins}:${secs}`;
+    }
+
+    function updateDisplay() {
+        const now = Date.now();
+        const totalElapsedSeconds = Math.floor((now - startTime + elapsedTime) / 1000);
+        timerDisplay.textContent = formatTime(totalElapsedSeconds);
+    }
+
+    function handleTimer(action) {
+        if (action === 'start' && !isRunning) {
+            startTime = Date.now();
+            timerInterval = setInterval(updateDisplay, 1000);
+            isRunning = true;
+            timerToggleButton.textContent = 'Pause';
+        } else if (action === 'pause' && isRunning) {
+            clearInterval(timerInterval);
+            elapsedTime += Date.now() - startTime;
+            isRunning = false;
+            timerToggleButton.textContent = 'Resume';
+        } else if (action === 'reset') {
+            const confirmReset = confirm("Are you sure you want to reset the timer?");
+            if (confirmReset) {
+                clearInterval(timerInterval);
+                elapsedTime = 0;
+                timerDisplay.textContent = formatTime(0);
+                isRunning = false;
+                timerToggleButton.textContent = 'Start';
+            }
+        }
+    }
+
+    timerToggleButton?.addEventListener('click', function() {
+        if (isRunning) {
+            handleTimer('pause');
+        } else {
+            handleTimer('start');
+        }
+    });
+
+    timerResetButton?.addEventListener('click', function() {
+        handleTimer('reset');
+    });
+
+    // ================================
+    // TICKET CREATION TIMER
+    // ================================
+    // let ticketTimerInterval = null;
+    // let ticketSeconds = 0;
+
+    // const ticketTimer = document.getElementById("ticketTimer");
+    // const ticketDisplay = document.getElementById("ticketTimerDisplay");
+
+    // function formatTicketTime(sec) {
+    //     const h = String(Math.floor(sec / 3600)).padStart(2, "0");
+    //     const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+    //     const s = String(sec % 60).padStart(2, "0");
+    //     return `${h}:${m}:${s}`;
+    // }
+
+    // function startTicketTimer() {
+    //     if (ticketTimerInterval) return;
+    //     ticketTimerInterval = setInterval(() => {
+    //         ticketSeconds++;
+    //         if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(ticketSeconds);
+    //     }, 1000);
+    //     console.log("▶️ Ticket Timer started");
+    // }
+
+    // function stopTicketTimer() {
+    //     clearInterval(ticketTimerInterval);
+    //     ticketTimerInterval = null;
+    //     console.log("⏸ Ticket Timer stopped");
+    // }
+
+    // function resetTicketTimer() {
+    //     clearInterval(ticketTimerInterval);
+    //     ticketTimerInterval = null;
+    //     ticketSeconds = 0;
+    //     if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(0);
+    //     console.log("♻️ Ticket Timer reset");
+    // }
+
+    // window.stopTicketTimer = stopTicketTimer;
+    // window.resetTicketTimer = resetTicketTimer;
+    // window.startTicketTimer = startTicketTimer;
+
+    // function isVisible(el) {
+    //     if (!el) return false;
+    //     let cur = el;
+    //     while (cur && cur.nodeType === 1) {
+    //         const cs = window.getComputedStyle(cur);
+    //         if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) {
+    //             return false;
+    //         }
+    //         cur = cur.parentElement;
+    //     }
+    //     const rect = el.getBoundingClientRect();
+    //     return !(rect.width === 0 && rect.height === 0);
+    // }
+
+    // function checkStopConditions() {
+    //     const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
+    //     const cbr = document.querySelector("input[name='cbr'], textarea[name='cbr'], #cbr");
+
+    //     const landmarksVisible = isVisible(landmarks);
+    //     const landmarksHasValue = landmarks && landmarks.value.trim() !== "";
+    //     const cbrHasValue = cbr && cbr.value.trim() !== "";
+
+    //     if (landmarksVisible) {
+    //         if (landmarksHasValue) stopTicketTimer();
+    //     } else {
+    //         if (cbrHasValue) stopTicketTimer();
+    //     }
+    // }
+
+    // document.addEventListener("change", function (e) {
+    //     const t = e.target;
+
+    //     if (t.matches("select[name='issueResolved'], #issueResolved") ||
+    //         t.matches("select[name='outageStatus'], #outageStatus")) {
+
+    //         const issueResolved = document.querySelector("select[name='issueResolved']")?.value || "";
+    //         const outageStatus = document.querySelector("select[name='outageStatus']")?.value || "";
+
+    //         if (issueResolved === "No - for Ticket Creation" || outageStatus === "Yes") {
+    //             if (ticketTimer) ticketTimer.style.display = "block";
+    //             startTicketTimer();
+    //         } else {
+    //             stopTicketTimer();
+    //             resetTicketTimer();
+    //             if (ticketTimer) {
+    //                 ticketTimer.style.display = "none";
+    //             }
+    //         }
+    //     }
+
+    //     if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
+    //     if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
+    //         const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
+    //         if (!isVisible(landmarks)) checkStopConditions();
+    //     }
+    // });
+
+    // document.addEventListener("input", function (e) {
+    //     const t = e.target;
+
+    //     if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
+    //     if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
+    //         const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
+    //         if (!isVisible(landmarks)) checkStopConditions();
+    //     }
+    // });
+
+    // (function makeDraggable(el) {
+    //     if (!el) return;
+    //     let offsetX = 0, offsetY = 0, isDown = false;
+    //     const header = el.querySelector("#ticketTimerHeader") || el;
+    //     header.style.cursor = "grab";
+
+    //     header.addEventListener("mousedown", dragMouseDown);
+    //     document.addEventListener("mouseup", closeDragElement);
+    //     document.addEventListener("mousemove", elementDrag);
+
+    //     function dragMouseDown(e) {
+    //         e.preventDefault();
+    //         isDown = true;
+    //         offsetX = e.clientX - el.offsetLeft;
+    //         offsetY = e.clientY - el.offsetTop;
+    //         header.style.cursor = "grabbing";
+    //     }
+
+    //     function elementDrag(e) {
+    //         if (!isDown) return;
+    //         e.preventDefault();
+    //         el.style.left = (e.clientX - offsetX) + "px";
+    //         el.style.top = (e.clientY - offsetY) + "px";
+    //     }
+
+    //     function closeDragElement() {
+    //         isDown = false;
+    //         header.style.cursor = "grab";
+    //     }
+    // })(ticketTimer);
+
+    // window.__checkTicketStop = checkStopConditions;
+});
+
 function resetAllFields(excludeFields = []) {
     const selects = document.querySelectorAll("#form2Container select");
     selects.forEach(select => {
@@ -464,8 +709,8 @@ function initializeVariables() {
     };
 }
 
-// Create the dynamic forms
-function createForm2() {
+// Create the dynamic forms based on the selected intent/WOCAS
+function createIntentBasedForm() {
     const selectIntent = document.getElementById("selectIntent");
     const form2Container = document.getElementById("form2Container");
 
@@ -547,7 +792,7 @@ function createForm2() {
     ]
 
     const requestForms = [
-        "formReqTaxAdj", "formReqChgTelUnit"
+        "formReqTaxAdj", "formReqChgTelUnit", "formReqOcular", "formReqProofOfSub"
     ]
 
     // Tech Follow-Up
@@ -765,13 +1010,70 @@ function createForm2() {
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             { label: "Re-Open Status Reason", type: "textarea", name: "reOpenStatsReason", placeholder: "Indicate the reason for re-opening the ticket (Dispatched to Field Technician - Re-Open or Escalated to Network - Re-Open)." },
-            // Cross Sell/Upsell
-            { label: "Cross Sell/Upsell", type: "select", name: "upsell", options: [
+                        // Cross-Sell/Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
+            ]},
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: [
+                "", 
+                "Always On",
+                "Mesh",
+                "Plan Upgrade",
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                // "Account has pending issues", 
+                // "Account is barred", 
+                // "Account is inhibited", 
+                // "Account is not yet active", 
+                // "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
             ]},
         ];
 
@@ -983,30 +1285,25 @@ function createForm2() {
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-
+        
         const queue = document.querySelector("[name='queue']");
-        const projRed = document.querySelector("[name='projRed']");
-        const ticketStatus = document.querySelector("[name='ticketStatus']");
-        const offerALS = document.querySelector("[name='offerALS']");
-        const issueResolved = document.querySelector("[name='issueResolved']");
-
         queue.addEventListener("change", () => {
             resetAllFields(["subject1", "statusReason","subStatus", "queue"]);
             if (queue.value === "FM POLL" || queue.value === "CCARE OFFBOARD") {
                 showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "issueResolved", "upsell" ]);
-                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason" ]);
+                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "productsOffered", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
 
             }else if (queue.value === "Default Entity Queue") {
                 showFields(["ffupCount", "ticketAge", "remarks", "issueResolved", "upsell"]);
-                hideSpecificFields(["projRed", "ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason" ]);
+                hideSpecificFields(["projRed", "ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "productsOffered", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
 
             } else {
                 showFields(["projRed" ]);
-                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "upsell" ]);
+                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "upsell", "productsOffered", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
             }
@@ -1021,33 +1318,35 @@ function createForm2() {
             }
         });
 
+        const projRed = document.querySelector("[name='projRed']");
         projRed.addEventListener("change", () => {
             resetAllFields(["subject1", "statusReason","subStatus", "queue", "projRed"]);
             if (projRed.value === "Yes") {
                 if (queue.value === "SDM CHILD" || queue.value ==="SDM" || queue.value ==="FSMG" || queue.value ==="L2 RESOLUTION" ) {
                     showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "rptCount", "upsell" ]);
-                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "availability", "address", "landmarks", "reOpenStatsReason" ]);
+                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "availability", "address", "landmarks", "reOpenStatsReason", "productsOffered", "declineReason", "notEligibleReason" ]);
                 } else {
                     showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell" ]);
-                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "reOpenStatsReason" ]);
+                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "reOpenStatsReason", "productsOffered", "declineReason", "notEligibleReason" ]);
                 }
 
                 updateToolLabelVisibility();
 
             } else if (projRed.value === "No"){
                 showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "upsell" ]);
-                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason" ]);
+                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "productsOffered", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
 
             } else {
-                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "upsell" ]);
+                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "upsell", "productsOffered", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
             }
             updateToolLabelVisibility();
         });
 
+        const ticketStatus = document.querySelector("[name='ticketStatus']");
         ticketStatus.addEventListener("change", () => {
             if (ticketStatus.value === "Beyond SLA") {
                 showFields(["offerALS" ]);
@@ -1059,6 +1358,7 @@ function createForm2() {
             updateToolLabelVisibility();
         });
 
+        const offerALS = document.querySelector("[name='offerALS']");
         offerALS.addEventListener("change", () => {
             if (offerALS.value === "Offered ALS/Accepted") {
                 showFields(["alsPackOffered", "effectiveDate", "nomiMobileNum" ]);
@@ -1070,6 +1370,7 @@ function createForm2() {
             }
         });
 
+        const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.value === "No") {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason" ]);
@@ -1080,6 +1381,24 @@ function createForm2() {
             }
             updateToolLabelVisibility();
         });
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+
+            showFields(["productsOffered"]);
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["productsOffered", "declineReason"]);
+            }
+        });
+
         updateToolLabelVisibility();
 
     } 
@@ -1212,6 +1531,11 @@ function createForm2() {
                 "Aligned Record", 
                 "Awaiting Parent Case", 
                 "Broken/Damaged Modem/ONU", 
+                "Cannot Browse",
+                "Cannot Browse via Mesh",
+                "Cannot Connect via LAN",
+                "Cannot Connect via WiFi",
+		        "Data Bind Port",
                 "FCR - Cannot Browse", 
                 "FCR - Cannot Connect via LAN", 
                 "FCR - Cannot Connect via WiFi", 
@@ -1219,7 +1543,12 @@ function createForm2() {
                 "FCR - Low BW profile",
                 "FCR - Slow/Intermittent Browsing",
                 "Individual Trouble", 
-                "Misaligned Record", 
+                "Misaligned Record",
+                "Network Trouble - Cannot Browse",
+                "Network Trouble - Cannot Browse via Mesh",
+                "Node Down",
+                "Not Applicable [via Store]",
+                "Redirected to PLDT Sites",
                 "Node Down", 
                 "Not Applicable [via Store]", 
                 "Primary Trouble", 
@@ -1239,9 +1568,64 @@ function createForm2() {
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
+            ]},
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: [
+                "", 
+                "Always On"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                // "Account has pending issues", 
+                // "Account is barred", 
+                // "Account is inhibited", 
+                // "Account is not yet active", 
+                // "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
             ]},
         ];
 
@@ -1583,20 +1967,15 @@ function createForm2() {
         form2Container.appendChild(buttonTable);
 
         const facility = document.querySelector("[name='facility']");
-        const resType = document.querySelector("[name='resType']");
-        const outageStatus = document.querySelector("[name='outageStatus']");
-        const onuRunStats = document.querySelector("[name='onuRunStats']");
-        const issueResolved = document.querySelector("[name='issueResolved']");
-
         facility.addEventListener("change", () => {
             resetAllFields(["facility"]);
             if (facility.value === "Fiber") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
                     showFields(["onuSerialNum", "modemLights", "actualExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "issueResolved"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "issueResolved", "productsOffered", "declineReason", "notEligibleReason"]);
 
                     if (channelField.value === "CDT-SOCMED") {
                         showFields(["resolution"]);
@@ -1605,15 +1984,15 @@ function createForm2() {
                     }
                 } else {
                     showFields(["onuSerialNum", "modemLights", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 }
             } else if (facility.value === "Fiber - Radius") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
                     showFields(["remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "cvReading", "rtaRequest", "actualExp", "issueResolved"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "cvReading", "rtaRequest", "actualExp", "issueResolved", "productsOffered", "declineReason", "notEligibleReason"]);
 
                     if (channelField.value === "CDT-SOCMED") {
                         showFields(["resolution"]);
@@ -1622,7 +2001,7 @@ function createForm2() {
                     }
                 } else {
                     alert("This form is currently unavailable for customers with Fiber - Radius service.");
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
 
                     const facilityField = document.querySelector('[name="facility"]');
                     if (facilityField) facilityField.value = "";
@@ -1630,26 +2009,27 @@ function createForm2() {
                 }
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "issueResolved", "resolution", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "issueResolved", "resolution", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility();
         });
     
+        const resType = document.querySelector("[name='resType']");
         resType.addEventListener("change", () => {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else {
                     alert("This form is currently unavailable for customers with Fiber - DSL service.");
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
 
                     const resTypeField = document.querySelector('[name="resType"]');
                     if (resTypeField) resTypeField.value = "";
@@ -1657,16 +2037,17 @@ function createForm2() {
                 }
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility();
         });
     
+        const outageStatus = document.querySelector("[name='outageStatus']");
         outageStatus.addEventListener("change", () => {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "issueResolved", "availability", "address", "landmarks"]);
+                hideSpecificFields(["onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "issueResolved", "availability", "address", "landmarks", "productsOffered", "declineReason", "notEligibleReason"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -1676,16 +2057,17 @@ function createForm2() {
             } else {
                 if (facility.value === "Fiber") {
                     showFields(["onuSerialNum", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "option82Config", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "option82Config", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else {
                     showFields(["onuSerialNum", "modemLights", "cvReading", "rtaRequest", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "option82Config", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "option82Config", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 }
                 
             }
             updateToolLabelVisibility();
         });
 
+        const onuRunStats = document.querySelector("[name='onuRunStats']");
         onuRunStats.addEventListener("change", () => {
             if (onuRunStats.value === "UP" || onuRunStats.value === "Active") {
                 showFields(["option82Config"]);
@@ -1695,6 +2077,7 @@ function createForm2() {
             updateToolLabelVisibility();
         });
     
+        const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
@@ -1709,6 +2092,23 @@ function createForm2() {
                 hideSpecificFields(["resolution"]);
             }
             updateToolLabelVisibility();
+        });
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+
+            showFields(["productsOffered"]);
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["productsOffered", "declineReason"]);
+            }
         });
 
         updateToolLabelVisibility();
@@ -2272,25 +2672,25 @@ function createForm2() {
                 "CEP Affected Services Tab"
             ]},
             { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
-            // { label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
-            //     "", 
-            //     "FEOL", 
-            //     "HUOL"
-            // ]},
-            // { label: "Modem Brand", type: "select", name: "modemBrand", options: [
-            //     "", 
-            //     "FHTT", 
-            //     "HWTC", 
-            //     "ZTEG",
-            //     "AZRD",
-            //     "PRLN",
-            //     "Other Brands"
-            // ]},
-            // { label: "ONU Connection Type", type: "select", name: "onuConnectionType", options: [
-            //     "", 
-            //     "InterOp", 
-            //     "Non-interOp"
-            // ]},
+            { label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
+                "", 
+                "FEOL", 
+                "HUOL"
+            ]},
+            { label: "Modem Brand", type: "select", name: "modemBrand", options: [
+                "", 
+                "FHTT", 
+                "HWTC", 
+                "ZTEG",
+                "AZRD",
+                "PRLN",
+                "Other Brands"
+            ]},
+            { label: "ONU Connection Type", type: "select", name: "onuConnectionType", options: [
+                "", 
+                "InterOp", 
+                "Non-interOp"
+            ]},
             { label: "ONU Model (L2)", type: "text", name: "onuModel", placeholder: "Available in DMS."},
             { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
             { label: "Internet Light Status", type: "select", name: "intLightStatus", options: [
@@ -2433,7 +2833,6 @@ function createForm2() {
             ]},
             { label: "Investigation 4", type: "select", name: "investigation4", options: [
                 "— Select applicable Investigation 4 —",
-                "Network Trouble - Cannot Browse",
                 "Awaiting Parent Case",
                 "Cannot Browse",
                 "Cannot Browse via Mesh",
@@ -2448,6 +2847,7 @@ function createForm2() {
                 "FCR - Device for Replacement in Store",
                 "FCR - Redirected to PLDT Sites",
                 "Individual Trouble",
+                "Network Trouble - Cannot Browse",
                 "Network Trouble - Cannot Browse via Mesh",
                 "Node Down",
                 "Not Applicable [via Store]",
@@ -2468,10 +2868,65 @@ function createForm2() {
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: [
+                "", 
+                "Always On",
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                // "Account has pending issues", 
+                // "Account is barred", 
+                // "Account is inhibited", 
+                // "Account is not yet active", 
+                // "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createInstructionsRow() {
@@ -2826,7 +3281,6 @@ function createForm2() {
             updateVisibility(".esca-checklist-row");
         }
 
-
         form2Container.appendChild(table);
 
         const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
@@ -2843,26 +3297,15 @@ function createForm2() {
         form2Container.appendChild(buttonTable);
 
         const facility = document.querySelector("[name='facility']");
-        const resType = document.querySelector("[name='resType']");
-        const outageStatus = document.querySelector("[name='outageStatus']");
-        const onuRunStats = document.querySelector("[name='onuRunStats']");
-        // const equipmentBrand = document.querySelector("[name='equipmentBrand']");
-        const modemBrand = document.querySelector("[name='modemBrand']");
-        const onuConnectionType = document.querySelector("[name='onuConnectionType']");
-        const connectionMethod = document.querySelector("[name='connectionMethod']");
-        const issueResolved = document.querySelector("[name='issueResolved']");
-        const resolution = document.querySelector("[name='resolution']");
-        const testedOk = document.querySelector("[name='testedOk']");
-
         facility.addEventListener("change", () => {
             resetAllFields(["facility"]);
             if (facility.value === "Fiber") {
                 if (selectedValue === "form500_1") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form500_2") {
                     showFields(["nmsSkinRemarks", "dmsRemarks", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "connectionMethod", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "connectionMethod", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
                     hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
@@ -2872,14 +3315,14 @@ function createForm2() {
             } else if (facility.value === "Fiber - Radius") {
                 if (selectedValue === "form500_1") {
                     showFields(["connectionMethod", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form500_3" || selectedValue === "form500_4") {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else {
                     alert("This form is currently unavailable for customers with Fiber - Radius service.");
                     resetAllFields([]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
 
                     const facilityField = document.querySelector('[name="facility"]');
                     if (facilityField) facilityField.value = "";
@@ -2889,49 +3332,51 @@ function createForm2() {
                 updateToolLabelVisibility();
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             }
 
             updateToolLabelVisibility();
         });
     
+        const resType = document.querySelector("[name='resType']");
         resType.addEventListener("change", () => {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
                 if (selectedValue=== "form500_1") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form500_2") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 }
                 
                 updateToolLabelVisibility();
             } else {
                 showFields(["remarks", "issueResolved"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             }
 
             updateToolLabelVisibility();
         });
 
+        const outageStatus = document.querySelector("[name='outageStatus']");
         outageStatus.addEventListener("change", () => {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (selectedValue === "form500_1" && facility.value === "Fiber" && outageStatus.value === "No") {
                 showFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "option82Config", "dmsWifiState", "dmsLanPortStatus", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageReference", "pcNumber", "option82Config", "dmsWifiState", "dmsLanPortStatus", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             } else if (selectedValue === "form500_1" && facility.value === "Copper VDSL" && outageStatus.value === "No") {
                 showFields(["onuSerialNum", "intLightStatus", "wanLightStatus", "connectionMethod", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "onuRunStats", "option82Config", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks"]);
+                hideSpecificFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "onuRunStats", "option82Config", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks", "productsOffered", "declineReason", "notEligibleReason"]);
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
                 } else {
@@ -2941,6 +3386,7 @@ function createForm2() {
             updateToolLabelVisibility();
         });
 
+        const onuRunStats = document.querySelector("[name='onuRunStats']");
         onuRunStats.addEventListener("change", () => {
             if (onuRunStats.value === "UP" || onuRunStats.value === "Active") {
                 showFields(["option82Config"]);
@@ -2950,48 +3396,53 @@ function createForm2() {
             updateToolLabelVisibility();
         });
 
-        // function updateONUConnectionType() {
-        //     if (!equipmentBrand.value || !modemBrand.value) {
-        //         onuConnectionType.value = ""; 
-        //         onuConnectionType.dispatchEvent(new Event("change")); 
-        //         return;
-        //     }
+        const equipmentBrand = document.querySelector("[name='equipmentBrand']");
+        const modemBrand = document.querySelector("[name='modemBrand']");
+        const onuConnectionType = document.querySelector("[name='onuConnectionType']");
 
-        //     const newValue =
-        //         (equipmentBrand.value === "FEOL" && modemBrand.value === "FHTT") ||
-        //         (equipmentBrand.value === "HUOL" && modemBrand.value === "HWTC")
-        //             ? "Non-interOp"
-        //             : "InterOp";
+        function updateONUConnectionType() {
+            if (!equipmentBrand.value || !modemBrand.value) {
+                onuConnectionType.value = ""; 
+                onuConnectionType.dispatchEvent(new Event("change")); 
+                return;
+            }
 
-        //     if (onuConnectionType.value !== newValue) {
-        //         onuConnectionType.value = ""; 
-        //         onuConnectionType.dispatchEvent(new Event("change")); 
+            const newValue =
+                (equipmentBrand.value === "FEOL" && modemBrand.value === "FHTT") ||
+                (equipmentBrand.value === "HUOL" && modemBrand.value === "HWTC")
+                    ? "Non-interOp"
+                    : "InterOp";
 
-        //         setTimeout(() => {
-        //             onuConnectionType.value = newValue; 
-        //             onuConnectionType.dispatchEvent(new Event("change")); 
-        //         }, 0);
-        //     }
-        // }
+            if (onuConnectionType.value !== newValue) {
+                onuConnectionType.value = ""; 
+                onuConnectionType.dispatchEvent(new Event("change")); 
 
-        // onuConnectionType.addEventListener("mousedown", (event) => {
-        //     event.preventDefault();
-        // });
+                setTimeout(() => {
+                    onuConnectionType.value = newValue; 
+                    onuConnectionType.dispatchEvent(new Event("change")); 
+                }, 0);
+            }
+        }
 
-        // equipmentBrand.addEventListener("change", updateONUConnectionType);
-        // modemBrand.addEventListener("change", updateONUConnectionType);
+        onuConnectionType.addEventListener("mousedown", (event) => {
+            event.preventDefault();
+        });
 
-        // updateONUConnectionType();
+        equipmentBrand.addEventListener("change", updateONUConnectionType);
+        modemBrand.addEventListener("change", updateONUConnectionType);
 
-        // onuConnectionType.addEventListener("change", () => {
-        //     if (onuConnectionType.value === "Non-interOp") {
-        //         showFields(["vlan", "ipAddress", "connectedDevices"]);
-        //     } else {
-        //         hideSpecificFields(["vlan", "ipAddress", "connectedDevices"]);
-        //     }
-        //     updateToolLabelVisibility();
-        // });
+        updateONUConnectionType();
+
+        onuConnectionType.addEventListener("change", () => {
+            if (onuConnectionType.value === "Non-interOp") {
+                showFields(["vlan", "ipAddress", "connectedDevices"]);
+            } else {
+                hideSpecificFields(["vlan", "ipAddress", "connectedDevices"]);
+            }
+            updateToolLabelVisibility();
+        });
     
+        const connectionMethod = document.querySelector("[name='connectionMethod']");
         connectionMethod.addEventListener("change", () => {
             if (connectionMethod.value === "WiFi") {
                 showFields(["dmsWifiState"]);
@@ -3004,6 +3455,7 @@ function createForm2() {
             }
         });
         
+        const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
@@ -3027,6 +3479,26 @@ function createForm2() {
             }
             updateToolLabelVisibility();
         });
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+
+            showFields(["productsOffered"]);
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["productsOffered", "declineReason"]);
+            }
+        });
+
+        const resolution = document.querySelector("[name='resolution']");
+        const testedOk = document.querySelector("[name='testedOk']");
 
         function testedOkReso() {
             if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
@@ -3187,10 +3659,67 @@ function createForm2() {
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: [
+                "", 
+                "Mesh",
+                "Plan Upgrade"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                // "Account has pending issues", 
+                // "Account is barred", 
+                // "Account is inhibited", 
+                // "Account is not yet active", 
+                // "Account is restricted",
+                "Case is escalated",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createInstructionsRow() {
@@ -3571,49 +4100,44 @@ function createForm2() {
         form2Container.appendChild(buttonTable);
 
         const facility = document.querySelector("[name='facility']");
-        const resType = document.querySelector("[name='resType']");
-        const outageStatus = document.querySelector("[name='outageStatus']");
-        const connectionMethod = document.querySelector("[name='connectionMethod']");
-        const issueResolved = document.querySelector("[name='issueResolved']");
-        const resolution = document.querySelector("[name='resolution']");
-        const testedOk = document.querySelector("[name='testedOk']");
-
         facility.addEventListener("change", () => {
             resetAllFields(["facility"]);
             if (facility.value === "Fiber") {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["resType", "planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 updateToolLabelVisibility(); 
             } else if (facility.value === "Fiber - Radius") {
                 showFields(["planDetails", "connectionMethod", "pingTestResult", "speedTestResult", "remarks", "issueResolved"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
                 hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks","issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "testedOk" ,"issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "testedOk" ,"issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility(); 
         });
     
+        const resType = document.querySelector("[name='resType']");
         resType.addEventListener("change", () => {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility(); 
         });
 
+        const outageStatus = document.querySelector("[name='outageStatus']");
         outageStatus.addEventListener("change", () => {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["planDetails", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks"]);
+                hideSpecificFields(["planDetails", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks", "productsOffered", "declineReason", "notEligibleReason"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -3623,11 +4147,11 @@ function createForm2() {
             } else {
                 if (facility.value === "Fiber") {
                     showFields(["planDetails", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "outageReference", "pcNumber", "deviceBrandAndModel", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "outageReference", "pcNumber", "deviceBrandAndModel", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
 
                 } else {
                     showFields(["planDetails", "connectionMethod", "pingTestResult", "speedTestResult", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);   
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);   
                 }
                 updateToolLabelVisibility(); 
             }
@@ -3635,6 +4159,7 @@ function createForm2() {
             updateToolLabelVisibility(); 
         });
 
+        const connectionMethod = document.querySelector("[name='connectionMethod']");
         connectionMethod.addEventListener("change", () => {
             if (connectionMethod.value === "WiFi") {
                 showFields(["deviceBrandAndModel"]);
@@ -3642,7 +4167,8 @@ function createForm2() {
                 hideSpecificFields(["deviceBrandAndModel"]);
             }
         });
-    
+
+        const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
@@ -3667,6 +4193,25 @@ function createForm2() {
             updateToolLabelVisibility();
         });
 
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+
+            showFields(["productsOffered"]);
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["productsOffered", "declineReason"]);
+            }
+        });
+
+        const resolution = document.querySelector("[name='resolution']");
+        const testedOk = document.querySelector("[name='testedOk']");
         function testedOkReso() {
             if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
                 hideSpecificFields(["availability", "address", "landmarks"]);
@@ -5931,7 +6476,7 @@ function createForm2() {
 
     }
 
-    // Tech Requests
+    // Tech Modem Request Transactions
     else if (mrtForms.includes(selectedValue)) { 
         const table = document.createElement("table");
 
@@ -6017,7 +6562,6 @@ function createForm2() {
             { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
             { label: "SLA / ETR", type: "text", name: "sla" },
             // Special Instructions
-            // { label: "Special Instructions", type: "textarea", name: "specialInstruct", placeholder: "Contact Details, CBR, Address, Landmarks, & Availability" },
             { label: "Contact Person", type: "text", name: "contactName" },
             { label: "Contact Number", type: "number", name: "cbr" },
             { label: "Preferred Date & Time", type: "text", name: "availability" },
@@ -6384,13 +6928,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -6547,6 +7143,24 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+
     } else if (requestForms.includes(selectedValue)) { 
         const table = document.createElement("table");
 
@@ -6566,13 +7180,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -6588,25 +7254,10 @@ function createForm2() {
             descriptionDiv.appendChild(header);
 
             const definitions = {
-                formReqGoGreen: "Requests for enrollment in the Go Green program",
-                formReqUpdateContact: "Requests to update the account's contact information (Primary or Secondary)",
-                formReqSrvcRenewal: "Requests for renewal of a service (subscription, contract, or add-on)",
                 formReqTaxAdj: "Requests for a tax adjustment (typically for Microbusiness accounts)",
                 formReqChgTelUnit: "Requests for change of telephone unit (SO creation)",
-                formReqDiscoVAS: "Requests for the disconnection of Value-Added Services (VAS) such as Mesh, Cignal Add-on, Always-On, etc.",
-                formReqTempDisco: "Requests for the temporary disconnection of the account",
-                formReqNSR: "Requests for bill adjustment related to rebate on non-service",
-                formReqRentMSF: "Requests for dispute on rental adjustment for Monthly Service Fee (MSF)",
-                formReqRentLPN: "Requests for dispute on rental adjustment for Value-Added Services (VOD such as Netflix, LGP, VIU)",
-                formReqNRC: "Requests for dispute on rental adjustment for non-recurring charges and one-time device costs (e.g., remaining device balance)",
-                formReqSCC: "Requests for dispute on rental adjustment for service connection charges (e.g., relocation, reconnection, in-move fees)",
-                formReqTollUFC: "To be updated.",
-                formReqOtherTolls: "To be updated.",
-                formReqDowngradeOthers: "Requests for downgrade to a lower subscription plan.",
-                formReqDowngrade1299: "Processing of SO for downgrade from a higher plan to Fiber Unli Plan 1299.",
-                formReqDowngrade1399: "Processing of SO for downgrade from a higher plan to Plan 1399 with Cignal subscription.",
-                formReqDowngrade1799: "Processing of SO for downgrade from a higher plan to Plan 1799 with Cignal subscription.",
-                
+                formReqOcular: "Processing of SO for verification of the service area, address, and installed in actual. To check if the services installed are used for Personal or Business purposes.",
+                formReqProofOfSub: "For aftersales request (i.e Downgrade, Upgrade, Change of Ownership, etc.)"    
             };
 
             const ul = document.createElement("ul");
@@ -6627,9 +7278,6 @@ function createForm2() {
         }
 
         function createPromptRow() {
-            const custAuthEl = document.querySelector('[name="custAuth"]');
-            const custAuth = custAuthEl ? custAuthEl.value : "";
-
             const row = document.createElement("tr");
             const td = document.createElement("td");
 
@@ -6654,42 +7302,15 @@ function createForm2() {
             li3.textContent = "List of accounts where the taxes withheld will be applied";
 
             const li4 = document.createElement("li");
-            li4.textContent = "Active account or No treatment";
+            li4.textContent = "Active account or not in treatment";
 
             const li5 = document.createElement("li");
             li5.textContent = "No open Service Order (SO)";
 
-            const li6 = document.createElement("li");
-            li6.textContent = "If the account is still within the lock-in period, advise the customer to settle the Pre-Termination Fee (PTF) at the Smart/PLDT Sales and Service Center (SSC) and then proceed with the request for disconnection of the Value-Added Service (VAS)";
-
-            const li7 = document.createElement("li");
-            li7.textContent = "At least 1 year in tenure";
-
-            const li8 = document.createElement("li");
-            li8.textContent = "Paid maintenance fee";
-
-            const li9 = document.createElement("li");
-            li9.textContent = "Zero outstanding balance at the time of request";
-
-            const li10 = document.createElement("li");
-            li10.textContent = "A ₱500 downgrade fee applies. 36 months lock-in period will refresh.";
-
-            const li11 = document.createElement("li");
-            li11.textContent = "Signed Subscription Certificate";
-
-            const li12 = document.createElement("li");
-            li12.textContent = "Signed LOA of the customer with copy of Valid ID of requestor & SOR ";
-
             if (selectedValue === "formReqTaxAdj") {
                 [li1, li2, li3].forEach(li => ulReq.appendChild(li));
-            } else if (selectedValue === "formReqChgTelUnit") {
+            } else if (selectedValue === "formReqChgTelUnit" || selectedValue === "formReqOcular") {
                 [li4, li5].forEach(li => ulReq.appendChild(li));
-            } else if (selectedValue === "formReqDiscoVAS") {
-                ulReq.appendChild(li6);
-            } else if (selectedValue === "formReqTempDisco") {
-                [li7, li8, li9].forEach(li => ulReq.appendChild(li));
-            } else if (selectedValue === "formReqDowngradeOthers") {
-                [li10, li11, li12].forEach(li => ulReq.appendChild(li));
             }
 
             checklistDiv.appendChild(ulReq);
@@ -6782,9 +7403,7 @@ function createForm2() {
         const checklistForms = [
             "formReqTaxAdj",
             "formReqChgTelUnit",
-            "formReqDiscoVAS",
-            "formReqTempDisco",
-            "formReqDowngradeOthers"
+            "formReqOcular"
         ];
 
         if (checklistForms.includes(selectedValue)) {
@@ -6803,6 +7422,23 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
     } else if (selectedValue === "formReqAddressMod") { 
         const table = document.createElement("table");
 
@@ -6828,13 +7464,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -6987,6 +7675,24 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+        
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
     } else if (selectedValue === "formReqSupRetAccNum" || selectedValue === "formReqSupChangeAccNum") { 
         const table = document.createElement("table");
 
@@ -7012,13 +7718,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -7258,6 +8016,23 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
     } else if (selectedValue === "formReqDisconnection") { 
         const table = document.createElement("table");
 
@@ -7284,13 +8059,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -7529,6 +8356,24 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
     } else if (selectedValue === "formReqDispute") { 
         const table = document.createElement("table");
 
@@ -7559,13 +8404,70 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
+            { label: "Ordertake?", type: "select", name: "ordertake", options: [
+                "", 
+                "Yes", 
+                "No"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -7610,7 +8512,7 @@ function createForm2() {
             ul.className = "checklist";
 
             const li1 = document.createElement("li");
-            li1.textContent = "Requests for bill adjustment related to rebate on non-service";
+            li1.textContent = "Requests for bill adjustment related to rebate due to non-service";
 
             const li2 = document.createElement("li");
             li2.textContent = "Requests for dispute on rental adjustment for Monthly Service Fee (MSF)";
@@ -7656,6 +8558,8 @@ function createForm2() {
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
+            row.style.display = field.name === "ordertake" ? "none" : "table-row";
+
             const td = document.createElement("td");
             const divInput = document.createElement("div");
             divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
@@ -7742,6 +8646,34 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        const requestType = document.querySelector("[name='requestType']");
+
+        requestType.addEventListener("change", () => {
+            if (requestType.selectedIndex === 1) {
+                showFields(["ordertake"]);
+            } else {
+                hideSpecificFields(["ordertake"]);
+            }
+        });
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+
     } else if (selectedValue === "formReqDowngrade") { 
         const table = document.createElement("table");
 
@@ -7769,13 +8701,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -7961,6 +8945,997 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+        
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+
+    } else if (selectedValue === "formReqDDE") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Temporary Due Date Extension",
+                "Permanent Due Date Extension"
+            ] },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            // Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests related to Payment due date extension.";
+            ul.appendChild(li);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createPromptRow(requestType) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const checklistDiv = document.createElement("div");
+            checklistDiv.className = "form2DivPrompt"; 
+
+            const reqHeader = document.createElement("p");
+            reqHeader.textContent = "Request Type Description";
+            reqHeader.className = "requirements-header";
+            checklistDiv.appendChild(reqHeader);
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Customer inquire for a due date/payment  extension within 7 days";
+            
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Request for payment due date extension for (7) allowable period due to financial constraints to avoid account being restricted after the due date";
+
+            if (requestType === "Temporary Due Date Extension") {
+                ul.appendChild(li1);
+            } else {
+                ul.appendChild(li2);
+            }
+
+            checklistDiv.appendChild(ul);
+
+            const clHeader = document.createElement("p");
+            clHeader.textContent = "Requirements";
+            clHeader.className = "checklist-header";
+            checklistDiv.appendChild(clHeader);
+
+            const reqTypeUl = document.createElement("ul");
+            reqTypeUl.className = "checklist";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Account is active and current";
+            reqTypeUl.appendChild(li3);
+
+            const li4 = document.createElement("li");
+            li4.textContent = "Due Date is within 10 days from the due date stated in SOA";
+            reqTypeUl.appendChild(li4);
+
+            const li5 = document.createElement("li");
+            li5.textContent = "No Open SO";
+            reqTypeUl.appendChild(li5);
+
+            const li6 = document.createElement("li");
+            li6.textContent = "Not Enrolled to extended credit Adjustment (ECA) or Promise to Pay";
+            reqTypeUl.appendChild(li6);
+
+            const li7 = document.createElement("li");
+            li7.textContent = "No Account Treatment";
+            reqTypeUl.appendChild(li7);
+
+            const li8 = document.createElement("li");
+            li8.textContent = "Bill not yet paid or settled before the due date";
+            reqTypeUl.appendChild(li8);
+
+            const li9 = document.createElement("li");
+            li9.textContent = "Not tagged as Failed Promise to Pay or Bounced Check";
+            reqTypeUl.appendChild(li9);
+            
+            checklistDiv.appendChild(reqTypeUl);
+
+            td.appendChild(checklistDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+
+            if (field.name === "requestType") {
+                requestTypeRow = row; // keep reference
+                const select = row.querySelector("select");
+
+                select.addEventListener("change", (e) => {
+                    const selected = e.target.value;
+
+                    const existingPrompt = table.querySelector(".form2DivPrompt")?.closest("tr");
+                    if (existingPrompt) existingPrompt.remove();
+
+                    if (selected) {
+                        const promptRow = createPromptRow(selected);
+                        requestTypeRow.parentNode.insertBefore(promptRow, requestTypeRow.nextSibling);
+                    }
+                });
+            }
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+                
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
+    } else if (selectedValue === "formReqInmove") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            // Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            // Definition header
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Request to relocate or move the customer’s devices to another location within the same physical address.";
+            ul.appendChild(li);
+
+            // Requirements header
+            const clHeader = document.createElement("p");
+            clHeader.textContent = "Requirements";
+            clHeader.className = "checklist-header";
+
+            const reqTypeUl = document.createElement("ul");
+            reqTypeUl.className = "checklist";
+
+            const li2 = document.createElement("li");
+            li2.textContent = "No Open SO";
+            reqTypeUl.appendChild(li2);
+
+            const li3 = document.createElement("li");
+            li3.textContent = "No Account Treatment";
+            reqTypeUl.appendChild(li3);
+
+            // Append everything
+            div.appendChild(header);
+            div.appendChild(ul);
+            div.appendChild(clHeader);
+            div.appendChild(reqTypeUl);
+
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+                
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
+    } else if (selectedValue === "formReqMigration") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            // Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            // Definition header
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Processing of request for Change of facility, from DSL to Fiber​.";
+            ul.appendChild(li);
+
+            // Requirements header
+            const clHeader = document.createElement("p");
+            clHeader.textContent = "Requirements";
+            clHeader.className = "checklist-header";
+
+            const reqTypeUl = document.createElement("ul");
+            reqTypeUl.className = "checklist";
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Corresponding fees";
+            reqTypeUl.appendChild(li2);
+
+            const li3 = document.createElement("li");
+            li3.textContent = "No Account Treatment";
+            reqTypeUl.appendChild(li3);
+
+            const li4 = document.createElement("li");
+            li4.textContent = "No Open SO";
+            reqTypeUl.appendChild(li4);
+
+            const li5 = document.createElement("li");
+            li5.textContent = "Subscription Certificate";
+            reqTypeUl.appendChild(li5);
+
+            // Append everything
+            div.appendChild(header);
+            div.appendChild(ul);
+            div.appendChild(clHeader);
+            div.appendChild(reqTypeUl);
+
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
+    } else if (selectedValue === "formReqMisappPay" || selectedValue === "formReqReflectPay") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                "", 
+                "Failed", 
+                "Passed",
+                "NA"
+            ]},
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum"},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
+                "", 
+                "Yes",
+                "No - Customer is Unresponsive",
+                "No - Customer Declined Further Assistance",
+                "No - System Ended Chat"
+            ] },
+            // Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            // Definition header
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li1 = document.createElement("li");
+            li1.textContent = "Requests related to Misapplied Payment (payment credited to wrong account number, payments intended for multiple accounts but credited to only one account)";
+            
+
+            const li2 = document.createElement("li");
+            li2.textContent = "Requests related to Unreflected Payment (payment not reflected in the customer's account)";
+            
+
+            if (selectedValue === "formReqMisappPay") {
+                ul.appendChild(li1);
+            } else if (selectedValue === "formReqReflectPay") {
+                ul.appendChild(li2);
+            }
+
+            // Requirements header
+            const clHeader = document.createElement("p");
+            clHeader.textContent = "Requirements";
+            clHeader.className = "checklist-header";
+
+            const reqTypeUl = document.createElement("ul");
+            reqTypeUl.className = "checklist";
+
+            const li3 = document.createElement("li");
+            li3.textContent = "Proof of Payment";
+            reqTypeUl.appendChild(li3);
+
+            const li4 = document.createElement("li");
+            li4.textContent = "Letter of Request if customer is not the Account holder with one Signature";
+            reqTypeUl.appendChild(li4);
+
+            const li5 = document.createElement("li");
+            li5.textContent = "No Open SO";
+            reqTypeUl.appendChild(li5);
+
+            const li6 = document.createElement("li");
+            li6.textContent = "Valid ID with three Specimen signatures";
+            reqTypeUl.appendChild(li6);
+
+            const li7 = document.createElement("li");
+            li7.textContent = "For Non-SOR - Valid ID of SOR with three (3) specimen signatures and ID of the authorized representative";
+            reqTypeUl.appendChild(li7);
+
+            // Append everything
+            div.appendChild(header);
+            div.appendChild(ul);
+            div.appendChild(clHeader);
+            div.appendChild(reqTypeUl);
+
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") 
+                        ? 6 
+                        : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+        
+        table.appendChild(createDefinitionRow());
+        fields.forEach((field, index) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+        });
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            sfTaggingButtonHandler,
+            saveFormData,
+            resetButtonHandler,
+        ];
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+                        
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
     } else if (selectedValue === "formReqReconnect") {
         const table = document.createElement("table");
 
@@ -7986,13 +9961,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ]},
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
-                "",
-                "Yes - Accepted",
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         const reconSpecificDefinition = {
@@ -8167,6 +10194,24 @@ function createForm2() {
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
     } else if (selectedValue === "formReqRefund") { 
         const table = document.createElement("table");
 
@@ -8194,13 +10239,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -8397,6 +10494,24 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+                    
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
     } else if (selectedValue === "formReqRelocation") { 
         const table = document.createElement("table");
 
@@ -8423,13 +10538,70 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
+            { label: "Ordertake?", type: "select", name: "ordertake", options: [
+                "", 
+                "Yes", 
+                "No"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -8517,6 +10689,8 @@ function createForm2() {
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
+            row.style.display = field.name === "ordertake" ? "none" : "table-row";
+
             const td = document.createElement("td");
             const divInput = document.createElement("div");
             divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
@@ -8603,6 +10777,32 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        const requestType = document.querySelector("[name='requestType']");
+        requestType.addEventListener("change", () => {
+            if (requestType.selectedIndex === 2) {
+                showFields(["ordertake"]);
+            } else {
+                hideSpecificFields(["ordertake"]);
+            }
+        });
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
     } else if (selectedValue === "formReqSpecFeat") { 
         const table = document.createElement("table");
 
@@ -8630,13 +10830,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -8835,6 +11087,24 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+
     } else if (selectedValue === "formReqSpeedAddOn") { 
         const table = document.createElement("table");
 
@@ -8861,13 +11131,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -9025,6 +11347,24 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+        
     } else if (selectedValue === "formReqUfc") { 
         const table = document.createElement("table");
 
@@ -9050,13 +11390,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -9085,7 +11477,7 @@ function createForm2() {
             return row;
         }
 
-        function createPromptRow(requestType) {
+        function createPromptRow() {
             const row = document.createElement("tr");
             const td = document.createElement("td");
 
@@ -9200,6 +11592,24 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+
     } else if (selectedValue === "formReqUpgrade") { 
         const table = document.createElement("table");
 
@@ -9229,13 +11639,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -9425,6 +11887,24 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+
     } else if (selectedValue === "formReqVAS") { 
         const table = document.createElement("table");
 
@@ -9455,13 +11935,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -9677,6 +12209,24 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+
     } else if (selectedValue === "formReqWireReroute") { 
         const table = document.createElement("table");
 
@@ -9702,13 +12252,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -9879,8 +12481,25 @@ function createForm2() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-    }
 
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+
+    }
 
     // Non-Tech Complaints
     else if (selectedValue === "formCompMyHomeWeb") { 
@@ -9896,13 +12515,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createFieldRow(field) {
@@ -9980,6 +12651,22 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
     } else if (selectedValue === "formCompMisappliedPayment") {
         const table = document.createElement("table");
 
@@ -9995,7 +12682,65 @@ function createForm2() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
+            // Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createPromptRow() {
@@ -10153,6 +12898,22 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
         
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
     } else if (selectedValue === "formCompUnreflectedPayment") {
         const table = document.createElement("table");
 
@@ -10169,7 +12930,65 @@ function createForm2() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
+            // Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createPromptRow() {
@@ -10337,12 +13156,28 @@ function createForm2() {
         form2Container.appendChild(buttonTable);
 
         const paymentChannel = document.querySelector("[name='paymentChannel']");
-
         paymentChannel.addEventListener("change", () => {
             if (paymentChannel.selectedIndex === 4) {
                 showFields(["otherPaymentChannel"]);
             } else {
                 hideSpecificFields(["otherPaymentChannel"]);
+            }
+        });
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
             }
         });
     
@@ -10363,7 +13198,65 @@ function createForm2() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
+            // Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createPromptRow() {
@@ -10483,9 +13376,26 @@ function createForm2() {
 
         const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
         const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
+
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
     
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
     } 
 
     // Non-Tech Inquiry
@@ -10508,13 +13418,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -10686,6 +13648,23 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+
     } else if (selectedValue === "formInqBillInterpret") {
         const table = document.createElement("table");
 
@@ -10708,7 +13687,65 @@ function createForm2() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
+            // Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -10825,6 +13862,23 @@ function createForm2() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
     
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
+
     } else if (selectedValue === "formInqPermaDisc") {
         const table = document.createElement("table");
 
@@ -10845,13 +13899,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -11012,6 +14118,23 @@ function createForm2() {
         const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
     
     } else if (selectedValue === "formInqOutsBal") {
         const table = document.createElement("table");
@@ -11038,7 +14161,65 @@ function createForm2() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
+            // Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -11156,6 +14337,23 @@ function createForm2() {
         const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
     
     } else if (selectedValue === "formInqRefund") {
         const table = document.createElement("table");
@@ -11177,7 +14375,65 @@ function createForm2() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            { label: "Upsell", type: "select", name: "upsell", options: ["", "Yes - Accepted", "No - Declined", "No - Ignored", "NA - Not Eligible"] }
+            // Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: [
+                "", 
+                "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
+                "No - Declined",
+                "No - Ignored",
+                "NA - Not Eligible"
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -11291,6 +14547,23 @@ function createForm2() {
         const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
     
     }
 
@@ -11342,13 +14615,65 @@ function createForm2() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
+            // Upsell
             { label: "Upsell", type: "select", name: "upsell", options: [
                 "", 
                 "Yes - Accepted", 
+                "Yes - Pending Req. (For callback)",
                 "No - Declined",
                 "No - Ignored",
                 "NA - Not Eligible"
-            ]}
+            ]},
+            { label: "Decline Reason", type: "select", name: "declineReason", options: [
+                "", 
+                "Cannot decide at the moment", 
+                "Contract terms concerns", 
+                "Disconnected Call/Chat", 
+                "Financial constraints", 
+                "Lack of confidence in the offer", 
+                "Lack of trust in the offer", 
+                "Needs time to think it over", 
+                "Negative past experience", 
+                "No perceived need or benefit",
+                "Not authorized", 
+                "Not interested at this time", 
+                "Price too high", 
+                "Product difficulty to use", 
+                "Satisfied with current plan", 
+                "Satisfied with current service", 
+                "Service difficulty to use", 
+                "Service reliability concerns"
+            ]},
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
+                "", 
+                "Account has pending issues", 
+                "Account is barred", 
+                "Account is inhibited", 
+                "Account is not yet active", 
+                "Account is restricted",
+                "Customer already availed the product", 
+                "Customer already availed the service", 
+                "Customer already upgraded their plan", 
+                "Customer is in a hurry", 
+                "Customer is irate", 
+                "Customer is requesting a supervisor", 
+                "Customer is requesting a manager", 
+                "Customer is requesting to downgrade", 
+                "Disconnection concerns", 
+                "LOB is not applicable", 
+                "Microbusiness Account", 
+                "Plan not eligible for upsell", 
+                "Poor LTE signal strength in the area", 
+                "Poor payment history", 
+                "Potential crisis", 
+                "Prepaid Fiber",
+                "Technical incompatibility", 
+                "Temporary Disconnection concerns",
+                "Time is limited",
+                "Unresolved AFTERSALES complaints", 
+                "Unresolved AFTERSALES concerns", 
+                "VTD concerns"
+            ]},
         ];
 
         function createDefinitionRow() {
@@ -11544,7 +14869,6 @@ function createForm2() {
 
         // Request Type options based on selectedValue
         const reqTypeSelect = document.querySelector('select[name="requestType"]');
-
         const reqTypeOptions = [
             "",
             "Activation", 
@@ -11639,7 +14963,6 @@ function createForm2() {
 
         // Findings options based on selectedValue
         const findingsSelect = document.querySelector('select[name="findings"]');
-
         const allFindingsOptions = [
             "",
             "Activation", 
@@ -11783,6 +15106,23 @@ function createForm2() {
         }
 
         updateFindingsOptions(findingsSelect.value);
+
+        hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        const upsell = document.querySelector("[name='upsell']");
+        upsell.addEventListener("change", () => {
+            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 3) {
+                showFields(["declineReason"]);
+                hideSpecificFields(["notEligibleReason"]);
+            } else if (upsell.selectedIndex === 4) {
+                hideSpecificFields(["declineReason", "notEligibleReason"]);
+            } else if (upsell.selectedIndex === 5) {
+                showFields(["notEligibleReason"]);
+                hideSpecificFields(["declineReason"]);
+            }
+        });
 
     }
 
@@ -12300,7 +15640,7 @@ function createForm2() {
     }
 }
 
-document.getElementById("selectIntent").addEventListener("change", createForm2);
+document.getElementById("selectIntent").addEventListener("change", createIntentBasedForm);
 
 function createButtons(buttonLabels, buttonHandlers) {
     const vars = initializeVariables();
@@ -13190,8 +16530,8 @@ function validateRequiredFields(filter = []) {
         "contactName": "Contact Person",
         "cbr": "CBR",
         "availability": "Availability",
-        "address": "Complete Address",
-        "landmarks": "Nearest Landmarks"
+        // "address": "Complete Address",
+        // "landmarks": "Nearest Landmarks"
     };
 
     const emptyFields = [];
@@ -13439,7 +16779,12 @@ function techNotesButtonHandler(showFloating = true) {
             { name: "offerALS"},
             { name: "alsPackOffered"},
             { name: "effectiveDate", label: "Effectivity Date" },
-            { name: "nomiMobileNum", label: "MOBILE #" }
+            { name: "nomiMobileNum", label: "MOBILE #" },
+
+            // Upsell
+            { name: "productsOffered", label: "OFFERED" },
+            { name: "declineReason", label: "DECLINE REASON" },
+            { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL DUE TO" },
         ];
 
         const seenFields = new Set();
@@ -13474,33 +16819,39 @@ function techNotesButtonHandler(showFloating = true) {
 
                     if (alsValue) actionsTakenParts.push(alsValue);
                 } else {
-                    actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
+                    if (field.name === "productsOffered" || field.name === "notEligibleReason") {
+                        actionsTakenParts.push((field.label ? `${field.label} ` : "") + value);
+                    } else {
+                        actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
+                    }
                 }
             }
         });
 
         const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
-        if (issueResolvedValue === "Yes") {
-            actionsTakenParts.push("Resolved");
-        } else if (issueResolvedValue === "No - Customer is Unresponsive") {
-            actionsTakenParts.push("Customer is Unresponsive");
-        } else if (issueResolvedValue === "No - Customer Declined Further Assistance") {
-            actionsTakenParts.push("Customer Declined Further Assistance");
-        } else if (issueResolvedValue === "No - System Ended Chat") {
-            actionsTakenParts.push("System Ended Chat");
+
+        const issueResolvedMap = {
+            "Yes": "Resolved",
+            "No - Customer is Unresponsive": "Customer is Unresponsive",
+            "No - Customer Declined Further Assistance": "Customer Declined Further Assistance",
+            "No - System Ended Chat": "System Ended Chat"
+        };
+
+        if (issueResolvedMap[issueResolvedValue]) {
+            actionsTakenParts.push(issueResolvedMap[issueResolvedValue]);
         }
 
         const upsellValue = document.querySelector('[name="upsell"]')?.value || "";
-        let upsellNote = "";
-        if (upsellValue === "Yes - Accepted") {
-            upsellNote = "#CDNTUPGACCEPTED";
-        } else if (upsellValue === "No - Declined") {
-            upsellNote = "#CDNTUPGDECLINED";
-        } else if (upsellValue === "No - Ignored") {
-            upsellNote = "#CDNTUPGIGNORED";
-        } else if (upsellValue === "NA - Not Eligible") {
-            upsellNote = "#CDNTUPGNOTELIGIBLE";
-        }
+
+        const upsellMap = {
+            "Yes - Accepted": "#CDNTUPGACCEPTED",
+            "Yes - Pending Req. (For callback)": "#CDNTUPGFORCALLBACK",
+            "No - Declined": "#CDNTUPGDECLINED",
+            "No - Ignored": "#CDNTUPGIGNORED",
+            "NA - Not Eligible": "#CDNTUPGNOTELIGIBLE"
+        };
+
+        const upsellNote = upsellMap[upsellValue] || "";
 
         let actionsTaken = "A: " + actionsTakenParts.join("/ ");
 
@@ -13926,7 +17277,7 @@ function nontechNotesButtonHandler(showFloating = true) {
 
     function validateRequiredFields() {
         const fieldLabels = {
-            "srNum": "SR Number",
+            // "srNum": "SR Number",
             "custConcern": "Concern",
             "ownership": "Ownership",
             "custAuth": "Customer Authentication",
@@ -14014,41 +17365,60 @@ function nontechNotesButtonHandler(showFloating = true) {
         const affectedTool = getFuseFieldValueIfVisible("affectedTool");
         const otherTool = getFuseFieldValueIfVisible("otherTool");
 
-        if (affectedTool === "Other PLDT tools") {
-            if (otherTool) {
-                actionsTakenParts.push(`${otherTool} Downtime`);
+        if (affectedTool) {
+            const toolName = affectedTool === "Other PLDT tools" ? otherTool : affectedTool;
+            if (toolName) {
+                actionsTakenParts.push(`${toolName} Downtime`);
             }
-        } else if (affectedTool) {
-            actionsTakenParts.push(`${affectedTool} Downtime`);
         }
 
+        // Issue Resolved mapping
         const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
-        if (issueResolvedValue === "Yes") {
-            actionsTakenParts.push("Resolved");
-        } else if (issueResolvedValue === "No - Customer is Unresponsive") {
-            actionsTakenParts.push("Customer is Unresponsive");
-        } else if (issueResolvedValue === "No - Customer Declined Further Assistance") {
-            actionsTakenParts.push("Customer Declined Further Assistance");
-        } else if (issueResolvedValue === "No - System Ended Chat") {
-            actionsTakenParts.push("System Ended Chat");
+        const issueResolvedMap = {
+            "Yes": "Resolved",
+            "No - Customer is Unresponsive": "Customer is Unresponsive",
+            "No - Customer Declined Further Assistance": "Customer Declined Further Assistance",
+            "No - System Ended Chat": "System Ended Chat"
+        };
+
+        if (issueResolvedMap[issueResolvedValue]) {
+            actionsTakenParts.push(issueResolvedMap[issueResolvedValue]);
         }
 
+        // Upsell mapping
         const upsellValue = document.querySelector('[name="upsell"]')?.value || "";
-        let upsellNote = "";
-        if (upsellValue === "Yes - Accepted") {
-            upsellNote = "#CDNTUPGACCEPTED";
-        } else if (upsellValue === "No - Declined") {
-            upsellNote = "#CDNTUPGDECLINED";
-        } else if (upsellValue === "No - Ignored") {
-            upsellNote = "#CDNTUPGIGNORED";
-        } else if (upsellValue === "NA - Not Eligible") {
-            upsellNote = "#CDNTUPGNOTELIGIBLE";
+        const upsellMapping = {
+            "Yes - Accepted": "#CDNTUPGACCEPTED",
+            "Yes - Pending Req. (For callback)": "#CDNTUPGFORCALLBACK",
+            "No - Declined": "#CDNTUPGDECLINED",
+            "No - Ignored": "#CDNTUPGIGNORED",
+            "NA - Not Eligible": "#CDNTUPGNOTELIGIBLE"
+        };
+
+        const upsellNote = upsellMapping[upsellValue] || "";
+
+        // Ordertake mapping
+        const ordertakeValue = document.querySelector('[name="ordertake"]')?.value || "";
+        let otNote = "";
+
+        if (ordertakeValue === "Yes") {
+            const requestTypeMap = {
+                "Rebate Non Service": "#NSR",
+                "CID Creation": "#CCBORELOCHANDLING"
+            };
+
+            otNote = requestTypeMap[vars.requestType] || "";
         }
 
+        // Construct final Actions Taken note
         let actionsTaken = "A: " + actionsTakenParts.join("/ ");
 
         if (upsellNote) {
             actionsTaken += "\n\n" + upsellNote;
+        }
+
+        if (otNote) {
+            actionsTaken += "\n" + otNote;
         }
 
         const eSnowTicketNum = getFuseFieldValueIfVisible("eSnowTicketNum");
@@ -14102,11 +17472,11 @@ function nontechNotesButtonHandler(showFloating = true) {
         "othersWebForm", "othersEntAcc", "othersHomeBro", "othersSmart", "othersSME177", "othersToolsDown", "othersAO", "othersRepair", "othersBillAndAcc", "othersUT"
     ];
 
-    const requestForms = [
-        "formReqGoGreen", "formReqUpdateContact", "formReqSrvcRenewal", "formReqTaxAdj", "formReqChgTelUnit", "formReqRelocation", "formReqSpecFeat", "formReqSpeedAddOn", "formReqUfc", "formReqUpgrade", "formReqWireReroute"
+    const reqBasedIntent = [
+        "formReqGoGreen", "formReqUpdateContact", "formReqSrvcRenewal", "formReqTaxAdj", "formReqChgTelUnit", "formReqRelocation", "formReqSpecFeat", "formReqSpeedAddOn", "formReqUfc", "formReqUpgrade", "formReqWireReroute", "formReqInmove", "formReqDDE", "formReqMigration", "formReqMisappPay", "formReqReflectPay", "formReqOcular", "formReqProofOfSub"
     ];
 
-    const requestFormsBasedReqType = [
+    const reqBasedReqType = [
         "formReqAccMgt", "formReqAddressMod", "formReqDisconnection", "formReqDispute", "formReqDowngrade", "formReqReconnect", "formReqRefund", "formReqVAS"
     ];
     
@@ -14294,14 +17664,14 @@ function nontechNotesButtonHandler(showFloating = true) {
     }
     
     // Non-Tech Requests
-    else if (requestForms.includes(vars.selectedIntent)) {
+    else if (reqBasedIntent.includes(vars.selectedIntent)) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/${vars.selectedIntentText}${soSrNum}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
-    } else if (requestFormsBasedReqType.includes(vars.selectedIntent)) {
+    } else if (reqBasedReqType.includes(vars.selectedIntent)) {
         const emptyFields = validateRequiredFields();
         if (emptyFields.length > 0) return;
 
@@ -14666,7 +18036,7 @@ function sfTaggingButtonHandler() {
 
     const reqFormat1 = ["formReqSupRetAccNum", "formReqSupChangeAccNum"];
 
-    const reqFormat2 = ["formReqAddressMod", "formReqDisconnection", "formReqDispute", "formReqDowngrade", "formReqSpecFeat", "formReqSpeedAddOn", "formReqUpgrade", "formReqVAS"];
+    const reqFormat2 = ["formReqAddressMod", "formReqDisconnection", "formReqDispute", "formReqDowngrade", "formReqSpecFeat", "formReqSpeedAddOn", "formReqUpgrade", "formReqVAS", "formReqDDE"];
 
     const reqFormat3 = ["formReqReconnect", "formReqRefund", "formReqRelocation"];
 
@@ -15154,29 +18524,11 @@ function sfTaggingButtonHandler() {
     } 
 
     // Non-Tech Request
-    else if (vars.selectedIntent === 'formReqAccMgt') {
-        bauRows = [
-            ['VOC:', 'Request'],
-            ['Case Type:', 'Account'],
-            ['Case Sub-Type:', vars.requestType]
-        ];
-    } else if (reqFormat1.includes(vars.selectedIntent)) {
+    else if (reqFormat1.includes(vars.selectedIntent)) {
         bauRows = [
             ['VOC:', 'Request'],
             ['Case Type:', vars.selectedOptGroupLabel],
             ['Case Sub-Type:', vars.selectedIntentText]
-        ];
-    } else if (vars.selectedIntent === 'formReqTaxAdj') {
-        bauRows = [
-            ['VOC:', 'Request'],
-            ['Case Type:', 'Billing'],
-            ['Case Sub-Type:', vars.selectedIntentText]
-        ];
-    } else if (vars.selectedIntent === 'formReqChgTelUnit') {
-        bauRows = [
-            ['VOC:', 'Request'],
-            ['Case Type:', `${vars.selectedIntentText}`],
-            ['Case Sub-Type:', 'Customer Initiated']
         ];
     } else if (reqFormat2.includes(vars.selectedIntent)) {
         bauRows = [
@@ -15190,6 +18542,24 @@ function sfTaggingButtonHandler() {
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.requestType}`]
         ];
+    } else if (vars.selectedIntent === 'formReqAccMgt') {
+        bauRows = [
+            ['VOC:', 'Request'],
+            ['Case Type:', 'Account'],
+            ['Case Sub-Type:', vars.requestType]
+        ];
+    } else if (vars.selectedIntent === 'formReqTaxAdj') {
+        bauRows = [
+            ['VOC:', 'Request'],
+            ['Case Type:', 'Billing'],
+            ['Case Sub-Type:', vars.selectedIntentText]
+        ];
+    } else if (vars.selectedIntent === 'formReqChgTelUnit') {
+        bauRows = [
+            ['VOC:', 'Request'],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', 'Customer Initiated']
+        ];
     } else if (vars.selectedIntent === 'formReqUfc') {
         bauRows = [
             ['VOC:', 'Request'],
@@ -15201,6 +18571,30 @@ function sfTaggingButtonHandler() {
             ['VOC:', 'Request'],
             ['Case Type:', 'Wire Re-Route'],
             ['Case Sub-Type:', 'Re-Routing Inside / Outside Wire']
+        ];
+    } else if (vars.selectedIntent === 'formReqInmove' || vars.selectedIntent === 'formReqOcular') {
+        bauRows = [
+            ['VOC:', 'Request'],
+            ['Case Type:', vars.selectedIntentText],
+            ['Case Sub-Type:', vars.selectedIntentText]
+        ];
+    } else if (vars.selectedIntent === 'formReqMigration') {
+        bauRows = [
+            ['VOC:', 'Request'],
+            ['Case Type:', vars.selectedIntentText],
+            ['Case Sub-Type:', `${vars.selectedIntentText} - Customer Initiated / PLDT Initiated`]
+        ];
+    } else if (vars.selectedIntent === 'formReqMisappPay' || vars.selectedIntent === 'formReqReflectPay') {
+        bauRows = [
+            ['VOC:', 'Request'],
+            ['Case Type:', vars.selectedIntentText],
+            ['Case Sub-Type:', `${vars.selectedIntentText} - Payman`]
+        ];
+    } else if (vars.selectedIntent === 'formReqProofOfSub') {
+        bauRows = [
+            ['VOC:', 'Request'],
+            ['Case Type:', `${vars.selectedIntentText}`],
+            ['Case Sub-Type:', 'Sending Subscription Certificate/Declaration']
         ];
     }
 
@@ -15836,7 +19230,7 @@ function resetButtonHandler() {
         });
 
         const footerElement = document.getElementById("footerValue");
-        const footerText = "Standard Notes Generator Version 5.2.040326";
+        const footerText = "Standard Notes Generator Version 5.2.130326";
         typeWriter(footerText, footerElement, 50);
 
         const notepad = document.getElementById("notepad");
@@ -15993,6 +19387,13 @@ function saveFormData() {
         "formReqUpgrade",
         "formReqVAS",
         "formReqWireReroute",
+        "formReqInmove",
+        "formReqDDE",
+        "formReqMigration",
+        "formReqMisappPay",
+        "formReqReflectPay",
+        "formReqOcular",
+        "formReqProofOfSub",
         
         // Others
         "othersToolsDown",
@@ -16275,6 +19676,24 @@ const instructions = [
 
 const versions = [
     {
+        version: "V5.2.130326",
+        updates: [
+        { title: "Enhancements", items: [
+            "Main form behavior updated to display the correct fields based on the selected agent channel.",
+            "Improved <strong>Updates</strong> section for better visuals.",
+            "Expanded <strong>Notepad</strong> section to provide more space for notes and improve usability.",
+            "Improved Upsell Notes integration to capture reasons for declined and ineligible offers for <strong>NIC-NDT</strong>, <strong>NIC</strong>, <strong>SIC</strong> and all <strong>Non-Tech</strong> intents."
+        ]},
+        { title: "Added", items: [
+            "Ordertake option for NSR and Relocation added for tracking purposes.",
+            "Upsell <strong>Pending Req. (For callback)</strong> option added.",
+            "Non-Tech request intents(<strong>Inmove</strong>, <strong>DDE</strong>, <strong>Migration</strong>, <strong>Misapplied Payment</strong>, <strong>Occular Inspection/Amend SAM</strong>, <strong>Proof of PLDT Subscription</strong>, and <strong>Unreflected Payment</strong>).",
+            "<strong>NIC Intent</strong>: Reintroduced Equipment and Modem Brand fields to enable easier identification of the ONU connection type (InterOp vs. Non-InterOp).",
+            "Added NIC Investigation 4 options for NIC-NDT intent."
+        ]},
+        ]
+    },
+    {
         version: "V5.2.040326",
         updates: [
         { title: "Added", items: [
@@ -16348,228 +19767,10 @@ const versions = [
 
 renderUpdates("updatesContainer", instructions, versions);
 
-const toggleBtn = document.getElementById("toggleUpdatesBtn");
-const updatesDiv = document.getElementById("updatesContainer");
+// const toggleBtn = document.getElementById("toggleUpdatesBtn");
+// const updatesDiv = document.getElementById("updatesContainer");
 
-toggleBtn.addEventListener("click", () => {
-    updatesDiv.classList.toggle("expanded");
-    toggleBtn.textContent = updatesDiv.classList.contains("expanded") ? "-" : "+";
-});
-
-document.addEventListener('DOMContentLoaded', function() { 
-    // ================================
-    // SECTION 1: MAIN TIMER
-    // ================================
-    let timerInterval;
-    let startTime;
-    let elapsedTime = 0;
-    let isRunning = false;
-
-    const timerDisplay = document.getElementById('timerDisplay');
-    const timerToggleButton = document.getElementById('timerToggleButton');
-    const timerResetButton = document.getElementById('timerResetButton');
-
-    if (timerDisplay) timerDisplay.textContent = formatTime(0);
-
-    function formatTime(seconds) {
-        const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
-        const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-        const secs = String(seconds % 60).padStart(2, '0');
-        return `${hrs}:${mins}:${secs}`;
-    }
-
-    function updateDisplay() {
-        const now = Date.now();
-        const totalElapsedSeconds = Math.floor((now - startTime + elapsedTime) / 1000);
-        timerDisplay.textContent = formatTime(totalElapsedSeconds);
-    }
-
-    function handleTimer(action) {
-        if (action === 'start' && !isRunning) {
-            startTime = Date.now();
-            timerInterval = setInterval(updateDisplay, 1000);
-            isRunning = true;
-            timerToggleButton.textContent = 'Pause';
-        } else if (action === 'pause' && isRunning) {
-            clearInterval(timerInterval);
-            elapsedTime += Date.now() - startTime;
-            isRunning = false;
-            timerToggleButton.textContent = 'Resume';
-        } else if (action === 'reset') {
-            const confirmReset = confirm("Are you sure you want to reset the timer?");
-            if (confirmReset) {
-                clearInterval(timerInterval);
-                elapsedTime = 0;
-                timerDisplay.textContent = formatTime(0);
-                isRunning = false;
-                timerToggleButton.textContent = 'Start';
-            }
-        }
-    }
-
-    timerToggleButton?.addEventListener('click', function() {
-        if (isRunning) {
-            handleTimer('pause');
-        } else {
-            handleTimer('start');
-        }
-    });
-
-    timerResetButton?.addEventListener('click', function() {
-        handleTimer('reset');
-    });
-
-    const channelSelect = document.getElementById("channel");
-    const sfCaseNumRow = document.getElementById("case-num-row");
-
-    channelSelect?.addEventListener("change", function () {
-        const shouldShow = channelSelect.value === "CDT-SOCMED";
-        sfCaseNumRow.style.display = shouldShow ? "" : "none";
-    });
-
-    if (typeof initializeFormElements === "function") initializeFormElements();
-    if (typeof registerEventHandlers === "function") registerEventHandlers();
-
-    // ================================
-    // SECTION 2: TICKET CREATION TIMER
-    // ================================
-    // let ticketTimerInterval = null;
-    // let ticketSeconds = 0;
-
-    // const ticketTimer = document.getElementById("ticketTimer");
-    // const ticketDisplay = document.getElementById("ticketTimerDisplay");
-
-    // function formatTicketTime(sec) {
-    //     const h = String(Math.floor(sec / 3600)).padStart(2, "0");
-    //     const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
-    //     const s = String(sec % 60).padStart(2, "0");
-    //     return `${h}:${m}:${s}`;
-    // }
-
-    // function startTicketTimer() {
-    //     if (ticketTimerInterval) return;
-    //     ticketTimerInterval = setInterval(() => {
-    //         ticketSeconds++;
-    //         if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(ticketSeconds);
-    //     }, 1000);
-    //     console.log("▶️ Ticket Timer started");
-    // }
-
-    // function stopTicketTimer() {
-    //     clearInterval(ticketTimerInterval);
-    //     ticketTimerInterval = null;
-    //     console.log("⏸ Ticket Timer stopped");
-    // }
-
-    // function resetTicketTimer() {
-    //     clearInterval(ticketTimerInterval);
-    //     ticketTimerInterval = null;
-    //     ticketSeconds = 0;
-    //     if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(0);
-    //     console.log("♻️ Ticket Timer reset");
-    // }
-
-    // window.stopTicketTimer = stopTicketTimer;
-    // window.resetTicketTimer = resetTicketTimer;
-    // window.startTicketTimer = startTicketTimer;
-
-    // function isVisible(el) {
-    //     if (!el) return false;
-    //     let cur = el;
-    //     while (cur && cur.nodeType === 1) {
-    //         const cs = window.getComputedStyle(cur);
-    //         if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) {
-    //             return false;
-    //         }
-    //         cur = cur.parentElement;
-    //     }
-    //     const rect = el.getBoundingClientRect();
-    //     return !(rect.width === 0 && rect.height === 0);
-    // }
-
-    // function checkStopConditions() {
-    //     const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
-    //     const cbr = document.querySelector("input[name='cbr'], textarea[name='cbr'], #cbr");
-
-    //     const landmarksVisible = isVisible(landmarks);
-    //     const landmarksHasValue = landmarks && landmarks.value.trim() !== "";
-    //     const cbrHasValue = cbr && cbr.value.trim() !== "";
-
-    //     if (landmarksVisible) {
-    //         if (landmarksHasValue) stopTicketTimer();
-    //     } else {
-    //         if (cbrHasValue) stopTicketTimer();
-    //     }
-    // }
-
-    // document.addEventListener("change", function (e) {
-    //     const t = e.target;
-
-    //     if (t.matches("select[name='issueResolved'], #issueResolved") ||
-    //         t.matches("select[name='outageStatus'], #outageStatus")) {
-
-    //         const issueResolved = document.querySelector("select[name='issueResolved']")?.value || "";
-    //         const outageStatus = document.querySelector("select[name='outageStatus']")?.value || "";
-
-    //         if (issueResolved === "No - for Ticket Creation" || outageStatus === "Yes") {
-    //             if (ticketTimer) ticketTimer.style.display = "block";
-    //             startTicketTimer();
-    //         } else {
-    //             stopTicketTimer();
-    //             resetTicketTimer();
-    //             if (ticketTimer) {
-    //                 ticketTimer.style.display = "none";
-    //             }
-    //         }
-    //     }
-
-    //     if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
-    //     if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
-    //         const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
-    //         if (!isVisible(landmarks)) checkStopConditions();
-    //     }
-    // });
-
-    // document.addEventListener("input", function (e) {
-    //     const t = e.target;
-
-    //     if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
-    //     if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
-    //         const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
-    //         if (!isVisible(landmarks)) checkStopConditions();
-    //     }
-    // });
-
-    // (function makeDraggable(el) {
-    //     if (!el) return;
-    //     let offsetX = 0, offsetY = 0, isDown = false;
-    //     const header = el.querySelector("#ticketTimerHeader") || el;
-    //     header.style.cursor = "grab";
-
-    //     header.addEventListener("mousedown", dragMouseDown);
-    //     document.addEventListener("mouseup", closeDragElement);
-    //     document.addEventListener("mousemove", elementDrag);
-
-    //     function dragMouseDown(e) {
-    //         e.preventDefault();
-    //         isDown = true;
-    //         offsetX = e.clientX - el.offsetLeft;
-    //         offsetY = e.clientY - el.offsetTop;
-    //         header.style.cursor = "grabbing";
-    //     }
-
-    //     function elementDrag(e) {
-    //         if (!isDown) return;
-    //         e.preventDefault();
-    //         el.style.left = (e.clientX - offsetX) + "px";
-    //         el.style.top = (e.clientY - offsetY) + "px";
-    //     }
-
-    //     function closeDragElement() {
-    //         isDown = false;
-    //         header.style.cursor = "grab";
-    //     }
-    // })(ticketTimer);
-
-    // window.__checkTicketStop = checkStopConditions;
-});
+// toggleBtn.addEventListener("click", () => {
+//     updatesDiv.classList.toggle("expanded");
+//     toggleBtn.textContent = updatesDiv.classList.contains("expanded") ? "-" : "+";
+// });

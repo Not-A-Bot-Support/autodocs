@@ -11,10 +11,10 @@ body {
     font-size: 12px;
     letter-spacing: 1.5px;
     background-color: #F5F7FA;
-    background-image: url("../images/bg.png");
-    background-size: cover;        /* makes the image fill the screen */
-    background-repeat: no-repeat;  /* prevents tiling */
-    background-position: center;   /* centers the image */
+    background-image: url("../images/bg-new.png");
+    background-size: 1920px 1080px; /* fixed size */
+    background-repeat: no-repeat;
+    background-position: left bottom;
     background-attachment: fixed;
     color: #2C3E50;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -87,32 +87,117 @@ header {
     box-sizing: border-box;
 }
 
-.updatesDiv {
+/* Notepad Area */
+.notepadDiv {
     position: fixed;
     left: 505px;
     top: 85px;
-    width: 600px;
+    width: 480px;
+    height: calc(100dvh - 150px);
     background-color: #f4f6f8;
     border: 1px solid #ccc;
     border-radius: 10px;
     padding: 15px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    max-height: 70vh;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
+    z-index: 100;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.notepadHeader {
+    margin-bottom: 10px;
+}
+
+.notepadDiv h3 {
+    font-size: 15px;
+    margin: 0;
+    color: #2C3E50;
+    line-height: 1.4;
+}
+
+/* textarea.notepad {
+    width: 100%;
+    flex: 1;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    line-height: 1.5;
+    resize: none;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    color: #2C3E50;
+} */
+
+.notepad {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    overflow-y: auto;
+    outline: none;
+    line-height: 1.5;
+    color: #2C3E50;
+    background-color: white;
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.35) transparent;
+}
+
+/* Chrome / Edge / Safari */
+.notepad::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notepad::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.notepad::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.35);
+    border-radius: 10px;
+}
+
+.notepad::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.5);
+}
+
+/* Updates Area */
+.updatesDiv {
+    position: fixed;
+    left: 1005px;
+    top: 85px;
+    width: 600px;
+    background-color: #f4f6f8;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px 15px 5px 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    max-height: calc(100dvh - 150px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     z-index: 100;
 }
 
-.updatesDiv.expanded {
+.updatesDiv::-webkit-scrollbar {
+    display: none;
+}
+
+/* .updatesDiv.expanded {
     max-height: calc(100dvh - 150px);
     overflow: auto;
     scrollbar-width: none;
     -ms-overflow-style: none; 
-}
+} */
 
-.updatesDiv.expanded::-webkit-scrollbar {
+/* .updatesDiv.expanded::-webkit-scrollbar {
     display: none;
-}
+} */
 
 .updatesHeader {
     align-items: baseline;
@@ -126,7 +211,7 @@ header {
     line-height: 1.4;
 }
 
-.toggleUpdatesBtn {
+/* .toggleUpdatesBtn {
     position: absolute;
     top: 12.5px;
     right: 15px;
@@ -143,11 +228,11 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-}
+} */
 
-.toggleUpdatesBtn:hover {
+/* .toggleUpdatesBtn:hover {
     background-color: #e0e0e0;
-}
+} */
 
 .updateItem {
     background-color: #fff;
@@ -179,7 +264,7 @@ header {
   background-color: #f4f6f8;
   border: 1px solid #ccc;
   border-radius: 10px;
-  padding: 10px 15px;
+  /* padding: 10px 15px; */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   line-height: 1.4;
 }
@@ -195,7 +280,7 @@ header {
 .divsContainer {
     display: flex;
     flex-direction: column;
-    background-color: rgba(244, 246, 248, 0.75); /* 0 = fully transparent, 1 = solid */
+    background-color: rgba(244, 246, 248, 0.95); /* 0 = fully transparent, 1 = solid */
     border: 1px solid #ccc;
     border-radius: 10px;
     padding: 5px;
@@ -311,7 +396,7 @@ input:focus, select:focus {
     outline: none;  
 }
 
-textarea.notepad {
+textarea.wocas {
     width: 100%;
     padding: 5px;  
     margin: 0;
@@ -874,6 +959,7 @@ button.form3-button {
     height: 55px;
     letter-spacing: 1px;
     z-index: 100;
+    border-top: 2.5px solid #92a6bb;
 }
 
 .footer-content {
