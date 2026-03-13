@@ -1,6 +1,6 @@
 //script.js
 
-// Standard Notes Generator Version 5.2.130326
+// Standard Notes Generator Version 5.3.130326
 // Developed & Designed by: QA Ryan
 
 // Channel, Concern Type, and VOC Options
@@ -19240,7 +19240,7 @@ function resetButtonHandler() {
         });
 
         const footerElement = document.getElementById("footerValue");
-        const footerText = "Standard Notes Generator Version 5.2.130326";
+        const footerText = "Standard Notes Generator Version 5.3.130326";
         typeWriter(footerText, footerElement, 50);
 
         const notepad = document.getElementById("notepad");
@@ -19686,7 +19686,7 @@ const instructions = [
 
 const versions = [
     {
-        version: "V5.2.130326",
+        version: "V5.3.130326",
         updates: [
             { title: "Enhancements", items: [
                 "Main form behavior updated to display the correct fields based on the selected agent channel.",
