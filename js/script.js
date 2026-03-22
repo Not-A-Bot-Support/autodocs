@@ -19763,8 +19763,8 @@ function renderUpdates(containerId, instructions, versions) {
 }
 
 const instructions = [
-    "Open the tool using the provided link or through smart assistant (Saya). Avoid using ‘Duplicate Tab’ to ensure the DOM scripts load properly.",
-    "To ensure data accuracy, we highly recommend deleting any previously saved records on this workstation before saving new ones.",
+    "Open the tool using the provided link or through smart assistant (Saya). Avoid using the browser's ‘Duplicate Tab’ to ensure the DOM scripts load properly.",
+    "To ensure data accuracy, delete any previously saved records on this workstation before saving new ones.",
     "Always utilize the LIT365 work instructions to ensure accurate, consistent, and up-to-date handling of every intent. These guidelines outline the correct process flow and required checks, so make sure to utilize them before completing any action.",
     "Fill out all required fields.",
     "If a field is not required (e.g. L2 fields), leave it blank. Avoid entering 'NA' or any unnecessary details.",
