@@ -1,6 +1,6 @@
 //script.js
 
-// Standard Notes Generator Version 5.3.130326
+// Standard Notes Generator Version 5.3.230326
 // Developed & Designed by: QA Ryan
 
 // Channel, Concern Type, and VOC Options
@@ -87,7 +87,7 @@ channelField.addEventListener("change", () => {
 function handleLobChange() {
     const lobSelectedValue = lobSelect.value;
 
-    resetForm2ContainerAndRebuildButtons();
+    // resetForm2ContainerAndRebuildButtons();
 
     vocSelect.innerHTML = "";
 
@@ -311,17 +311,81 @@ function copyValue(button) {
     }
 }
 
+// FORM 1 COPY FUNCTION
 document.addEventListener("DOMContentLoaded", () => {
-    const copyButtons = document.querySelectorAll("button.input-and-button");
-    copyButtons.forEach(button => {
-        button.addEventListener("click", () => copyValue(button));
+
+    document.addEventListener("click", (e) => {
+
+        // DROPDOWN TOGGLE
+        const btn = e.target.closest(".copy-btn");
+        if (btn) {
+            e.stopPropagation();
+
+            const dropdown = btn.closest(".copy-dropdown");
+
+            document.querySelectorAll(".copy-dropdown").forEach(d => {
+                if (d !== dropdown) d.classList.remove("active");
+            });
+
+            dropdown.classList.toggle("active");
+            return;
+        }
+
+        // DROPDOWN OPTIONS (Node / Option82)
+        const option = e.target.closest(".copy-option");
+        if (option) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const type = option.dataset.type;
+            const container = option.closest(".form1DivInput");
+            const input = container.querySelector("input");
+
+            if (!input) return;
+
+            // 👇 Normalize first (applies to BOTH cases)
+            let value = input.value.trim().toUpperCase();
+
+            if (type === "node") {
+                value = value.split("_")[0];
+            }
+
+            copyToClipboard(value);
+
+            option.closest(".copy-dropdown").classList.remove("active");
+            return;
+        }
+
+        // REGULAR COPY BUTTON (fallback)
+        const regularCopyBtn = e.target.closest(
+            "button.input-and-button:not(.copy-btn):not(.copy-option)"
+        );
+
+        if (regularCopyBtn) {
+            const container = regularCopyBtn.closest(".form1DivInput");
+            const input = container?.querySelector("input");
+
+            if (!input) return;
+
+            copyToClipboard(input.value);
+            return;
+        }
+
+        // CLICK OUTSIDE → close dropdowns
+        document.querySelectorAll(".copy-dropdown").forEach(d => {
+            d.classList.remove("active");
+        });
+
     });
 
-    const option82Button = document.getElementById("copyButton");
-    if (option82Button) {
-        option82Button.addEventListener("click", () => copyValue(option82Button));
-    }
 });
+
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text)
+        .then(() => console.log("Copied:", text))
+        .catch(err => console.error("Copy failed:", err));
+}
 
 // Timers & Show/Hide rows based on channel selection
 document.addEventListener('DOMContentLoaded', function() { 
@@ -401,14 +465,16 @@ document.addEventListener('DOMContentLoaded', function() {
             isRunning = false;
             timerToggleButton.textContent = 'Resume';
         } else if (action === 'reset') {
-            const confirmReset = confirm("Are you sure you want to reset the timer?");
-            if (confirmReset) {
+            showConfirm("Are you sure you want to reset the timer?")
+            .then((confirmReset) => {
+                if (!confirmReset) return;
+
                 clearInterval(timerInterval);
                 elapsedTime = 0;
                 timerDisplay.textContent = formatTime(0);
                 isRunning = false;
                 timerToggleButton.textContent = 'Start';
-            }
+            });
         }
     }
 
@@ -723,20 +789,25 @@ function createIntentBasedForm() {
     form.setAttribute("id", "Form2");
 
     const selectedOption = selectIntent.options[selectIntent.selectedIndex];
-    let footerText = selectedOption.textContent;
-
     const lobValue = document.getElementById("lob").value;
+
+    let introText = selectedOption.textContent;
 
     if (lobValue === "NON-TECH") {
         const optgroupElement = selectedOption.parentElement;
-        if (optgroupElement.tagName === "OPTGROUP") {
+
+        if (optgroupElement && optgroupElement.tagName === "OPTGROUP") {
             const optgroupLabel = optgroupElement.label;
-            footerText = `${optgroupLabel} - ${footerText}`;
+            introText = `${optgroupLabel} - ${introText}`;
         }
     }
 
-    const footer = document.getElementById("footerValue");
-    typeWriter(footerText, footer, 50);
+    if (fabMessage) {
+        fabMessage.classList.remove("hide");
+        stopTyping = false;
+
+        typeWriter(introText, fabMessage, 35);
+    }
 
     const voiceAndDataForms = [
         "form100_1", "form100_2", "form100_3", "form100_4", "form100_5", "form100_6", "form100_7"
@@ -2000,7 +2071,7 @@ function createIntentBasedForm() {
                         hideSpecificFields(["resolution"]);
                     }
                 } else {
-                    alert("This form is currently unavailable for customers with Fiber - Radius service.");
+                    showAlert("This form is currently unavailable for customers with Fiber - Radius service.");
                     hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
 
                     const facilityField = document.querySelector('[name="facility"]');
@@ -2028,7 +2099,7 @@ function createIntentBasedForm() {
                     showFields(["remarks", "issueResolved"]);
                     hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else {
-                    alert("This form is currently unavailable for customers with Fiber - DSL service.");
+                    showAlert("This form is currently unavailable for customers with Fiber - DSL service.");
                     hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
 
                     const resTypeField = document.querySelector('[name="resType"]');
@@ -2502,14 +2573,8 @@ function createIntentBasedForm() {
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-
+        
         const facility = document.querySelector("[name='facility']");
-        const resType = document.querySelector("[name='resType']");
-        const oltAndOnuConnectionType = document.querySelector("[name='oltAndOnuConnectionType']");
-        const services = document.querySelector("[name='services']");
-        const outageStatus = document.querySelector("[name='outageStatus']");
-        const issueResolved = document.querySelector("[name='issueResolved']");
-
         facility.addEventListener("change", () => {
             resetAllFields(["facility"]);
             if (facility.value === "Fiber") {
@@ -2546,6 +2611,7 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
     
+        const resType = document.querySelector("[name='resType']");
         resType.addEventListener("change", () => {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
@@ -2572,12 +2638,22 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
 
+        const outageStatus = document.querySelector("[name='outageStatus']");
         outageStatus.addEventListener("change", () => {
             resetAllFields(["facility", "resType", "services", "serviceStatus", "outageStatus"]);
             if (outageStatus.value === "No" && facility.value === "Fiber") {
                 if (selectedValue === "form101_1" || selectedValue === "form101_2" || selectedValue === "form101_3") {
                     showFields(["onuSerialNum", "modemLights", "oltAndOnuConnectionType", "actualExp", "remarks", "issueResolved"]);
                     hideSpecificFields(["outageReference", "pcNumber", "callType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                } else {
+                    showFields(["remarks", "issueResolved"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                }
+                updateToolLabelVisibility();
+            } else if (outageStatus.value === "No" && facility.value === "Copper VDSL") {
+                if (selectedValue === "form101_1" || selectedValue === "form101_2" || selectedValue === "form101_3") {
+                    showFields(["onuSerialNum", "actualExp", "remarks", "issueResolved"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "modemLights", "callType", "oltAndOnuConnectionType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
                 } else {
                     showFields(["remarks", "issueResolved"]);
                     hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
@@ -2596,7 +2672,7 @@ function createIntentBasedForm() {
                 updateToolLabelVisibility();
             } else {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["onuSerialNum", "modemLights", "callType", "oltAndOnuConnectionType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "issueResolved", "availability", "address", "landmarks"]);
+                hideSpecificFields(["onuSerialNum", "modemLights", "callType", "oltAndOnuConnectionType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "issueResolved", "availability", "address", "landmarks"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -2609,6 +2685,7 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
 
+        const services = document.querySelector("[name='services']");
         services.addEventListener("change", () => {
             if (services.value === "Voice Only") {
                 if (outageStatus.value === "No") {
@@ -2619,6 +2696,7 @@ function createIntentBasedForm() {
             }
         });
 
+        const oltAndOnuConnectionType = document.querySelector("[name='oltAndOnuConnectionType']");
         oltAndOnuConnectionType.addEventListener("change", () => {
             if (oltAndOnuConnectionType.value === "FEOL - Non-interOp") {
                 showFields(["fsx1Status"]);
@@ -2627,6 +2705,7 @@ function createIntentBasedForm() {
             }
         });
     
+        const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
@@ -3320,7 +3399,7 @@ function createIntentBasedForm() {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
                     hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else {
-                    alert("This form is currently unavailable for customers with Fiber - Radius service.");
+                    showAlert("This form is currently unavailable for customers with Fiber - Radius service.");
                     resetAllFields([]);
                     hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
 
@@ -15770,7 +15849,7 @@ function optionNotAvailable() {
 
     if (isFieldVisible("facility")) {
         if (vars.facility === "") {
-            alert("Please complete the form.");
+            showAlert("Please complete the form.");
             return true;
         }
     }
@@ -16068,7 +16147,7 @@ function cepCaseTitle() {
                 } else if (vars.investigation4 === "Cannot Reach Specific Website") {
                     title = "HIGH LATENCY OR LAG GAMING";
                 } else {
-                    alert("Please fill out Investigation 4 to proceed.");
+                    showAlert("Please fill out Investigation 4 to proceed.");
                     return "";
                 }
             } else {
@@ -16599,7 +16678,7 @@ function cepButtonHandler(showFloating = true, filter = []) {
     if (optionNotAvailable()) return "";
 
     if (vars.selectedIntent.startsWith("form300") && vars.custAuth === "Failed") {
-        alert("This option is not available. Please use the Salesforce or FUSE button.");
+        showAlert("This option is not available. Please use the Salesforce or FUSE button.");
         return;
     }
 
@@ -16772,7 +16851,9 @@ function techNotesButtonHandler(showFloating = true) {
     function constTechCAOutput() {
         const fields = [
 
-            // Probing
+            // Remarks
+            { name: "nmsSkinRemarks" },
+            { name: "dmsRemarks" },
             { name: "remarks" },
 
             // Alternative Services
@@ -19147,8 +19228,8 @@ function resetForm2ContainerAndRebuildButtons() {
     const buttonData = [
         { label: "💾 Save", handler: saveFormData },
         { label: "🔄 Reset", handler: resetButtonHandler },
-        { label: "📄 Export", handler: exportFormData },
-        { label: "🗑️ Delete All", handler: deleteAllData }
+        // { label: "📄 Export", handler: exportFormData },
+        // { label: "🗑️ Delete All", handler: deleteAllData }
     ];
 
     buttonData.forEach(({ label, handler }) => {
@@ -19169,9 +19250,10 @@ function resetForm2ContainerAndRebuildButtons() {
 
 // Reset forms
 function resetButtonHandler() {
-    const userChoice = confirm("Are you sure you want to reset the form?");
+    showConfirm("Are you sure you want to reset the form?")
+    .then((userChoice) => {
+        if (!userChoice) return;
 
-    if (userChoice) {
         const agentName = document.getElementsByName("agentName")[0]; 
         const teamLead = document.getElementsByName("teamLead")[0]; 
         const pldtUser = document.getElementsByName("pldtUser")[0]; 
@@ -19240,24 +19322,8 @@ function resetButtonHandler() {
         });
 
         const footerElement = document.getElementById("footerValue");
-        const footerText = "Standard Notes Generator Version 5.3.130326";
+        const footerText = "Standard Notes Generator Version 5.3.230326";
         typeWriter(footerText, footerElement, 50);
-
-        const notepad = document.getElementById("notepad");
-        notepad.rows = 10;
-        notepad.style.height = "";
-
-        const ticketTimer = document.getElementById("ticketTimer");
-
-        if (ticketTimer) ticketTimer.style.display = "none";
-
-        if (typeof window.resetTicketTimer === "function") {
-            window.resetTicketTimer();
-        } else if (typeof window.stopTicketTimer === "function") {
-            window.stopTicketTimer();
-            const ticketDisplay = document.getElementById("ticketTimerDisplay");
-            if (ticketDisplay) ticketDisplay.textContent = "00:00:00";
-        }
 
         setTimeout(function() {
             window.scrollTo({
@@ -19266,7 +19332,7 @@ function resetButtonHandler() {
                 behavior: 'smooth'
             });
         }, 100);
-    }
+    });
 }
 
 // Save generated notes to localStorage
@@ -19284,7 +19350,7 @@ function saveFormData() {
     const missingFields = [];
 
     if (!sfCaseNumberElement) {
-        alert("Case number field is missing on the form.");
+        showAlert("Case number field is missing on the form.");
         return;
     }
 
@@ -19296,7 +19362,7 @@ function saveFormData() {
     }
 
     if (missingFields.length > 0) {
-        alert(`Notes cannot be saved. Please fill out the following fields: ${missingFields.join(", ")}`);
+        showAlert(`We couldn’t save your notes. Please fill out the following fields: ${missingFields.join(", ")}`);
         return;
     }
 
@@ -19458,7 +19524,7 @@ function saveFormData() {
     savedData[uniqueKey] = savedEntry;
     localStorage.setItem("tempDatabase", JSON.stringify(savedData));
 
-    alert("All set! Your notes have been saved.");
+    showAlert("All set! Your notes have been saved.");
 }
 
 // Export saved notes as a text file, sorted by timestamp
@@ -19466,7 +19532,7 @@ function exportFormData() {
     const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
     
     if (Object.keys(savedData).length === 0) {
-        alert("No data available to export.");
+        showAlert("No data available to export.");
         return;
     }
 
@@ -19530,25 +19596,26 @@ function exportFormData() {
 
     link.click();
     
-    alert("Notes exported successfully!");
+    showAlert("Notes exported successfully!");
 }
 
 // Delete all saved data in localStorage
 function deleteAllData() {
-    const userChoice = confirm("Are you sure you want to delete all saved data?");
-    
-    if (userChoice) {
+    showConfirm("Are you sure you want to delete all saved records in this workstation?")
+    .then((userChoice) => {
+        if (!userChoice) return;
+
         localStorage.clear();
-        alert("All data has been deleted successfully.");
-    }
+        showAlert("All data has been deleted successfully.");
+    });
 }
 
 // Show appropriate buttons based on form state
 const primaryButtons = {
   saveButton: saveFormData,
-  resetButton: resetButtonHandler,
-  exportButton: exportFormData,
-  deleteButton: deleteAllData
+  resetButton: resetButtonHandler
+//   exportButton: exportFormData,
+//   deleteButton: deleteAllData
 };
 
 Object.entries(primaryButtons).forEach(([id, handler]) => {
@@ -19558,6 +19625,7 @@ Object.entries(primaryButtons).forEach(([id, handler]) => {
 // Form Container Scrollbar Behavior
 const container = document.querySelector('.divsContainer');
 const scrollbar = document.querySelector('.customScrollbar');
+
 let hideTimeout;
 let isDragging = false;
 let dragOffset = 0;
@@ -19658,25 +19726,45 @@ function renderUpdates(containerId, instructions, versions) {
 
     // --- Updates Sections ---
     versions.forEach(({ version, updates }) => {
+
         const updatesDiv = document.createElement("div");
         updatesDiv.classList.add("updateItem");
-        updatesDiv.innerHTML = `<h3>${version} Update</h3>`;
+
+        // clickable title
+        const title = document.createElement("h3");
+        title.classList.add("updateTitle");
+        title.textContent = `${version} Update`;
+
+        // collapsible container
+        const content = document.createElement("div");
+        content.classList.add("updateContent");
 
         updates.forEach((section, index) => {
-        const sectionDiv = document.createElement("div");
-        sectionDiv.innerHTML = `
-            <strong>${index + 1}. ${section.title}</strong>
-            <ul>${section.items.map(i => `<li>${i}</li>`).join("")}</ul>
-        `;
-        updatesDiv.appendChild(sectionDiv);
+
+            const sectionDiv = document.createElement("div");
+
+            sectionDiv.innerHTML = `
+                <strong>${section.title}</strong>
+                <ul>${section.items.map(i => `<li>${i}</li>`).join("")}</ul>
+            `;
+
+            content.appendChild(sectionDiv);
         });
 
+        // click toggle
+        title.addEventListener("click", () => {
+            updatesDiv.classList.toggle("active");
+        });
+
+        updatesDiv.appendChild(title);
+        updatesDiv.appendChild(content);
         container.appendChild(updatesDiv);
     });
 }
 
 const instructions = [
-    "Open the tool using the provided link. Avoid using ‘Duplicate Tab’ to ensure the DOM scripts load properly.",
+    "Open the tool using the provided link or through smart assistant (Saya). Avoid using ‘Duplicate Tab’ to ensure the DOM scripts load properly.",
+    "To ensure data accuracy, we highly recommend deleting any previously saved records on this workstation before saving new ones.",
     "Always utilize the LIT365 work instructions to ensure accurate, consistent, and up-to-date handling of every intent. These guidelines outline the correct process flow and required checks, so make sure to utilize them before completing any action.",
     "Fill out all required fields.",
     "If a field is not required (e.g. L2 fields), leave it blank. Avoid entering 'NA' or any unnecessary details.",
@@ -19686,22 +19774,48 @@ const instructions = [
 
 const versions = [
     {
+        version: "V5.3.230326",
+        updates: [
+            { title: "🎉 Introducing Saya", items: [
+                "Meet <strong>Saya</strong>, your smart assistant that provides helpful tips, suggests actions, and makes your workflow faster and easier.",
+            ]},
+            { title: "🎨 UI Improvements", items: [
+                "Improved the layout of alerts and confirmation messages for better clarity",
+                "Fixed buttons alignment for a cleaner and more consistent look",
+                "Enhanced how pop-ups appear and close for a smoother experience",
+                "Reduced screen clutter to help you stay focused",
+                "Added NIC Investigation 4 options under NIC-NDT",
+                "Enhanced the Option82 field to allow agents to copy either the node or the complete Option82 value."
+            ]},
+            { title: "🛠️ Fixes", items: [
+                "Fixed errors caused by missing functions to improve stability",
+                "Corrected NDT intent logic for Copper VDSL accounts under network outage conditions.",
+            ]},
+            { title: "🚀 Overall Impact", items: [
+                "Smoother and more seamless interactions",
+                "Cleaner and more organized interface",
+                "Faster and more responsive assistant behavior",
+                "Easier to understand and use"
+            ]},
+        ]
+    },
+    {
         version: "V5.3.130326",
         updates: [
-            { title: "Enhancements", items: [
+            { title: "✨ Enhancements", items: [
                 "Main form behavior updated to display the correct fields based on the selected agent channel.",
                 "Improved <strong>Updates</strong> section for better visuals.",
                 "Expanded <strong>Notepad</strong> section to provide more space for notes and improve usability.",
                 "Improved Upsell Notes integration to capture reasons for declined and ineligible offers for <strong>NIC-NDT</strong>, <strong>NIC</strong>, <strong>SIC</strong> and all <strong>Non-Tech</strong> intents."
             ]},
-            { title: "Added", items: [
+            { title: "➕ Added", items: [
                 "Ordertake option for NSR and Relocation added for tracking purposes.",
                 "Upsell <strong>Pending Req. (For callback)</strong> option added.",
                 "Non-Tech request intents(<strong>Inmove</strong>, <strong>DDE</strong>, <strong>Migration</strong>, <strong>Misapplied Payment</strong>, <strong>Occular Inspection/Amend SAM</strong>, <strong>Proof of PLDT Subscription</strong>, and <strong>Unreflected Payment</strong>).",
                 "<strong>NIC Intent</strong>: Reintroduced Equipment and Modem Brand fields to enable easier identification of the ONU connection type (InterOp vs. Non-InterOp).",
                 "Added NIC Investigation 4 options for NIC-NDT intent."
             ]},
-            { title: "Fixes", items: [
+            { title: "🛠️ Fixes", items: [
                 "Resolved a bug causing decline and ineligibility reasons to not display in the generated notes for all non-technical intents.",
             ]},
         ]
@@ -19709,7 +19823,7 @@ const versions = [
     {
         version: "V5.2.040326",
         updates: [
-        { title: "Added", items: [
+        { title: "➕ Added", items: [
             "Non-Tech Request intents: <strong>Address Modification (Record), Disconnection, Dispute, Refund, Relocation, Special Features, Speed Add On 500, Unli Fam Call, Upgrade, VAS, Withholding Tax Adjustment,</strong> and <strong>Wire Re-Route</strong>.",
             "<strong>Service ID</strong> is now included in the generated notes for Non-Tech intents.",
             "Enabled <strong>ESA tagging</strong> for all Non-Tech intents (Hotline agents).",
@@ -19719,25 +19833,25 @@ const versions = [
     {
         version: "V5.2.160226",
         updates: [
-        { title: "Fixed", items: [
+        { title: "🛠️ Fixed", items: [
             "Formatting issue causing generated endorsement notes to be incorrectly split into multiple sections." ]},
-        { title: "Improvements", items: [
+        { title: "✨ Improvements", items: [
             "Enhanced the Endorsement Form to dynamically display only relevant fields based on the selected endorsement type, improving clarity and reducing unnecessary inputs." ]}
         ]
     },
     {
         version: "V5.2.140226",
         updates: [
-        { title: "Improvements", items: [
+        { title: "✨ Improvements", items: [
             "Enhanced Endorsement Form UI", 
             "Improved generating endorsement notes" ]},
-        { title: "Added", items: [
+        { title: "➕ Added", items: [
             "Non-Tech Request intents: <strong>Downgrade</strong> and <strong>Reconnection</strong>.", 
             "<strong>Repeater count</strong> field under FFUP intent.", 
             "<strong>“Not Applicable”</strong> option for ALS offering. This applies to tickets beyond the 24-hour SLA but still within the 36-hour ALS eligibility threshold." ]},
-        { title: "Bug Fixes", items: [
+        { title: "🐞 Bug Fixes", items: [
             "Resolved layout overflow issue" ]},
-        { title: "Removed", items: [
+        { title: "➖ Removed", items: [
             "ALS Offering notation from the CEP tool. ALS details will be available exclusively in FUSE or Salesforce (SF) notation.",
             "Ticket creation timer" ]}
         ]
@@ -19745,45 +19859,624 @@ const versions = [
     {
         version: "V5.2.101225",
         updates: [
-        { title: "Added", items: ["Instructions to always utilize LIT365 work instructions for proper guidance", "Investigation 4 options for SIC (High Utilization OLT/PON Port)", "DC and RA Exec status fields in the NMS skin"] },
-        { title: "Improvements", items: ["UI enhancements for better usability", "Save and Export function enhancements to ensure accurate notation is saved and exported", "Special Instructions functionality", "Case Notes timeline formatting", "Enabled FCR notation for CEP tool"] },
-        { title: "Bug Fixes", items: ["Fixed minor bugs in generated notes", "Resolved SF Tagging issue for SOCMED agents"] }
+        { title: "➕ Added", items: ["Instructions to always utilize LIT365 work instructions for proper guidance", "Investigation 4 options for SIC (High Utilization OLT/PON Port)", "DC and RA Exec status fields in the NMS skin"] },
+        { title: "✨ Improvements", items: ["UI enhancements for better usability", "Save and Export function enhancements to ensure accurate notation is saved and exported", "Special Instructions functionality", "Case Notes timeline formatting", "Enabled FCR notation for CEP tool"] },
+        { title: "🐞 Bug Fixes", items: ["Fixed minor bugs in generated notes", "Resolved SF Tagging issue for SOCMED agents"] }
         ]
     },
     {
         version: "V5.2.131125",
         updates: [
-        { title: "Added Non-Tech Follow-up Intents", items: ["Refund", "Relocation", "Relocation - CID Creation", "Special Features", "Speed Add On 500", "Temporary Disconnection (VTD/HTD)", "Unreflected Payment", "Upgrade", "VAS", "Wire Re-Route", "Withholding Tax Adjustment"] }
+        { title: "➕ Added Non-Tech Follow-up Intents", items: ["Refund", "Relocation", "Relocation - CID Creation", "Special Features", "Speed Add On 500", "Temporary Disconnection (VTD/HTD)", "Unreflected Payment", "Upgrade", "VAS", "Wire Re-Route", "Withholding Tax Adjustment"] }
         ]
     },
     {
         version: "V5.2.301025",
         updates: [
-        { title: "Generated FUSE Notes (Hotline)", items: ["Generated notes are automatically divided into sections, eliminating the need for manual formatting or separation"] },
-        { title: "Fixes", items: ["Resolved issue on Concern Type options not displaying correctly", "Fixed scrolling behavior for smoother navigation through form sections"] },
-        { title: "Improvements & Enhancements:", items: ["Refined interface for smoother visuals and seamless workflow", "Enhanced user experience for more user-friendly navigation"] },
+        { title: "✨ Generated FUSE Notes (Hotline)", items: ["Generated notes are automatically divided into sections, eliminating the need for manual formatting or separation"] },
+        { title: "🛠️ Fixes", items: ["Resolved issue on Concern Type options not displaying correctly", "Fixed scrolling behavior for smoother navigation through form sections"] },
+        { title: "✨ Improvements", items: ["Refined interface for smoother visuals and seamless workflow", "Enhanced user experience for more user-friendly navigation"] },
         ]
     },
     {
         version: "V5.2.291025",
         updates: [
-        { title: "Removed fields", items: ["Equipment Brand, Modem Brand, and ONU Connection Type (NIC)"] },
-        { title: "Added Intents", items: ["Request for Private IP", "Gaming - High Latency/Lag"] },
-        { title: "Added fields", items: ["Clearview Latest real-time request completion date", "Tested OK for Hotline Agents (NIC/SIC/Selective Browsing intents)"] },
-        { title: "Added CEP Investigation 4 tagging", items: ["Device and Website IP Configuration (Request for Public/Private IP)", "No Audio/Video Output w/ Test Channel (IPTV Intents)"] },
-        { title: "Updated field labels", items: ["'DMS Status' to 'Internet/Data Status'", "'RX Power/OPTICSRXPOWER' to 'RX Power'", "'No. of Connected Devices (L2)' to 'No. of Conn. Devices (L2)'"] },
-        { title: "Fix", items: ["Resolved Offer ALS notation bug"] },
-        { title: "UI Enhancements", items: ["Slight tweaks for a fresher, more modern feel.", "New Instructions and Updates section: Your quick guide to staying informed!"] }
+        { title: "➖ Removed fields", items: ["Equipment Brand, Modem Brand, and ONU Connection Type (NIC)"] },
+        { title: "➕ Added Intents", items: ["Request for Private IP", "Gaming - High Latency/Lag"] },
+        { title: "➕ Added fields", items: ["Clearview Latest real-time request completion date", "Tested OK for Hotline Agents (NIC/SIC/Selective Browsing intents)"] },
+        { title: "➕ Added CEP Investigation 4 tagging", items: ["Device and Website IP Configuration (Request for Public/Private IP)", "No Audio/Video Output w/ Test Channel (IPTV Intents)"] },
+        { title: "✨ Updated field labels", items: ["'DMS Status' to 'Internet/Data Status'", "'RX Power/OPTICSRXPOWER' to 'RX Power'", "'No. of Connected Devices (L2)' to 'No. of Conn. Devices (L2)'"] },
+        { title: "🛠️ Fix", items: ["Resolved Offer ALS notation bug"] },
+        { title: "🎨 UI Enhancements", items: ["Slight tweaks for a fresher, more modern feel.", "New Instructions and Updates section: Your quick guide to staying informed!"] }
         ]
     }
 ];
 
 renderUpdates("updatesContainer", instructions, versions);
 
-// const toggleBtn = document.getElementById("toggleUpdatesBtn");
-// const updatesDiv = document.getElementById("updatesContainer");
+// FAB MENU ELEMENT REFERENCES
+const panel = document.getElementById("floatingPanel");
+const fabButton = document.getElementById("fabButton");
+const fabMenu = document.getElementById("fabMenu");
+const fabMessage = document.getElementById("fabMessage");
 
-// toggleBtn.addEventListener("click", () => {
-//     updatesDiv.classList.toggle("expanded");
-//     toggleBtn.textContent = updatesDiv.classList.contains("expanded") ? "-" : "+";
-// });
+const intro = "Hi! I’m Saya. Click me to explore more features.";
+
+// Guard (prevents runtime errors)
+if (!panel || !fabButton || !fabMenu || !fabMessage) {
+    console.warn("FAB Assistant: Missing required elements.");
+}
+
+// CONFIGURATION
+const FabConfig = {
+    typingSpeed: 35,
+    hideDelay: 7500,
+    randomInterval: 600000,
+    actionDelay: 120
+};
+
+// PANEL TOGGLE
+fabButton?.addEventListener("click", () => {
+    panel.classList.toggle("open");
+});
+
+// TYPEWRITER
+let typingTimer = null;
+let isTyping = false;
+let stopTyping = false;
+let isMessageActive = false;
+let messageQueue = [];
+let isProcessingQueue = false;
+let hideTimer = null;
+
+function typeWriter(text, element, speed, hideDelay = FabConfig.hideDelay, callback) {
+    if (!element) return;
+
+    clearTimeout(typingTimer);
+    clearTimeout(hideTimer);
+
+    element.classList.remove("hide");
+
+    isTyping = true;
+    element.innerHTML = "";
+
+    let i = 0;
+
+    function type() {
+        if (stopTyping) {
+            element.innerHTML = "";
+            isTyping = false;
+            if (callback) callback();
+            return;
+        }
+
+        if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            i++;
+            typingTimer = setTimeout(type, speed);
+        } else {
+            isTyping = false;
+
+            hideTimer = setTimeout(() => {
+                element.classList.add("hide");
+
+                if (callback) callback(); // 👈 trigger next step AFTER full lifecycle
+            }, hideDelay);
+        }
+    }
+
+    type();
+}
+
+function processQueue() {
+    if (isProcessingQueue) return;
+    if (messageQueue.length === 0) return;
+
+    isProcessingQueue = true;
+
+    const { text, delay, continueLoop } = messageQueue.shift();
+
+    typeWriter(text, fabMessage, FabConfig.typingSpeed, delay, () => {
+        isProcessingQueue = false;
+
+        if (continueLoop) {
+            setTimeout(() => {
+                enqueueRandomMessage();
+            }, FabConfig.randomInterval);
+        } else {
+            processQueue(); // continue queue only
+        }
+    });
+}
+
+function enqueueMessage(text, delay = FabConfig.hideDelay, continueLoop = true) {
+    if (!text) return;
+
+    messageQueue.push({ text, delay, continueLoop });
+    processQueue();
+}
+
+// HOVER BEHAVIOR
+fabButton?.addEventListener("mouseenter", () => {
+    stopTyping = true;
+    clearTimeout(typingTimer);
+    fabMessage?.classList.add("hide");
+});
+
+fabButton?.addEventListener("mouseleave", () => {
+    stopTyping = false;
+});
+
+// MENU VISIBILITY (CLASS-BASED)
+panel?.addEventListener("mouseenter", () => {
+    fabMenu.classList.add("show");
+});
+
+panel?.addEventListener("mouseleave", () => {
+    fabMenu.classList.remove("show");
+});
+
+function runFabAction(action) {
+    fabMenu.classList.remove("show");
+    setTimeout(action, FabConfig.actionDelay);
+}
+
+// BUTTON ACTIONS
+function openDuplicateTab() {
+    window.open(
+        "https://not-a-bot-support.github.io/autodocs/",
+        "_blank"
+    );
+}
+
+// RANDOM MESSAGES
+const assistantMessages = {
+    tips: [
+        // Tips
+        "💡You can duplicate this tab anytime. Just click me and select 'Duplicate Tab'!",
+        "💡You can use the Notepad section to store temporary notes or frequently used spiels for quick access.",
+        "💡To ensure data accuracy, we highly recommend deleting any previously saved records on this workstation before saving new ones.",
+        "💡When filling out the form, make sure all required fields are completed.",
+        "💡If a field isn’t required (like L2 fields), you can leave it blank, no need to enter “NA” or extra unnecessary details.",
+
+        // DYKs
+        "🧠 Did you know? I can help you export your saved notes as a text file. Just click me and select 'Export Saved Notes'!",
+        "🧠 Did you know? You can clear saved records in this workstation from my menu.",
+
+        // Reminders
+        "ℹ️ LIT365 work instructions outline the correct process flow and required checks, so make sure to utilize them before completing any action.",
+        "ℹ️ Always remember! Review your inputs carefully and ensure all information is accurate before generating the notes.",
+        "👋 Hey there! Just a quick reminder, I’m here to help with your standard notation, but I’m not a work instruction.",
+        "ℹ️ For accurate and up-to-date handling, always utilize the LIT365 Work Instructions.",
+        "ℹ️ Always ensure that all actions performed in each tool are properly documented.",
+        "ℹ️ Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”.",
+        "ℹ️ You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency under the “Other Actions Taken” field.",
+    ],
+
+    quotes: [
+        "❤️ Every call or case is an opportunity to turn frustration into trust.",
+        "❤️ Great agents don’t just answer calls or cases, they solve problems and create better experiences.",
+        "❤️ Difficult calls or cases don’t define you; how you handle them does.",
+        "❤️ One calm response can change an entire customer experience.",
+        "❤️ Consistency, patience, and empathy are the true KPIs of a great agent.",
+        "❤️ Every resolved issue is proof that your effort matters.",
+        "❤️ Service excellence starts with listening.",
+        "❤️ The best agents turn complaints into compliments.",
+        "❤️ Stay calm, stay professional, and let your solutions speak for you.",
+        "❤️ Behind every ‘thank you for your help’ is a job well done.",
+        "❤️ Every conversation is a chance to make someone’s day better.",
+        "❤️ A calm response can turn a frustrated customer into a loyal one.",
+        "❤️ Great customer service isn’t about having all the answers, it's about caring enough to find them.",
+        "❤️ One solved issue today can build a customer’s trust for years.",
+        "❤️ Behind every successful team are team members who care about the customer experience.",
+        "❤️ Not every call will be easy, but every call is an opportunity to grow.",
+        "❤️ Stay calm, stay kind, and let your professionalism lead the way.",
+        "❤️ Difficult customers test your patience, but they also sharpen your skills.",
+        "❤️ The strongest agents stay composed even when the queue is full.",
+        "❤️ Empathy turns service into a positive experience.",
+        "❤️ Empathy turns tension into cooperation.",
+        "❤️ Your patience today can turn a complaint into appreciation.",
+        "❤️ Professionalism shines brightest in challenging conversations.",
+        "❤️ Take a deep breath, stay composed, and guide the customer to a solution.",
+        "❤️ Respectful communication can soften even the toughest interactions.",
+        "❤️ Let empathy guide the conversation, not frustration.",
+        "❤️ Difficult moments reveal the strength of a great support agent.",
+        "❤️ Handling difficult customers well is a skill that builds true service excellence.",
+        "❤️ Empathy can diffuse tension faster than explanations.",
+        "❤️ When you understand the customer, the solution becomes obvious.",
+        "❤️ Empathy turns difficult calls into manageable conversations.",
+        "❤️ Empathy is your most powerful de-escalation tool.",
+        "❤️ Understanding saves time, assumptions waste it.",
+        "❤️ When you lead with empathy, control follows naturally.",
+        "❤️ Empathy isn’t soft, it’s strategic.",
+        "❤️ A calm customer starts with a calm, understanding agent.",
+        "❤️ The better you connect, the faster you resolve.",
+        "❤️ Empathy lowers stress, for both the customer and you.",
+        "❤️ Customers cooperate more when they feel heard.",
+        "❤️ Empathy builds trust, and trust speeds up every interaction.",
+        "❤️ When customers feel understood, they stop resisting solutions.",
+        "❤️ Empathy helps you handle calls, not absorb them.",
+        "❤️ Empathy improves customer experience without increasing your average handling time.",
+        "❤️ The right words early save minutes later.",
+        "❤️ One empathetic sentence can prevent a long escalation.",
+        "❤️ Customers remember how you made them feel, score that.",
+        "❤️ Empathy is the bridge between script and success.",
+        "❤️ A smooth call starts with emotional alignment.",
+        "❤️ Empathy helps you respond, not react.",
+        "❤️ Empathy gives you control in chaotic conversations.",
+        "❤️ Empathy is a skill that grows your career, not just your metrics.",
+        "❤️ Great agents don’t just solve problems, they understand people.",
+        "❤️ Your ability to connect is your competitive advantage.",
+        "❤️ Empathy today builds leadership tomorrow.",
+        "❤️ The best communicators are the best listeners.",
+        "❤️ Empathy sharpens emotional intelligence, your lifelong asset.",
+        "❤️ Every call is practice in mastering human interaction.",
+        "❤️ Every case is practice in mastering human interaction.",
+        "❤️ Empathy doesn’t mean absorbing emotions, it means understanding them.",
+        "❤️ You can care without carrying the weight.",
+        "❤️ Professional empathy protects your energy.",
+        "❤️ Listen deeply, but detach wisely.",
+        "❤️ Your role is to guide, not to take things personally.",
+        "❤️ You are there to help, not to be affected.",
+        "❤️ Strong agents feel, but don’t fall.",
+        "❤️ One good conversation can turn someone’s entire day around.",
+        "❤️ Small moments of understanding create big impact.",
+        "❤️ You don’t just answer calls, you improve experiences.",
+        "❤️ Your voice can turn frustration into relief.",
+        "❤️ Every interaction is an opportunity to stand out.",
+        "❤️ You are the human side of the business.",
+        "❤️ Quality is doing it right every time.",
+        "🌡️ Behind every angry customer is an unmet expectation.",
+        "🌡️ Frustrated customer? Don’t take it personally, take it professionally.",
+        "🌡️ Frustration is a signal, not an attack.",
+        "🌡️ The louder the customer, the more they need to feel heard.",
+        "🌡️ You don’t fix emotions, but you can acknowledge them.",
+        "👂 Acknowledging the issue early saves you from explaining twice later.",
+        "👂 When customers feel heard, they stop repeating, and you gain control of the call.",
+        "👂 A strong acknowledgement sets the tone, you lead the conversation from the start.",
+        "👂 Recognition builds cooperation faster than solutions alone.",
+        "👂 The first 10 seconds of empathy can save 10 minutes of handling time.",
+        "👂 Acknowledging emotions is not extra, it’s strategic efficiency.",
+        "👂 When you name the problem clearly, you reduce confusion instantly.",
+        "👂 Customers don’t need perfection, they need to feel understood.",
+        "👂 A good acknowledgement turns frustration into focus.",
+        "👂 Listen to understand, not to respond!",
+        "🤝 When you sound in control, the customer feels secure.",
+        "🤝 Reassurance turns uncertainty into cooperation.",
+        "🤝 Confidence in your words creates confidence in your solution.",
+        "🤝 Customers don’t just need answers, they need certainty.",
+        "🤝 Your assurance stabilizes the entire interaction.",
+        "🤝 When customers trust you, resolution becomes easier.",
+        "🤝 Guide the call, don’t let uncertainty take over.",
+        "🤝 Reassurance prevents escalation.",
+        "🤝 Confidence is part of the solution.",
+    ],
+
+    advice: [
+        "🌟 Focus on solutions, not just the problem.",
+        "🌟 Listen carefully; sometimes customers only need to feel heard.",
+        "🌟 When customers raise their voice, raise your patience.",
+        "🌟 Respond with solutions, not emotions.",
+        "🌟 A calm agent can de-escalate even the most stressful situations.",
+        "🌟 Focus on the issue, not the attitude.",
+        "🌟 Keep your tone kind, even when the situation isn’t.",
+        "🌟 Acknowledge the customer’s concern before offering the solution.",
+        "🌟 Focus on helping, not on winning the argument.",
+        "🌟 Sometimes the best solution begins with simply listening.",
+        "🌟 Keep your responses professional, your tone sets the direction of the conversation.",
+        "🌟 A calm explanation can clear confusion and rebuild trust.",
+        "🌟 Treat every customer with respect, even when the conversation is challenging.",
+        "🌟 Guide the conversation toward solutions with patience and clarity.",
+        "🌟 Listen with patience, respond with empathy, and resolve with confidence.",
+        "🌟 Listening patiently is the first step to de-escalating any situation.",
+        "🌟 Lower your tone, slow the conversation, and guide it toward resolution.",
+        "🌟 Let the customer feel heard before you try to be understood.",
+        "🌟 Respond with clarity and respect, even when emotions run high.",
+        "🌟 Take control of the conversation by staying professional and composed.",
+        "🌟 Guide the conversation gently from frustration to resolution.",
+        "🌟 Listen to understand, not just to reply. Pay attention to the customer’s real concern so you can provide the most accurate solution.",
+        "🌟 Queues get heavy and customers may be frustrated. Remain calm, professional, and solution-focused even during difficult interactions.",
+        "🌟 The more you know about the service or system, the faster you can resolve issues. Confidence comes from knowledge.",
+        "🌟 Customers want to feel understood. Simple phrases like “I understand how difficult or challenging that must be” can immediately improve the interaction.",
+        "🌟 Know how to balance speed and accuracy. Handle each case carefully while keeping an eye on response times.",
+        "🌟 Each call or chat is a chance to improve. Successful agents review mistakes, accept feedback, and continuously grow.",
+        "🌟 Use clear, polite, and structured responses. A professional tone builds trust and prevents misunderstandings.",
+        "🌟 Even when the shift is long, maintaining a positive attitude helps you stay motivated and deliver better service.",
+        "🌟 Customers contact support because they need help. Instead of focusing on the problem, focus on what you can do to resolve it.",
+    ],
+
+    jokes: [
+        // Jokes
+        "😆 Keep calm and clear the queue.",
+        "😆 Powered by coffee and customer complaints.",
+        "😆 The queue never sleeps.",
+        "😆 Customer service: where patience becomes a career.",
+        "😆 I don’t have anger issues, I just work in customer support.",
+        "😆 My job is to turn ‘I want to speak to your manager’ into ‘Thank you for your help!’",
+        "😆 Customer support: the art of keeping calm while everything is on fire.",
+        "😆 I’m not just an agent, I’m a professional problem solver.",
+        "😆 I don’t always handle difficult customers, but when I do, I prefer to do it with a smile.",
+        "😆 Customer support: where every day is a new adventure in patience.",
+        "😆 I’m not saying I’m a superhero, but have you ever seen me and a superhero in the same room?",
+        "😆 My superpower? Turning frustrated customers into satisfied ones.",
+        "😆 Customer: ‘I’ve been waiting for hours!\nChat start Time: 20 seconds ago.",
+        "😆 Customer: ‘Calm down.\nAgent: Hindi naman ako galit bago ka nag-chat.",
+        "😆 Customer: ‘You’re not listening to me!’\nAgent: ‘I’m sorry, I can barely hear you over the sound of your frustration.’",
+        "😆 Agent life: Nagso-sorry sa problemang hindi mo naman ginawa.",
+        "😆 Customer: “Why is this happening?” \nAgent: Also wondering why.",
+        "😆 Customer: ‘Are you still there?’\nAgent: <i>Nagbabasa pa lang ng concern.</i>",
+        "😆 Typing… deleting… typing ulit… para lang maging professional.",
+
+        // Suspicious
+        "🤔 Avail… suspicious.",
+        "🤔 No irate customers today… suspicious.",
+        "🤔 Customer says ‘no rush’… suspicious.",
+        "🤔 Everything is working fine… suspicious.",
+        "🤔 No escalations today… suspicious.",
+        "🤔 Customer understood on first explanation… suspicious.",
+        "🤔 Call ended in 2 minutes… suspicious.",
+        "🤔 QA gave 100% score… suspicious.",
+        "🤔 TL said ‘good job’ only… suspicious.",
+        "🤔 Shift ended peacefully… suspicious.",
+        "🤔 No ‘can I speak to your supervisor?’… suspicious.",
+        "🤔 Customer says ‘I’m calm’… suspicious.",
+        "🤔 Customer: ‘I won’t take much of your time’… suspicious.",
+        "🤔 Customer understood the policy… suspicious.",
+        "🤔 Customer read the instructions… suspicious.",
+        "🤔 Customer didn’t interrupt… suspicious.",
+        "🤔 Customer accepted resolution immediately… suspicious.",
+        "🤔 Tools loaded fast… suspicious.",
+        "🤔 No downtime announcement… suspicious.",
+        "🤔 No error message today… suspicious.",
+        "👀 Avail… parang may something.",
+        "👀 Walang irate today… suspicious ah.",
+        "👀 Customer na-gets agad… suspicious.",
+        "👀 Walang escalation buong shift… hmm suspicious.",
+        "👀 Ang bilis ng call… parang may mali ah.",
+        "👀 Tools walang error… grabe suspicious.",
+        "👀 Perfect QA? Ay wow… suspicious.",
+    ],
+
+    hugot: [
+        "🥺 Sa trabaho kaya kong mag-sorry kahit hindi ko kasalanan… pero sa relasyon, ako pa rin ang iniwan.",
+        "🥺 Parang queue lang ang feelings ko, akala ko tapos na, may papasok pa pala.",
+        "🥺 Akala ko okay na ako, pero parang queue, bumabalik pa rin.",
+        "🥺 Kung ang puso ko may status, siguro ‘Waiting for resolution’.",
+        "🥺 Parang customer concern ang feelings ko, lagi na lang unresolved.",
+        "🥺 Sana may troubleshooting din para sa broken heart.",
+        "🥺 Parang escalation lang tayo… dumating ka lang para ipasa ako sa iba.",
+        "🥺 Parang ticket ko sa system ang love life ko, lagi na lang awaiting for resolution.",
+        "🥺 Sa BPO ko lang naranasan maging kalmado kahit internally nasasaktan.",
+        "🥺 Sana relasyon din natin may QA score… para alam ko kung saan ako nagkulang.",
+        "🥺 Kung may recording or transcript lang sa relasyon natin, malalaman ko kung kailan nagbago.",
+        "🥺 Hindi lang queue ang mahirap i-handle… pati feelings ko.",
+        "🥺 Parang shift schedule lang tayo, hindi talaga nagtatagpo.",
+        "🥺 Parang internet connection… akala ko stable, biglang nawawala.",
+        "🥺 Sana sinabi mo na lang agad… para hindi ako nag-invest ng effort.",
+        "🥺 Sana puso ko may ‘End Chat’ button… para tapos na agad.",
+        "🥺 Parang queue ang memories natin, kahit ayaw ko na, bumabalik pa rin.",
+        "🥺 Akala ko clear na ang queue… pati pala ikaw babalik pa.",
+        "🥺 Sana feelings ko may resolution agad… hindi yung laging follow-up.",
+        "🥺 Akala ko resolved na… yun pala reopen lang ulit.",
+        "🥺 Parang escalation lang ako sa buhay mo, ipinasa mo lang sa iba.",
+        "🥺 Akala ko ako na ang final resolution… escalation lang pala ako.",
+        "🥺 Sa relasyon natin, ako ang nag-handle… pero sa iba ka nagpa-resolve.",
+        "🥺 Kung may evaluation lang ang feelings mo, baka alam ko kung bakit bumagsak.",
+        "🥺 Ginawa ko naman lahat… pero parang QA audit, may nakita ka pa ring mali.",
+        "🥺 Sa work kaya kong i-handle ang galit ng customer… pero hindi ang pagkawala mo.",
+        "🥺 Sa BPO natutunan kong maging kalmado… kahit nasasaktan na.",
+        "🥺 Kaya kong i-resolve ang customer issues… pero hindi ang feelings ko.",
+        "🥺 Ako night shift, ikaw day shift… siguro kaya hindi tayo nag-work.",
+        "🥺 Parang customer concern lang ako sa buhay mo, nireplyan mo lang kasi kailangan.",
+        "🥺 Sa customer kaya kong sabihin ‘I understand your concern’… pero hanggang ngayon hindi ko pa rin maintindihan kung bakit mo ako iniwan.",
+        "🥺 Sa trabaho may QA feedback… sa’yo wala man lang explanation.",
+        "🥺 Mas mabilis ko pang naintindihan ang customer issue kaysa sa relasyon natin.",
+        "🥺 Sa trabaho kaya kong ayusin ang problema ng iba… pero sarili kong feelings hindi ko ma-troubleshoot.",
+        "🥺 Mas mabilis pa mag-reply ang irate customer kaysa sa’yo.",
+        "🥺 Parang system outage ang feelings ko sa’yo, lahat affected.",
+        "🥺 Parang queue ang love life ko, laging maraming issue.",
+        "🥺 Mas malinaw pa instructions ng customer kaysa sa intentions mo.",
+        "🥺 Sa work may knowledge base… sa’yo wala akong reference kung ano ba talaga tayo.",
+        "🥺 Parang ticket lang ako sa buhay mo, sinilip mo lang, pero hindi mo inasikaso.",
+        "🥺 Mas madali pang i-handle ang escalation kaysa sa mixed signals mo.",
+        "🥺 Sa customer may resolution… sa’yo puro confusion.",
+        "🥺 Mas consistent pa ang queue kaysa sa effort mo.",
+        "🥺 Parang system update ka… biglang nagbago nang walang notification.",
+        "🥺 Mas predictable pa ang queue kaysa sa mood mo.",
+        "🥺 Parang knowledge base ka… marami akong gustong malaman pero kulang ang sagot.",
+        "🥺 Sa trabaho lahat ng issue may case number… sa’yo hindi ko alam kung saan magsisimula.",
+        "🥺 Mas madaling intindihin ang complicated na customer kaysa sa ugali mo.",
+        "🥺 Sa trabaho may escalation path… sa’yo wala akong mapuntahan.",
+        "🥺 Sa trabaho may SLA… sa’yo walang timeline kung kailan magiging okay.",
+        "🥺 Parang auto-reply lang ako sa buhay mo… nandiyan pero walang tunay na meaning.",
+        "🥺 Sa trabaho may step-by-step troubleshooting… sa’yo puro trial and error.",
+        "🥺 Mas mabilis pa ma-resolve ang customer issue kaysa sa misunderstandings natin.",
+        "🥺 Mas madaling sundan ang troubleshooting steps kaysa sa mood mo.",
+        "🥺 Parang loading screen ang relasyon natin, ang tagal bago maintindihan kung saan papunta.",
+        "🥺 Mas madaling magpaliwanag sa irate customer kaysa ipaintindi ang halaga ko sa’yo.",
+        "🥺 Sa training may nesting period… sana sa feelings ko rin may practice muna bago masaktan.",
+        "🥺 Parang trainee ako sa buhay mo… laging may room for improvement pero hindi sapat.",
+        "🥺 Sa training may coaching… sa’yo walang nag-guide kung saan ako nagkamali.",
+        "🥺 Parang trainee lang ako sa’yo… umaasang mapansin ng trainer.",
+        "🥺 Sa training may graduation… pero sa’yo parang hindi ako nakaabot.",
+        "🥺 Parang trainee ako sa feelings mo… hindi pa ready for regularization.",
+        "🥺 Sa training may knowledge check… sa’yo wala akong tamang sagot.",
+        "🥺 Parang trainee ako sa relasyon natin… trying my best pero kulang pa rin.",
+        "🥺 Sa training may feedback… sa’yo wala man lang explanation.",
+        "🥺 Parang trainee ako sa’yo… maraming effort pero hindi pa rin enough.",
+        "🥺 Sa training may learning curve… sa’yo parang pababa.",
+        "🥺 Sa training kaya kong pumasa sa assessments… pero sa’yo parang bagsak pa rin.",
+        "🥺 Sa TL may feedback… sa’yo puro mixed signals.",
+        "🥺 Sa TL may guidance… sa’yo iniwan mo lang ako mag-figure out.",
+        "🥺 Sa TL may team huddle… sa’yo hindi man lang tayo nag-usap.",
+        "🥺 Parang TL ka sa buhay ko… lagi mo akong pinapaisip kung sapat ba ako.",
+        "🥺 Sa TL may coaching plan… sa’yo walang direction.",
+        "🥺 Parang TL ka sa queue… lumalapit lang kapag mabigat na.",
+        "🥺 Sa TL may encouragement… sa’yo puro confusion.",
+        "🥺 Parang TL ka… alam mong may mali pero hindi mo sinasabi agad.",
+        "🥺 Sa TL may performance review… sa’yo hindi ko alam kung pasado ba ako.",
+        "🥺 Parang TL ka sa buhay ko… may authority pero hindi ko maintindihan.",
+        "🥺 Parang TL ka sa buhay ko… alam kong may sasabihin ka, kinakabahan lang ako kung ano.",
+        "😉 Hindi kita binagsak, may pinapaayos lang ako — QA",
+        "😉 Hindi kulang effort mo, kulang lang ng isang linya — QA",
+        "😉 Alam kong kaya mo, kaya kita kino-correct — QA",
+        "😉 Kung hindi kita i-coach, hindi ka magle-level up — TL",
+        "😉 Hindi ako kalaban, quality lang ang pinoprotektahan ko — QA",
+        "😉 I see your effort, now let’s fix the gaps — QA",
+        "😉 Magaling ka na, polish na lang kulang — QA",
+        "😄 Na-resolve mo… pero hindi mo na-document — QA",
+        "😄 Nasa isip mo, pero wala sa call — QA",
+        "😄 Nasa isip mo, pero wala sa transcript — QA",
+        "😅 Kaya mo ‘yan, kaya hindi kita pinalampas — QA",
+        "😉 Hindi kita pinapahirapan, tinutulungan lang kitang humusay — QA",
+    ]
+};
+
+// RANDOM MESSAGE PRIO
+const messagePrio = {
+    tips: 0.5,
+    quotes: 0.2,
+    advice: 0.2,
+    jokes: 0.05,
+    hugot: 0.05
+};
+
+function getWeightedCategory() {
+    const categories = Object.keys(messagePrio);
+    const weights = Object.values(messagePrio);
+
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+    const rand = Math.random() * totalWeight;
+
+    let cumulative = 0;
+
+    for (let i = 0; i < categories.length; i++) {
+        cumulative += weights[i];
+        if (rand < cumulative) {
+            return categories[i];
+        }
+    }
+
+    return categories[categories.length - 1]; // fallback
+}
+
+let lastMessage = "";
+
+function randomAssistantMessage() {
+    const category = getWeightedCategory();
+    const messages = assistantMessages[category];
+
+    if (!messages || messages.length === 0) return "";
+
+    if (messages.length === 1) {
+        lastMessage = messages[0];
+        return messages[0];
+    }
+
+    const filtered = messages.filter(m => m !== lastMessage);
+    const newMessage = filtered[Math.floor(Math.random() * filtered.length)];
+
+    lastMessage = newMessage;
+    return newMessage;
+}
+
+// MESSAGE DISPLAY
+function showInitialMessage() {
+    enqueueMessage(intro, 2500);
+}
+
+showInitialMessage();
+
+function showAssistantMessage() {
+    if (isTyping || !fabMessage) return;
+
+    const text = randomAssistantMessage();
+    if (!text) return;
+
+    stopTyping = false;
+    typeWriter(text, fabMessage, FabConfig.typingSpeed);
+}
+
+function showIntentMessage(text) {
+    if (!text) return;
+
+    messageQueue = [];
+    stopTyping = true;
+
+    setTimeout(() => {
+        stopTyping = false;
+        enqueueMessage(text, 2500, false);
+    }, 50);
+}
+
+function enqueueRandomMessage() {
+    if (panel.classList.contains("open")) return;
+
+    const text = randomAssistantMessage();
+    if (!text) return;
+
+    enqueueMessage(text);
+}
+
+// CUSTOM ALERT
+function showAlert(message) {
+  const overlay = document.getElementById("customAlert");
+  const messageBox = document.getElementById("alertMessage");
+  const okBtn = document.getElementById("alertOkBtn");
+
+  messageBox.textContent = message;
+
+  // SHOW (fade in)
+  overlay.classList.remove("hide");
+  overlay.style.display = "flex";
+  requestAnimationFrame(() => {
+    overlay.classList.add("show");
+  });
+
+  const closeAlert = () => {
+    overlay.classList.remove("show");
+    overlay.classList.add("hide");
+
+    setTimeout(() => {
+      overlay.style.display = "none";
+      overlay.classList.remove("hide");
+    }, 300); // match CSS transition
+  };
+
+  okBtn.onclick = closeAlert;
+}
+
+// CUSTOM CONFIRM
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById("customConfirm");
+    const messageBox = document.getElementById("confirmMessage");
+    const okBtn = document.getElementById("confirmOk");
+    const cancelBtn = document.getElementById("confirmCancel");
+
+    messageBox.textContent = message;
+
+    // SHOW (fade in)
+    overlay.classList.remove("hide");
+    overlay.style.display = "flex";
+    requestAnimationFrame(() => {
+      overlay.classList.add("show");
+    });
+
+    const cleanup = (result) => {
+      overlay.classList.remove("show");
+      overlay.classList.add("hide");
+
+      setTimeout(() => {
+        overlay.style.display = "none";
+        overlay.classList.remove("hide");
+        okBtn.onclick = null;
+        cancelBtn.onclick = null;
+        resolve(result);
+      }, 300);
+    };
+
+    okBtn.onclick = () => cleanup(true);
+    cancelBtn.onclick = () => cleanup(false);
+  });
+}

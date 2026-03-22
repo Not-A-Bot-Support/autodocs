@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Standard Notes Generator V5.2</title>
+    <title>Standard Notes Generator V5.3</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,6 +20,25 @@
     </div>
 
     <div class="mainContainer">
+        <div id="floatingPanel">
+            <div id="fabButton">
+                <img src="images/assistant.png" alt="Assistant" draggable="false">
+            </div>
+
+            <div id="fabMenu">
+                <nav>
+                    <ul>
+                        <li onclick="runFabAction(openDuplicateTab)">Duplicate Tab</li>
+                        <li onclick="runFabAction(exportFormData)">Export Saved Notes</li>
+                        <li onclick="runFabAction(deleteAllData)">Clear Saved Records</li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div id="fabMessage"></div>
+
+        </div>
+
         <div class="scrollWrapper">
             <div class="divsContainer">
                 <div class="form1Div" id="form1Container">
@@ -162,7 +181,14 @@
                                 <label for="option82">Option82/NE Type*</label>
                                 <div class="form1DivInput">
                                     <input type="text" class="input-and-button" id="option82" name="Option82">
-                                    <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
+                                    <div class="copy-dropdown">
+                                        <button type="button" class="input-and-button copy-btn">📋 Copy</button>
+
+                                        <div class="copy-menu">
+                                            <button type="button" class="input-and-button copy-option" data-type="node">Node</button>
+                                            <button type="button" class="input-and-button copy-option" data-type="full">Option82</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -465,10 +491,15 @@
                 <div class="form2Div" id="form2Container">
                     <table id="form2ButtonTable">
                         <tr  id="buttons-row" style="display: none;">
-                            <td><button type="button" id="saveButton" class="form1-button" tabindex="-1">💾 Save</button></td>
-                            <td><button type="button" id="resetButton" class="form1-button" tabindex="-1">🔄 Reset</button></td>
-                            <td><button type="button" id="exportButton" class="form1-button" tabindex="-1">📄 Export</button></td>
-                            <td><button type="button" id="deleteButton" class="form1-button" tabindex="-1">🗑️ Delete All</button></td>
+                            <td colspan="2"><button type="button" id="saveButton" class="form1-button" tabindex="-1">💾 Save</button></td>
+                            <td colspan="2">
+                                <button type="button" id="resetButton" class="form1-button" tabindex="-1">🔄 Reset</button></td>
+                            <!-- <td>
+                                <button type="button" id="exportButton" class="form1-button" tabindex="-1">📄 Export</button>
+                            </td>
+                            <td>
+                                <button type="button" id="deleteButton" class="form1-button" tabindex="-1">🗑️ Delete All</button>
+                            </td> -->
                         </tr>
                     </table>
                 </div>
@@ -490,6 +521,25 @@
         </div>
         
     </div>
+
+    <div id="customAlert" class="alert-overlay">
+        <div class="alert-box">
+            <p id="alertMessage"></p>
+            <div class="alert-actions">
+                <button id="alertOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customConfirm" class="alert-overlay">
+        <div class="alert-box">
+            <p id="confirmMessage"></p>
+            <div class="alert-actions">
+                <button id="confirmOk">OK</button>
+                <button id="confirmCancel">Cancel</button>
+            </div>
+        </div>
+    </div>
     
     <div class="footer">
         <div class="footer-content">
@@ -509,7 +559,7 @@
                 </table>
             </div>
             <div class="footer-text">
-                <span id="footerValue">Standard Notes Generator Version 5.3.130326</span>
+                <span id="footerValue">Standard Notes Generator Version 5.3.230326</span>
                 <span>&copy; Developed and designed by: QA Team</span>
             </div>
         </div>
@@ -531,10 +581,10 @@
         <div class="form3Div" id="form3Container"></div>
     </div>
 
-    <div id="ticketTimer" class="floating-timer noselect" style="display:none;">
+    <!-- <div id="ticketTimer" class="floating-timer noselect" style="display:none;">
         <div id="ticketTimerHeader">Ticket Creation Timer</div>
         <div id="ticketTimerDisplay">00:00:00</div>
-    </div>
+    </div> -->
 
     <br>
 </body>
