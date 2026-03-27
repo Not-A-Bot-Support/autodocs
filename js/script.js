@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const isCCBO = channelSelect.value === "CDT-CCBO";
 
         rows.caseAccountHeader.style.display = "";
-        rows.caseOrigin.style.display = isCCBO ? "" : "none";
+        // rows.caseOrigin.style.display = isCCBO ? "" : "none";
         rows.custName.style.display = "";
         rows.accNum.style.display = "";
         rows.phoneNum.style.display = "";
