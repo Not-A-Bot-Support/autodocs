@@ -1,22 +1,83 @@
-//script.js
+/* script.js
 
-// Standard Notes Generator Version 5.3.230326
-// Developed & Designed by: QA Ryan
+Standard Notes Generator Version 5.3.270326
+Developed & Designed by: QA Ryan */
+
+// FIRST LOAD CHECK
+document.addEventListener("DOMContentLoaded", async () => {
+    const hasPrompted = sessionStorage.getItem("hasCheckedNotes");
+
+    if (!hasPrompted) {
+        const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
+
+        if (Object.keys(savedData).length > 0) {
+            const shouldClear = await showConfirm1(
+                "Existing saved notes have been detected on this workstation.\n\nHow would you like to proceed?"
+            );
+
+            if (shouldClear) {
+                localStorage.removeItem("tempDatabase");
+                showAlert("Previously saved notes (old records) have been deleted.");
+            }
+        }
+
+        sessionStorage.setItem("hasCheckedNotes", "true");
+    }
+});
 
 // Channel, Concern Type, and VOC Options
+const LOB_OPTIONS = [
+    { value: "", text: "" },
+    { value: "TECH", text: "TECH" },
+    { value: "NON-TECH", text: "NON-TECH" }
+];
+
+const TECH_VOC_ALLOWED = ["COMPLAINT", "FOLLOW-UP", "REQUEST", "OTHERS"];
+
+const TECH_COMPLAINT_GROUPS = [
+    "Always On",
+    "No Dial Tone and No Internet Connection",
+    "No Internet Connection",
+    "Slow Internet/Intermittent Connection",
+    "No Dial Tone",
+    "Poor Call Quality/Noisy Telephone Line",
+    "Cannot Make a Call",
+    "Cannot Receive a Call",
+    "Selective Browsing Complaints",
+    "No Audio/Video Output",
+    "Poor Audio/Video Quality",
+    "Missing Set-Top-Box Functions",
+    "Streaming Apps Issues",
+    "formCompMyHomeWeb",
+    "formCompPersonnelIssue"
+];
+
+const NON_TECH_GROUP_MAP = {
+    "INQUIRY": "inquiry",
+    "COMPLAINT": "complaint",
+    "FOLLOW-UP": "follow-up",
+    "REQUEST": "request",
+    "OTHERS": "others"
+};
+
+// Global variables
 let lobSelect, vocSelect, intentSelect;
-let serviceIDRow, option82Row, intentWocasRow, wocasRow;;
+let serviceIDRow, option82Row, intentWocasRow, wocasRow;
 let allLobOptions, allVocOptions, allIntentChildren, placeholderClone;
 
 function initializeFormElements() {
     lobSelect = document.getElementById("lob");
     vocSelect = document.getElementById("voc");
     intentSelect = document.getElementById("selectIntent");
-
     serviceIDRow = document.getElementById("service-id-row");
     option82Row = document.getElementById("option82-row");
     intentWocasRow = document.getElementById("intent-wocas-row");
     wocasRow = document.getElementById("wocas-row");
+
+    if (!lobSelect || !vocSelect || !intentSelect) {
+        console.error("Required form elements not found");
+        return;
+    }
 
     allVocOptions = Array.from(vocSelect.options).map(opt => opt.cloneNode(true));
     vocSelect.innerHTML = "";
@@ -31,63 +92,63 @@ function initializeFormElements() {
     const placeholderOption = allIntentChildren.find(el => el.tagName === "OPTION" && el.value === "");
     placeholderClone = placeholderOption ? placeholderOption.cloneNode(true) : null;
 
-    allLobOptions = [
-        { value: "", text: "" },
-        { value: "TECH", text: "TECH" },
-        { value: "NON-TECH", text: "NON-TECH" }
-    ];
+    allLobOptions = LOB_OPTIONS;
 
     // Start LOB with only blank option
     lobSelect.innerHTML = "";
     const blankOption = document.createElement("option");
     blankOption.value = "";
     blankOption.textContent = "";
-    blankOption.disabled = true;  // <-- cannot select
-    blankOption.selected = true;  // <-- default shown
+    blankOption.disabled = true;
+    blankOption.selected = true;
     lobSelect.appendChild(blankOption);
 }
 
 function showRowAndScroll(rowElement) {
-    rowElement.style.display = "";
-    rowElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (rowElement) {
+        rowElement.style.display = "";
+        rowElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
 }
 
 function hideRow(rowElement) {
-    rowElement.style.display = "none";
+    if (rowElement) {
+        rowElement.style.display = "none";
+    }
 }
 
 const channelField = document.getElementById("channel");
 
-channelField.addEventListener("change", () => {
-    lobSelect.innerHTML = "";
+if (channelField) {
+    channelField.addEventListener("change", () => {
+        lobSelect.innerHTML = "";
 
-    // Always show the non-selectable blank option first
-    const blankOption = document.createElement("option");
-    blankOption.value = "";
-    blankOption.textContent = "";
-    blankOption.disabled = true;
-    blankOption.selected = true;
-    lobSelect.appendChild(blankOption);
+        // Always show the non-selectable blank option first
+        const blankOption = document.createElement("option");
+        blankOption.value = "";
+        blankOption.textContent = "";
+        blankOption.disabled = true;
+        blankOption.selected = true;
+        lobSelect.appendChild(blankOption);
 
-    if (channelField.value !== "") {
-        // Show only valid LOBs when channel is selected
-        allLobOptions.forEach(optData => {
-            if (optData.value !== "") { // skip the blank
-                const opt = document.createElement("option");
-                opt.value = optData.value;
-                opt.textContent = optData.text;
-                lobSelect.appendChild(opt);
-            }
-        });
-    }
+        if (channelField.value !== "") {
+            // Show only valid LOBs when channel is selected
+            allLobOptions.forEach(optData => {
+                if (optData.value !== "") { // skip the blank
+                    const opt = document.createElement("option");
+                    opt.value = optData.value;
+                    opt.textContent = optData.text;
+                    lobSelect.appendChild(opt);
+                }
+            });
+        }
 
-    vocSelect.innerHTML = "";  // Reset VOC
-});
+        vocSelect.innerHTML = "";  // Reset VOC
+    });
+}
 
 function handleLobChange() {
     const lobSelectedValue = lobSelect.value;
-
-    // resetForm2ContainerAndRebuildButtons();
 
     vocSelect.innerHTML = "";
 
@@ -97,8 +158,8 @@ function handleLobChange() {
     }
 
     allVocOptions.forEach(option => {
-    if (
-            (lobSelectedValue === "TECH" && ["COMPLAINT", "FOLLOW-UP", "REQUEST", "OTHERS"].includes(option.value)) ||
+        if (
+            (lobSelectedValue === "TECH" && TECH_VOC_ALLOWED.includes(option.value)) ||
             (lobSelectedValue === "NON-TECH" && option.value !== "")
         ) {
             vocSelect.appendChild(option);
@@ -130,6 +191,21 @@ function handleVocChange() {
     }
 
     // Show-Hide Rows
+    updateRowsVisibility(lobValue, vocValue);
+
+    // Show only blank option
+    intentSelect.innerHTML = "";
+    if (placeholderClone) {
+        intentSelect.appendChild(placeholderClone.cloneNode(true));
+    }
+
+    // Populate Intent/WOCAS Options
+    populateIntentSelect(lobValue, vocValue);
+
+    intentSelect.selectedIndex = 0;
+}
+
+function updateRowsVisibility(lobValue, vocValue) {
     if (lobValue === "TECH") {
         if (vocValue === "FOLLOW-UP") {
             showRowAndScroll(wocasRow);
@@ -153,118 +229,69 @@ function handleVocChange() {
         hideRow(option82Row);
         showRowAndScroll(intentWocasRow);
     }
+}
 
-    // Show only blank option
-    intentSelect.innerHTML = "";
-    if (placeholderClone) {
-        intentSelect.appendChild(placeholderClone.cloneNode(true));
-    }
-
-    // Show-Hide Intent/OCAS Options
-    let group = "";
-
+function populateIntentSelect(lobValue, vocValue) {
     if (lobValue === "TECH") {
         if (vocValue === "COMPLAINT") {
-            const techComplaintGroups = [
-                "Always On",
-                "No Dial Tone and No Internet Connection",
-                "No Internet Connection",
-                "Slow Internet/Intermittent Connection",
-                "No Dial Tone",
-                "Poor Call Quality/Noisy Telephone Line",
-                "Cannot Make a Call",
-                "Cannot Receive a Call",
-                "Selective Browsing Complaints",
-                "No Audio/Video Output",
-                "Poor Audio/Video Quality",
-                "Missing Set-Top-Box Functions",
-                "Streaming Apps Issues",
-
-                "formCompMyHomeWeb",
-                "formCompPersonnelIssue"
-            ];
-
             allIntentChildren.forEach(el => {
-                if (el.tagName === "OPTGROUP" && techComplaintGroups.includes(el.label)) {
+                if (el.tagName === "OPTGROUP" && TECH_COMPLAINT_GROUPS.includes(el.label)) {
                     intentSelect.appendChild(el.cloneNode(true));
-                } else if (el.tagName === "OPTION" && techComplaintGroups.includes(el.value)) {
+                } else if (el.tagName === "OPTION" && TECH_COMPLAINT_GROUPS.includes(el.value)) {
                     intentSelect.appendChild(el.cloneNode(true));
                 }
             });
         } else if (vocValue === "FOLLOW-UP") {
             allIntentChildren.forEach(el => {
                 if (el.tagName === "OPTION" && el.value === "formFfupRepair") {
-                intentSelect.appendChild(el.cloneNode(true));
+                    intentSelect.appendChild(el.cloneNode(true));
                 }
             });
-
         } else if (vocValue === "REQUEST") {
             allIntentChildren.forEach(el => {
                 if (el.tagName === "OPTGROUP" && el.label === "Change Configuration - Data") {
-                intentSelect.appendChild(el.cloneNode(true));
+                    intentSelect.appendChild(el.cloneNode(true));
                 }
             });
         } else {
-            group = "others";
-
-            allIntentChildren.forEach(el => {
-                if (el.tagName === "OPTION" && el.dataset.group === group) {
-                    intentSelect.appendChild(el.cloneNode(true));
-                } else if (el.tagName === "OPTGROUP") {
-                    const matchingOptions = Array.from(el.children).filter(opt => opt.dataset.group === group);
-                    if (matchingOptions.length > 0) {
-                        const newGroup = el.cloneNode(false);
-                        matchingOptions.forEach(opt => newGroup.appendChild(opt.cloneNode(true)));
-                        intentSelect.appendChild(newGroup);
-                    }
-                }
-            });
+            const group = "others";
+            populateByGroup(group);
         }
     } else if (lobValue === "NON-TECH") {
-        // Map vocValue to group
-        let groupMap = {
-            "INQUIRY": "inquiry",
-            "COMPLAINT": "complaint",
-            "FOLLOW-UP": "follow-up",
-            "REQUEST": "request",
-            "OTHERS": "others"
-        };
-
-        let group = groupMap[vocValue];
-
-        // Loop through intent children once
-        allIntentChildren.forEach(el => {
-            if (el.tagName === "OPTION" && el.dataset.group === group) {
-                // Add matching option
-                intentSelect.appendChild(el.cloneNode(true));
-
-            } else if (el.tagName === "OPTGROUP") {
-                let matchingOptions;
-
-                // Special handling for REQUEST + "Change Configuration - Data"
-                if (vocValue === "REQUEST" && el.label === "Change Configuration - Data") {
-                    matchingOptions = Array.from(el.children).filter(opt => opt.value === "form300_1");
-                } else {
-                    matchingOptions = Array.from(el.children).filter(opt => opt.dataset.group === group);
-                }
-
-                if (matchingOptions.length > 0) {
-                    const newGroup = el.cloneNode(false); // clone optgroup label only
-                    matchingOptions.forEach(opt => newGroup.appendChild(opt.cloneNode(true)));
-                    intentSelect.appendChild(newGroup);
-                }
-            }
-        });
+        const group = NON_TECH_GROUP_MAP[vocValue];
+        populateByGroup(group, vocValue);
     }
+}
 
-    intentSelect.selectedIndex = 0;
+function populateByGroup(group, vocValue = null) {
+    allIntentChildren.forEach(el => {
+        if (el.tagName === "OPTION" && el.dataset.group === group) {
+            intentSelect.appendChild(el.cloneNode(true));
+        } else if (el.tagName === "OPTGROUP") {
+            let matchingOptions;
+            // Special handling for REQUEST + "Change Configuration - Data"
+            if (vocValue === "REQUEST" && el.label === "Change Configuration - Data") {
+                matchingOptions = Array.from(el.children).filter(opt => opt.value === "form300_1");
+            } else {
+                matchingOptions = Array.from(el.children).filter(opt => opt.dataset.group === group);
+            }
+            if (matchingOptions.length > 0) {
+                const newGroup = el.cloneNode(false);
+                matchingOptions.forEach(opt => newGroup.appendChild(opt.cloneNode(true)));
+                intentSelect.appendChild(newGroup);
+            }
+        }
+    });
 }
 
 function registerEventHandlers() {
-    lobSelect.addEventListener("change", handleLobChange);
-    vocSelect.addEventListener("change", handleVocChange);
+    if (lobSelect && vocSelect) {
+        lobSelect.addEventListener("change", handleLobChange);
+        vocSelect.addEventListener("change", handleVocChange);
+    }
 }
 
+// Typewriter Effect
 let typingInterval;
 
 function typeWriter(text, element, delay = 50) {
@@ -285,6 +312,7 @@ function typeWriter(text, element, delay = 50) {
     }, delay);
 }
 
+// Auto-Expand Textarea field
 function autoExpandTextarea(event) {
     if (event.target.tagName === 'TEXTAREA') {
         const textarea = event.target;
@@ -295,25 +323,37 @@ function autoExpandTextarea(event) {
 
 document.addEventListener('input', autoExpandTextarea);
 
+// Copy to Clipboard Command
+function resolveCopyValue(rawValue = "", type = null) {
+    if (typeof rawValue !== "string") {
+        rawValue = String(rawValue || "");
+    }
+
+    let normalized = rawValue.trim();
+
+    if (type === "node") {
+        normalized = normalized.toUpperCase().split("_")[0];
+    }
+
+    return normalized;
+}
+
 function copyValue(button) {
     const input = button.previousElementSibling || document.getElementById("option82");
-    if (input) {
-        let valueToCopy;
+    if (!input) return;
 
-        if (input.id === "option82") {
-            valueToCopy = input.value.split("_")[0];
-        } else {
-            valueToCopy = input.value;
-        }
+    const type = input.dataset?.type || (input.id === "option82" ? "option82" : null);
+    const rawValue = input.value || "";
 
-        navigator.clipboard.writeText(valueToCopy)
-            .catch(err => console.error("Error copying text: ", err));
-    }
+    const valueToCopy = type === "option82"
+        ? resolveCopyValue(rawValue, "opt82")?.split("_")[0]
+        : resolveCopyValue(rawValue);
+
+    copyToClipboard(valueToCopy);
 }
 
 // FORM 1 COPY FUNCTION
 document.addEventListener("DOMContentLoaded", () => {
-
     document.addEventListener("click", (e) => {
 
         // DROPDOWN TOGGLE
@@ -343,14 +383,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!input) return;
 
-            // 👇 Normalize first (applies to BOTH cases)
-            let value = input.value.trim().toUpperCase();
-
-            if (type === "node") {
-                value = value.split("_")[0];
-            }
-
-            copyToClipboard(value);
+            const resolved = resolveCopyValue(input.value, type);
+            copyToClipboard(resolved);
 
             option.closest(".copy-dropdown").classList.remove("active");
             return;
@@ -367,7 +401,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!input) return;
 
-            copyToClipboard(input.value);
+            const resolved = resolveCopyValue(input.value);
+            copyToClipboard(resolved);
             return;
         }
 
@@ -380,14 +415,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
         .then(() => console.log("Copied:", text))
         .catch(err => console.error("Copy failed:", err));
 }
 
-// Timers & Show/Hide rows based on channel selection
+// Show/Hide rows based on channel selection & Timers
 document.addEventListener('DOMContentLoaded', function() { 
     // ================================
     // SHOW/HIDE ROWS BASED ON CHANNEL
@@ -401,20 +435,23 @@ document.addEventListener('DOMContentLoaded', function() {
         accNum: document.getElementById("acc-num-row"),
         phoneNum: document.getElementById("phone-num-row"),
         lobVoc: document.getElementById("lob-and-voc-row"),
-        buttonsRow: document.getElementById("buttons-row")
+        buttonsRow: document.getElementById("buttons-row"),
+        caseOrigin: document.getElementById("case-origin-row")
     };
 
     function updateChannelRows() {
         if (!channelSelect.value) return;
 
         const isSocMed = channelSelect.value === "CDT-SOCMED";
+        const isCCBO = channelSelect.value === "CDT-CCBO";
 
         rows.caseAccountHeader.style.display = "";
+        rows.caseOrigin.style.display = isCCBO ? "" : "none";
         rows.custName.style.display = "";
         rows.accNum.style.display = "";
         rows.phoneNum.style.display = "";
         rows.lobVoc.style.display = "";
-        rows.caseNum.style.display = isSocMed ? "" : "none";
+        rows.caseNum.style.display = (isSocMed || isCCBO) ? "" : "none";
         rows.buttonsRow.style.display = "";
     }
 
@@ -465,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
             isRunning = false;
             timerToggleButton.textContent = 'Resume';
         } else if (action === 'reset') {
-            showConfirm("Are you sure you want to reset the timer?")
+            showConfirm2("Are you sure you want to reset the timer?")
             .then((confirmReset) => {
                 if (!confirmReset) return;
 
@@ -634,6 +671,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // window.__checkTicketStop = checkStopConditions;
 });
 
+// Reset Dropdown options to default
 function resetAllFields(excludeFields = []) {
     const selects = document.querySelectorAll("#form2Container select");
     selects.forEach(select => {
@@ -643,6 +681,7 @@ function resetAllFields(excludeFields = []) {
     });
 }
 
+// Hide specific fields
 function hideSpecificFields(fieldNames) {
     const allRows = document.querySelectorAll("tr");
     fieldNames.forEach(name => {
@@ -655,6 +694,7 @@ function hideSpecificFields(fieldNames) {
     });
 }
 
+// Show specific fields
 function showFields(fieldNames) {
     const allRows = document.querySelectorAll("tr");
     fieldNames.forEach(name => {
@@ -667,6 +707,7 @@ function showFields(fieldNames) {
     });
 }
 
+// Check if field is visible
 function isFieldVisible(fieldName) {
     const field = document.querySelector(`[name="${fieldName}"]`);
     if (!field) return false;
@@ -681,6 +722,7 @@ function isFieldVisible(fieldName) {
             fieldStyle.opacity === "0");
 }
 
+// Get Field value only if it is visible
 function getFieldValueIfVisible(fieldName) {
     if (!isFieldVisible(fieldName)) return "";
 
@@ -690,12 +732,13 @@ function getFieldValueIfVisible(fieldName) {
     let value = field.value.trim();
 
     if (field.tagName.toLowerCase() === "textarea") {
-        value = value.replace(/\n/g, "/ ");
+        value = value.replace(/\r?\n|\|/g, "/ ");
     }
 
     return value;
 }
 
+// Declare global variables
 function initializeVariables() {
     const q = (selector) => {
         const field = document.querySelector(selector);
@@ -15721,6 +15764,7 @@ function createIntentBasedForm() {
 
 document.getElementById("selectIntent").addEventListener("change", createIntentBasedForm);
 
+// Create Buttons helper
 function createButtons(buttonLabels, buttonHandlers) {
     const vars = initializeVariables();
 
@@ -15844,6 +15888,7 @@ function createButtons(buttonLabels, buttonHandlers) {
     return buttonTable;
 }
 
+// Notes Generation helper
 function optionNotAvailable() {
     const vars = initializeVariables();
 
@@ -19228,7 +19273,7 @@ function resetForm2ContainerAndRebuildButtons() {
     const buttonData = [
         { label: "💾 Save", handler: saveFormData },
         { label: "🔄 Reset", handler: resetButtonHandler },
-        // { label: "📄 Export", handler: exportFormData },
+        // { label: "📄 Export", handler: exportDataAsTxt },
         // { label: "🗑️ Delete All", handler: deleteAllData }
     ];
 
@@ -19250,7 +19295,7 @@ function resetForm2ContainerAndRebuildButtons() {
 
 // Reset forms
 function resetButtonHandler() {
-    showConfirm("Are you sure you want to reset the form?")
+    showConfirm2("Are you sure you want to reset the form?")
     .then((userChoice) => {
         if (!userChoice) return;
 
@@ -19322,7 +19367,7 @@ function resetButtonHandler() {
         });
 
         const footerElement = document.getElementById("footerValue");
-        const footerText = "Standard Notes Generator Version 5.3.230326";
+        const footerText = "Standard Notes Generator Version 5.3.270326";
         typeWriter(footerText, footerElement, 50);
 
         setTimeout(function() {
@@ -19506,13 +19551,18 @@ function saveFormData() {
     const fallbackKey = `NOCASE-${now.getTime()}`;
 
     const uniqueKey = (selectedChannel === 'CDT-HOTLINE' || !sfCaseNumber) ? fallbackKey : sfCaseNumber.toUpperCase();
+    const intentSelect = document.querySelector('[name="slctFrm1"]');
 
     const savedEntry = {
         timestamp: timestamp, 
-        custName: document.querySelector('[name="custName"]').value.trim().toUpperCase(),
+        selectChannel: document.querySelector('[name="selectChannel"]').value.trim().toUpperCase(),
+        agentName: document.querySelector('[name="agentName"]').value.trim().toUpperCase(),
+        teamLead: document.querySelector('[name="teamLead"]').value.trim().toUpperCase(),
         sfCaseNumber: sfCaseNumber,
+        custName: document.querySelector('[name="custName"]').value.trim().toUpperCase(),
         selectLOB: document.querySelector('[name="selectLOB"]').value.trim().toUpperCase(),
         selectVOC: document.querySelector('[name="selectVOC"]').value.trim().toUpperCase(),
+        selectIntent: intentSelect.options[intentSelect.selectedIndex].text.trim().toUpperCase(),
         accountNum: document.querySelector('[name="accountNum"]').value.trim().toUpperCase(),
         landlineNum: document.querySelector('[name="landlineNum"]').value.trim().toUpperCase(),
         serviceID: document.querySelector('[name="serviceID"]').value.trim().toUpperCase(),
@@ -19528,7 +19578,7 @@ function saveFormData() {
 }
 
 // Export saved notes as a text file, sorted by timestamp
-function exportFormData() {
+function exportDataAsTxt() {
     const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
     
     if (Object.keys(savedData).length === 0) {
@@ -19553,10 +19603,11 @@ function exportFormData() {
             }
         };
 
-        appendIfValid("CUSTOMER NAME", entry.custName);
         appendIfValid("SF CASE #", entry.sfCaseNumber);
+        appendIfValid("CUSTOMER NAME", entry.custName);
         appendIfValid("LOB", entry.selectLOB);
         appendIfValid("VOC", entry.selectVOC);
+        appendIfValid("INTENT", entry.selectIntent);
         appendIfValid("ACCOUNT #", entry.accountNum);
         appendIfValid("LANDLINE #", entry.landlineNum);
 
@@ -19580,7 +19631,7 @@ function exportFormData() {
             }
         }
 
-        notepadContent += `\nCASE NOTES:\n${entry.combinedNotes}\n\n`;
+        notepadContent += `\nCASE NOTES:\n${entry.combinedNotes}\n`;
         notepadContent += "=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n\n";
     }
 
@@ -19599,9 +19650,94 @@ function exportFormData() {
     showAlert("Notes exported successfully!");
 }
 
+// Export saved notes as an excel file, sorted by timestamp
+function exportDataAsExcel() {
+    const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
+    
+    if (Object.keys(savedData).length === 0) {
+        showAlert("No data available to export.");
+        return;
+    }
+
+    const sortedEntries = Object.entries(savedData).sort((a, b) => {
+        const timeA = new Date(a[1].timestamp).getTime();
+        const timeB = new Date(b[1].timestamp).getTime();
+        return timeA - timeB;
+    });
+
+    const excelData = [];
+
+    for (const [key, entry] of sortedEntries) {
+
+        const lob = entry.selectLOB || "";
+        const voc = entry.selectVOC || "";
+
+        let serviceID = "";
+        let option82 = "";
+
+        if (lob !== "NON-TECH" && voc !== "FOLLOW-UP") {
+            serviceID = entry.serviceID || "";
+            option82 = entry.Option82 || "";
+        }
+
+        excelData.push({
+            "Saved On": entry.timestamp || "",
+            "Channel": entry.selectChannel || "",
+            "Agent Name": entry.agentName || "", 
+            "Team Leader": entry.teamLead || "", 
+            "SF Case #": entry.sfCaseNumber || "",  
+            "Customer Name": entry.custName || "",
+            "LOB": entry.selectLOB || "",
+            "VOC": entry.selectVOC || "",
+            "Intent": entry.selectIntent || "",
+            "Account #": entry.accountNum || "",
+            "Landline #": entry.landlineNum || "",
+            "Service ID": serviceID,
+            "Option82": option82,
+            "Case Notes": entry.combinedNotes || ""
+        });
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+    /* =======================
+       COLUMN WIDTHS
+    ======================= */
+    const headers = Object.keys(excelData[0] || {});
+
+    const colWidths = headers.map(key => ({
+        wch: Math.max(
+            key.length,
+            ...excelData.map(row => String(row[key] || "").length)
+        )
+    }));
+
+    // Dynamically target "Case Notes" width
+    const caseNotesIndex = headers.indexOf("Case Notes");
+
+    if (caseNotesIndex !== -1) {
+        colWidths[caseNotesIndex].wch = 40;
+    }
+
+    worksheet["!cols"] = colWidths;
+
+    /* =======================
+       EXPORT
+    ======================= */
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Saved Notes");
+
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+
+    XLSX.writeFile(workbook, `Saved Notes_${formattedDate}.xlsx`);
+
+    showAlert("Notes exported successfully as Excel file!");
+}
+
 // Delete all saved data in localStorage
 function deleteAllData() {
-    showConfirm("Are you sure you want to delete all saved records in this workstation?")
+    showConfirm2("Are you sure you want to delete all saved records in this workstation?")
     .then((userChoice) => {
         if (!userChoice) return;
 
@@ -19614,7 +19750,7 @@ function deleteAllData() {
 const primaryButtons = {
   saveButton: saveFormData,
   resetButton: resetButtonHandler
-//   exportButton: exportFormData,
+//   exportButton: exportDataAsTxt,
 //   deleteButton: deleteAllData
 };
 
@@ -19773,6 +19909,16 @@ const instructions = [
 ];
 
 const versions = [
+    {
+        version: "V5.3.270326",
+        updates: [
+            { title: "Improvements", items: [
+                "Added startup detection of existing saved notes with options to keep or delete them before saving new ones.",
+                "Added an option to export saved notes to Excel in the Smart Assistant (Saya).",
+                "Enhanced note parsing to replace “|” with “/” for consistent formatting."
+            ]},
+        ]
+    },
     {
         version: "V5.3.230326",
         updates: [
@@ -20035,7 +20181,7 @@ const assistantMessages = {
         // Tips
         "💡You can duplicate this tab anytime. Just click me and select 'Duplicate Tab'!",
         "💡You can use the Notepad section to store temporary notes or frequently used spiels for quick access.",
-        "💡To ensure data accuracy, we highly recommend deleting any previously saved records on this workstation before saving new ones.",
+        "💡To ensure data accuracy, I highly recommend deleting any previously saved records on this workstation before saving new ones.",
         "💡When filling out the form, make sure all required fields are completed.",
         "💡If a field isn’t required (like L2 fields), you can leave it blank, no need to enter “NA” or extra unnecessary details.",
 
@@ -20447,21 +20593,51 @@ function showAlert(message) {
 }
 
 // CUSTOM CONFIRM
-function showConfirm(message) {
+function showConfirm1(message) {
   return new Promise((resolve) => {
-    const overlay = document.getElementById("customConfirm");
-    const messageBox = document.getElementById("confirmMessage");
-    const okBtn = document.getElementById("confirmOk");
-    const cancelBtn = document.getElementById("confirmCancel");
+    const overlay = document.getElementById("customConfirm1");
+
+    const messageBox = overlay.querySelector("#confirmMessage1");
+    const okBtn = overlay.querySelector("#confirmDelete");
+    const cancelBtn = overlay.querySelector("#confirmKeep");
 
     messageBox.textContent = message;
 
-    // SHOW (fade in)
     overlay.classList.remove("hide");
     overlay.style.display = "flex";
-    requestAnimationFrame(() => {
-      overlay.classList.add("show");
-    });
+    requestAnimationFrame(() => overlay.classList.add("show"));
+
+    const cleanup = (result) => {
+      overlay.classList.remove("show");
+      overlay.classList.add("hide");
+
+      setTimeout(() => {
+        overlay.style.display = "none";
+        overlay.classList.remove("hide");
+        okBtn.onclick = null;
+        cancelBtn.onclick = null;
+        resolve(result);
+      }, 300);
+    };
+
+    okBtn.onclick = () => cleanup(true);
+    cancelBtn.onclick = () => cleanup(false);
+  });
+}
+
+function showConfirm2(message) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById("customConfirm2");
+
+    const messageBox = overlay.querySelector("#confirmMessage2");
+    const okBtn = overlay.querySelector("#confirmOk");
+    const cancelBtn = overlay.querySelector("#confirmCancel");
+
+    messageBox.textContent = message;
+
+    overlay.classList.remove("hide");
+    overlay.style.display = "flex";
+    requestAnimationFrame(() => overlay.classList.add("show"));
 
     const cleanup = (result) => {
       overlay.classList.remove("show");

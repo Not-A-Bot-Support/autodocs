@@ -394,6 +394,45 @@ input:focus, select:focus {
     outline: none;  
 }
 
+/* --- RADIO GROUP LAYOUT --- */
+.radio-group {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    border: solid 2px #2C3E50;
+    border-radius: 5px;
+    padding: 0 20px;
+    height: 29px;
+}
+
+/* Override default label behavior ONLY for radios */
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 0;
+    cursor: pointer;
+}
+
+/* Fix radio size (prevent full width issue) */
+.radio-option input[type="radio"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Optional: better text alignment */
+.radio-option span {
+    color: #2C3E50;
+    font-size: 13px;
+}
+
+input, select, textarea, button {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+}
+
 textarea.wocas {
     width: 100%;
     padding: 5px;  
@@ -688,12 +727,6 @@ button.form2-button:active {
 
 input, select {
     height: 28px;
-}
-
-input, select, textarea, button {
-    font-family: "Inter", sans-serif;
-    font-size: 12px;
-    letter-spacing: 1.5px;
 }
 
 #overlay {

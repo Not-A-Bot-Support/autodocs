@@ -29,7 +29,8 @@
                 <nav>
                     <ul>
                         <li onclick="runFabAction(openDuplicateTab)">Duplicate Tab</li>
-                        <li onclick="runFabAction(exportFormData)">Export Saved Notes</li>
+                        <li onclick="runFabAction(exportDataAsExcel)">Export Notes to Excel (.xlsx)</li>
+                        <li onclick="runFabAction(exportDataAsTxt)">Export Notes to Notepad (.txt)</li>
                         <li onclick="runFabAction(deleteAllData)">Clear Saved Records</li>
                     </ul>
                 </nav>
@@ -75,6 +76,7 @@
                                 <div class="form1DivInput">
                                     <select id="channel" name="selectChannel">
                                         <option value="" disabled selected></option>
+                                        <!-- <option value="CDT-CCBO">CDT-CCBO</option> -->
                                         <option value="CDT-HOTLINE">CDT-HOTLINE</option>
                                         <option value="CDT-SOCMED">CDT-SOCMED</option>
                                     </select>
@@ -98,6 +100,28 @@
                                 <div class="form1DivHeader">CASE & ACCOUNT DETAILS</div>
                             </th>
                         </tr>
+                        <!-- <tr id="case-origin-row" style="display: none;">
+                            <td colspan="2">
+                                <label>Case Origin*</label>
+                                <div class="form1DivInput radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="selectCaseOrigin" value="Chatbot" required>
+                                        <span>Chatbot</span>
+                                    </label>
+
+                                    <label class="radio-option">
+                                        <input type="radio" name="selectCaseOrigin" value="Ordertake">
+                                        <span>Ordertake</span>
+                                    </label>
+
+                                    <label class="radio-option">
+                                        <input type="radio" name="selectCaseOrigin" value="Webform">
+                                        <span>Webform</span>
+                                    </label>
+
+                                </div>
+                            </td>
+                        </tr> -->
                         <tr id="cust-name-row" style="display: none;">
                             <td colspan="2">
                                 <label for="cust-name">Customer/Caller Name</label>
@@ -531,15 +555,27 @@
         </div>
     </div>
 
-    <div id="customConfirm" class="alert-overlay">
+    <div id="customConfirm1" class="alert-overlay">
         <div class="alert-box">
-            <p id="confirmMessage"></p>
+            <p id="confirmMessage1"></p>
+            <div class="alert-actions">
+                <button id="confirmKeep">Keep</button>
+                <button id="confirmDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customConfirm2" class="alert-overlay">
+        <div class="alert-box">
+            <p id="confirmMessage2"></p>
             <div class="alert-actions">
                 <button id="confirmOk">OK</button>
                 <button id="confirmCancel">Cancel</button>
             </div>
         </div>
     </div>
+
+    
     
     <div class="footer">
         <div class="footer-content">
@@ -559,7 +595,7 @@
                 </table>
             </div>
             <div class="footer-text">
-                <span id="footerValue">Standard Notes Generator Version 5.3.230326</span>
+                <span id="footerValue">Standard Notes Generator Version 5.3.270326</span>
                 <span>&copy; Developed and designed by: QA Team</span>
             </div>
         </div>
@@ -589,5 +625,7 @@
     <br>
 </body>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="js/script.js"></script>
+
 </html>
