@@ -1,6 +1,6 @@
 /* script.js
 
-Standard Notes Generator Version 5.3.270326
+Standard Notes Generator Version 5.3.010426
 Developed & Designed by: QA Ryan */
 
 // FIRST LOAD CHECK
@@ -32,7 +32,12 @@ const LOB_OPTIONS = [
     { value: "NON-TECH", text: "NON-TECH" }
 ];
 
-const TECH_VOC_ALLOWED = ["COMPLAINT", "FOLLOW-UP", "REQUEST", "OTHERS"];
+const TECH_VOC_ALLOWED = [
+    "COMPLAINT", 
+    "FOLLOW-UP", 
+    "REQUEST", 
+    "OTHERS"
+];
 
 const TECH_COMPLAINT_GROUPS = [
     "Always On",
@@ -1141,23 +1146,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -1693,23 +1687,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -3001,23 +2984,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -3793,23 +3765,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -7061,23 +7022,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -7313,23 +7263,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -7597,23 +7536,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -7851,23 +7779,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -8192,23 +8109,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -8537,23 +8443,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -8834,23 +8729,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -9121,23 +9005,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -9408,23 +9281,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -9625,23 +9487,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -9850,23 +9701,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -10094,23 +9934,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -10372,23 +10201,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -10671,23 +10489,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -10963,23 +10770,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -11264,23 +11060,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -11523,23 +11308,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -11772,23 +11546,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -12068,23 +11831,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -12385,23 +12137,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -12648,23 +12389,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -12815,23 +12545,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -13063,23 +12782,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -13331,23 +13039,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -13551,23 +13248,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -13820,23 +13506,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -14032,23 +13707,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -14294,23 +13958,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -14508,23 +14161,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -14748,23 +14390,12 @@ function createIntentBasedForm() {
             ]},
             { label: "Decline Reason", type: "select", name: "declineReason", options: [
                 "", 
-                "Cannot decide at the moment", 
-                "Contract terms concerns", 
-                "Disconnected Call/Chat", 
-                "Financial constraints", 
-                "Lack of confidence in the offer", 
-                "Lack of trust in the offer", 
-                "Needs time to think it over", 
-                "Negative past experience", 
-                "No perceived need or benefit",
-                "Not authorized", 
-                "Not interested at this time", 
-                "Price too high", 
-                "Product difficulty to use", 
-                "Satisfied with current plan", 
-                "Satisfied with current service", 
-                "Service difficulty to use", 
-                "Service reliability concerns"
+                "Budget constraint", 
+                "No need / satisfied with current plan", 
+                "Time constraint", 
+                "No reason stated", 
+                "Poor service experience", 
+                "Not decision‑maker"
             ]},
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
                 "", 
@@ -18087,9 +17718,14 @@ function showBantayKableFloatingDiv(sections, sectionLabels) {
 function sfTaggingButtonHandler() {
     const vars = initializeVariables();
 
+    // Tech
     let bauRows = [];
     let netOutageRows = [];
     let crisisRows = [];
+
+    // Non-Tech
+    let smntRows = [];
+    let baaRows = [];
 
     const voiceAndDataForms = [
         "form100_1", "form100_2", "form100_3", "form100_4", "form100_5", "form100_6", "form100_7"
@@ -18342,43 +17978,79 @@ function sfTaggingButtonHandler() {
 
     // Non-Tech Complaint
     else if (vars.selectedIntent === 'formCompMyHomeWeb') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Complaint'],
             ['Case Type:', 'PLDT Web'],
             ['Case Sub-Type:', 'PLDT Web Inaccessibility']
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Complaint'],
+            ['Sub_WrapUp:', 'PLDT Web'],
+            ['Sub_SetCategory:', 'PLDT Web Inaccessibility']
+        ];
     } else if (vars.selectedIntent === 'formCompMisappliedPayment') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Complaint'],
             ['Case Type:', 'Billing'],
             ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.findings}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Complaint'],
+            ['Sub_WrapUp:', 'Billing'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText} - ${vars.findings}`]
+        ];
     } else if (vars.selectedIntent === 'formCompUnreflectedPayment') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Complaint'],
             ['Case Type:', 'Billing'],
             ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.paymentChannel}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Complaint'],
+            ['Sub_WrapUp:', 'Billing'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText} - ${vars.paymentChannel}`]
+        ];
     } else if (vars.selectedIntent === 'formCompPersonnelIssue') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Complaint'],
             ['Case Type:', 'Personnel'],
             ['Case Sub-Type:', `${vars.personnelType}`]
+        ];
+
+        baaRows = [
+            ['WrapUp:', 'Complaint'],
+            ['Sub_WrapUp:', 'Personnel'],
+            ['Sub_SetCategory:', `${vars.personnelType}`]
         ];
     }
     
     // Non-Tech Inquiry
     else if (inqAccounts.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Account'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Account'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (vars.selectedIntent === 'formInqAda') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Billing'],
             ['Case Sub-Type:', 'ADA']
+        ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Billing'],
+            ['Sub_SetCategory:', 'ADA']
         ];
     } else if (vars.selectedIntent === 'formInqBillInterpret') {
         let subType = '';
@@ -18392,223 +18064,435 @@ function sfTaggingButtonHandler() {
             subType = `${vars.selectedIntentText} (Prorate / Breakdown) - ${vars.subType}`;
         }
 
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Billing'],
             ['Case Sub-Type:', subType]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Billing'],
+            ['Sub_SetCategory:', subType]
+        ];
     } else if (inqBilling.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Billing'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
+        ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Billing'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
         ];
     } else if (vars.selectedIntent === 'formInqOutsBal') {
         let subType = '';
         
         subType = `${vars.selectedIntentText} - ${vars.subType}`;
 
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Billing'],
             ['Case Sub-Type:', subType]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Billing'],
+            ['Sub_SetCategory:', subType]
+        ];
     } else if (inqChangeOwnership.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Change Ownership'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Change Ownership'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (inqDisco.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Disconnection'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Disconnection'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (inqDowngrade.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Downgrade'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Downgrade'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (vars.selectedIntent === 'formInqDdateExt') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Due Date Extension'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Due Date Extension'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (vars.selectedIntent === 'formInqEntertainment') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Entertainment'],
             ['Case Sub-Type:', 'Lions Gate/HBO Go/Viu/Others']
         ];
+        
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Entertainment'],
+            ['Sub_SetCategory:', 'Lions Gate/HBO Go/Viu/Others']
+        ];
     } else if (vars.selectedIntent === 'formInqInmove') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Inmove'],
             ['Case Sub-Type:', 'Inmove (Same Address)']
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Inmove'],
+            ['Sub_SetCategory:', 'Inmove (Same Address)']
+        ];
     } else if (vars.selectedIntent === 'formInqMigration') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Migration'],
             ['Case Sub-Type:', 'Migration - Customer Initiated / PLDT Initiated']
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Migration'],
+            ['Sub_SetCategory:', 'Migration - Customer Initiated / PLDT Initiated']
+        ];
     } else if (vars.selectedIntent === 'formInqProdAndPromo') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Product & Promos'],
             ['Case Sub-Type:', 'New Application / PLDT Plans']
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Product & Promos'],
+            ['Sub_SetCategory:', 'New Application / PLDT Plans']
+        ];
     } else if (inqRefProgram.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Referral Program'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Referral Program'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (vars.selectedIntent === 'formInqRefund') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Refund'],
             ['Case Sub-Type:', '`Refund - ${vars.subType}`']
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Refund'],
+            ['Sub_SetCategory:', `Refund - ${vars.subType}`]
+        ];
     } else if (vars.selectedIntent === 'formInqReloc') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Relocation'],
             ['Case Sub-Type:', 'Relocation - Facility Availability / Transfer Fees / SLA']
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Relocation'],
+            ['Sub_SetCategory:', 'Relocation - Facility Availability / Transfer Fees / SLA']
+        ];
     } else if (vars.selectedIntent === 'formInqRewards') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Rewards Program'],
             ['Case Sub-Type:', 'MVP/HOME Rewards']
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Rewards Program'],
+            ['Sub_SetCategory:', 'MVP/HOME Rewards']
+        ];
     } else if (inqSpecialFeat.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Special Features'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Special Features'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (vars.selectedIntent === 'formInqSAO500') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Speed Add On 500'],
             ['Case Sub-Type:', 'Product Info']
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Speed Add On 500'],
+            ['Sub_SetCategory:', 'Product Info']
+        ];
     } else if (inqUfc.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'UNLI FAM CALL'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'UNLI FAM CALL'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (inqUpgrade.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Upgrade'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Upgrade'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (inqVAS.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'VAS'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'VAS'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (vars.selectedIntent === 'formInqWireReRoute') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Inquiry'],
             ['Case Type:', 'Wire Re-Route'],
             ['Case Sub-Type:', 'Processing Fees / SLA']
+        ];
+
+        baaRows = [
+            ['WrapUp:', 'Inquiry'],
+            ['Sub_WrapUp:', 'Wire Re-Route'],
+            ['Sub_SetCategory:', 'Processing Fees / SLA']
         ];
     }
     
     // Non-Tech Follow-up
     else if (vars.selectedIntent === 'formFfupChangeOwnership') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.requestType}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `${vars.requestType}`]
+        ];
     } else if (vars.selectedIntent === 'formFfupChangeTelNum') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', 'Change of Telephone Number'],
             ['Case Sub-Type:', `Change TelNum - ${vars.findings}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', 'Change of Telephone Number'],
+            ['Sub_SetCategory:', `Change TelNum - ${vars.findings}`]
+        ];
     } else if (vars.selectedIntent === 'formFfupChangeTelUnit') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', 'Change Telephone Unit'],
             ['Case Sub-Type:', 'Change Tel Unit - Opsim']
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', 'Change Telephone Unit'],
+            ['Sub_SetCategory:', 'Change Tel Unit - Opsim']
+        ];
     } else if (ffupDisco.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `Disconnect -  ${vars.findings}`]
         ];
-    } else if (vars.selectedIntent === 'formFfupDispute') {
-        const cleanApprvr = vars.approver ? vars.approver.replace(/\s*\([^)]*\)/, '') : '';
 
-        bauRows = [
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `Disconnect -  ${vars.findings}`],
+        ];
+    } else if (vars.selectedIntent === 'formFfupDispute') {
+        // const cleanApprvr = vars.approver ? vars.approver.replace(/\s*\([^)]*\)/, '') : '';
+
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
-            ['Case Sub-Type:', `${vars.disputeType} - ${cleanApprvr}`]
+            ['Case Sub-Type:', `${vars.disputeType}`],
+            ['Status:', 'Closed-Escalated']
+        ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `${vars.disputeType}`],
+            ['WrapUp_Status:', 'Closed-Escalated']
         ];
     } else if (ffupBasedOnFindings.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.findings}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `${vars.selectedIntentText} - ${vars.findings}`]
+        ];
     } else if (vars.selectedIntent === 'formFfupDDE') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Due Date Ext (CCAM)']
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', 'Due Date Ext (CCAM)']
+        ];
     } else if (ffupDisputes.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.selectedIntentText} - Payman`]
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `${vars.selectedIntentText} - Payman`]
+        ];
+
     } else if (vars.selectedIntent === 'formFfupOcular') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}/AMEND SAM`],
             ['Case Sub-Type:', `Ocular/Amend - ${vars.findings}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `Ocular/Amend - ${vars.findings}`]
+        ];
     } else if (ffupRecon.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `Reconnection - ${vars.findings}`]
         ];
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `Reconnection - ${vars.findings}`]
+        ];
     } else if (ffupRefund.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `Refund - ${vars.findings}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `Refund - ${vars.findings}`]
+        ];
     } else if (vars.selectedIntent === 'formFfupRelocCid') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Relocation - PMA']
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', 'Relocation - PMA']
+        ];
     } else if (vars.selectedIntent === 'formFfupSpecialFeat') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Special Features - Activation/Deactivation	']
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', 'Special Features - Activation/Deactivation']
+        ];
     } else if (vars.selectedIntent === 'formFfupSAO') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.findings}`]
+        ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `${vars.findings}`]
         ];
     } else if (vars.selectedIntent === 'formFfupTempDisco') {
         let caseSubType = "";
@@ -18619,151 +18503,274 @@ function sfTaggingButtonHandler() {
             caseSubType = `VTD - ${vars.findings}`;
         }
 
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', caseSubType]
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', caseSubType]
+        ];
     } else if (vars.selectedIntent === 'formFfupUP') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.selectedIntentText} - Payman`]
         ];
+
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `${vars.selectedIntentText} - Payman`]
+        ];
     } else if (ffupVAS.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', 'VAS'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', 'VAS'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (vars.selectedIntent === 'formFfupReroute') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Re-Route/OW - Opsim']
         ];
+        
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', 'Re-Route/OW - Opsim']
+        ];
     }  else if (vars.selectedIntent === 'formFfupWT') {
-        bauRows = [
+        smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Withholding Tax (CCAM)']
+        ];
+        
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', 'Withholding Tax (CCAM)']
         ];
     } 
     
     // For validation
     else if (vars.selectedIntent === 'formFfupRepairRecon') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Follow-up'],
             ['Case Type:', 'Follow-up Aftersales'],
             ['Case Sub-Type:', 'Reconnection']
+        ];
+        baaRows = [
+            ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', 'Reconnection']
         ];
     } 
 
     // Non-Tech Request
     else if (reqFormat1.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', vars.selectedOptGroupLabel],
             ['Case Sub-Type:', vars.selectedIntentText]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', vars.selectedOptGroupLabel],
+            ['Sub_SetCategory:', vars.selectedIntentText]
+        ];
     } else if (reqFormat2.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', vars.selectedIntentText],
             ['Case Sub-Type:', vars.requestType]
         ];
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', vars.selectedIntentText],
+            ['Sub_SetCategory:', vars.requestType]
+        ];
     } else if (reqFormat3.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', `${vars.selectedIntentText} - ${vars.requestType}`]
         ];
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', `${vars.selectedIntentText} - ${vars.requestType}`]
+        ];
     } else if (vars.selectedIntent === 'formReqAccMgt') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', 'Account'],
             ['Case Sub-Type:', vars.requestType]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', 'Account'],
+            ['Sub_SetCategory:', vars.requestType]
+        ];
     } else if (vars.selectedIntent === 'formReqTaxAdj') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', 'Billing'],
             ['Case Sub-Type:', vars.selectedIntentText]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', 'Billing'],
+            ['Sub_SetCategory:', vars.selectedIntentText]
+        ];
     } else if (vars.selectedIntent === 'formReqChgTelUnit') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Customer Initiated']
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', 'Customer Initiated']
+        ];
     } else if (vars.selectedIntent === 'formReqUfc') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', 'UNLI FAM CALL'],
             ['Case Sub-Type:', 'UFC Activation/Deactivation']
         ];
+        
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', 'UNLI FAM CALL'],
+            ['Sub_SetCategory:', 'UFC Activation/Deactivation']
+        ];
     } else if (vars.selectedIntent === 'formReqWireReroute') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', 'Wire Re-Route'],
             ['Case Sub-Type:', 'Re-Routing Inside / Outside Wire']
         ];
-    } else if (vars.selectedIntent === 'formReqInmove' || vars.selectedIntent === 'formReqOcular') {
-        bauRows = [
-            ['VOC:', 'Request'],
-            ['Case Type:', vars.selectedIntentText],
-            ['Case Sub-Type:', vars.selectedIntentText]
+
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', 'Wire Re-Route'],
+            ['Sub_SetCategory:', 'Re-Routing Inside / Outside Wire']
         ];
     } else if (vars.selectedIntent === 'formReqMigration') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', vars.selectedIntentText],
             ['Case Sub-Type:', `${vars.selectedIntentText} - Customer Initiated / PLDT Initiated`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', vars.selectedIntentText],
+            ['Sub_SetCategory:', `${vars.selectedIntentText} - Customer Initiated / PLDT Initiated`]
+        ];
     } else if (vars.selectedIntent === 'formReqMisappPay' || vars.selectedIntent === 'formReqReflectPay') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', vars.selectedIntentText],
             ['Case Sub-Type:', `${vars.selectedIntentText} - Payman`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', vars.selectedIntentText],
+            ['Sub_SetCategory:', `${vars.selectedIntentText} - Payman`]
+        ];
+
     } else if (vars.selectedIntent === 'formReqProofOfSub') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Request'],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Sending Subscription Certificate/Declaration']
+        ];
+
+        baaRows = [
+            ['WrapUp:', 'Request'],
+            ['Sub_WrapUp:', `${vars.selectedIntentText}`],
+            ['Sub_SetCategory:', 'Sending Subscription Certificate/Declaration']
         ];
     }
 
     // Others
     else if (vars.selectedIntent === 'othersToolsDown') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Others'],
             ['Case Type:', 'Tools Downtime'],
             ['Case Sub-Type:', `${vars.affectedTool}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Others'],
+            ['Sub_WrapUp:', 'Tools Downtime'],
+            ['Sub_SetCategory:', `${vars.affectedTool}`]
+        ];
     } else if (vars.selectedIntent === 'othersWebForm') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Others'],
             ['Case Type:', 'Refer to Hero Channel'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+
+        baaRows = [
+            ['WrapUp:', 'Others'],
+            ['Sub_WrapUp:', 'Refer to Hero Channel'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (othHotline.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Others'],
             ['Case Type:', 'Refer to other hotline'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+        
+        baaRows = [
+            ['WrapUp:', 'Others'],
+            ['Sub_WrapUp:', 'Refer to other hotline'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (othTransfer.includes(vars.selectedIntent)) {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Others'],
             ['Case Type:', 'Transfer'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
+        
+        baaRows = [
+            ['WrapUp:', 'Others'],
+            ['Sub_WrapUp:', 'Transfer'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
+        ];
     } else if (vars.selectedIntent === 'othersUT') {
-        bauRows = [
+        smntRows = [
             ['VOC:', 'Others'],
             ['Case Type:', 'Unsuccessful Transaction'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
+        ];
+        
+        baaRows = [
+            ['WrapUp:', 'Others'],
+            ['Sub_WrapUp:', 'Unsuccessful Transaction'],
+            ['Sub_SetCategory:', `${vars.selectedIntentText}`]
         ];
     }
 
@@ -18842,6 +18849,16 @@ function sfTaggingButtonHandler() {
     if (crisisRows.length > 0) {
         const crisisTable = createTable('Potential Crisis', crisisRows);
         sfTaggingValues.appendChild(crisisTable);
+    }
+
+    if (smntRows.length > 0) {
+        const smntTable = createTable('Salesforce Tagging', smntRows);
+        sfTaggingValues.appendChild(smntTable);
+    }
+
+    if (baaRows.length > 0) {
+        const baaTable = createTable('ESA Tagging', baaRows);
+        sfTaggingValues.appendChild(baaTable);
     }
 
     sfTaggingValues.style.textAlign = "left";
@@ -19367,7 +19384,7 @@ function resetButtonHandler() {
         });
 
         const footerElement = document.getElementById("footerValue");
-        const footerText = "Standard Notes Generator Version 5.3.270326";
+        const footerText = "Standard Notes Generator Version 5.3.010426";
         typeWriter(footerText, footerElement, 50);
 
         setTimeout(function() {
@@ -19909,6 +19926,15 @@ const instructions = [
 ];
 
 const versions = [
+    {
+        version: "V5.3.010426",
+        updates: [
+            { title: "Improvements", items: [
+                "Added ESA tagging for SMNT-BAA agents",
+                "Refined declined reason for upselling to enable clearer and more consistent tracking."
+            ]},
+        ]
+    },
     {
         version: "V5.3.270326",
         updates: [
