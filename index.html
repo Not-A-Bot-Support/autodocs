@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Standard Notes Generator V5.3</title>
+    <title>Standard Notes Generator V5.4</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -83,53 +83,10 @@
                                 </div>
                             </td>
                         </tr>
-                        <!-- <tr>
-                            <th colspan="2">
-                                <div class="form1DivHeader">NOTEPAD</div>
-                            </th>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <div class="form1DivInput">
-                                    <textarea class="notepad" rows="10" id="notepad" name="Notepad" style="margin-top: 5px;"></textarea>
-                                </div>
-                            </td>
-                        </tr> -->
                         <tr id="case-and-account-header-row" style="display: none;">
                             <th colspan="2">
                                 <div class="form1DivHeader">CASE & ACCOUNT DETAILS</div>
                             </th>
-                        </tr>
-                        <!-- <tr id="case-origin-row" style="display: none;">
-                            <td colspan="2">
-                                <label>Case Origin*</label>
-                                <div class="form1DivInput radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="selectCaseOrigin" value="Chatbot" required>
-                                        <span>Chatbot</span>
-                                    </label>
-
-                                    <label class="radio-option">
-                                        <input type="radio" name="selectCaseOrigin" value="Ordertake">
-                                        <span>Ordertake</span>
-                                    </label>
-
-                                    <label class="radio-option">
-                                        <input type="radio" name="selectCaseOrigin" value="Webform">
-                                        <span>Webform</span>
-                                    </label>
-
-                                </div>
-                            </td>
-                        </tr> -->
-                        <tr id="cust-name-row" style="display: none;">
-                            <td colspan="2">
-                                <label for="cust-name">Customer/Caller Name</label>
-                                <div class="form1DivInput">
-                                    <input type="text" class="input-and-button" id="cust-name" name="custName">
-                                    <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
-                                </div>
-                            </td>
                         </tr>
                         <tr id="case-num-row" style="display: none;">
                             <td colspan="2">
@@ -139,6 +96,15 @@
                                     <button type="button" class="input-and-button" id="case-num-btn" tabindex="-1">📋 Copy</button>
                                 </div>
                             </td> 
+                        </tr>
+                        <tr id="cust-name-row" style="display: none;">
+                            <td colspan="2">
+                                <label for="cust-name">Customer/Caller Name</label>
+                                <div class="form1DivInput">
+                                    <input type="text" class="input-and-button" id="cust-name" name="custName">
+                                    <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
+                                </div>
+                            </td>
                         </tr>
                         <tr id="acc-num-row" style="display: none;">    
                             <td colspan="2">
@@ -157,6 +123,19 @@
                                     <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
                                 </div>
                             </td> 
+                        </tr>
+                        <!-- <tr id="saved-notes-header-row" style="display: none;">
+                            <th colspan="2">
+                                <div class="form1DivHeader">Saved Notes</div>
+                            </th>
+                        </tr> -->
+                        <tr id="saved-notes-row" style="display: none;">
+                            <td colspan="2">
+                                <label for="savedNotes" id="savedNotes-label">Saved Notes</label>
+                                <div class="form1DivInput">
+                                    <textarea class="wocas" id="savedNotes" name="savedNotes"></textarea>
+                                </div>
+                            </td>
                         </tr>
                         <tr id="lob-and-voc-row" style="display: none;">
                             <td>
@@ -424,9 +403,9 @@
                                         <option data-group="follow-up" value="formFfupOverpay">Overpayment</option>
                                         <option data-group="follow-up" value="formFfupPermaDisco">Permanent Disconnection</option>
                                         <optgroup label="Reconnection">
-                                            <option data-group="follow-up" value="fomFfupRenew">Reconnection - RENEW</option>
-                                            <option data-group="follow-up" value="fomFfupResume">Reconnection - RESUME</option>
-                                            <option data-group="follow-up" value="fomFfupUnbar">Reconnection - UNBAR</option>
+                                            <option data-group="follow-up" value="formFfupRenew">Reconnection - RENEW</option>
+                                            <option data-group="follow-up" value="formFfupResume">Reconnection - RESUME</option>
+                                            <option data-group="follow-up" value="formFfupUnbar">Reconnection - UNBAR</option>
                                         </optgroup>
                                         <optgroup label="Refund">
                                             <option data-group="follow-up" value="formFfupCustDependency">Customer Dependency</option>
@@ -595,7 +574,7 @@
                 </table>
             </div>
             <div class="footer-text">
-                <span id="footerValue">Standard Notes Generator Version 5.3.010426</span>
+                <span id="footerValue">Standard Notes Generator Version 5.4.080426</span>
                 <span>&copy; Developed and designed by: QA Team</span>
             </div>
         </div>

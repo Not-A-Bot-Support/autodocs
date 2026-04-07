@@ -1,6 +1,6 @@
 /* script.js
 
-Standard Notes Generator Version 5.3.010426
+Standard Notes Generator Version 5.4.080426
 Developed & Designed by: QA Ryan */
 
 // FIRST LOAD CHECK
@@ -276,7 +276,7 @@ function populateByGroup(group, vocValue = null) {
             let matchingOptions;
             // Special handling for REQUEST + "Change Configuration - Data"
             if (vocValue === "REQUEST" && el.label === "Change Configuration - Data") {
-                matchingOptions = Array.from(el.children).filter(opt => opt.value === "form300_1");
+                matchingOptions = Array.from(el.children);
             } else {
                 matchingOptions = Array.from(el.children).filter(opt => opt.dataset.group === group);
             }
@@ -357,8 +357,14 @@ function copyValue(button) {
     copyToClipboard(valueToCopy);
 }
 
-// FORM 1 COPY FUNCTION
+// LOAD DATA & FORM 1 COPY FUNCTION
 document.addEventListener("DOMContentLoaded", () => {
+    const caseField = document.querySelector('[name="sfCaseNum"]');
+
+    if (!caseField) return;
+
+    caseField.addEventListener("change", loadFormData);
+
     document.addEventListener("click", (e) => {
 
         // DROPDOWN TOGGLE
@@ -903,7 +909,7 @@ function createIntentBasedForm() {
     ]
 
     const ffupForms = [
-        "formFfupChangeOwnership", "formFfupChangeTelNum", "formFfupChangeTelUnit", "formFfupDiscoVas", "formFfupDispute", "formFfupDowngrade", "formFfupDDE", "formFfupInmove", "formFfupMigration", "formFfupMisappPay", "formFfupNewApp", "formFfupOcular", "formFfupOverpay", "formFfupPermaDisco", "fomFfupRenew", "fomFfupResume", "fomFfupUnbar", "formFfupCustDependency", "formFfupAMSF", "formFfupFinalAcc", "formFfupOverpayment", "formFfupWrongBiller", "formFfupReloc", "formFfupRelocCid", "formFfupSpecialFeat", "formFfupSAO", "formFfupTempDisco", "formFfupUP", "formFfupUpgrade", "formFfupVasAct", "formFfupVasDel", "formFfupReroute", "formFfupWT"
+        "formFfupChangeOwnership", "formFfupChangeTelNum", "formFfupChangeTelUnit", "formFfupDiscoVas", "formFfupDispute", "formFfupDowngrade", "formFfupDDE", "formFfupInmove", "formFfupMigration", "formFfupMisappPay", "formFfupNewApp", "formFfupOcular", "formFfupOverpay", "formFfupPermaDisco", "formFfupRenew", "formFfupResume", "formFfupUnbar", "formFfupCustDependency", "formFfupAMSF", "formFfupFinalAcc", "formFfupOverpayment", "formFfupWrongBiller", "formFfupReloc", "formFfupRelocCid", "formFfupSpecialFeat", "formFfupSAO", "formFfupTempDisco", "formFfupUP", "formFfupUpgrade", "formFfupVasAct", "formFfupVasDel", "formFfupReroute", "formFfupWT"
     ]
 
     const alwaysOnForms = [
@@ -14456,9 +14462,9 @@ function createIntentBasedForm() {
                 formFfupOcular: "Follow-up on Ocular Inspection/Visit requests, within SLA if processed within 1 day from the requested date, beyond SLA if processed after 1 day",
                 formFfupOverpay: "Follow-up on disputes for Overpayment requests, within SLA if processed within 5 days from the processed date, beyond SLA if processed after 5 days",
                 formFfupPermaDisco: "Follow-up on Permanent Disconnection requests processed within 7 calendar days (within SLA) or after (beyond SLA) from the SO issuance",
-                fomFfupRenew: "Follow-up on Reconnection from PD requests: considered within SLA if made within 5 calendar days from SO issuance, and beyond SLA if made after 5 calendar days",
-                fomFfupResume: "Follow-up on Reconnection from TD requests: considered within SLA if made within 24-48 hours for churn or within 2 hours for regular payment, and beyond SLA if made after 48 hours for churn or after 2 hours for regular payment",
-                fomFfupUnbar: "Follow-up on Reconnection from CK requests: considered within SLA if made within 2 hours upon SO issuance and beyond SLA if made after 2 hours",
+                formFfupRenew: "Follow-up on Reconnection from PD requests: considered within SLA if made within 5 calendar days from SO issuance, and beyond SLA if made after 5 calendar days",
+                formFfupResume: "Follow-up on Reconnection from TD requests: considered within SLA if made within 24-48 hours for churn or within 2 hours for regular payment, and beyond SLA if made after 48 hours for churn or after 2 hours for regular payment",
+                formFfupUnbar: "Follow-up on Reconnection from CK requests: considered within SLA if made within 2 hours upon SO issuance and beyond SLA if made after 2 hours",
                 formFfupCustDependency: "Follow up on refund requests from customers who choose not to proceed with their application. Requests are considered within SLA if made within 15 days from the MS Form submission date; otherwise, tag as beyond SLA.",
                 formFfupAMSF: "Follow up on refund requests for cancelled new applications. Requests are considered within SLA if made within 15 days from the MS Form submission date; otherwise, tag as beyond SLA.",
                 formFfupFinalAcc: "Follow up on refund requests with visible disputes on the account (Final Account). Requests are considered within SLA if made within 15 days; otherwise, tag as beyond SLA.",
@@ -14598,7 +14604,7 @@ function createIntentBasedForm() {
 
         // Hide/Show Fields
         const selectFieldsToShow = [
-            "formFfupDiscoVas", "formFfupDowngrade", "formFfupInmove", "formFfupMigration", "formFfupNewApp", "formFfupPermaDisco", "fomFfupRenew", "fomFfupResume", "fomFfupUnbar", "formFfupReloc", "formFfupTempDisco", "formFfupUpgrade"
+            "formFfupDiscoVas", "formFfupDowngrade", "formFfupInmove", "formFfupMigration", "formFfupNewApp", "formFfupPermaDisco", "formFfupRenew", "formFfupResume", "formFfupUnbar", "formFfupReloc", "formFfupTempDisco", "formFfupUpgrade"
         ];
 
         if (selectedValue === "formFfupChangeOwnership") {
@@ -14794,17 +14800,17 @@ function createIntentBasedForm() {
                     "No SO Generated",
                     "System Task / Stuck SO"
                 ],
-                "fomFfupRenew": [
+                "formFfupRenew": [
                     "Activation Task",
                     "No SO Generated",
                     "System Task / Stuck SO"
                 ],
-                "fomFfupResume": [
+                "formFfupResume": [
                     "Activation Task",
                     "No SO Generated",
                     "System Task / Stuck SO"
                 ],
-                "fomFfupUnbar": [
+                "formFfupUnbar": [
                     "Activation Task (DTS)",
                     "No SO Generated (DTS)",
                     "System Task / Stuck SO (DTS)"
@@ -16257,77 +16263,77 @@ function specialInstButtonHandler(includeWocas = true) {
     return specialInstCopiedText.toUpperCase();
 }
 
-function validateRequiredFields(filter = []) {
-    const fieldLabels = {
-        // Description
-        "Option82": "Option82",
-        "investigation3": "Investigation 3",
+// function validateRequiredFields(filter = []) {
+//     const fieldLabels = {
+//         // Description
+//         "Option82": "Option82",
+//         "investigation3": "Investigation 3",
 
-        // Case Notes in Timeline
-        "facility": "Facility",
-        "resType": "Residential Type",
-        "outageStatus": "Network Outage Status",
-        "accountType": "Account Type",
-        "WOCAS": "WOCAS",
-        "investigation1": "Investigation 1",
-        "investigation2": "Investigation 2",
-        "investigation4": "Investigation 4",
-        "req4retracking": "Request for Retracking",
-        "stbID": "Set-Top-Box ID",
-        "smartCardID": "Smartcard ID",
-        "cignalPlan": "Cignal TV Plan",
-        "onuSerialNum": "Modem/ONU Serial #",
-        "onuRunStats": "NMS Skin ONU Status",
-        "cvReading": "Clearview Reading",
+//         // Case Notes in Timeline
+//         "facility": "Facility",
+//         "resType": "Residential Type",
+//         "outageStatus": "Network Outage Status",
+//         "accountType": "Account Type",
+//         "WOCAS": "WOCAS",
+//         "investigation1": "Investigation 1",
+//         "investigation2": "Investigation 2",
+//         "investigation4": "Investigation 4",
+//         "req4retracking": "Request for Retracking",
+//         "stbID": "Set-Top-Box ID",
+//         "smartCardID": "Smartcard ID",
+//         "cignalPlan": "Cignal TV Plan",
+//         "onuSerialNum": "Modem/ONU Serial #",
+//         "onuRunStats": "NMS Skin ONU Status",
+//         "cvReading": "Clearview Reading",
 
-        // Special Instructions
-        "specialInstruct": "Special Instructions",
-        "contactName": "Contact Person",
-        "cbr": "CBR",
-        "availability": "Availability",
-        // "address": "Complete Address",
-        // "landmarks": "Nearest Landmarks"
-    };
+//         // Special Instructions
+//         "specialInstruct": "Special Instructions",
+//         "contactName": "Contact Person",
+//         "cbr": "CBR",
+//         "availability": "Availability",
+//         // "address": "Complete Address",
+//         // "landmarks": "Nearest Landmarks"
+//     };
 
-    const emptyFields = [];
+//     const emptyFields = [];
 
-    for (const field in fieldLabels) {
-        const inputField = document.querySelector(`[name="${field}"]`);
-        if (isFieldVisible(field)) {
-        const isEmpty =
-            !inputField ||
-            inputField.value.trim() === "" ||
-            (inputField.tagName === "SELECT" && inputField.selectedIndex === 0);
+//     for (const field in fieldLabels) {
+//         const inputField = document.querySelector(`[name="${field}"]`);
+//         if (isFieldVisible(field)) {
+//         const isEmpty =
+//             !inputField ||
+//             inputField.value.trim() === "" ||
+//             (inputField.tagName === "SELECT" && inputField.selectedIndex === 0);
 
-        if (isEmpty) {
-            emptyFields.push(fieldLabels[field]);
-        }
-        }
-    }
+//         if (isEmpty) {
+//             emptyFields.push(fieldLabels[field]);
+//         }
+//         }
+//     }
 
-    let alertFields = [];
+//     let alertFields = [];
 
-    if (filter.length === 0 || filter.includes("Title")) {
-        // Don't alert for anything
-        alertFields = [];
-    } else if (filter.includes("Description")) {
-        // Only alert for Option82 and Investigation 3 if they're missing
-        const importantKeys = ["Option82", "Investigation 3"];
-        alertFields = emptyFields.filter(field => importantKeys.includes(field));
-    } else if (filter.includes("Case Notes in Timeline")) {
-        const importantKeys = ["Facility", "Residential Type", "Network Outage Status", "Account Type", "WOCAS", "Investigation 1", "Investigation 2", "Investigation 3", "Investigation 4", "Request for Retracking", "Set-Top-Box Serial Number", "Smartcard ID", "Cignal TV Plan", "Modem/ONU Serial #", "NMS Skin ONU Status", "Clearview Reading"];
-        alertFields = emptyFields.filter(field => importantKeys.includes(field));
-    } else if (filter.includes("Special Instructions")) {
-        const importantKeys = ["Network Outage Status", "Special Instructions", "Contact Person", "CBR", "Availability", "Complete Address", "Nearest Landmarks"];
-        alertFields = emptyFields.filter(field => importantKeys.includes(field));
-    }
+//     if (filter.length === 0 || filter.includes("Title")) {
+//         // Don't alert for anything
+//         alertFields = [];
+//     } else if (filter.includes("Description")) {
+//         // Only alert for Option82 and Investigation 3 if they're missing
+//         const importantKeys = ["Option82", "Investigation 3"];
+//         alertFields = emptyFields.filter(field => importantKeys.includes(field));
+//     } else if (filter.includes("Case Notes in Timeline")) {
+//         const importantKeys = ["Facility", "Residential Type", "Network Outage Status", "Account Type", "WOCAS", "Investigation 1", "Investigation 2", "Investigation 3", "Investigation 4", "Request for Retracking", "Set-Top-Box Serial Number", "Smartcard ID", "Cignal TV Plan", "Modem/ONU Serial #", "NMS Skin ONU Status", "Clearview Reading"];
+//         alertFields = emptyFields.filter(field => importantKeys.includes(field));
+//     } else if (filter.includes("Special Instructions")) {
+//         const importantKeys = ["Network Outage Status", "Special Instructions", "Contact Person", "CBR", "Availability", "Complete Address", "Nearest Landmarks"];
+//         alertFields = emptyFields.filter(field => importantKeys.includes(field));
+//     }
 
-    if (alertFields.length > 0) {
-        alert(`Please complete the following field(s): ${alertFields.join(", ")}`);
-    }
+//     if (alertFields.length > 0) {
+//         alert(`Please complete the following field(s): ${alertFields.join(", ")}`);
+//     }
 
-    return { emptyFields, alertFields };
-}
+//     return { emptyFields, alertFields };
+// }
 
 function cepButtonHandler(showFloating = true, filter = []) {
     const vars = initializeVariables();
@@ -16358,8 +16364,8 @@ function cepButtonHandler(showFloating = true, filter = []) {
         return;
     }
 
-    const { emptyFields, alertFields } = validateRequiredFields(filter);
-    if (alertFields.length > 0) return;
+    // const { emptyFields, alertFields } = validateRequiredFields(filter);
+    // if (alertFields.length > 0) return;
 
     const dataMap = {
         Title: (cepCaseTitle() || "").toUpperCase(),
@@ -16460,7 +16466,7 @@ function getSfFieldValueIfVisible(fieldName) {
     let value = field.value.trim();
 
     if (field.tagName.toLowerCase() === "textarea") {
-        value = value.replace(/\n/g, "/ ");
+        value = value.replace(/\r?\n|\|/g, "/ ");
     }
 
     return value;
@@ -16496,33 +16502,33 @@ function techNotesButtonHandler(showFloating = true) {
         "form500_5", "form501_7", "form101_5", "form510_9", "form500_6"
     ]
 
-    function validateRequiredFields() {
-        const fieldLabels = {
-            "WOCAS": "WOCAS",
-            "remarks": "Actions Taken",
-            "upsell": "Upsell",
-        };
+    // function validateRequiredFields() {
+    //     const fieldLabels = {
+    //         "WOCAS": "WOCAS",
+    //         "remarks": "Actions Taken",
+    //         "upsell": "Upsell",
+    //     };
 
-        let requiredFields = Object.keys(fieldLabels);
+    //     let requiredFields = Object.keys(fieldLabels);
 
-        const emptyFields = [];
+    //     const emptyFields = [];
 
-        requiredFields.forEach(field => {
-            const inputField = document.querySelector(`[name="${field}"]`);
-            if (isFieldVisible(field)) {
-                if (!inputField || inputField.value.trim() === "" ||
-                    (inputField.tagName === "SELECT" && inputField.selectedIndex === 0)) {
-                    emptyFields.push(fieldLabels[field]);
-                }
-            }
-        });
+    //     requiredFields.forEach(field => {
+    //         const inputField = document.querySelector(`[name="${field}"]`);
+    //         if (isFieldVisible(field)) {
+    //             if (!inputField || inputField.value.trim() === "" ||
+    //                 (inputField.tagName === "SELECT" && inputField.selectedIndex === 0)) {
+    //                 emptyFields.push(fieldLabels[field]);
+    //             }
+    //         }
+    //     });
 
-        if (emptyFields.length > 0) {
-            alert(`Please complete the following field(s): ${emptyFields.join(", ")}`);
-        }
+    //     if (emptyFields.length > 0) {
+    //         alert(`Please complete the following field(s): ${emptyFields.join(", ")}`);
+    //     }
 
-        return emptyFields;
-    }
+    //     return emptyFields;
+    // }
 
     function constTechCAOutput() {
         const fields = [
@@ -16825,8 +16831,8 @@ function techNotesButtonHandler(showFloating = true) {
     const ticketAge = formatField("/ CASE AGE", "ticketAge");
     // const wocas = formatField("/ WOCAS", "WOCAS");
 
-    const emptyFields = validateRequiredFields();
-    if (emptyFields.length > 0) return;
+    // const emptyFields = validateRequiredFields();
+    // if (emptyFields.length > 0) return;
 
     if (vars.selectedIntent === "formFfupRepair") {
         concernCopiedText = `${combinedInfo}\nC: ${vars.channel}_${vars.pldtUser}/ FOLLOW-UP REPAIR ${vars.ticketStatus}${queue}${ffupCount}${ticketAge}`;
@@ -17017,9 +17023,9 @@ function getFuseFieldValueIfVisible(fieldName) {
             vars.ticketStatus === "Beyond SLA" &&
             (vars.offerALS !== "Offered ALS/Accepted" && vars.offerALS !== "Offered ALS/Declined")
         ) {
-            value = value.replace(/\n/g, " / ");
+            value = value.replace(/\r?\n|\|/g, "/ ");
         } else {
-            value = value.replace(/\n/g, "/ ");
+            value = value.replace(/\r?\n|\|/g, "/ ");
         }
     }
 
@@ -17032,44 +17038,44 @@ function nontechNotesButtonHandler(showFloating = true) {
     let concernCopiedText = "";
     let actionsTakenCopiedText = "";
 
-    function validateRequiredFields() {
-        const fieldLabels = {
-            // "srNum": "SR Number",
-            "custConcern": "Concern",
-            "ownership": "Ownership",
-            "custAuth": "Customer Authentication",
-            "findings": "Cause of Misapplied Payment",
-            "paymentChannel": "Payment Channel",
-            "otherPaymentChannel": "Other Payment Channel",
-            "issueResolved": "Issue Resolved",
-            "upsell": "Upsell",
-            "eSnowTicketNum": "E-Solve/Snow Ticket Number"
-        };
+    // function validateRequiredFields() {
+    //     const fieldLabels = {
+    //         // "srNum": "SR Number",
+    //         "custConcern": "Concern",
+    //         "ownership": "Ownership",
+    //         "custAuth": "Customer Authentication",
+    //         "findings": "Cause of Misapplied Payment",
+    //         "paymentChannel": "Payment Channel",
+    //         "otherPaymentChannel": "Other Payment Channel",
+    //         "issueResolved": "Issue Resolved",
+    //         "upsell": "Upsell",
+    //         "eSnowTicketNum": "E-Solve/Snow Ticket Number"
+    //     };
 
-        let requiredFields = Object.keys(fieldLabels);
+    //     let requiredFields = Object.keys(fieldLabels);
 
-        if (vars.selectedIntent === "othersUT") {
-            requiredFields = requiredFields.filter(field => field !== "custConcern");
-        }
+    //     if (vars.selectedIntent === "othersUT") {
+    //         requiredFields = requiredFields.filter(field => field !== "custConcern");
+    //     }
 
-        const emptyFields = [];
+    //     const emptyFields = [];
 
-        requiredFields.forEach(field => {
-            const inputField = document.querySelector(`[name="${field}"]`);
-            if (isFieldVisible(field)) {
-                if (!inputField || inputField.value.trim() === "" ||
-                    (inputField.tagName === "SELECT" && inputField.selectedIndex === 0)) {
-                    emptyFields.push(fieldLabels[field]);
-                }
-            }
-        });
+    //     requiredFields.forEach(field => {
+    //         const inputField = document.querySelector(`[name="${field}"]`);
+    //         if (isFieldVisible(field)) {
+    //             if (!inputField || inputField.value.trim() === "" ||
+    //                 (inputField.tagName === "SELECT" && inputField.selectedIndex === 0)) {
+    //                 emptyFields.push(fieldLabels[field]);
+    //             }
+    //         }
+    //     });
 
-        if (emptyFields.length > 0) {
-            alert(`Please complete the following field(s): ${emptyFields.join(", ")}`);
-        }
+    //     if (emptyFields.length > 0) {
+    //         alert(`Please complete the following field(s): ${emptyFields.join(", ")}`);
+    //     }
 
-        return emptyFields;
-    }
+    //     return emptyFields;
+    // }
 
     function constructFuseOutput() {
         const fields = [
@@ -17224,7 +17230,7 @@ function nontechNotesButtonHandler(showFloating = true) {
     ];
 
     const ffupFormsBasedOnFindings = [
-        "formFfupChangeTelNum", "formFfupDowngrade", "formFfupInmove", "formFfupMigration", "formFfupNewApp", "formFfupOcular", "formFfupDiscoVas", "formFfupPermaDisco", "fomFfupRenew", "fomFfupResume", "fomFfupUnbar", "formFfupReloc", "formFfupSAO", "formFfupUpgrade"
+        "formFfupChangeTelNum", "formFfupDowngrade", "formFfupInmove", "formFfupMigration", "formFfupNewApp", "formFfupOcular", "formFfupDiscoVas", "formFfupPermaDisco", "formFfupRenew", "formFfupResume", "formFfupUnbar", "formFfupReloc", "formFfupSAO", "formFfupUpgrade"
     ];
 
     const ffupFormsDisputes = [
@@ -17249,29 +17255,29 @@ function nontechNotesButtonHandler(showFloating = true) {
     
     // non-Tech Complaints
     if (vars.selectedIntent === "formCompMyHomeWeb") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompMisappliedPayment") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText} - ${vars.findings}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompUnreflectedPayment") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompPersonnelIssue") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.personnelType} COMPLAINT${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
@@ -17280,29 +17286,29 @@ function nontechNotesButtonHandler(showFloating = true) {
     
     // non-Tech Inquiries
     else if (inquiryForms.includes(vars.selectedIntent)) {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqBillInterpret") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ BILL INTERPRETATION - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqOutsBal") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ OUTSTANDING BALANCE - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqRefund") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ REFUND - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
@@ -17311,15 +17317,15 @@ function nontechNotesButtonHandler(showFloating = true) {
     
     // Non-Tech Follow-Ups
     else if (ffupForms.includes(vars.selectedIntent)) {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupDispute") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         let disputeNotes = "";
 
@@ -17350,8 +17356,8 @@ function nontechNotesButtonHandler(showFloating = true) {
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${disputeNotes}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
     } else if (ffupFormsBasedOnFindings.includes(vars.selectedIntent)) {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         const findingsMap = {
             "Activation": "FOR ACTIVATION",
@@ -17372,29 +17378,29 @@ function nontechNotesButtonHandler(showFloating = true) {
         }
         actionsTakenCopiedText = constructFuseOutput();
     } else if (ffupFormsDisputes.includes(vars.selectedIntent)) {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP DISPUTE FOR ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (ffupFormsRefund.includes(vars.selectedIntent)) {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP REFUND - ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupSpecialFeat") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} (${vars.requestType})${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupTempDisco") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         const findingsMap = {
             "CCAM (Processing)": "FOR PROCESSING",
@@ -17408,22 +17414,22 @@ function nontechNotesButtonHandler(showFloating = true) {
         }
         actionsTakenCopiedText = constructFuseOutput();
     } else if (vars.selectedIntent === "formFfupUP") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} FOR VALIDATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupVasAct") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ACTIVATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupVasDel") {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ${vars.vasProduct} DELIVERY${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
@@ -17432,15 +17438,15 @@ function nontechNotesButtonHandler(showFloating = true) {
     
     // Non-Tech Requests
     else if (reqBasedIntent.includes(vars.selectedIntent)) {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/${vars.selectedIntentText}${soSrNum}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (reqBasedReqType.includes(vars.selectedIntent)) {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/${vars.requestType}${soSrNum}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
@@ -17449,8 +17455,8 @@ function nontechNotesButtonHandler(showFloating = true) {
 
     // Others
     else if (othersForms.includes(vars.selectedIntent)) {
-        const emptyFields = validateRequiredFields();
-        if (emptyFields.length > 0) return;
+        // const emptyFields = validateRequiredFields();
+        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
@@ -17798,7 +17804,7 @@ function sfTaggingButtonHandler() {
 
     const ffupDisco = ["formFfupDiscoVas", "formFfupPermaDisco"];
 
-    const ffupRecon = ["fomFfupRenew", "fomFfupResume", "fomFfupUnbar"];
+    const ffupRecon = ["formFfupRenew", "formFfupResume", "formFfupUnbar"];
 
     const ffupRefund = ["formFfupCustDependency", "formFfupAMSF", "formFfupFinalAcc", "formFfupOverpayment", "formFfupWrongBiller"];
 
@@ -19335,6 +19341,13 @@ function resetButtonHandler() {
 
         resetForm2ContainerAndRebuildButtons();
 
+        // Reset + hide saved notes row
+        const savedNotesRow = document.getElementById("saved-notes-row");
+
+        if (savedNotesRow) {
+            savedNotesRow.style.display = "none";
+        }
+
         const rowsToHide = [
             "landline-num-row",
             "service-id-row",
@@ -19384,7 +19397,7 @@ function resetButtonHandler() {
         });
 
         const footerElement = document.getElementById("footerValue");
-        const footerText = "Standard Notes Generator Version 5.3.010426";
+        const footerText = "Standard Notes Generator Version 5.4.080426";
         typeWriter(footerText, footerElement, 50);
 
         setTimeout(function() {
@@ -19401,7 +19414,7 @@ function resetButtonHandler() {
 function saveFormData() {
     const selectedChannel = document.getElementById("channel")?.value?.trim();
     const sfCaseNumberElement = document.querySelector('[name="sfCaseNum"]');
-    const sfCaseNumber = sfCaseNumberElement?.value.trim();
+    const sfCaseNumber = (sfCaseNumberElement?.value || "").trim();
 
     const customerNameElement = document.querySelector('[name="custName"]');
     const customerName = customerNameElement?.value.trim();
@@ -19446,24 +19459,19 @@ function saveFormData() {
     const nontechNotes = nontechNotesButtonHandler(false);
 
     const fuseNotes = Array.isArray(techNotes)
-        ? `SF/FUSE:\n${techNotes.join("\n")}`
+        ? `SF/FUSE NOTES:\n${techNotes.join("\n")}`
         : techNotes
-            ? `SF/FUSE:\n${techNotes}`
+            ? `SF/FUSE NOTES:\n${techNotes}`
             : "";
 
     const cepNotes = newTicketNotes.length
-        ? `CEP:\n${newTicketNotes.join("\n")}`
+        ? `CEP NOTES:\n${newTicketNotes.join("\n")}`
         : "";
 
     const bantayKableNotes = bantayKableButtonHandler(false);
     const nonTechIntents = [
         // Complaint
-        "formReqNonServiceRebate",
-        "formReqReconnection",
-        "formCompMyHomeWeb",
-        "formCompMisappliedPayment",
-        "formCompUnreflectedPayment",
-        "formCompPersonnelIssue",
+        "formReqNonServiceRebate", "formReqReconnection", "formCompMyHomeWeb", "formCompMisappliedPayment", "formCompUnreflectedPayment", "formCompPersonnelIssue",
 
         // Inquiry
         ...inquiryForms,
@@ -19486,9 +19494,9 @@ function saveFormData() {
         "formFfupOcular",
         "formFfupOverpay",
         "formFfupPermaDisco",
-        "fomFfupRenew",
-        "fomFfupResume",
-        "fomFfupUnbar",
+        "formFfupRenew",
+        "formFfupResume",
+        "formFfupUnbar",
         "formFfupCustDependency",
         "formFfupAMSF",
         "formFfupFinalAcc",
@@ -19552,46 +19560,190 @@ function saveFormData() {
     if (nonTechIntents.includes(vars.selectedIntent)) {
         combinedNotes = nontechNotes || bantayKableNotes || "";
     } else if (vars.selectedIntent === "formFfupRepair") {
-        const labeledFfup = ffupNotes ? `CEP:\n${ffupNotes}` : "";
-        const labeledTech = techNotes ? `SF/FUSE:\n${techNotes}` : "";
+        const labeledFfup = ffupNotes ? `CEP NOTES:\n${ffupNotes}` : "";
+        const labeledTech = techNotes ? `SF/FUSE NOTES:\n${techNotes}` : "";
         combinedNotes = [labeledFfup, labeledTech].filter(Boolean).join("\n\n");
     } else {
         combinedNotes = [fuseNotes, cepNotes].filter(Boolean).join("\n\n");
     }
 
-    // combinedNotes = combinedNotes.trim();
     combinedNotes = (combinedNotes || "").toString().trim();
-    //console.log(typeof combinedNotes, combinedNotes);
+
+    const removeDuplicateBlocks = (text) => {
+        const blocks = text.split(/\n\s*\n/); // split by empty line
+        const seen = new Set();
+
+        return blocks.filter(block => {
+            const normalized = block.replace(/\s+/g, " ").trim();
+            if (seen.has(normalized)) return false;
+            seen.add(normalized);
+            return true;
+        }).join("\n\n");
+    };
+
+    combinedNotes = removeDuplicateBlocks(combinedNotes);
 
     const now = new Date();
     const timestamp = now.toLocaleString();
     const fallbackKey = `NOCASE-${now.getTime()}`;
 
-    const uniqueKey = (selectedChannel === 'CDT-HOTLINE' || !sfCaseNumber) ? fallbackKey : sfCaseNumber.toUpperCase();
+    const uniqueKey = (selectedChannel === 'CDT-HOTLINE' || !sfCaseNumber)
+        ? fallbackKey
+        : sfCaseNumber;
     const intentSelect = document.querySelector('[name="slctFrm1"]');
 
+    const intentText = intentSelect
+        ? intentSelect.options[intentSelect.selectedIndex]?.text || ""
+        : "";
+
+    function getValue(name) {
+        return (document.querySelector(`[name="${name}"]`)?.value || "")
+            .trim()
+            .toUpperCase();
+    }
+
     const savedEntry = {
-        timestamp: timestamp, 
-        selectChannel: document.querySelector('[name="selectChannel"]').value.trim().toUpperCase(),
-        agentName: document.querySelector('[name="agentName"]').value.trim().toUpperCase(),
-        teamLead: document.querySelector('[name="teamLead"]').value.trim().toUpperCase(),
+        timestamp: timestamp,
+        selectChannel: getValue("selectChannel"),
+        agentName: getValue("agentName"),
+        teamLead: getValue("teamLead"),
         sfCaseNumber: sfCaseNumber,
-        custName: document.querySelector('[name="custName"]').value.trim().toUpperCase(),
-        selectLOB: document.querySelector('[name="selectLOB"]').value.trim().toUpperCase(),
-        selectVOC: document.querySelector('[name="selectVOC"]').value.trim().toUpperCase(),
-        selectIntent: intentSelect.options[intentSelect.selectedIndex].text.trim().toUpperCase(),
-        accountNum: document.querySelector('[name="accountNum"]').value.trim().toUpperCase(),
-        landlineNum: document.querySelector('[name="landlineNum"]').value.trim().toUpperCase(),
-        serviceID: document.querySelector('[name="serviceID"]').value.trim().toUpperCase(),
-        Option82: document.querySelector('[name="Option82"]').value.trim().toUpperCase(),
-        combinedNotes: combinedNotes.toUpperCase()
+        custName: getValue("custName"),
+        selectLOB: getValue("selectLOB"),
+        selectVOC: getValue("selectVOC"),
+        selectIntent: intentText.trim().toUpperCase(),
+        accountNum: getValue("accountNum"),
+        landlineNum: getValue("landlineNum"),
+        serviceID: getValue("serviceID"),
+        Option82: getValue("Option82"),
+        WOCAS: getValue("WOCAS"),
+        combinedNotes: combinedNotes.toUpperCase(),
+        upsell: getValue("upsell"),
+        productsOffered: getValue("productsOffered"),
+        declineReason: getValue("declineReason"),
+        notEligibleReason: getValue("notEligibleReason")
     };
 
     const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
-    savedData[uniqueKey] = savedEntry;
+
+    // Check if entry already exists
+    if (savedData[uniqueKey]) {
+        const existing = savedData[uniqueKey];
+
+        const normalize = str => str.replace(/\s+/g, " ").trim();
+
+        const existingNotes = normalize(existing.combinedNotes || "");
+        const newNotes = normalize(savedEntry.combinedNotes || "");
+
+        // No changes
+        const hasChanges =
+            existingNotes !== newNotes ||
+            existing.upsell !== savedEntry.upsell ||
+            existing.productsOffered !== savedEntry.productsOffered ||
+            existing.declineReason !== savedEntry.declineReason ||
+            existing.notEligibleReason !== savedEntry.notEligibleReason;
+
+        if (!hasChanges) {
+            showAlert("No changes detected. Notes were not updated.");
+            return;
+        }
+
+        // Replace existing entry with updated notes and timestamp
+        savedData[uniqueKey] = {
+            ...existing,
+            combinedNotes: savedEntry.combinedNotes,
+            upsell: savedEntry.upsell,
+            productsOffered: savedEntry.productsOffered,
+            declineReason: savedEntry.declineReason,
+            notEligibleReason: savedEntry.notEligibleReason,
+            lastUpdated: new Date().toLocaleString()
+        };
+
+        showAlert("Changes saved successfully.");
+
+    } else {
+        savedData[uniqueKey] = {
+            ...savedEntry,
+            createdAt: savedEntry.timestamp,
+            lastUpdated: ""
+        };
+
+        showAlert("All set! Your notes have been saved.");
+    }
+
+    // Save back to localStorage
     localStorage.setItem("tempDatabase", JSON.stringify(savedData));
 
-    showAlert("All set! Your notes have been saved.");
+}
+
+// Load saved notes from localStorage
+function loadFormData() {
+    const rawInput = document.querySelector('[name="sfCaseNum"]')?.value || "";
+    const sfCaseNumber = rawInput.trim();
+
+    const savedData = JSON.parse(localStorage.getItem("tempDatabase")) || {};
+
+    console.log("Looking for:", sfCaseNumber);
+    console.log("Keys:", Object.keys(savedData));
+
+    let savedEntry = savedData[sfCaseNumber];
+
+    if (!savedEntry && sfCaseNumber) {
+        savedEntry = Object.values(savedData).find(entry =>
+            (entry.sfCaseNumber || "").toUpperCase() === sfCaseNumber
+        );
+    }
+
+    if (!savedEntry) {
+        console.log("No match found.");
+        return;
+    }
+
+    console.log("Match found:", savedEntry);
+
+    const setValue = (name, value) => {
+        const el = document.querySelector(`[name="${name}"]`);
+        if (el && value !== undefined && value !== null) {
+            el.value = value;
+
+            if (el.tagName === 'TEXTAREA') {
+                setTimeout(() => {
+                    autoExpandTextarea({ target: el });
+                }, 0);
+            }
+        }
+    };
+
+    setValue("sfCaseNum", savedEntry.sfCaseNumber);
+    setValue("custName", savedEntry.custName);
+    setValue("accountNum", savedEntry.accountNum);
+    setValue("landlineNum", savedEntry.landlineNum);
+
+    const buildSavedNotes = (entry) => {
+        const parts = [];
+
+        if (entry.timestamp) parts.push(`SAVED ON: ${entry.timestamp}`);
+        if (entry.selectLOB) parts.push(`LOB: ${entry.selectLOB}`);
+        if (entry.selectVOC) parts.push(`VOC: ${entry.selectVOC}`);
+        if (entry.selectIntent) parts.push(`INTENT: ${entry.selectIntent}`);
+        if (entry.serviceID) parts.push(`SERVICE ID: ${entry.serviceID}`);
+        if (entry.Option82) parts.push(`OPTION82: ${entry.Option82}`);
+        if (entry.WOCAS) parts.push(`WOCAS: ${entry.WOCAS}`);
+
+        if (entry.combinedNotes) {
+            parts.push(`\n${entry.combinedNotes}`);
+        }
+
+        return parts.join("\n");
+    };
+
+    setValue("savedNotes", buildSavedNotes(savedEntry));
+
+    const notesRow = document.getElementById("saved-notes-row");
+
+    if (savedEntry && savedEntry.combinedNotes?.trim()) {
+        if (notesRow) notesRow.style.display = "table-row";
+    }
 }
 
 // Export saved notes as a text file, sorted by timestamp
@@ -19613,6 +19765,10 @@ function exportDataAsTxt() {
 
     for (const [key, entry] of sortedEntries) {
         notepadContent += `SAVED ON: ${entry.timestamp}\n`;
+
+        if (entry.lastUpdated) {
+            notepadContent += `LAST UPDATED: ${entry.lastUpdated}\n`;
+        }
 
         const appendIfValid = (label, value) => {
             if (value !== undefined && value !== "undefined") {
@@ -19699,6 +19855,7 @@ function exportDataAsExcel() {
 
         excelData.push({
             "Saved On": entry.timestamp || "",
+            "Modified On": entry.lastUpdated || "",
             "Channel": entry.selectChannel || "",
             "Agent Name": entry.agentName || "", 
             "Team Leader": entry.teamLead || "", 
@@ -19711,7 +19868,11 @@ function exportDataAsExcel() {
             "Landline #": entry.landlineNum || "",
             "Service ID": serviceID,
             "Option82": option82,
-            "Case Notes": entry.combinedNotes || ""
+            "Case Notes": entry.combinedNotes || "",
+            "Upsell": entry.upsell || "",
+            "Products Offered": entry.productsOffered || "",
+            "Decline Reason": entry.declineReason || "",
+            "Not Eligible Reason": entry.notEligibleReason || ""
         });
     }
 
@@ -19927,10 +20088,29 @@ const instructions = [
 
 const versions = [
     {
+        version: "V5.4.080426",
+        updates: [
+            { title: "Improvements", items: [
+                "<strong>Auto Data Retrieval:</strong> Form now automatically loads saved data when a matching SF Case Number is detected, in preparation for live chat to PM/DM migration.",
+                "<strong>Improved Matching Logic:</strong> Refined lookup to ensure accurate retrieval from local storage.",
+                "<strong>Dynamic Notes Display:</strong> Saved notes section now appears only when data exists.",
+                "<strong>Upsell Notes & Tagging:</strong> Added upsell details to notes and Excel (Product Offered, Decline Reason, Not Eligible Reason) for easier tracking.",
+                "Enhanced note parsing to replace “|” with “/” in both FUSE and SF notes for consistent formatting.",
+                "<strong>Added “Modified On” Timestamp:</strong> Saved and exported notes will now show when they were last updated, making it easier to track recent changes."
+            ]},
+            { title: "Fixes", items: [
+                "<strong>Stability Fixes:</strong> Resolved issue where load function triggered only once.",
+                "<strong>UI Behavior Fix:</strong> Addressed textarea auto-expand not triggering on initial load.",
+                "<strong>Missing Options in Request Dropdown:</strong> Resolved an issue where only one option was showing under <stong>“Change Configuration - Data”</stong> when selecting a Request. All available options are now displayed correctly.",
+                "<strongData Saving Fix: </strong> Saved notes now update correctly when changes are made."
+            ]},
+        ]
+    },
+    {
         version: "V5.3.010426",
         updates: [
             { title: "Improvements", items: [
-                "Added ESA tagging for SMNT-BAA agents",
+                "Added ESA tagging for SMNT-BAA agents.",
                 "Refined declined reason for upselling to enable clearer and more consistent tracking."
             ]},
         ]
