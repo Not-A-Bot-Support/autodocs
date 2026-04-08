@@ -920,6 +920,80 @@ function createIntentBasedForm() {
         "formReqTaxAdj", "formReqChgTelUnit", "formReqOcular", "formReqProofOfSub"
     ]
 
+    const UPSELL_OPTIONS = {
+        upsell: [
+            "", 
+            "Yes - Accepted",
+            "No - Declined",
+            "No - Ignored",
+            "No - Undecided",
+            "NA - Not Eligible"
+        ],
+        productsOffered: [
+            "", 
+            "Always On",
+            "Mesh",
+            "Plan Upgrade",
+        ],
+        declineReason: [
+            "", 
+            "Budget constraint", 
+            "No need / satisfied with current plan", 
+            "Time constraint", 
+            "No reason stated", 
+            "Poor service experience", 
+            "Not decision-maker"
+        ],
+        notEligibleReason: [
+            "", 
+            "Account has pending issues", 
+            "Account is barred", 
+            "Account is inhibited", 
+            "Account is not yet active", 
+            "Account is restricted",
+            "Customer already availed the product", 
+            "Customer already availed the service", 
+            "Customer already upgraded their plan", 
+            "Customer is in a hurry", 
+            "Customer is irate", 
+            "Customer is requesting a supervisor", 
+            "Customer is requesting a manager", 
+            "Customer is requesting to downgrade", 
+            "Disconnection concerns", 
+            "LOB is not applicable", 
+            "Microbusiness Account", 
+            "Plan not eligible for upsell", 
+            "Poor LTE signal strength in the area", 
+            "Poor payment history", 
+            "Potential crisis", 
+            "Prepaid Fiber",
+            "Technical incompatibility", 
+            "Temporary Disconnection concerns",
+            "Time is limited",
+            "Unresolved AFTERSALES complaints", 
+            "Unresolved AFTERSALES concerns", 
+            "VTD concerns"
+        ]
+    };
+
+    function handleUpsellChange(upsell) {
+        showFields(["productsOffered"]);
+
+        if (upsell.selectedIndex === 1 || upsell.selectedIndex === 3 || upsell.selectedIndex === 4) {
+            hideSpecificFields(["declineReason", "notEligibleReason"]);
+
+        } else if (upsell.selectedIndex === 2) {
+            showFields(["declineReason"]);
+            hideSpecificFields(["notEligibleReason"]);
+
+        } else if (upsell.selectedIndex === 5) {
+            showFields(["notEligibleReason"]);
+            hideSpecificFields(["productsOffered", "declineReason"]);
+        } else {
+            hideSpecificFields(["productsOffered", "declineReason", "notEligibleReason"]);
+        }
+    }
+
     // Tech Follow-Up
     if (selectedValue === "formFfupRepair") { 
         const table = document.createElement("table");
@@ -1135,60 +1209,11 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             { label: "Re-Open Status Reason", type: "textarea", name: "reOpenStatsReason", placeholder: "Indicate the reason for re-opening the ticket (Dispatched to Field Technician - Re-Open or Escalated to Network - Re-Open)." },
-                        // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: [
-                "", 
-                "Always On",
-                "Mesh",
-                "Plan Upgrade",
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                // "Account has pending issues", 
-                // "Account is barred", 
-                // "Account is inhibited", 
-                // "Account is not yet active", 
-                // "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            // Cross-Sell/Upsell
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -1497,21 +1522,7 @@ function createIntentBasedForm() {
         });
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-
-            showFields(["productsOffered"]);
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["productsOffered", "declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
         updateToolLabelVisibility();
 
@@ -1679,57 +1690,10 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: [
-                "", 
-                "Always On"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                // "Account has pending issues", 
-                // "Account is barred", 
-                // "Account is inhibited", 
-                // "Account is not yet active", 
-                // "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -2198,21 +2162,7 @@ function createIntentBasedForm() {
         });
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-
-            showFields(["productsOffered"]);
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["productsOffered", "declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
         updateToolLabelVisibility();
 
@@ -2370,14 +2320,6 @@ function createIntentBasedForm() {
             { label: "Address", type: "textarea", name: "address" },
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
-            // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]}
         ];
 
         function createInstructionsRow() {
@@ -2976,57 +2918,10 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
             // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: [
-                "", 
-                "Always On",
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                // "Account has pending issues", 
-                // "Account is barred", 
-                // "Account is inhibited", 
-                // "Account is not yet active", 
-                // "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -3581,21 +3476,7 @@ function createIntentBasedForm() {
         });
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-
-            showFields(["productsOffered"]);
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["productsOffered", "declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
         const resolution = document.querySelector("[name='resolution']");
         const testedOk = document.querySelector("[name='testedOk']");
@@ -3756,59 +3637,10 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
             // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: [
-                "", 
-                "Mesh",
-                "Plan Upgrade"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                // "Account has pending issues", 
-                // "Account is barred", 
-                // "Account is inhibited", 
-                // "Account is not yet active", 
-                // "Account is restricted",
-                "Case is escalated",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -4283,21 +4115,7 @@ function createIntentBasedForm() {
         });
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-
-            showFields(["productsOffered"]);
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["productsOffered", "declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
         const resolution = document.querySelector("[name='resolution']");
         const testedOk = document.querySelector("[name='testedOk']");
@@ -4397,14 +4215,6 @@ function createIntentBasedForm() {
             { label: "Address", type: "textarea", name: "address" },
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
-            // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
         ];
 
         function createInstructionsRow() {
@@ -4967,14 +4777,6 @@ function createIntentBasedForm() {
             { label: "Address", type: "textarea", name: "address" },
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
-            // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
         ];
 
         function createInstructionsRow() {
@@ -5501,14 +5303,6 @@ function createIntentBasedForm() {
             { label: "Address", type: "textarea", name: "address" },
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
-            // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
         ];
 
         function createInstructionsRow() {
@@ -6009,14 +5803,6 @@ function createIntentBasedForm() {
             { label: "Preferred Date & Time", type: "text", name: "availability" },
             { label: "Address", type: "textarea", name: "address" },
             { label: "Landmarks", type: "textarea", name: "landmarks" },
-            // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
         ];
 
         function createInstructionsRow() {
@@ -6269,14 +6055,6 @@ function createIntentBasedForm() {
             { label: "Address", type: "textarea", name: "address" },
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
-            // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
         ];
 
         function createInstructionsRow() {
@@ -7018,53 +6796,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -7225,19 +6959,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     } else if (requestForms.includes(selectedValue)) { 
         const table = document.createElement("table");
@@ -7259,53 +6981,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -7492,19 +7170,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqAddressMod") { 
         const table = document.createElement("table");
@@ -7532,53 +7198,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -7735,19 +7357,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqSupRetAccNum" || selectedValue === "formReqSupChangeAccNum") { 
         const table = document.createElement("table");
@@ -7775,53 +7385,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -8064,19 +7630,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqDisconnection") { 
         const table = document.createElement("table");
@@ -8105,53 +7659,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -8394,19 +7904,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqDispute") { 
         const table = document.createElement("table");
@@ -8439,53 +7937,10 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
+            // Ordertake prompt for Rebate Non Service
             { label: "Ordertake?", type: "select", name: "ordertake", options: [
                 "", 
                 "Yes", 
@@ -8683,19 +8138,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     } else if (selectedValue === "formReqDowngrade") { 
         const table = document.createElement("table");
@@ -8725,53 +8168,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -8961,19 +8360,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     } else if (selectedValue === "formReqDDE") { 
         const table = document.createElement("table");
@@ -9001,53 +8388,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -9242,19 +8585,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqInmove") { 
         const table = document.createElement("table");
@@ -9277,53 +8608,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -9448,19 +8735,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqMigration") { 
         const table = document.createElement("table");
@@ -9483,53 +8758,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -9662,19 +8893,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqMisappPay" || selectedValue === "formReqReflectPay") { 
         const table = document.createElement("table");
@@ -9697,53 +8916,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -9890,19 +9065,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqReconnect") {
         const table = document.createElement("table");
@@ -9930,53 +9093,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ]},
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         const reconSpecificDefinition = {
@@ -10155,19 +9274,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqRefund") { 
         const table = document.createElement("table");
@@ -10197,53 +9304,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -10444,19 +9507,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqRelocation") { 
         const table = document.createElement("table");
@@ -10485,53 +9536,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
             { label: "Ordertake?", type: "select", name: "ordertake", options: [
                 "", 
                 "Yes", 
@@ -10725,19 +9732,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
     } else if (selectedValue === "formReqSpecFeat") { 
         const table = document.createElement("table");
 
@@ -10766,53 +9761,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -11015,19 +9966,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     } else if (selectedValue === "formReqSpeedAddOn") { 
         const table = document.createElement("table");
@@ -11056,53 +9995,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -11264,19 +10159,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
         
     } else if (selectedValue === "formReqUfc") { 
         const table = document.createElement("table");
@@ -11304,53 +10187,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -11498,19 +10337,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     } else if (selectedValue === "formReqUpgrade") { 
         const table = document.createElement("table");
@@ -11542,53 +10369,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -11782,19 +10565,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     } else if (selectedValue === "formReqVAS") { 
         const table = document.createElement("table");
@@ -11827,53 +10598,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -12093,19 +10820,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     } else if (selectedValue === "formReqWireReroute") { 
         const table = document.createElement("table");
@@ -12133,53 +10848,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -12354,19 +11025,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     }
 
@@ -12385,53 +11044,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createFieldRow(field) {
@@ -12512,19 +11127,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
     } else if (selectedValue === "formCompMisappliedPayment") {
         const table = document.createElement("table");
 
@@ -12541,53 +11144,9 @@ function createIntentBasedForm() {
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createPromptRow() {
@@ -12748,19 +11307,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
     } else if (selectedValue === "formCompUnreflectedPayment") {
         const table = document.createElement("table");
 
@@ -12778,53 +11325,9 @@ function createIntentBasedForm() {
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createPromptRow() {
@@ -13003,19 +11506,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
     
     } else if (selectedValue === "formCompPersonnelIssue") {
         const table = document.createElement("table");
@@ -13035,53 +11526,9 @@ function createIntentBasedForm() {
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createPromptRow() {
@@ -13208,19 +11655,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
     } 
 
     // Non-Tech Inquiry
@@ -13244,53 +11679,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -13465,19 +11856,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     } else if (selectedValue === "formInqBillInterpret") {
         const table = document.createElement("table");
@@ -13502,53 +11881,9 @@ function createIntentBasedForm() {
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -13668,19 +12003,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     } else if (selectedValue === "formInqPermaDisc") {
         const table = document.createElement("table");
@@ -13703,53 +12026,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -13914,19 +12193,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
     
     } else if (selectedValue === "formInqOutsBal") {
         const table = document.createElement("table");
@@ -13954,53 +12221,9 @@ function createIntentBasedForm() {
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -14122,19 +12345,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
     
     } else if (selectedValue === "formInqRefund") {
         const table = document.createElement("table");
@@ -14157,53 +12368,9 @@ function createIntentBasedForm() {
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -14321,19 +12488,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
     
     }
 
@@ -14386,53 +12541,9 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: [
-                "", 
-                "Yes - Accepted", 
-                "Yes - Pending Req. (For callback)",
-                "No - Declined",
-                "No - Ignored",
-                "NA - Not Eligible"
-            ]},
-            { label: "Decline Reason", type: "select", name: "declineReason", options: [
-                "", 
-                "Budget constraint", 
-                "No need / satisfied with current plan", 
-                "Time constraint", 
-                "No reason stated", 
-                "Poor service experience", 
-                "Not decision‑maker"
-            ]},
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: [
-                "", 
-                "Account has pending issues", 
-                "Account is barred", 
-                "Account is inhibited", 
-                "Account is not yet active", 
-                "Account is restricted",
-                "Customer already availed the product", 
-                "Customer already availed the service", 
-                "Customer already upgraded their plan", 
-                "Customer is in a hurry", 
-                "Customer is irate", 
-                "Customer is requesting a supervisor", 
-                "Customer is requesting a manager", 
-                "Customer is requesting to downgrade", 
-                "Disconnection concerns", 
-                "LOB is not applicable", 
-                "Microbusiness Account", 
-                "Plan not eligible for upsell", 
-                "Poor LTE signal strength in the area", 
-                "Poor payment history", 
-                "Potential crisis", 
-                "Prepaid Fiber",
-                "Technical incompatibility", 
-                "Temporary Disconnection concerns",
-                "Time is limited",
-                "Unresolved AFTERSALES complaints", 
-                "Unresolved AFTERSALES concerns", 
-                "VTD concerns"
-            ]},
+            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createDefinitionRow() {
@@ -14869,19 +12980,7 @@ function createIntentBasedForm() {
         hideSpecificFields(["declineReason", "notEligibleReason"]);
 
         const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => {
-            if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 3) {
-                showFields(["declineReason"]);
-                hideSpecificFields(["notEligibleReason"]);
-            } else if (upsell.selectedIndex === 4) {
-                hideSpecificFields(["declineReason", "notEligibleReason"]);
-            } else if (upsell.selectedIndex === 5) {
-                showFields(["notEligibleReason"]);
-                hideSpecificFields(["declineReason"]);
-            }
-        });
+        upsell.addEventListener("change", () => handleUpsellChange(upsell));
 
     }
 
@@ -16532,7 +14631,6 @@ function techNotesButtonHandler(showFloating = true) {
 
     function constTechCAOutput() {
         const fields = [
-
             // Remarks
             { name: "nmsSkinRemarks" },
             { name: "dmsRemarks" },
@@ -16553,17 +14651,16 @@ function techNotesButtonHandler(showFloating = true) {
         const seenFields = new Set();
         let actionsTakenParts = [];
 
+        const offerALS = document.querySelector('[name="offerALS"]')?.value || "";
+
         fields.forEach(field => {
             const inputElement = document.querySelector(`[name="${field.name}"]`);
             let value = getSfFieldValueIfVisible(field.name);
-
-            value = getSfFieldValueIfVisible(field.name);
 
             if (inputElement && inputElement.tagName === "SELECT" && inputElement.selectedIndex === 0) {
                 return;
             }
 
-            const offerALS = document.querySelector('[name="offerALS"]')?.value || "";
             const alsPackValue = getSfFieldValueIfVisible("alsPackOffered");
 
             if (value && !seenFields.has(field.name)) {
@@ -16592,7 +14689,6 @@ function techNotesButtonHandler(showFloating = true) {
         });
 
         const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
-
         const issueResolvedMap = {
             "Yes": "Resolved",
             "No - Customer is Unresponsive": "Customer is Unresponsive",
@@ -16605,24 +14701,25 @@ function techNotesButtonHandler(showFloating = true) {
         }
 
         const upsellValue = document.querySelector('[name="upsell"]')?.value || "";
-
         const upsellMap = {
-            "Yes - Accepted": "#CDNTUPGACCEPTED",
-            "Yes - Pending Req. (For callback)": "#CDNTUPGFORCALLBACK",
-            "No - Declined": "#CDNTUPGDECLINED",
-            "No - Ignored": "#CDNTUPGIGNORED",
-            "NA - Not Eligible": "#CDNTUPGNOTELIGIBLE"
+            "Yes - Accepted": "#UpsellAccepted",
+            "No - Declined": "#UpsellDeclined",
+            "No - Ignored": "#UpsellIgnored",
+            "No - Undecided": "#UpsellUndecided",
+            "NA - Not Eligible": "#UpsellNotEligible"
         };
 
         const upsellNote = upsellMap[upsellValue] || "";
+        return {
+            actions: "A: " + actionsTakenParts.join("/ "),
+            upsellNote
+        };
+    }
 
-        let actionsTaken = "A: " + actionsTakenParts.join("/ ");
-
-        if (upsellNote) {
-            actionsTaken += "\n\n" + upsellNote;
-        }
-
-        return actionsTaken.trim();
+    function formatActions(actions, upsellNote) {
+        let result = actions.toUpperCase();
+        if (upsellNote) result += "\n\n" + upsellNote;
+        return result;
     }
 
     function constOtherDetails() {
@@ -16813,13 +14910,10 @@ function techNotesButtonHandler(showFloating = true) {
 
     const custName = formatField("CUST NAME", "custName");
     const sfCaseNum = formatField("SF", "sfCaseNum");
-    // const pcNumber = formatField("PARENT", "pcNumber");
-    // const cepCaseNumber = formatField("", "cepCaseNumber");
     const minNumber = formatField("/ AFFECTED MIN", "minNumber");
 
     const combinedInfo = [
         custName, sfCaseNum, minNumber
-        // , pcNumber, cepCaseNumber
     ]
         .filter(Boolean)
         .join("/ "); 
@@ -16829,36 +14923,36 @@ function techNotesButtonHandler(showFloating = true) {
     const queue = formatField("/ QUEUE", "queue");
     const ffupCount = formatField("/ FFUP COUNT", "ffupCount");
     const ticketAge = formatField("/ CASE AGE", "ticketAge");
-    // const wocas = formatField("/ WOCAS", "WOCAS");
 
-    // const emptyFields = validateRequiredFields();
-    // if (emptyFields.length > 0) return;
+    const { actions, upsellNote } = constTechCAOutput();
 
     if (vars.selectedIntent === "formFfupRepair") {
         concernCopiedText = `${combinedInfo}\nC: ${vars.channel}_${vars.pldtUser}/ FOLLOW-UP REPAIR ${vars.ticketStatus}${queue}${ffupCount}${ticketAge}`;
-        actionsTakenCopiedText = constTechCAOutput();
+        actionsTakenCopiedText = formatActions(actions, upsellNote);
     } else if (optGroupIntents.includes(vars.selectedIntent)) {
         concernCopiedText = `${combinedInfo}\nC: ${vars.channel}${selectedOptGroupLabel}`;
-        actionsTakenCopiedText = constTechCAOutput();
+        actionsTakenCopiedText = formatActions(actions, upsellNote);
+
         if (vars.channel === "CDT-HOTLINE") {
             otherDetailsCopiedText = constOtherDetails();
         }
     } else if (optTextIntents.includes(vars.selectedIntent)) {
         concernCopiedText = `${combinedInfo}\nC: ${vars.channel}${selectedIntentText}`;
-        actionsTakenCopiedText = constTechCAOutput();
+        actionsTakenCopiedText = formatActions(actions, upsellNote);
+
         if (vars.channel === "CDT-HOTLINE") {
             otherDetailsCopiedText = constOtherDetails();
         }
     } else if (alwaysOnIntents.includes(vars.selectedIntent)) {
         concernCopiedText = `${combinedInfo}\nC: ${vars.channel}${selectedIntentText} (ALWAYS ON)`;
-        actionsTakenCopiedText = constTechCAOutput();
+        actionsTakenCopiedText = formatActions(actions, upsellNote);
+        
         if (vars.channel === "CDT-HOTLINE") {
             otherDetailsCopiedText = constOtherDetails();
         }
     }
 
     concernCopiedText = concernCopiedText.toUpperCase();
-    actionsTakenCopiedText = actionsTakenCopiedText.toUpperCase();
     otherDetailsCopiedText = otherDetailsCopiedText.toUpperCase();
     
     let otherDetailsSections = [];
@@ -17038,45 +15132,6 @@ function nontechNotesButtonHandler(showFloating = true) {
     let concernCopiedText = "";
     let actionsTakenCopiedText = "";
 
-    // function validateRequiredFields() {
-    //     const fieldLabels = {
-    //         // "srNum": "SR Number",
-    //         "custConcern": "Concern",
-    //         "ownership": "Ownership",
-    //         "custAuth": "Customer Authentication",
-    //         "findings": "Cause of Misapplied Payment",
-    //         "paymentChannel": "Payment Channel",
-    //         "otherPaymentChannel": "Other Payment Channel",
-    //         "issueResolved": "Issue Resolved",
-    //         "upsell": "Upsell",
-    //         "eSnowTicketNum": "E-Solve/Snow Ticket Number"
-    //     };
-
-    //     let requiredFields = Object.keys(fieldLabels);
-
-    //     if (vars.selectedIntent === "othersUT") {
-    //         requiredFields = requiredFields.filter(field => field !== "custConcern");
-    //     }
-
-    //     const emptyFields = [];
-
-    //     requiredFields.forEach(field => {
-    //         const inputField = document.querySelector(`[name="${field}"]`);
-    //         if (isFieldVisible(field)) {
-    //             if (!inputField || inputField.value.trim() === "" ||
-    //                 (inputField.tagName === "SELECT" && inputField.selectedIndex === 0)) {
-    //                 emptyFields.push(fieldLabels[field]);
-    //             }
-    //         }
-    //     });
-
-    //     if (emptyFields.length > 0) {
-    //         alert(`Please complete the following field(s): ${emptyFields.join(", ")}`);
-    //     }
-
-    //     return emptyFields;
-    // }
-
     function constructFuseOutput() {
         const fields = [
             { name: "offerALS" },
@@ -17102,7 +15157,7 @@ function nontechNotesButtonHandler(showFloating = true) {
 
         fields.forEach(field => {
             const inputElement = document.querySelector(`[name="${field.name}"]`);
-            let value = getFuseFieldValueIfVisible(field.name);
+            let value;
 
             if (field.name === "paymentChannel") {
                 const paymentChannelValue = getFuseFieldValueIfVisible("paymentChannel");
@@ -17135,18 +15190,25 @@ function nontechNotesButtonHandler(showFloating = true) {
             }
         });
 
+        // Affected Tool
         const affectedTool = getFuseFieldValueIfVisible("affectedTool");
         const otherTool = getFuseFieldValueIfVisible("otherTool");
 
         if (affectedTool) {
-            const toolName = affectedTool === "Other PLDT tools" ? otherTool : affectedTool;
+            const toolName =
+                affectedTool === "Other PLDT tools"
+                    ? (otherTool || "").trim()
+                    : affectedTool;
+
             if (toolName) {
                 actionsTakenParts.push(`${toolName} Downtime`);
             }
         }
 
         // Issue Resolved mapping
-        const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
+        const issueResolvedValue =
+            document.querySelector('[name="issueResolved"]')?.value || "";
+
         const issueResolvedMap = {
             "Yes": "Resolved",
             "No - Customer is Unresponsive": "Customer is Unresponsive",
@@ -17160,18 +15222,21 @@ function nontechNotesButtonHandler(showFloating = true) {
 
         // Upsell mapping
         const upsellValue = document.querySelector('[name="upsell"]')?.value || "";
-        const upsellMapping = {
-            "Yes - Accepted": "#CDNTUPGACCEPTED",
-            "Yes - Pending Req. (For callback)": "#CDNTUPGFORCALLBACK",
-            "No - Declined": "#CDNTUPGDECLINED",
-            "No - Ignored": "#CDNTUPGIGNORED",
-            "NA - Not Eligible": "#CDNTUPGNOTELIGIBLE"
+
+        const upsellMap = {
+            "Yes - Accepted": "#UpsellAccepted",
+            "No - Declined": "#UpsellDeclined",
+            "No - Ignored": "#UpsellIgnored",
+            "No - Undecided": "#UpsellUndecided",
+            "NA - Not Eligible": "#UpsellNotEligible"
         };
 
-        const upsellNote = upsellMapping[upsellValue] || "";
+        const upsellNote = upsellMap[upsellValue] || "";
 
         // Ordertake mapping
-        const ordertakeValue = document.querySelector('[name="ordertake"]')?.value || "";
+        const ordertakeValue =
+            document.querySelector('[name="ordertake"]')?.value || "";
+
         let otNote = "";
 
         if (ordertakeValue === "Yes") {
@@ -17183,20 +15248,28 @@ function nontechNotesButtonHandler(showFloating = true) {
             otNote = requestTypeMap[vars.requestType] || "";
         }
 
-        // Construct final Actions Taken note
-        let actionsTaken = "A: " + actionsTakenParts.join("/ ");
+        // Construct final Actions Taken
+        const cleanedParts = actionsTakenParts.filter(Boolean);
 
+        // Uppercase ONLY the main actions
+        let actionsTaken = cleanedParts.length
+            ? "A: " + cleanedParts.join("/ ").toUpperCase()
+            : "";
+
+        // Append upsell note (DO NOT uppercase)
         if (upsellNote) {
-            actionsTaken += "\n\n" + upsellNote;
+            actionsTaken += (actionsTaken ? "\n\n" : "") + upsellNote;
         }
 
+        // Append ordertake note (decide if uppercase or not)
         if (otNote) {
-            actionsTaken += " " + otNote;
+            actionsTaken += (actionsTaken ? " " : "") + otNote;
         }
 
+        // Append eSnow (usually keep as-is)
         const eSnowTicketNum = getFuseFieldValueIfVisible("eSnowTicketNum");
         if (eSnowTicketNum) {
-            actionsTaken += eSnowTicketNum;
+            actionsTaken += (actionsTaken ? " " : "") + eSnowTicketNum;
         }
 
         return actionsTaken.trim();
@@ -17226,7 +15299,7 @@ function nontechNotesButtonHandler(showFloating = true) {
     ];
 
     const ffupForms = [
-        "formFfupChangeOwnership", "formFfupChangeTelUnit", "formFfupDDE",, "formFfupRelocCid", "formFfupReroute", "formFfupWT"
+        "formFfupChangeOwnership", "formFfupChangeTelUnit", "formFfupDDE", "formFfupRelocCid", "formFfupReroute", "formFfupWT"
     ];
 
     const ffupFormsBasedOnFindings = [
@@ -17464,7 +15537,6 @@ function nontechNotesButtonHandler(showFloating = true) {
     }
 
     concernCopiedText = concernCopiedText.toUpperCase();
-    actionsTakenCopiedText = actionsTakenCopiedText.toUpperCase();
 
     const textToCopyGroups = [
         [concernCopiedText, actionsTakenCopiedText].filter(Boolean).join("\n"),
@@ -20096,7 +18168,8 @@ const versions = [
                 "<strong>Dynamic Notes Display:</strong> Saved notes section now appears only when data exists.",
                 "<strong>Upsell Notes & Tagging:</strong> Added upsell details to notes and Excel (Product Offered, Decline Reason, Not Eligible Reason) for easier tracking.",
                 "Enhanced note parsing to replace “|” with “/” in both FUSE and SF notes for consistent formatting.",
-                "<strong>Added “Modified On” Timestamp:</strong> Saved and exported notes will now show when they were last updated, making it easier to track recent changes."
+                "<strong>Added “Modified On” Timestamp:</strong> Saved and exported notes will now show when they were last updated, making it easier to track recent changes.",
+                "<strong>Upsell Notes:</strong> Updated upsell options by mapping selections to predefined tags (e.g., #UpsellAccepted, #UpsellDeclined, #UpsellIgnored, #UpsellUndecided, #UpsellNotEligible)."
             ]},
             { title: "Fixes", items: [
                 "<strong>Stability Fixes:</strong> Resolved issue where load function triggered only once.",

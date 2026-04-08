@@ -264,7 +264,7 @@ header {
 
 /* expanded state */
 .updateItem.active .updateContent {
-    max-height: 500px; /* enough height for content */
+    max-height: 600px; /* enough height for content */
 }
 
 .scrollWrapper {
