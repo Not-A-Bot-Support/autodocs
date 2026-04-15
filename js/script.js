@@ -1,6 +1,6 @@
 /* script.js
 
-Standard Notes Generator Version 5.4.080426
+Standard Notes Generator
 Developed & Designed by: QA Ryan */
 
 // FIRST LOAD CHECK
@@ -1412,14 +1412,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
+            ffupButtonHandler,
             techNotesButtonHandler,
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -2020,14 +2018,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
-            techNotesButtonHandler, 
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            ffupButtonHandler,
+            techNotesButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -2079,7 +2075,7 @@ function createIntentBasedForm() {
                 hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "issueResolved", "resolution", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "issueResolved", "resolution", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility();
         });
@@ -2535,14 +2531,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
+            ffupButtonHandler,
             techNotesButtonHandler,
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -3278,14 +3272,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
+            ffupButtonHandler,
             techNotesButtonHandler,
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -4007,14 +3999,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
+            ffupButtonHandler,
             techNotesButtonHandler,
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -4604,14 +4594,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
+            ffupButtonHandler,
             techNotesButtonHandler,
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -5031,14 +5019,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
+            ffupButtonHandler,
             techNotesButtonHandler,
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -5605,14 +5591,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
+            ffupButtonHandler,
             techNotesButtonHandler,
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -5984,14 +5968,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
-            techNotesButtonHandler, 
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            ffupButtonHandler,
+            techNotesButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -6262,14 +6244,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
+            ffupButtonHandler,
             techNotesButtonHandler,
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -6632,14 +6612,12 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
         const buttonHandlers = [
-            ffupButtonHandler, 
-            techNotesButtonHandler, 
-            endorsementForm, 
-            sfTaggingButtonHandler,
-            saveFormData,
-            resetButtonHandler,
+            ffupButtonHandler,
+            techNotesButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
         ];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -13506,6 +13484,10 @@ function createButtons(buttonLabels, buttonHandlers) {
 
     const channelField = document.getElementById("channel").value;
     const lobField = document.getElementById("lob").value;
+
+    const isHotline = channelField === "CDT-HOTLINE";
+    const isTech = lobField === "TECH";
+
     const buttonTable = document.createElement("table");
     let buttonIndex = 0;
 
@@ -13519,55 +13501,102 @@ function createButtons(buttonLabels, buttonHandlers) {
             while (buttonIndex < buttonLabels.length) {
                 let label = buttonLabels[buttonIndex];
 
-                const isHotline = channelField === "CDT-HOTLINE";
-                const isTech = lobField === "TECH";
-
+                // =============================
+                // 🔹 HOTLINE RULES
+                // =============================
                 if (isHotline) {
                     if (label === "SF/FUSE") {
                         label = "FUSE";
                     }
 
                     if (label === "SF Tagging") {
-                        label = "ESA Tagging";
-                    }
-
-                    if (label === "Endorse") {
-                        buttonIndex++;
-                        continue;
+                        label = "Tagging";
                     }
                 }
-                
+
+                if (!isTech) {
+                    if (label === "SF Tagging") {
+                        label = "Tagging";
+                    }
+                }
+
+                // =============================
+                // 🔹 Intent-based label tweak
+                // =============================
                 if (vars.selectedIntent === "formFfupRepair" && label === "SF/FUSE") {
                     label = "SF & FUSE";
                 }
 
-                if (isHotline && isTech && label === "ESA Tagging") {
+                // =============================
+                // 🔹 Tech + Hotline rule
+                // =============================
+                if (isHotline && isTech && label === "Tagging") {
                     buttonIndex++;
                     continue;
                 }
 
-                if (label === "CEP" && vars.selectedIntent !== "formFfupRepair") {
+                // =============================
+                // 🔹 CEP / MORE DROPDOWNS
+                // =============================
+                if (
+                    (label === "CEP" && vars.selectedIntent !== "formFfupRepair") ||
+                    (label === "More")
+                ) {
                     const dropdown = document.createElement("div");
                     dropdown.classList.add("dropdown");
 
+                    // Align "More" to right
+                    if (label === "More") {
+                        dropdown.classList.add("align-right");
+                    }
+
                     const mainButton = document.createElement("button");
-                    mainButton.textContent = "CEP ⮝";
+                    mainButton.textContent = `${label} ⮝`;
                     mainButton.classList.add("form2-button", "dropdown-toggle");
 
                     const dropdownContent = document.createElement("div");
                     dropdownContent.classList.add("dropdown-content");
 
-                    const subOptions = [
-                        { label: "Title", keys: ["Title"] },
-                        { label: "Description", keys: ["Description"] },
-                        { label: "Case Notes", keys: ["Case Notes in Timeline"] },
-                        { label: "Special Inst.", keys: ["Special Instructions"] }
-                    ];
+                    let subOptions = [];
+
+                    // CEP OPTIONS
+                    if (label === "CEP") {
+                        subOptions = [
+                            { label: "Title", action: () => cepButtonHandler(true, ["Title"]) },
+                            { label: "Description", action: () => cepButtonHandler(true, ["Description"]) },
+                            { label: "Case Notes", action: () => cepButtonHandler(true, ["Case Notes in Timeline"]) },
+                            { label: "Special Inst.", action: () => cepButtonHandler(true, ["Special Instructions"]) }
+                        ];
+                    }
+
+                    // MORE OPTIONS (NON-HOTLINE ONLY)
+                    else if (label === "More") {
+                        subOptions = [];
+
+                        subOptions.push(
+                            { label: "🔄 Reset", action: () => resetButtonHandler() }
+                        );
+
+                        // Hotline: NO SF Tagging
+                        if (!isHotline) {
+                            // Only show SF Tagging for TECH (if that's your rule)
+                            if (isTech) {
+                                subOptions.push({
+                                    label: "🗂️ SF Tagging",
+                                    action: () => sfTaggingButtonHandler()
+                                });
+                            }
+                        }
+
+                        subOptions.push(
+                            { label: "💾 Save", action: () => saveFormData() }
+                        );
+                    }
 
                     subOptions.forEach(option => {
                         const subBtn = document.createElement("button");
                         subBtn.textContent = option.label;
-                        subBtn.onclick = () => cepButtonHandler(true, option.keys);
+                        subBtn.onclick = option.action;
                         dropdownContent.appendChild(subBtn);
                     });
 
@@ -13599,6 +13628,9 @@ function createButtons(buttonLabels, buttonHandlers) {
                     break;
                 }
 
+                // =============================
+                // 🔹 DEFAULT BUTTON
+                // =============================
                 const button = document.createElement("button");
                 button.textContent = label;
                 button.onclick = buttonHandlers[buttonIndex];
@@ -13606,6 +13638,7 @@ function createButtons(buttonLabels, buttonHandlers) {
 
                 cell.appendChild(button);
                 row.appendChild(cell);
+
                 buttonIndex++;
                 hasButton = true;
                 break;
@@ -13657,7 +13690,9 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
     if (!vars.pldtUser) missingFields.push("PLDT Username");
 
     if (enableValidation && missingFields.length > 0) {
-        alert(`Please fill out the following fields: ${missingFields.join(", ")}`);
+        showAlert(
+            `Please fill out the following fields:\n\n${missingFields.join("\n")}*`
+        );
         return;
     }
 
@@ -17467,18 +17502,6 @@ function resetButtonHandler() {
                 vocSelect.appendChild(option.cloneNode(true));
             }
         });
-
-        const footerElement = document.getElementById("footerValue");
-        const footerText = "Standard Notes Generator Version 5.4.080426";
-        typeWriter(footerText, footerElement, 50);
-
-        setTimeout(function() {
-            window.scrollTo({
-                top: 0,
-                left: 0,
-                behavior: 'smooth'
-            });
-        }, 100);
     });
 }
 
@@ -17501,15 +17524,15 @@ function saveFormData() {
         return;
     }
 
-    if (!customerName) missingFields.push("Customer Name");
-    if (!accountNumber) missingFields.push("Account Number");
+    if (!customerName) missingFields.push("Customer Name*");
+    if (!accountNumber) missingFields.push("Account Number*");
 
     if (selectedChannel !== "CDT-HOTLINE") {
-        if (!sfCaseNumber) missingFields.push("SF Case Number");
+        if (!sfCaseNumber) missingFields.push("SF Case Number*");
     }
 
     if (missingFields.length > 0) {
-        showAlert(`We couldn’t save your notes. Please fill out the following fields: ${missingFields.join(", ")}`);
+        showAlert(`We couldn’t save your notes. Please fill out the following fields:\n\n${missingFields.join("\n")}`);
         return;
     }
 
@@ -17657,11 +17680,35 @@ function saveFormData() {
 
     const now = new Date();
     const timestamp = now.toLocaleString();
-    const fallbackKey = `NOCASE-${now.getTime()}`;
 
+    function generateHotlineKey() {
+        const normalize = str => (str || "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .toUpperCase();
+
+        const raw = [
+            normalize(document.querySelector('[name="custName"]')?.value),
+            normalize(document.querySelector('[name="accountNum"]')?.value),
+            normalize(document.querySelector('[name="slctFrm1"]')?.value),
+            normalize((combinedNotes || "").slice(0, 100))
+        ].join("|");
+
+        // Simple hash → convert to 8-digit number
+        let hash = 0;
+        for (let i = 0; i < raw.length; i++) {
+            hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+            hash |= 0;
+        }
+
+        return Math.abs(hash).toString().padStart(8, "0").slice(0, 8);
+    }
+
+    const fallbackKey = generateHotlineKey();
     const uniqueKey = (selectedChannel === 'CDT-HOTLINE' || !sfCaseNumber)
         ? fallbackKey
         : sfCaseNumber;
+
     const intentSelect = document.querySelector('[name="slctFrm1"]');
 
     const intentText = intentSelect
@@ -17676,6 +17723,7 @@ function saveFormData() {
 
     const savedEntry = {
         timestamp: timestamp,
+        callId: fallbackKey,
         selectChannel: getValue("selectChannel"),
         agentName: getValue("agentName"),
         teamLead: getValue("teamLead"),
@@ -18159,6 +18207,18 @@ const instructions = [
 ];
 
 const versions = [
+    {
+        version: "V5.4.150426",
+        updates: [
+            { title: "UI Enhancements:", items: [
+                "Refined visuals for better readability.",
+                "Consolidated multiple secondary actions into a single expandable “More” button to reduce clutter and improve usability.",
+            ]},
+            { title: "Fixes", items: [
+                "<strong>Duplication Detection:</strong> Enhanced fallback key logic for saved hotline notes to improve duplicate detection accuracy.",
+            ]},
+        ]
+    },
     {
         version: "V5.4.080426",
         updates: [
