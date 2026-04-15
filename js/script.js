@@ -18145,9 +18145,44 @@ Array.from(container.children).forEach(child => resizeObserver.observe(child));
 updateScrollbar();
 
 // Updates Container
-function renderUpdates(containerId, instructions, versions) {
+function renderUpdates(containerId, introduction, instructions, versions) {
     const container = document.getElementById(containerId);
     if (!container) return console.error(`Container with ID '${containerId}' not found.`);
+
+    // --- Introduction Section ---
+    introduction.forEach(({ version, updates }) => {
+        const introductionDiv = document.createElement("div");
+        introductionDiv.classList.add("updateItem");
+
+        // clickable title
+        const introductionTitle = document.createElement("h3");
+        introductionTitle.classList.add("updateTitle");
+        introductionTitle.textContent = version || "Standard Notes Generator (Autodocs) V5.4";
+
+        // collapsible content
+        const introductionContent = document.createElement("div");
+        introductionContent.classList.add("updateContent");
+
+        updates.forEach(section => {
+            const sectionDiv = document.createElement("div");
+
+            sectionDiv.innerHTML = `
+                <strong>${section.title}</strong>
+                <ul>${section.items.map(i => `<li>${i}</li>`).join("")}</ul>
+            `;
+
+            introductionContent.appendChild(sectionDiv);
+        });
+
+        // toggle behavior
+        introductionTitle.addEventListener("click", () => {
+            introductionDiv.classList.toggle("active");
+        });
+
+        introductionDiv.appendChild(introductionTitle);
+        introductionDiv.appendChild(introductionContent);
+        container.appendChild(introductionDiv);
+    });
 
     // --- Instructions Section ---
     const instructionsDiv = document.createElement("div");
@@ -18196,6 +18231,39 @@ function renderUpdates(containerId, instructions, versions) {
     });
 }
 
+const introduction = [
+    {
+        version: "Standard Notes Generator (Autodocs) V5",
+        updates: [
+            { title: "About", items: [
+                "<strong>Where consistency meets efficiency.</strong>",
+                "This tool is designed to standardize and streamline case documentation across all workflows.",
+                "By enforcing a consistent structure, it enables agents and support teams to easily track, review, and understand case details.",
+                "This reduces manual effort, minimizes errors, and improves overall case handling efficiency and accuracy."
+            ]},
+            { title: "Features", items: [
+                "<strong>Concern Type Categorization:</strong> Easily identify whether a case is technical or non-technical, helping agents apply the correct handling approach.",
+                "<strong>Voice of the Customer (VOC) Classification:</strong> Categorizes customer intent (e.g., complaint, request, follow-up, inquiry) for better case understanding and documentation accuracy.",
+                "<strong>WOCAS-Based Intents:</strong> Intents are aligned with actual customer statements, guiding agents in selecting the correct option while enabling the system to generate accurate documentation output.",
+                "<strong>Saved Notes Checker:</strong> Detects existing saved notes upon startup and prompts agents to either keep or delete them.",
+                "<strong>Built-in Notepad:</strong> Provides a dedicated space for temporary notes or frequently used spiels.",
+                "<strong>One-Click Copy Function:</strong> Simplifies copying of details or notes with a single click, no manual highlighting needed.",
+                "<strong>One-Click Notes Generation:</strong> Automatically generates structured and standardized case notes, eliminating the need for manual formatting.",
+                "<strong>Quick Copy for Generated Notes:</strong> Allows agents to instantly copy generated notes directly from the output section.",
+                "<strong>Multiple Notes Format Support:</strong> Generates notes in different formats depending on the documentation requirements of the selected tool or process.",
+                "<strong>Auto Data Retrieval:</strong> Automatically retrieves previously saved data or notes from the database, reducing the need for repeated data entry.",
+                "<strong>Update Notes Feature:</strong> Appends new notes to existing records without overwriting previously saved information.",
+                "<strong>Auto-Populate Fields:</strong> Automatically fills in key details such as customer name, account number, landline, concern type, VOC, service ID, Option 82, and WOCAS when available in the database.",
+                "<strong>Intent-Based Fields:</strong> Dynamically displays only relevant fields based on the selected intent, ensuring required information is captured while excluding unnecessary inputs.",
+                "<strong>Endorsement Notes Generation:</strong> Enables agents to generate endorsement notes aligned with standard endorsement guidelines when escalation is required.",
+                "<strong>Instructions and Updates Section:</strong> Centralized area for tool updates, enhancements, and important instructions.",
+                "<strong>LIT365 Work Instructions Integration:</strong> Provides intent-specific work instruction links to reduce time spent searching for guidelines.",
+                "<strong>Export Saved Notes:</strong> Allows agents to export saved notes into Excel or Notepad format for reporting or backup purposes."
+            ]},
+        ]
+    }
+];
+
 const instructions = [
     "Open the tool using the provided link or through smart assistant (Saya). Avoid using the browser's ‘Duplicate Tab’ to ensure the DOM scripts load properly.",
     "To ensure data accuracy, delete any previously saved records on this workstation before saving new ones.",
@@ -18211,6 +18279,7 @@ const versions = [
         version: "V5.4.150426",
         updates: [
             { title: "UI Enhancements:", items: [
+                "Added Tool Overview. See <strong>Standard Notes Generator (Autodocs) V5</strong> section.",
                 "Refined visuals for better readability.",
                 "Consolidated multiple secondary actions into a single expandable “More” button to reduce clutter and improve usability.",
             ]},
@@ -18377,7 +18446,7 @@ const versions = [
     }
 ];
 
-renderUpdates("updatesContainer", instructions, versions);
+renderUpdates("updatesContainer", introduction, instructions, versions);
 
 // FAB MENU ELEMENT REFERENCES
 const panel = document.getElementById("floatingPanel");
