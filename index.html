@@ -76,7 +76,6 @@
                                 <div class="form1DivInput">
                                     <select id="channel" name="selectChannel">
                                         <option value="" disabled selected></option>
-                                        <!-- <option value="CDT-CCBO">CDT-CCBO</option> -->
                                         <option value="CDT-HOTLINE">CDT-HOTLINE</option>
                                         <option value="CDT-SOCMED">CDT-SOCMED</option>
                                     </select>
@@ -124,11 +123,6 @@
                                 </div>
                             </td> 
                         </tr>
-                        <!-- <tr id="saved-notes-header-row" style="display: none;">
-                            <th colspan="2">
-                                <div class="form1DivHeader">Saved Notes</div>
-                            </th>
-                        </tr> -->
                         <tr id="saved-notes-row" style="display: none;">
                             <td colspan="2">
                                 <label for="savedNotes" id="savedNotes-label">Saved Notes</label>
@@ -293,6 +287,18 @@
                                         <!-- Tech Follow-Up Intent -->
                                         <option value="formFfupRepair">Repair/Network Outage</option>
 
+                                        <!-- Tech Request Intent -->
+                                        <optgroup label="Change Configuration - Data">
+                                            <option value="form300_1">Change of WiFi Name/Password</option>
+                                            <option value="form300_2">Request for Local User GUI Access</option>
+                                            <option value="form300_3">Request for Super Admin GUI Access</option>
+                                            <option value="form300_4">Change modem set-up from Route to Bridge Mode</option>
+                                            <option value="form300_5">Change modem set-up from Bridge to Route Mode</option>
+                                            <option value="form300_6">LAN Port Activation</option>
+                                            <option value="form300_7">Request for Public IP</option>
+                                            <option value="form300_8">Request for Private IP</option>
+                                        </optgroup>
+
                                         <!--- Non-Tech Inquiry ---->
                                         <optgroup label="Account">
                                             <option data-group="inquiry" value="formInqAccSrvcStatus">Account/Service Status</option>
@@ -431,16 +437,6 @@
                                         <!--- Non-Tech Request --->
                                         <option data-group="request" value="formReqAccMgt">Account Management</option>
                                         <option data-group="request" value="formReqAddressMod">Address Modification (Record)</option>
-                                        <optgroup label="Change Configuration - Data">
-                                            <option data-group="request" value="form300_1">Change of WiFi Name/Password</option>
-                                            <option data-group="request" value="form300_2">Request for Local User GUI Access</option>
-                                            <option data-group="request" value="form300_3">Request for Super Admin GUI Access</option>
-                                            <option data-group="request" value="form300_4">Change modem set-up from Route to Bridge Mode</option>
-                                            <option data-group="request" value="form300_5">Change modem set-up from Bridge to Route Mode</option>
-                                            <option data-group="request" value="form300_6">LAN Port Activation</option>
-                                            <option data-group="request" value="form300_7">Request for Public IP</option>
-                                            <option data-group="request" value="form300_8">Request for Private IP</option>
-                                        </optgroup>
                                         <optgroup label="Change Ownership">
                                             <option data-group="request" value="formReqSupRetAccNum">Supersedure retain Account number</option>
                                             <option data-group="request" value="formReqSupChangeAccNum">Supersedure with change account number</option>
@@ -497,12 +493,6 @@
                             <td colspan="2"><button type="button" id="saveButton" class="form1-button" tabindex="-1">💾 Save</button></td>
                             <td colspan="2">
                                 <button type="button" id="resetButton" class="form1-button" tabindex="-1">🔄 Reset</button></td>
-                            <!-- <td>
-                                <button type="button" id="exportButton" class="form1-button" tabindex="-1">📄 Export</button>
-                            </td>
-                            <td>
-                                <button type="button" id="deleteButton" class="form1-button" tabindex="-1">🗑️ Delete All</button>
-                            </td> -->
                         </tr>
                     </table>
                 </div>
@@ -526,36 +516,51 @@
     </div>
 
     <div id="customAlert" class="alert-overlay">
-        <div class="alert-box">
-            <p id="alertMessage"></p>
-            <div class="alert-actions">
+        <div class="alert-box custom-style">
+            <div class="alert-content">
+                <p id="alertMessage"></p>
+            </div>
+
+            <div class="alert-footer single">
                 <button id="alertOkBtn">OK</button>
             </div>
         </div>
     </div>
 
     <div id="customConfirm1" class="alert-overlay">
-        <div class="alert-box">
-            <p id="confirmMessage1"></p>
-            <div class="alert-actions">
-                <button id="confirmKeep">Keep</button>
-                <button id="confirmDelete">Delete</button>
+        <div class="alert-box custom-style">            
+            <div class="alert-content">
+                <p id="confirmMessage1"></p>
+            </div>
+
+            <div class="alert-footer-table">
+                <table>
+                    <tr>
+                    <td><button id="confirmKeep">Keep</button></td>
+                    <td><button id="confirmDelete">Delete</button></td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
 
     <div id="customConfirm2" class="alert-overlay">
-        <div class="alert-box">
-            <p id="confirmMessage2"></p>
-            <div class="alert-actions">
-                <button id="confirmOk">OK</button>
-                <button id="confirmCancel">Cancel</button>
+        <div class="alert-box custom-style">            
+            <div class="alert-content">
+                <p id="confirmMessage2"></p>
+            </div>
+
+            <div class="alert-footer-table">
+                <table>
+                    <tr>
+                    <td><button id="confirmOk">OK</button></td>
+                    <td><button id="confirmCancel">Cancel</button></td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
 
-    
-    
     <div class="footer">
         <div class="footer-content">
             <div class="timer">
@@ -595,12 +600,6 @@
     <div id="floating2Div" style="display: none;">
         <div class="form3Div" id="form3Container"></div>
     </div>
-
-    <!-- <div id="ticketTimer" class="floating-timer noselect" style="display:none;">
-        <div id="ticketTimerHeader">Ticket Creation Timer</div>
-        <div id="ticketTimerDisplay">00:00:00</div>
-    </div> -->
-
     <br>
 </body>
 

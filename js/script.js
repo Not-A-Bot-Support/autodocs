@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (Object.keys(savedData).length > 0) {
             const shouldClear = await showConfirm1(
-                "Existing saved notes have been detected on this workstation.\n\nHow would you like to proceed?"
+                "Saved notes already exist on this workstation.\n\nWhat would you like to do?"
             );
 
             if (shouldClear) {
@@ -264,22 +264,31 @@ function populateIntentSelect(lobValue, vocValue) {
         }
     } else if (lobValue === "NON-TECH") {
         const group = NON_TECH_GROUP_MAP[vocValue];
-        populateByGroup(group, vocValue);
+        populateByGroup(group, vocValue, lobValue);
     }
 }
 
-function populateByGroup(group, vocValue = null) {
+function populateByGroup(group, vocValue = null, lobValue = null) {
     allIntentChildren.forEach(el => {
+
+        // Block ONLY for NON-TECH
+        if (
+            lobValue === "NON-TECH" &&
+            el.tagName === "OPTGROUP" &&
+            el.label === "Change Configuration - Data"
+        ) {
+            return;
+        }
+
         if (el.tagName === "OPTION" && el.dataset.group === group) {
             intentSelect.appendChild(el.cloneNode(true));
-        } else if (el.tagName === "OPTGROUP") {
-            let matchingOptions;
-            // Special handling for REQUEST + "Change Configuration - Data"
-            if (vocValue === "REQUEST" && el.label === "Change Configuration - Data") {
-                matchingOptions = Array.from(el.children);
-            } else {
-                matchingOptions = Array.from(el.children).filter(opt => opt.dataset.group === group);
-            }
+        } 
+        else if (el.tagName === "OPTGROUP") {
+
+            const matchingOptions = Array.from(el.children).filter(
+                opt => opt.dataset.group === group
+            );
+
             if (matchingOptions.length > 0) {
                 const newGroup = el.cloneNode(false);
                 matchingOptions.forEach(opt => newGroup.appendChild(opt.cloneNode(true)));
@@ -457,7 +466,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const isCCBO = channelSelect.value === "CDT-CCBO";
 
         rows.caseAccountHeader.style.display = "";
-        // rows.caseOrigin.style.display = isCCBO ? "" : "none";
         rows.custName.style.display = "";
         rows.accNum.style.display = "";
         rows.phoneNum.style.display = "";
@@ -537,149 +545,6 @@ document.addEventListener('DOMContentLoaded', function() {
     timerResetButton?.addEventListener('click', function() {
         handleTimer('reset');
     });
-
-    // ================================
-    // TICKET CREATION TIMER
-    // ================================
-    // let ticketTimerInterval = null;
-    // let ticketSeconds = 0;
-
-    // const ticketTimer = document.getElementById("ticketTimer");
-    // const ticketDisplay = document.getElementById("ticketTimerDisplay");
-
-    // function formatTicketTime(sec) {
-    //     const h = String(Math.floor(sec / 3600)).padStart(2, "0");
-    //     const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
-    //     const s = String(sec % 60).padStart(2, "0");
-    //     return `${h}:${m}:${s}`;
-    // }
-
-    // function startTicketTimer() {
-    //     if (ticketTimerInterval) return;
-    //     ticketTimerInterval = setInterval(() => {
-    //         ticketSeconds++;
-    //         if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(ticketSeconds);
-    //     }, 1000);
-    //     console.log("▶️ Ticket Timer started");
-    // }
-
-    // function stopTicketTimer() {
-    //     clearInterval(ticketTimerInterval);
-    //     ticketTimerInterval = null;
-    //     console.log("⏸ Ticket Timer stopped");
-    // }
-
-    // function resetTicketTimer() {
-    //     clearInterval(ticketTimerInterval);
-    //     ticketTimerInterval = null;
-    //     ticketSeconds = 0;
-    //     if (ticketDisplay) ticketDisplay.textContent = formatTicketTime(0);
-    //     console.log("♻️ Ticket Timer reset");
-    // }
-
-    // window.stopTicketTimer = stopTicketTimer;
-    // window.resetTicketTimer = resetTicketTimer;
-    // window.startTicketTimer = startTicketTimer;
-
-    // function isVisible(el) {
-    //     if (!el) return false;
-    //     let cur = el;
-    //     while (cur && cur.nodeType === 1) {
-    //         const cs = window.getComputedStyle(cur);
-    //         if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) {
-    //             return false;
-    //         }
-    //         cur = cur.parentElement;
-    //     }
-    //     const rect = el.getBoundingClientRect();
-    //     return !(rect.width === 0 && rect.height === 0);
-    // }
-
-    // function checkStopConditions() {
-    //     const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
-    //     const cbr = document.querySelector("input[name='cbr'], textarea[name='cbr'], #cbr");
-
-    //     const landmarksVisible = isVisible(landmarks);
-    //     const landmarksHasValue = landmarks && landmarks.value.trim() !== "";
-    //     const cbrHasValue = cbr && cbr.value.trim() !== "";
-
-    //     if (landmarksVisible) {
-    //         if (landmarksHasValue) stopTicketTimer();
-    //     } else {
-    //         if (cbrHasValue) stopTicketTimer();
-    //     }
-    // }
-
-    // document.addEventListener("change", function (e) {
-    //     const t = e.target;
-
-    //     if (t.matches("select[name='issueResolved'], #issueResolved") ||
-    //         t.matches("select[name='outageStatus'], #outageStatus")) {
-
-    //         const issueResolved = document.querySelector("select[name='issueResolved']")?.value || "";
-    //         const outageStatus = document.querySelector("select[name='outageStatus']")?.value || "";
-
-    //         if (issueResolved === "No - for Ticket Creation" || outageStatus === "Yes") {
-    //             if (ticketTimer) ticketTimer.style.display = "block";
-    //             startTicketTimer();
-    //         } else {
-    //             stopTicketTimer();
-    //             resetTicketTimer();
-    //             if (ticketTimer) {
-    //                 ticketTimer.style.display = "none";
-    //             }
-    //         }
-    //     }
-
-    //     if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
-    //     if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
-    //         const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
-    //         if (!isVisible(landmarks)) checkStopConditions();
-    //     }
-    // });
-
-    // document.addEventListener("input", function (e) {
-    //     const t = e.target;
-
-    //     if (t.matches("input[name='landmarks'], textarea[name='landmarks'], #landmarks")) checkStopConditions();
-    //     if (t.matches("input[name='cbr'], textarea[name='cbr'], #cbr")) {
-    //         const landmarks = document.querySelector("input[name='landmarks'], textarea[name='landmarks'], #landmarks");
-    //         if (!isVisible(landmarks)) checkStopConditions();
-    //     }
-    // });
-
-    // (function makeDraggable(el) {
-    //     if (!el) return;
-    //     let offsetX = 0, offsetY = 0, isDown = false;
-    //     const header = el.querySelector("#ticketTimerHeader") || el;
-    //     header.style.cursor = "grab";
-
-    //     header.addEventListener("mousedown", dragMouseDown);
-    //     document.addEventListener("mouseup", closeDragElement);
-    //     document.addEventListener("mousemove", elementDrag);
-
-    //     function dragMouseDown(e) {
-    //         e.preventDefault();
-    //         isDown = true;
-    //         offsetX = e.clientX - el.offsetLeft;
-    //         offsetY = e.clientY - el.offsetTop;
-    //         header.style.cursor = "grabbing";
-    //     }
-
-    //     function elementDrag(e) {
-    //         if (!isDown) return;
-    //         e.preventDefault();
-    //         el.style.left = (e.clientX - offsetX) + "px";
-    //         el.style.top = (e.clientY - offsetY) + "px";
-    //     }
-
-    //     function closeDragElement() {
-    //         isDown = false;
-    //         header.style.cursor = "grab";
-    //     }
-    // })(ticketTimer);
-
-    // window.__checkTicketStop = checkStopConditions;
 });
 
 // Reset Dropdown options to default
@@ -4283,7 +4148,7 @@ function createIntentBasedForm() {
         function insertNoteRow(fields, toolLabelName) {
             const index = fields.findIndex(f => f.name === toolLabelName);
             if (index !== -1) {
-                fields.splice(index + 1, 0, { // 👈 insert AFTER the tool label
+                fields.splice(index + 1, 0, {
                     type: "noteRow",
                     name: "probingChecklist",
                     relatedTo: "rxPower"
@@ -4879,7 +4744,6 @@ function createIntentBasedForm() {
         function createFieldRow(field) {
             const row = document.createElement("tr");
             row.style.display = field.name === "facility" ? "table-row" : "none";
-            // row.style.display = "table-row";
 
             const td = document.createElement("td");
             const divInput = document.createElement("div");
@@ -6905,7 +6769,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -7303,7 +7167,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -7576,7 +7440,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -7850,7 +7714,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -8074,7 +7938,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -8306,7 +8170,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -8531,7 +8395,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -9453,7 +9317,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -9669,7 +9533,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -9912,7 +9776,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -10105,7 +9969,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -10283,7 +10147,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -10511,7 +10375,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -10766,7 +10630,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -10971,7 +10835,7 @@ function createIntentBasedForm() {
             table.appendChild(row);
 
             if (field.name === "requestType") {
-                requestTypeRow = row; // keep reference
+                requestTypeRow = row;
                 const select = row.querySelector("select");
 
                 select.addEventListener("change", (e) => {
@@ -12591,7 +12455,7 @@ function createIntentBasedForm() {
                     li.textContent = definition.main;
 
                     const subUl = document.createElement("ul");
-                    subUl.className = "checklist-sub"; // optional, for styling
+                    subUl.className = "checklist-sub"; 
 
                     definition.sub.forEach(subItem => {
                         const subLi = document.createElement("li");
@@ -13545,7 +13409,6 @@ function createButtons(buttonLabels, buttonHandlers) {
                     const dropdown = document.createElement("div");
                     dropdown.classList.add("dropdown");
 
-                    // Align "More" to right
                     if (label === "More") {
                         dropdown.classList.add("align-right");
                     }
@@ -14397,78 +14260,6 @@ function specialInstButtonHandler(includeWocas = true) {
     return specialInstCopiedText.toUpperCase();
 }
 
-// function validateRequiredFields(filter = []) {
-//     const fieldLabels = {
-//         // Description
-//         "Option82": "Option82",
-//         "investigation3": "Investigation 3",
-
-//         // Case Notes in Timeline
-//         "facility": "Facility",
-//         "resType": "Residential Type",
-//         "outageStatus": "Network Outage Status",
-//         "accountType": "Account Type",
-//         "WOCAS": "WOCAS",
-//         "investigation1": "Investigation 1",
-//         "investigation2": "Investigation 2",
-//         "investigation4": "Investigation 4",
-//         "req4retracking": "Request for Retracking",
-//         "stbID": "Set-Top-Box ID",
-//         "smartCardID": "Smartcard ID",
-//         "cignalPlan": "Cignal TV Plan",
-//         "onuSerialNum": "Modem/ONU Serial #",
-//         "onuRunStats": "NMS Skin ONU Status",
-//         "cvReading": "Clearview Reading",
-
-//         // Special Instructions
-//         "specialInstruct": "Special Instructions",
-//         "contactName": "Contact Person",
-//         "cbr": "CBR",
-//         "availability": "Availability",
-//         // "address": "Complete Address",
-//         // "landmarks": "Nearest Landmarks"
-//     };
-
-//     const emptyFields = [];
-
-//     for (const field in fieldLabels) {
-//         const inputField = document.querySelector(`[name="${field}"]`);
-//         if (isFieldVisible(field)) {
-//         const isEmpty =
-//             !inputField ||
-//             inputField.value.trim() === "" ||
-//             (inputField.tagName === "SELECT" && inputField.selectedIndex === 0);
-
-//         if (isEmpty) {
-//             emptyFields.push(fieldLabels[field]);
-//         }
-//         }
-//     }
-
-//     let alertFields = [];
-
-//     if (filter.length === 0 || filter.includes("Title")) {
-//         // Don't alert for anything
-//         alertFields = [];
-//     } else if (filter.includes("Description")) {
-//         // Only alert for Option82 and Investigation 3 if they're missing
-//         const importantKeys = ["Option82", "Investigation 3"];
-//         alertFields = emptyFields.filter(field => importantKeys.includes(field));
-//     } else if (filter.includes("Case Notes in Timeline")) {
-//         const importantKeys = ["Facility", "Residential Type", "Network Outage Status", "Account Type", "WOCAS", "Investigation 1", "Investigation 2", "Investigation 3", "Investigation 4", "Request for Retracking", "Set-Top-Box Serial Number", "Smartcard ID", "Cignal TV Plan", "Modem/ONU Serial #", "NMS Skin ONU Status", "Clearview Reading"];
-//         alertFields = emptyFields.filter(field => importantKeys.includes(field));
-//     } else if (filter.includes("Special Instructions")) {
-//         const importantKeys = ["Network Outage Status", "Special Instructions", "Contact Person", "CBR", "Availability", "Complete Address", "Nearest Landmarks"];
-//         alertFields = emptyFields.filter(field => importantKeys.includes(field));
-//     }
-
-//     if (alertFields.length > 0) {
-//         alert(`Please complete the following field(s): ${alertFields.join(", ")}`);
-//     }
-
-//     return { emptyFields, alertFields };
-// }
-
 function cepButtonHandler(showFloating = true, filter = []) {
     const vars = initializeVariables();
 
@@ -14497,9 +14288,6 @@ function cepButtonHandler(showFloating = true, filter = []) {
         showAlert("This option is not available. Please use the Salesforce or FUSE button.");
         return;
     }
-
-    // const { emptyFields, alertFields } = validateRequiredFields(filter);
-    // if (alertFields.length > 0) return;
 
     const dataMap = {
         Title: (cepCaseTitle() || "").toUpperCase(),
@@ -14635,34 +14423,6 @@ function techNotesButtonHandler(showFloating = true) {
     const alwaysOnIntents = [
         "form500_5", "form501_7", "form101_5", "form510_9", "form500_6"
     ]
-
-    // function validateRequiredFields() {
-    //     const fieldLabels = {
-    //         "WOCAS": "WOCAS",
-    //         "remarks": "Actions Taken",
-    //         "upsell": "Upsell",
-    //     };
-
-    //     let requiredFields = Object.keys(fieldLabels);
-
-    //     const emptyFields = [];
-
-    //     requiredFields.forEach(field => {
-    //         const inputField = document.querySelector(`[name="${field}"]`);
-    //         if (isFieldVisible(field)) {
-    //             if (!inputField || inputField.value.trim() === "" ||
-    //                 (inputField.tagName === "SELECT" && inputField.selectedIndex === 0)) {
-    //                 emptyFields.push(fieldLabels[field]);
-    //             }
-    //         }
-    //     });
-
-    //     if (emptyFields.length > 0) {
-    //         alert(`Please complete the following field(s): ${emptyFields.join(", ")}`);
-    //     }
-
-    //     return emptyFields;
-    // }
 
     function constTechCAOutput() {
         const fields = [
@@ -15216,7 +14976,6 @@ function nontechNotesButtonHandler(showFloating = true) {
 
             if (value && !seenFields.has(field.name)) {
                 seenFields.add(field.name);
-                // actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
                 if (field.name === "productsOffered" || field.name === "notEligibleReason") {
                     actionsTakenParts.push((field.label ? `${field.label} ` : "") + value);
                 } else {
@@ -15363,29 +15122,21 @@ function nontechNotesButtonHandler(showFloating = true) {
     
     // non-Tech Complaints
     if (vars.selectedIntent === "formCompMyHomeWeb") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompMisappliedPayment") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText} - ${vars.findings}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompUnreflectedPayment") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompPersonnelIssue") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.personnelType} COMPLAINT${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
@@ -15394,29 +15145,21 @@ function nontechNotesButtonHandler(showFloating = true) {
     
     // non-Tech Inquiries
     else if (inquiryForms.includes(vars.selectedIntent)) {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqBillInterpret") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ BILL INTERPRETATION - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqOutsBal") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ OUTSTANDING BALANCE - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqRefund") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ REFUND - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
@@ -15425,15 +15168,11 @@ function nontechNotesButtonHandler(showFloating = true) {
     
     // Non-Tech Follow-Ups
     else if (ffupForms.includes(vars.selectedIntent)) {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupDispute") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         let disputeNotes = "";
 
@@ -15464,8 +15203,6 @@ function nontechNotesButtonHandler(showFloating = true) {
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${disputeNotes}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
     } else if (ffupFormsBasedOnFindings.includes(vars.selectedIntent)) {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         const findingsMap = {
             "Activation": "FOR ACTIVATION",
@@ -15486,29 +15223,21 @@ function nontechNotesButtonHandler(showFloating = true) {
         }
         actionsTakenCopiedText = constructFuseOutput();
     } else if (ffupFormsDisputes.includes(vars.selectedIntent)) {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP DISPUTE FOR ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (ffupFormsRefund.includes(vars.selectedIntent)) {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP REFUND - ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupSpecialFeat") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} (${vars.requestType})${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupTempDisco") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         const findingsMap = {
             "CCAM (Processing)": "FOR PROCESSING",
@@ -15522,22 +15251,16 @@ function nontechNotesButtonHandler(showFloating = true) {
         }
         actionsTakenCopiedText = constructFuseOutput();
     } else if (vars.selectedIntent === "formFfupUP") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} FOR VALIDATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupVasAct") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ACTIVATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupVasDel") {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ${vars.vasProduct} DELIVERY${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
@@ -15546,15 +15269,11 @@ function nontechNotesButtonHandler(showFloating = true) {
     
     // Non-Tech Requests
     else if (reqBasedIntent.includes(vars.selectedIntent)) {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/${vars.selectedIntentText}${soSrNum}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (reqBasedReqType.includes(vars.selectedIntent)) {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/${vars.requestType}${soSrNum}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
@@ -15563,8 +15282,6 @@ function nontechNotesButtonHandler(showFloating = true) {
 
     // Others
     else if (othersForms.includes(vars.selectedIntent)) {
-        // const emptyFields = validateRequiredFields();
-        // if (emptyFields.length > 0) return;
 
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
@@ -15611,8 +15328,6 @@ function showFuseFloatingDiv(concernCopiedText, actionsTakenCopiedText) {
 
     const combinedSections = [
         [addUniqueText(concernCopiedText), addUniqueText(actionsTakenCopiedText)].filter(Boolean).join("\n"),
-        // [addUniqueText(titleCopiedText), addUniqueText(descriptionCopiedText), addUniqueText(caseNotesCopiedText), addUniqueText(specialInstCopiedText)].filter(Boolean).join("\n\n"),
-        // [addUniqueText(ffupCopiedText), addUniqueText(specialInstCopiedText)].filter(Boolean).join("\n\n")
     ];
 
     combinedSections.forEach(text => {
@@ -15625,7 +15340,6 @@ function showFuseFloatingDiv(concernCopiedText, actionsTakenCopiedText) {
             section.style.cursor = "pointer";
             section.style.whiteSpace = "pre-wrap";
             section.style.transition = "background-color 0.2s, transform 0.1s ease";
-            // section.classList.add("noselect");
 
             section.textContent = text;
 
@@ -16484,7 +16198,6 @@ function sfTaggingButtonHandler() {
             ['Sub_SetCategory:', `Disconnect -  ${vars.findings}`],
         ];
     } else if (vars.selectedIntent === 'formFfupDispute') {
-        // const cleanApprvr = vars.approver ? vars.approver.replace(/\s*\([^)]*\)/, '') : '';
 
         smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
@@ -17143,8 +16856,8 @@ function endorsementForm() {
 
     const buttonContainer = document.createElement("div");
     buttonContainer.style.display = "flex";
-    buttonContainer.style.justifyContent = "flex-end"; // align right
-    buttonContainer.style.gap = "10px"; // space between buttons
+    buttonContainer.style.justifyContent = "flex-end";
+    buttonContainer.style.gap = "10px";
 
     // Generate Button
     const generateButton = document.createElement("button");
@@ -17312,7 +17025,7 @@ function showFloating3Div(finalText, floating2Div) {
     contentWrapper.style.padding = "15px 15px 5px 15px";
     contentWrapper.style.display = "flex";
     contentWrapper.style.flexDirection = "column";
-    contentWrapper.style.gap = "12px"; // consistent spacing
+    contentWrapper.style.gap = "12px";
 
     const copiedValues = document.createElement("div");
 
@@ -17403,8 +17116,6 @@ function resetForm2ContainerAndRebuildButtons() {
     const buttonData = [
         { label: "💾 Save", handler: saveFormData },
         { label: "🔄 Reset", handler: resetButtonHandler },
-        // { label: "📄 Export", handler: exportDataAsTxt },
-        // { label: "🗑️ Delete All", handler: deleteAllData }
     ];
 
     buttonData.forEach(({ label, handler }) => {
@@ -17665,7 +17376,7 @@ function saveFormData() {
     combinedNotes = (combinedNotes || "").toString().trim();
 
     const removeDuplicateBlocks = (text) => {
-        const blocks = text.split(/\n\s*\n/); // split by empty line
+        const blocks = text.split(/\n\s*\n/);
         const seen = new Set();
 
         return blocks.filter(block => {
@@ -18048,8 +17759,6 @@ function deleteAllData() {
 const primaryButtons = {
   saveButton: saveFormData,
   resetButton: resetButtonHandler
-//   exportButton: exportDataAsTxt,
-//   deleteButton: deleteAllData
 };
 
 Object.entries(primaryButtons).forEach(([id, handler]) => {
@@ -18275,6 +17984,19 @@ const instructions = [
 ];
 
 const versions = [
+    {
+        version: "V5.4.170426",
+        updates: [
+            { title: "Prompt & Alert Message Improvements", items: [
+                "Improved prompt and alert messages for better clarity and consistency.",
+                "Refined wording to make instructions easier to understand.",
+                "Minor adjustments for a smoother user experience.",
+            ]},
+            { title: "Fixes", items: [
+                "Moved <strong>Change Configuration - Data</strong> intents from NON-TECH to TECH to match LIT365 standards and improve field visibility based on selection.",
+            ]},
+        ]
+    },
     {
         version: "V5.4.150426",
         updates: [
@@ -18514,7 +18236,7 @@ function typeWriter(text, element, speed, hideDelay = FabConfig.hideDelay, callb
             hideTimer = setTimeout(() => {
                 element.classList.add("hide");
 
-                if (callback) callback(); // 👈 trigger next step AFTER full lifecycle
+                if (callback) callback();
             }, hideDelay);
         }
     }
@@ -18538,7 +18260,7 @@ function processQueue() {
                 enqueueRandomMessage();
             }, FabConfig.randomInterval);
         } else {
-            processQueue(); // continue queue only
+            processQueue();
         }
     });
 }
