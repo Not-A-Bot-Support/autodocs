@@ -902,6 +902,7 @@ function createIntentBasedForm() {
                 "", 
                 "Data", 
                 "IPTV",
+				"VAS",
                 "Voice",
                 "Voice and Data" ]},
             { label: "Queue", type: "select", name: "queue", options: [
