@@ -18211,6 +18211,7 @@ const versions = [
                 "Added a <strong>“My Details”</strong> option in the Smart Assistant for quick access and updating of agent information.",
                 "New <strong>Notepad</strong> section – Allows agents to continue using the notepad even when the main window is minimized.",
                 "Introducing the <strong>“Saved Notes Viewer”</strong> – Gives agents real-time visibility into their saved notes without exporting it to a notepad or excel file.",
+                "Enhanced generated notes by adding an <strong>“Other Details”</strong> section in Salesforce and FUSE, improving documentation accuracy and enabling easier tracking."
             ]},
             { title: "Fixes", items: [
                 "Resolved an issue causing repeated “Request for Retracking Submitted” entries in SF/FUSE notes and restored the ability for agents to provide retracking details across all applicable IPTV intents.",
