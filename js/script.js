@@ -19,11 +19,70 @@ document.addEventListener("DOMContentLoaded", async () => {
                 localStorage.removeItem("tempDatabase");
                 showAlert("Previously saved notes (old records) have been deleted.");
             }
+
+            displaySavedNotesViewer();
         }
 
         sessionStorage.setItem("hasCheckedNotes", "true");
     }
 });
+
+// Toggle Agent Details Row
+window.agentDetailsData = {};
+
+function checkAndStoreAgentDetails() {
+    const agentName = document.getElementById('agent-name').value.trim();
+    const teamLead  = document.getElementById('team-lead').value.trim();
+    const pldtUser  = document.getElementById('pldt-user').value.trim();
+    const channel   = document.getElementById('channel').value.trim();
+
+    const allFilled = agentName && teamLead && pldtUser && channel;
+
+    if (allFilled) {
+        // Store values globally
+        window.agentDetailsData = {
+            agentName,
+            teamLead,
+            pldtUser,
+            channel
+        };
+
+        // Hide rows
+        document.getElementById('agent-details-header-row').style.display = 'none';
+        document.getElementById('agent-and-tl-details-row').style.display = 'none';
+        document.getElementById('user-and-channel-row').style.display = 'none';
+    }
+}
+
+// Run when user types or selects
+['agent-name', 'team-lead', 'pldt-user', 'channel'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', checkAndStoreAgentDetails);
+    el.addEventListener('change', checkAndStoreAgentDetails);
+});
+
+// Show Agent Details Temporarily
+function showAgentDetailsTemporarily(duration = 10000) {
+    const rows = [
+        document.getElementById('agent-details-header-row'),
+        document.getElementById('agent-and-tl-details-row'),
+        document.getElementById('user-and-channel-row')
+    ];
+
+    rows.forEach(row => {
+        row.style.display = '';
+    });
+
+    if (window.agentDetailsHideTimer) {
+        clearTimeout(window.agentDetailsHideTimer);
+    }
+
+    window.agentDetailsHideTimer = setTimeout(() => {
+        rows.forEach(row => {
+            row.style.display = 'none';
+        });
+    }, duration);
+}
 
 // Channel, Concern Type, and VOC Options
 const LOB_OPTIONS = [
@@ -638,7 +697,6 @@ function initializeVariables() {
         selectedIntent: q("#selectIntent"),
         selectedIntentText,
         selectedOptGroupLabel,
-        channel: q("#channel"),
         custName: q('[name="custName"]'),
         sfCaseNum: q('[name="sfCaseNum"]'),
         WOCAS: q('[name="WOCAS"]'),
@@ -655,7 +713,6 @@ function initializeVariables() {
         resType: q('[name="resType"]'),
         pcNumber: q('[name="pcNumber"]'),
         issueResolved: q('[name="issueResolved"]'),
-        pldtUser: q('[name="pldtUser"]'),
         ticketStatus: q('[name="ticketStatus"]'),
         offerALS: q('[name="offerALS"]'),
         accountNum: q('[name="accountNum"]'),
@@ -902,7 +959,6 @@ function createIntentBasedForm() {
                 "", 
                 "Data", 
                 "IPTV",
-				"VAS",
                 "Voice",
                 "Voice and Data" ]},
             { label: "Queue", type: "select", name: "queue", options: [
@@ -5575,15 +5631,15 @@ function createIntentBasedForm() {
         });
     
         req4retracking.addEventListener("change", () => {
-            const isForm510 = selectedValue === "form510_1" || selectedValue === "form510_2";
+            // const isForm510 = selectedValue === "form510_1" || selectedValue === "form510_2";
 
-            if (isForm510 && req4retracking.value === "Yes") {
+            if (req4retracking.value === "Yes") {
                 if (accountType.value === "PLDT") {
                     showFields(["stbID", "smartCardID", "cignalPlan"]);
                 } else if (accountType.value === "RADIUS") {
                     showFields(["stbID", "smartCardID", "cignalPlan", "exactExp"]);
                 }
-            } else if (isForm510 && req4retracking.value === "No") {
+            } else if (req4retracking.value === "No") {
                 if (accountType.value === "PLDT") {
                     hideSpecificFields(["stbID", "smartCardID", "cignalPlan"]);
                 } else if (accountType.value === "RADIUS") {
@@ -13534,10 +13590,10 @@ function optionNotAvailable() {
 
     if (isFieldVisible("issueResolved")) {
         if (vars.issueResolved === "") {
-            alert('Please indicate whether the issue is resolved or not.');
+            showAlert('Please indicate whether the issue is resolved or not.');
             return true;
-        } else if (vars.issueResolved !=="Yes" && vars.issueResolved !=="No - for Ticket Creation") {
-            alert('This option is not available. Please use Salesforce or FUSE button.');
+        } else if (vars.issueResolved !=="No - for Ticket Creation") {
+            showAlert('This option is not available. Please use Salesforce or FUSE button.');
             return true;
         }
     }
@@ -13550,8 +13606,13 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
     const vars = initializeVariables();
 
     const missingFields = [];
-    if (!vars.channel) missingFields.push("Channel");
-    if (!vars.pldtUser) missingFields.push("PLDT Username");
+
+    // Prefer stored global values, fallback to vars
+    const channel  = window.agentDetailsData?.channel;
+    const pldtUser = window.agentDetailsData?.pldtUser;
+
+    if (!channel)  missingFields.push("Channel");
+    if (!pldtUser) missingFields.push("PLDT Username");
 
     if (enableValidation && missingFields.length > 0) {
         showAlert(
@@ -13564,8 +13625,6 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
         const seenFields = new Set();
         let output = "";
 
-        const channel = getFieldValueIfVisible("selectChannel");
-        const pldtUser = getFieldValueIfVisible("pldtUser");
         if (channel && pldtUser) {
             output += `${channel}_${pldtUser}\n`;
             seenFields.add("selectChannel");
@@ -13777,6 +13836,7 @@ function showFfupFloatingDiv(sections, sectionLabels) {
 // Generating CEP Notes
 function cepCaseTitle() {
     const vars = initializeVariables();
+    const channel  = window.agentDetailsData?.channel;
 
     let caseTitle = "";
 
@@ -13835,9 +13895,9 @@ function cepCaseTitle() {
             }
 
             if (group.alwaysOn) {
-                caseTitle = `ALWAYS ON-${vars.channel} - ${title}`;
+                caseTitle = `ALWAYS ON-${channel} - ${title}`;
             } else {
-                caseTitle = `${prefix}${vars.channel} - ${title}`;
+                caseTitle = `${prefix}${channel} - ${title}`;
             }
 
             break;
@@ -14116,63 +14176,73 @@ function cepCaseNotes() {
         let actionsTakenParts = [];
 
         const req4retrackingValue = document.querySelector('[name="req4retracking"]')?.value || "";
-        const retrackingFields = ["stbID", "smartCardID", "accountNum", "cignalPlan", "exactExp"];
+        const retrackingFields = ["stbID", "smartCardID", "accountNum", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp"];
 
         fields.forEach(field => {
-            // Skip retracking fields unless request is Yes or specific intent with stbID/smartCardID
+            const isRetrackingField = retrackingFields.includes(field.name);
+            const isRetrackingRequested = req4retrackingValue === "Yes";
+
+            // Do not include retracking fields in actionsTakenParts when retracking = Yes
+            if (isRetrackingRequested && isRetrackingField) return;
+
+            // Still skip retracking fields when not requested
+            // except for the form510_7 override
             if (
-                req4retrackingValue !== "Yes" &&
-                retrackingFields.includes(field.name) &&
-                !(vars.selectedIntent === "form510_7" && (field.name === "stbID" || field.name === "smartCardID"))
-            ) return;
+                !isRetrackingRequested &&
+                isRetrackingField &&
+                !(vars.selectedIntent === "form510_7" &&
+                (field.name === "stbID" || field.name === "smartCardID"))
+            ) {
+                return;
+            }
 
             const inputElement = document.querySelector(`[name="${field.name}"]`);
-            let value = getFieldValueIfVisible(field.name);
+            const value = getFieldValueIfVisible(field.name);
 
             // Skip empty selects
             if (inputElement?.tagName === "SELECT" && inputElement.selectedIndex === 0) return;
 
-            if (value && !seenFields.has(field.name)) {
-                seenFields.add(field.name);
+            if (!value || seenFields.has(field.name)) return;
 
-                // Add units if needed
-                let displayValue = value;
-                switch (field.name) {
-                    case "pingTestResult":
-                        displayValue += " MS";
-                        break;
-                    case "speedTestResult":
-                        displayValue += " MBPS";
-                        break;
-                }
+            seenFields.add(field.name);
 
-                // Handle field-specific logic
-                switch (true) {
-                    case field.name.startsWith("investigation"):
-                        output += `${field.label}: ${displayValue}\n`;
-                        break;
+            // Add units if needed
+            let displayValue = value;
+            switch (field.name) {
+                case "pingTestResult":
+                    displayValue += " MS";
+                    break;
+                case "speedTestResult":
+                    displayValue += " MBPS";
+                    break;
+            }
 
-                    case field.name === "outageStatus":
-                        if (displayValue === "Yes") {
-                            actionsTakenParts.push("Affected by a network outage");
-                        } else if (displayValue === "No") {
-                            actionsTakenParts.push("Not part of network outage");
-                        }
+            // Field-specific logic
+            switch (true) {
+                case field.name.startsWith("investigation"):
+                    output += `${field.label}: ${displayValue}\n`;
+                    break;
 
-                        break;
+                case field.name === "outageStatus":
+                    actionsTakenParts.push(
+                        displayValue === "Yes"
+                            ? "Affected by a network outage"
+                            : "Not part of network outage"
+                    );
+                    break;
 
-                    case field.name === "dmsSelfHeal":
-                        if (displayValue === "Yes/Resolved") {
-                            actionsTakenParts.push("Performed Self Heal and the Issue was Resolved");
-                        } else if (displayValue === "Yes/Unresolved") {
-                            actionsTakenParts.push("Performed Self Heal but Issue was still Unresolved");
-                        }
+                case field.name === "dmsSelfHeal":
+                    if (displayValue === "Yes/Resolved") {
+                        actionsTakenParts.push("Performed Self Heal and the Issue was Resolved");
+                    } else if (displayValue === "Yes/Unresolved") {
+                        actionsTakenParts.push("Performed Self Heal but Issue was still Unresolved");
+                    }
+                    break;
 
-                        break;
-
-                    default:
-                        actionsTakenParts.push((field.label ? `${field.label}: ` : "") + displayValue);
-                }
+                default:
+                    actionsTakenParts.push(
+                        (field.label ? `${field.label}: ` : "") + displayValue
+                    );
             }
         });
 
@@ -14396,7 +14466,8 @@ function getSfFieldValueIfVisible(fieldName) {
 }
 
 function techNotesButtonHandler(showFloating = true) {
-    const vars = initializeVariables(); 
+    const vars = initializeVariables();
+    const channel  = window.agentDetailsData?.channel || ""; 
 
     let concernCopiedText = "";
     let actionsTakenCopiedText = "";
@@ -14425,7 +14496,7 @@ function techNotesButtonHandler(showFloating = true) {
         "form500_5", "form501_7", "form101_5", "form510_9", "form500_6"
     ]
 
-    function constTechCAOutput() {
+    function constTechActionsTakenOutput() {
         const fields = [
             // Remarks
             { name: "nmsSkinRemarks" },
@@ -14505,7 +14576,11 @@ function techNotesButtonHandler(showFloating = true) {
             "NA - Not Eligible": "#UpsellNotEligible"
         };
 
-        const upsellNote = upsellMap[upsellValue] || "";
+        const upsellNote =
+            channel === "CDT-HOTLINE"
+                ? (upsellMap[upsellValue] || "")
+                : "";
+
         return {
             actions: "A: " + actionsTakenParts.join("/ "),
             upsellNote
@@ -14529,18 +14604,18 @@ function techNotesButtonHandler(showFloating = true) {
             { name: "custAuth", label: "CUST AUTH" },
             { name: "simLight", label: "Sim Light Status" },
             { name: "minNumber", label: "MIN" },
-            { name: "onuModel" },
+            { name: "onuModel", label: "ONU Model" },
             { name: "onuSerialNum", label: "ONU SN" },
-            { name: "Option82" },
+            { name: "Option82", label: "Option82" },
             
             // Network Outage Status
-            { name: "outageStatus", label: "OUTAGE" },
+            { name: "outageStatus" },
 
             // ONU Lights Status and Connection Type
-            { name: "modemLights"},
+            { name: "modemLights", label: "Modem Lights Status" },
             { name: "intLightStatus", label: "Internet Light Status" },
             { name: "wanLightStatus", label: "WAN Light Status" },
-            { name: "onuConnectionType" },
+            { name: "onuConnectionType", label: "ONU Connection Type" },
 
             // Clearview
             { name: "cvReading", label: "CV" },
@@ -14562,7 +14637,7 @@ function techNotesButtonHandler(showFloating = true) {
             { name: "callSource", label: "Call Source" },
             { name: "ldnSet", label: "LDN Set" },
             { name: "option82Config", label: "Option82 Config" },
-            { name: "nmsSkinRemarks", label: "NMS"  },
+            // { name: "nmsSkinRemarks", label: "NMS"  },
             
             // DMS
             { name: "dmsInternetStatus", label: "DMS Internet/Data Status" },
@@ -14573,7 +14648,7 @@ function techNotesButtonHandler(showFloating = true) {
             { name: "dmsWifiState", label: "Wi-Fi State in DMS" },
             { name: "dmsLan4Status", label: "LAN Port Status in DMS" },
             { name: "dmsSelfHeal", label: "Performed Self Heal" },
-            { name: "dmsRemarks", label: "DMS" },
+            // { name: "dmsRemarks", label: "DMS" },
 
             // Probe & Troubleshoot
             { name: "callType", label: "Call Type" },
@@ -14584,16 +14659,16 @@ function techNotesButtonHandler(showFloating = true) {
             { name: "outageReference", label: "Source Reference" },
             { name: "connectionMethod", label: "Connected via" },
             { name: "deviceBrandAndModel", label: "Device Brand and Model" },
-            { name: "specificTimeframe"},
+            { name: "specificTimeframe", label: "Specific Timeframe" },
             { name: "speedTestResult", label: "Initial Speedtest Result" },
             { name: "pingTestResult", label: "Ping" },
-            { name: "gameNameAndServer"},
+            { name: "gameNameAndServer", label: "Game Name and Server" },
             { name: "gameServerIP", label: "Game Server IP Address" },
             { name: "pingTestResult2", label: "Game Server IP Address Ping Test Result" },
             { name: "traceroutePLDT", label: "Tracerout PLDT" },
             { name: "tracerouteExt", label: "Tracerout External" },
-            { name: "meshtype" },
-            { name: "meshOwnership", label: "Mesh" },
+            { name: "meshtype", label: "Mesh Type" },
+            { name: "meshOwnership", label: "Mesh Ownership" },
             { name: "websiteURL", label: "Website Address" },
             { name: "errMsg", label: "Error Message" },
             { name: "otherDevice", label: "Tested on Other Devices or Browsers" },
@@ -14614,15 +14689,21 @@ function techNotesButtonHandler(showFloating = true) {
             { name: "exactExp", label: "Exact Experience"},
 
             // Ticket Details
-            { name: "cepCaseNumber" },
-            { name: "pcNumber", label: "PARENT" },
+            { name: "cepCaseNumber", label: "CEP Case #" },
+            { name: "pcNumber", label: "PARENT Case #" },
+            { name: "ticketStatus", label: "Case Status" },
+            { name: "ffupCount", label: "No. of Follow-Up(s)" },
+            { name: "statusReason", label: "STATUS REASON" },
+            { name: "subStatus", label: "SUB STATUS" },
+            { name: "queue", label: "QUEUE" },
+            { name: "ticketAge", label: "Ticket Age" },
             { name: "sla", label: "SLA" },
 
             // Special Instructions
             { name: "contactName", label: "CONTACT PERSON" },
             { name: "cbr", label: "CBR" },
             { name: "availability", label: "AVAILABILITY" },
-            { name: "address"},
+            { name: "address", label: "COMPLETE ADDRESS" },
             { name: "landmarks", label: "NEAREST LANDMARK" },
             { name: "rptCount", label: "REPEATER" },
             { name: "WOCAS", label: "WOCAS" }
@@ -14631,7 +14712,7 @@ function techNotesButtonHandler(showFloating = true) {
         const seenFields = new Set();
         let output = "";
         let retrackingOutput = "";
-        let actionsTakenParts = [];
+        let otherDetailsParts = [];
 
         const req4retrackingValue = document.querySelector('[name="req4retracking"]')?.value || "";
         const retrackingFields = ["stbID", "smartCardID", "accountNum", "cignalPlan", "exactExp"];
@@ -14678,23 +14759,56 @@ function techNotesButtonHandler(showFloating = true) {
                 }
 
                 // Push action
-                actionsTakenParts.push(req4retrackingValue === "Yes"
-                    ? "Request for retracking submitted"
-                    : actionPart
-                );
+                const isRetrackingField = retrackingFields.includes(field.name);
+
+                // Skip ONLY retracking fields when retracking is requested
+                if (req4retrackingValue === "Yes" && isRetrackingField) {
+                    return;
+                }
+
+                // Always allow non-retracking fields
+                otherDetailsParts.push(actionPart);
             }
         });
 
+        if (req4retrackingValue === "Yes") {
+            otherDetailsParts.unshift("REQUEST FOR RETRACKING SUBMITTED");
+        }
+
         const facilityValue = document.querySelector('[name="facility"]')?.value || "";
-        if (facilityValue === "Copper VDSL") actionsTakenParts.push("Copper");
+        if (facilityValue === "Copper VDSL") otherDetailsParts.push("Copper");
 
-        const actionsTaken = actionsTakenParts.join("/ ");
+        let otherDetails = otherDetailsParts.join("/ ");
 
-        const finalNotes = [output.trim(), retrackingOutput.trim(), actionsTaken.trim()]
-            .filter(section => section)
-            .join("\n\n");
+        if (otherDetails) {
+            otherDetails = "OTHER DETAILS:\n" + otherDetails;
+        }
 
-        return finalNotes;
+        const upsellValue = document.querySelector('[name="upsell"]')?.value || "";
+
+        const upsellMap = {
+            "Yes - Accepted": "#UpsellAccepted",
+            "No - Declined": "#UpsellDeclined",
+            "No - Ignored": "#UpsellIgnored",
+            "No - Undecided": "#UpsellUndecided",
+            "NA - Not Eligible": "#UpsellNotEligible"
+        };
+
+        const socmedUpsellNote =
+            channel === "CDT-SOCMED"
+                ? (upsellMap[upsellValue] || "")
+                : "";
+
+        return {
+            details: [
+                output.trim(),
+                retrackingOutput.trim(),
+                otherDetails
+            ].filter(Boolean).join("\n\n"),
+
+            socmedUpsellNote
+        };
+
     }
 
     function formatField(label, name) {
@@ -14712,48 +14826,61 @@ function techNotesButtonHandler(showFloating = true) {
         custName, sfCaseNum, minNumber
     ]
         .filter(Boolean)
-        .join("/ "); 
+        .join("/ ");
 
     const selectedOptGroupLabel = vars.selectedOptGroupLabel ? `/ ${vars.selectedOptGroupLabel}` : "";
     const selectedIntentText = vars.selectedIntentText ? `/ ${vars.selectedIntentText}` : "";
-    const queue = formatField("/ QUEUE", "queue");
-    const ffupCount = formatField("/ FFUP COUNT", "ffupCount");
-    const ticketAge = formatField("/ CASE AGE", "ticketAge");
 
-    const { actions, upsellNote } = constTechCAOutput();
+    const { actions, upsellNote } = constTechActionsTakenOutput();
+    const { details, socmedUpsellNote } = constOtherDetails();
 
     if (vars.selectedIntent === "formFfupRepair") {
-        concernCopiedText = `${combinedInfo}\nC: ${vars.channel}_${vars.pldtUser}/ FOLLOW-UP REPAIR ${vars.ticketStatus}${queue}${ffupCount}${ticketAge}`;
+        concernCopiedText = `${combinedInfo}\nC: ${channel}/ FOLLOW-UP REPAIR ${vars.ticketStatus}`;
         actionsTakenCopiedText = formatActions(actions, upsellNote);
-    } else if (optGroupIntents.includes(vars.selectedIntent)) {
-        concernCopiedText = `${combinedInfo}\nC: ${vars.channel}${selectedOptGroupLabel}`;
-        actionsTakenCopiedText = formatActions(actions, upsellNote);
+        otherDetailsCopiedText = details.toUpperCase();
 
-        if (vars.channel === "CDT-HOTLINE") {
-            otherDetailsCopiedText = constOtherDetails();
+        if (channel === "CDT-SOCMED" && socmedUpsellNote) {
+            otherDetailsCopiedText += "\n\n" + socmedUpsellNote;
+        }
+    } else if (optGroupIntents.includes(vars.selectedIntent)) {
+        concernCopiedText = `${combinedInfo}\nC: ${channel}${selectedOptGroupLabel}`;
+        actionsTakenCopiedText = formatActions(actions, upsellNote);
+        otherDetailsCopiedText = details.toUpperCase();
+
+        if (channel === "CDT-SOCMED" && socmedUpsellNote) {
+            otherDetailsCopiedText += "\n\n" + socmedUpsellNote;
         }
     } else if (optTextIntents.includes(vars.selectedIntent)) {
-        concernCopiedText = `${combinedInfo}\nC: ${vars.channel}${selectedIntentText}`;
+        concernCopiedText = `${combinedInfo}\nC: ${channel}${selectedIntentText}`;
         actionsTakenCopiedText = formatActions(actions, upsellNote);
+        otherDetailsCopiedText = details.toUpperCase();
 
-        if (vars.channel === "CDT-HOTLINE") {
-            otherDetailsCopiedText = constOtherDetails();
+        if (channel === "CDT-SOCMED" && socmedUpsellNote) {
+            otherDetailsCopiedText += "\n\n" + socmedUpsellNote;
         }
     } else if (alwaysOnIntents.includes(vars.selectedIntent)) {
-        concernCopiedText = `${combinedInfo}\nC: ${vars.channel}${selectedIntentText} (ALWAYS ON)`;
+        concernCopiedText = `${combinedInfo}\nC: ${channel}${selectedIntentText} (ALWAYS ON)`;
         actionsTakenCopiedText = formatActions(actions, upsellNote);
-        
-        if (vars.channel === "CDT-HOTLINE") {
-            otherDetailsCopiedText = constOtherDetails();
+        otherDetailsCopiedText = details.toUpperCase();
+
+        if (channel === "CDT-SOCMED" && socmedUpsellNote) {
+            otherDetailsCopiedText += "\n\n" + socmedUpsellNote;
         }
     }
 
     concernCopiedText = concernCopiedText.toUpperCase();
-    otherDetailsCopiedText = otherDetailsCopiedText.toUpperCase();
+    // otherDetailsCopiedText = otherDetailsCopiedText.toUpperCase();
     
     let otherDetailsSections = [];
+
     if (otherDetailsCopiedText) {
-        otherDetailsSections = splitIntoSections(otherDetailsCopiedText, 250);
+        if (channel === "CDT-SOCMED") {
+            // Display as-is (single section)
+            otherDetailsSections = [otherDetailsCopiedText];
+        } else {
+            // Split into sections
+            otherDetailsSections = splitIntoSections(otherDetailsCopiedText, 250);
+        }
     }
 
     const notes_part1 = [
@@ -14795,8 +14922,8 @@ function splitIntoSections(text, maxChars = 250) {
 }
 
 function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
-
     const vars = initializeVariables();
+    
     const floatingDiv = document.getElementById("floatingDiv");
     const overlay = document.getElementById("overlay");
 
@@ -14856,7 +14983,8 @@ function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
         return sectionWrapper;
     }
 
-    const isHotline = vars.channel === "CDT-HOTLINE";
+    const channel  = window.agentDetailsData?.channel || vars.channel;
+    const isHotline = channel === "CDT-HOTLINE";
     const isFollowUpRepair = vars.selectedIntent === "formFfupRepair";
 
     if (isHotline && isFollowUpRepair) {
@@ -14876,8 +15004,20 @@ function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
             copiedValues.appendChild(createCopySection("Part 2", notes_part2));
         }
     } else {
+        let combinedText = "";
+
         if (notes_part1.trim()) {
-            copiedValues.appendChild(createCopySection("", notes_part1));
+            combinedText += notes_part1.trim();
+        }
+
+        if (Array.isArray(notes_part2) && notes_part2.length > 0) {
+            combinedText += (combinedText ? "\n\n" : "") + notes_part2.join("\n\n");
+        } else if (typeof notes_part2 === "string" && notes_part2.trim()) {
+            combinedText += (combinedText ? "\n\n" : "") + notes_part2;
+        }
+
+        if (combinedText) {
+            copiedValues.appendChild(createCopySection("", combinedText));
         }
     }
  
@@ -14924,6 +15064,7 @@ function getFuseFieldValueIfVisible(fieldName) {
 
 function nontechNotesButtonHandler(showFloating = true) {
     const vars = initializeVariables();
+    const channel  = window.agentDetailsData?.channel || ""; 
 
     let concernCopiedText = "";
     let actionsTakenCopiedText = "";
@@ -15123,23 +15264,19 @@ function nontechNotesButtonHandler(showFloating = true) {
     
     // non-Tech Complaints
     if (vars.selectedIntent === "formCompMyHomeWeb") {
-
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompMisappliedPayment") {
-
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText} - ${vars.findings}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ ${vars.selectedIntentText} - ${vars.findings}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompUnreflectedPayment") {
-
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formCompPersonnelIssue") {
-
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ ${vars.personnelType} COMPLAINT${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ ${vars.personnelType} COMPLAINT${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -15147,22 +15284,22 @@ function nontechNotesButtonHandler(showFloating = true) {
     // non-Tech Inquiries
     else if (inquiryForms.includes(vars.selectedIntent)) {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqBillInterpret") {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ BILL INTERPRETATION - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ BILL INTERPRETATION - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqOutsBal") {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ OUTSTANDING BALANCE - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ OUTSTANDING BALANCE - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formInqRefund") {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ REFUND - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ REFUND - ${vars.subType}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -15170,7 +15307,7 @@ function nontechNotesButtonHandler(showFloating = true) {
     // Non-Tech Follow-Ups
     else if (ffupForms.includes(vars.selectedIntent)) {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ FOLLOW-UP ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupDispute") {
@@ -15201,7 +15338,7 @@ function nontechNotesButtonHandler(showFloating = true) {
             disputeNotes = `DISPUTE FOR ${vars.disputeType}S`;
         }
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${disputeNotes}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ FOLLOW-UP ${disputeNotes}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
     } else if (ffupFormsBasedOnFindings.includes(vars.selectedIntent)) {
 
@@ -15220,22 +15357,22 @@ function nontechNotesButtonHandler(showFloating = true) {
         };
 
         if (vars.findings && findingsMap[vars.findings]) {
-            concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+            concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ FOLLOW-UP ${vars.selectedIntentText} ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         }
         actionsTakenCopiedText = constructFuseOutput();
     } else if (ffupFormsDisputes.includes(vars.selectedIntent)) {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP DISPUTE FOR ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ FOLLOW-UP DISPUTE FOR ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (ffupFormsRefund.includes(vars.selectedIntent)) {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP REFUND - ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ FOLLOW-UP REFUND - ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupSpecialFeat") {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} (${vars.requestType})${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ FOLLOW-UP ${vars.selectedIntentText} (${vars.requestType})${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupTempDisco") {
@@ -15248,22 +15385,22 @@ function nontechNotesButtonHandler(showFloating = true) {
         };
 
         if (vars.findings && findingsMap[vars.findings]) {
-            concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP TEMPORARY DISCONNECTION ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+            concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ FOLLOW-UP TEMPORARY DISCONNECTION ${findingsMap[vars.findings]}${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         }
         actionsTakenCopiedText = constructFuseOutput();
     } else if (vars.selectedIntent === "formFfupUP") {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP ${vars.selectedIntentText} FOR VALIDATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ FOLLOW-UP ${vars.selectedIntentText} FOR VALIDATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupVasAct") {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ACTIVATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ FOLLOW-UP VAS FOR ACTIVATION${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (vars.selectedIntent === "formFfupVasDel") {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/ FOLLOW-UP VAS FOR ${vars.vasProduct} DELIVERY${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ FOLLOW-UP VAS FOR ${vars.vasProduct} DELIVERY${insertCustConcern(vars.custConcern)}/ ${vars.ffupStatus}${soSrNum}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -15271,12 +15408,12 @@ function nontechNotesButtonHandler(showFloating = true) {
     // Non-Tech Requests
     else if (reqBasedIntent.includes(vars.selectedIntent)) {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/${vars.selectedIntentText}${soSrNum}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/${vars.selectedIntentText}${soSrNum}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     } else if (reqBasedReqType.includes(vars.selectedIntent)) {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}/${vars.requestType}${soSrNum}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/${vars.requestType}${soSrNum}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -15284,7 +15421,7 @@ function nontechNotesButtonHandler(showFloating = true) {
     // Others
     else if (othersForms.includes(vars.selectedIntent)) {
 
-        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${vars.channel}${insertCustConcern(vars.custConcern)}`;
+        concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
 
     }
@@ -15404,6 +15541,7 @@ function bantayKableButtonHandler(showFloating = true) {
         : "";
 
     function constructOutput(fields) {
+        const channel  = window.agentDetailsData?.channel  || vars.selectChannel;
         const seenFields = new Set();
         let section1 = "";
         let section2 = "";
@@ -15422,7 +15560,7 @@ function bantayKableButtonHandler(showFloating = true) {
         }
         remarks = remarks.trim().toUpperCase();
 
-        section1 += `C: ${vars.channel}${sfCaseNum}${accountNum}${insertCustConcern(custConcern)}\n`;
+        section1 += `C: ${channel}${sfCaseNum}${accountNum}${insertCustConcern(custConcern)}\n`;
         section1 += `A: ${remarks}`;
 
         fields.forEach(field => {
@@ -16839,12 +16977,22 @@ function endorsementForm() {
     ];
 
     autofillMappings.forEach(({ source, target }) => {
-        const sourceElement = document.querySelector(`#form1Container [name='${source}']`) ||
-                              document.querySelector(`#form2Container [name='${source}']`);
         const targetElement = table.querySelector(`[name='${target}']`);
+        if (!targetElement) return;
 
-        if (sourceElement && targetElement) {
-            let value = sourceElement.value;
+        let value = "";
+
+        if (source === "agentName" || source === "teamLead") {
+            value = window.agentDetailsData?.[source] || "";
+        } else {
+            const sourceElement =
+                document.querySelector(`#form1Container [name='${source}']`) ||
+                document.querySelector(`#form2Container [name='${source}']`);
+
+            value = sourceElement?.value || "";
+        }
+
+        if (value) {
             targetElement.value = value.toUpperCase();
         }
     });
@@ -17263,7 +17411,7 @@ function saveFormData() {
     ].filter(Boolean);
 
     const techNotes = techNotesButtonHandler(false);
-    const nontechNotes = nontechNotesButtonHandler(false);
+    const nontechNotes = `SF/FUSE NOTES:\n${nontechNotesButtonHandler(false)}`;
 
     const fuseNotes = Array.isArray(techNotes)
         ? `SF/FUSE NOTES:\n${techNotes.join("\n")}`
@@ -17275,7 +17423,7 @@ function saveFormData() {
         ? `CEP NOTES:\n${newTicketNotes.join("\n")}`
         : "";
 
-    const bantayKableNotes = bantayKableButtonHandler(false);
+    const bantayKableNotes = `SF/FUSE NOTES:\n${bantayKableButtonHandler(false)}`;
     const nonTechIntents = [
         // Complaint
         "formReqNonServiceRebate", "formReqReconnection", "formCompMyHomeWeb", "formCompMisappliedPayment", "formCompUnreflectedPayment", "formCompPersonnelIssue",
@@ -17506,6 +17654,8 @@ function saveFormData() {
     // Save back to localStorage
     localStorage.setItem("tempDatabase", JSON.stringify(savedData));
 
+    displaySavedNotesViewer();
+
 }
 
 // Load saved notes from localStorage
@@ -17578,6 +17728,72 @@ function loadFormData() {
     }
 }
 
+// Load to Saved Notes Viewer
+function displaySavedNotesViewer() {
+    const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
+    const viewer = document.querySelector(".savedNotesViewer");
+
+    viewer.innerHTML = "";
+
+    if (Object.keys(savedData).length === 0) {
+        viewer.textContent = "No saved notes available.";
+        return;
+    }
+
+    // Sort LATEST → OLDEST
+    const sortedEntries = Object.entries(savedData).sort((a, b) => {
+        const timeA = new Date(a[1].timestamp).getTime();
+        const timeB = new Date(b[1].timestamp).getTime();
+        return timeB - timeA;
+    });
+
+    for (const [key, entry] of sortedEntries) {
+        let block = "";
+
+        block += `SAVED ON: ${entry.timestamp}\n`;
+
+        if (entry.lastUpdated) {
+            block += `LAST UPDATED: ${entry.lastUpdated}\n`;
+        }
+
+        const appendIfValid = (label, value) => {
+            if (value !== undefined && value !== "undefined") {
+                block += `${label}: ${value}\n`;
+            }
+        };
+
+        appendIfValid("SF CASE #", entry.sfCaseNumber);
+        appendIfValid("CUSTOMER NAME", entry.custName);
+        appendIfValid("LOB", entry.selectLOB);
+        appendIfValid("VOC", entry.selectVOC);
+        appendIfValid("INTENT", entry.selectIntent);
+        appendIfValid("ACCOUNT #", entry.accountNum);
+        appendIfValid("LANDLINE #", entry.landlineNum);
+
+        const lob = entry.selectLOB || "";
+        const voc = entry.selectVOC || "";
+
+        if (lob !== "NON-TECH") {
+            if (["COMPLAINT", "REQUEST"].includes(voc)) {
+                appendIfValid("SERVICE ID", entry.serviceID);
+                appendIfValid("OPTION82", entry.Option82);
+            } else if (voc !== "FOLLOW-UP") {
+                appendIfValid("SERVICE ID", entry.serviceID);
+                appendIfValid("OPTION82", entry.Option82);
+            }
+        }
+
+        block += `\n${entry.combinedNotes}\n`;
+        block += "═".repeat(42) + "\n";
+
+        // Create <pre> block for formatting
+        const pre = document.createElement("pre");
+        pre.textContent = block;
+
+        viewer.appendChild(pre);
+    }
+}
+
 // Export saved notes as a text file, sorted by timestamp
 function exportDataAsTxt() {
     const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
@@ -17636,7 +17852,7 @@ function exportDataAsTxt() {
             }
         }
 
-        notepadContent += `\nCASE NOTES:\n${entry.combinedNotes}\n`;
+        notepadContent += `\n${entry.combinedNotes}\n`;
         notepadContent += "=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n\n";
     }
 
@@ -17754,6 +17970,8 @@ function deleteAllData() {
         localStorage.clear();
         showAlert("All data has been deleted successfully.");
     });
+
+    displaySavedNotesViewer();
 }
 
 // Show appropriate buttons based on form state
@@ -17985,6 +18203,20 @@ const instructions = [
 ];
 
 const versions = [
+    {
+        version: "V5.5.010526",
+        updates: [
+            { title: "Improvements", items: [
+                "<strong>Smart Auto‑Hide for Agent Details</strong> - Agent Details now automatically hide once completed to keep the form clean and focused, with values securely stored to prevent unnecessary validation prompts and ensure consistent autofill.",
+                "Added a <strong>“My Details”</strong> option in the Smart Assistant for quick access and updating of agent information.",
+                "New <strong>Notepad</strong> section – Allows agents to continue using the notepad even when the main window is minimized.",
+                "Introducing the <strong>“Saved Notes Viewer”</strong> – Gives agents real-time visibility into their saved notes without exporting it to a notepad or excel file.",
+            ]},
+            { title: "Fixes", items: [
+                "Resolved an issue causing repeated “Request for Retracking Submitted” entries in SF/FUSE notes and restored the ability for agents to provide retracking details across all applicable IPTV intents.",
+            ]},
+        ]
+    },
     {
         version: "V5.4.170426",
         updates: [
@@ -18286,7 +18518,9 @@ fabButton?.addEventListener("mouseleave", () => {
 
 // MENU VISIBILITY (CLASS-BASED)
 panel?.addEventListener("mouseenter", () => {
-    fabMenu.classList.add("show");
+    if (!fabMenu.classList.contains("force-hide")) {
+        fabMenu.classList.add("show");
+    }
 });
 
 panel?.addEventListener("mouseleave", () => {
@@ -18294,9 +18528,27 @@ panel?.addEventListener("mouseleave", () => {
 });
 
 function runFabAction(action) {
-    fabMenu.classList.remove("show");
-    setTimeout(action, FabConfig.actionDelay);
+    // Lock hover so menu doesn’t reopen
+    panel.classList.add("lock-hover");
+
+    // Force-hide menu
+    fabMenu.classList.add("force-hide");
+
+    // Close panel
+    panel.classList.remove("open");
+
+    // Run action
+    setTimeout(() => {
+        if (typeof action === "function") {
+            action();
+        }
+    }, FabConfig.actionDelay);
 }
+
+panel.addEventListener("mouseleave", () => {
+    panel.classList.remove("lock-hover");
+    fabMenu.classList.remove("force-hide");
+});
 
 // BUTTON ACTIONS
 function openDuplicateTab() {

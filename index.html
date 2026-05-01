@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Standard Notes Generator V5.4</title>
+    <title>Standard Notes Generator V5.5</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +28,7 @@
             <div id="fabMenu">
                 <nav>
                     <ul>
+                        <li onclick="runFabAction(showAgentDetailsTemporarily)">My Details</li>
                         <li onclick="runFabAction(openDuplicateTab)">Duplicate Tab</li>
                         <li onclick="runFabAction(exportDataAsExcel)">Export Notes to Excel (.xlsx)</li>
                         <li onclick="runFabAction(exportDataAsTxt)">Export Notes to Notepad (.txt)</li>
@@ -40,17 +41,24 @@
 
         </div>
 
+        <div class="notepadDiv" id="notepadContainer">
+            <div class="notepadHeader">
+                <h3>🗒️ Notepad</h3>
+            </div>
+            <div class="notepad" contenteditable="true"></div>
+        </div>
+
         <div class="scrollWrapper">
             <div class="divsContainer">
                 <div class="form1Div" id="form1Container">
                     <form id="frm1" name="frm1">
                     <table>
-                        <tr>
+                        <tr id="agent-details-header-row">
                             <th colspan="2">
                                 <div class="form1DivHeader">AGENT DETAILS</div>
                             </th>
                         </tr>
-                        <tr>
+                        <tr id="agent-and-tl-details-row">
                             <td>
                                 <label for="agent-name">Agent Name*</label>
                                 <div class="form1DivInput">
@@ -64,7 +72,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr>
+                        <tr id="user-and-channel-row">
                             <td>
                                 <label for="pldt-user">PLDT Username*</label>
                                 <div class="form1DivInput">
@@ -76,6 +84,7 @@
                                 <div class="form1DivInput">
                                     <select id="channel" name="selectChannel">
                                         <option value="" disabled selected></option>
+                                        <!-- <option value="CDT-CCBO">CDT-CCBO</option> -->
                                         <option value="CDT-HOTLINE">CDT-HOTLINE</option>
                                         <option value="CDT-SOCMED">CDT-SOCMED</option>
                                     </select>
@@ -123,6 +132,11 @@
                                 </div>
                             </td> 
                         </tr>
+                        <!-- <tr id="saved-notes-header-row" style="display: none;">
+                            <th colspan="2">
+                                <div class="form1DivHeader">Saved Notes</div>
+                            </th>
+                        </tr> -->
                         <tr id="saved-notes-row" style="display: none;">
                             <td colspan="2">
                                 <label for="savedNotes" id="savedNotes-label">Saved Notes</label>
@@ -287,18 +301,6 @@
                                         <!-- Tech Follow-Up Intent -->
                                         <option value="formFfupRepair">Repair/Network Outage</option>
 
-                                        <!-- Tech Request Intent -->
-                                        <optgroup label="Change Configuration - Data">
-                                            <option value="form300_1">Change of WiFi Name/Password</option>
-                                            <option value="form300_2">Request for Local User GUI Access</option>
-                                            <option value="form300_3">Request for Super Admin GUI Access</option>
-                                            <option value="form300_4">Change modem set-up from Route to Bridge Mode</option>
-                                            <option value="form300_5">Change modem set-up from Bridge to Route Mode</option>
-                                            <option value="form300_6">LAN Port Activation</option>
-                                            <option value="form300_7">Request for Public IP</option>
-                                            <option value="form300_8">Request for Private IP</option>
-                                        </optgroup>
-
                                         <!--- Non-Tech Inquiry ---->
                                         <optgroup label="Account">
                                             <option data-group="inquiry" value="formInqAccSrvcStatus">Account/Service Status</option>
@@ -437,6 +439,16 @@
                                         <!--- Non-Tech Request --->
                                         <option data-group="request" value="formReqAccMgt">Account Management</option>
                                         <option data-group="request" value="formReqAddressMod">Address Modification (Record)</option>
+                                        <optgroup label="Change Configuration - Data">
+                                            <option data-group="request" value="form300_1">Change of WiFi Name/Password</option>
+                                            <option data-group="request" value="form300_2">Request for Local User GUI Access</option>
+                                            <option data-group="request" value="form300_3">Request for Super Admin GUI Access</option>
+                                            <option data-group="request" value="form300_4">Change modem set-up from Route to Bridge Mode</option>
+                                            <option data-group="request" value="form300_5">Change modem set-up from Bridge to Route Mode</option>
+                                            <option data-group="request" value="form300_6">LAN Port Activation</option>
+                                            <option data-group="request" value="form300_7">Request for Public IP</option>
+                                            <option data-group="request" value="form300_8">Request for Private IP</option>
+                                        </optgroup>
                                         <optgroup label="Change Ownership">
                                             <option data-group="request" value="formReqSupRetAccNum">Supersedure retain Account number</option>
                                             <option data-group="request" value="formReqSupChangeAccNum">Supersedure with change account number</option>
@@ -493,6 +505,12 @@
                             <td colspan="2"><button type="button" id="saveButton" class="form1-button" tabindex="-1">💾 Save</button></td>
                             <td colspan="2">
                                 <button type="button" id="resetButton" class="form1-button" tabindex="-1">🔄 Reset</button></td>
+                            <!-- <td>
+                                <button type="button" id="exportButton" class="form1-button" tabindex="-1">📄 Export</button>
+                            </td>
+                            <td>
+                                <button type="button" id="deleteButton" class="form1-button" tabindex="-1">🗑️ Delete All</button>
+                            </td> -->
                         </tr>
                     </table>
                 </div>
@@ -500,11 +518,11 @@
             <div class="customScrollbar"></div>
         </div>
 
-        <div class="notepadDiv" id="notepadContainer">
-            <div class="notepadHeader">
-                <h3>🗒️ Notepad</h3>
+        <div class="savedNotesViewerDiv" id="savedNotesViewerContainer">
+            <div class="savedNotesViewerHeader">
+                <h3>📝 Saved Notes</h3>
             </div>
-            <div class="notepad" contenteditable="true"></div>
+            <div class="savedNotesViewer" contenteditable="true"></div>
         </div>
 
         <div class="updatesDiv" id="updatesContainer">
@@ -579,7 +597,7 @@
                 </table>
             </div>
             <div class="footer-text">
-                <span id="footerValue">Standard Notes Generator Version 5.4.170426</span>
+                <span id="footerValue">Standard Notes Generator Version 5.5.010526</span>
                 <span>&copy; Developed and designed by: QA Team</span>
             </div>
         </div>
