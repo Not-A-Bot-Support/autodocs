@@ -14350,7 +14350,7 @@ function specialInstButtonHandler(includeWocas = true) {
         { name: "rptCount", label: "Repeater"},
         { name: "rxPower", label: "RX"},
         { name: "WOCAS", label: "WOCAS"},
-        { name: "reOpenStatsReason", label: "Action Taken"},
+        { name: "reOpenStatsReason", label: "Re-Open Status Reason"},
     ];
 
     const fieldsToProcess = includeWocas
