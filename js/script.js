@@ -14762,8 +14762,18 @@ function techNotesButtonHandler(showFloating = true) {
 
         const req4retrackingValue = document.querySelector('[name="req4retracking"]')?.value || "";
         const retrackingFields = ["stbID", "smartCardID", "accountNum", "cignalPlan", "exactExp"];
+		const skipByIntent = {
+            formFfupRepair: [
+                "investigation1", "investigation2", "investigation3", "investigation4",
+                "contactName", "cbr", "availability", "address", "landmarks",
+                "rptCount", "sla", "reOpenStatsReason"
+            ]
+        };
 
         fields.forEach(field => {
+			// Skip fields for Follow-up Repair intent
+            if (skipByIntent[vars.selectedIntent]?.includes(field.name)) return;
+			
             // Skip retracking fields unless request is Yes or specific intent with stbID/smartCardID
             if (
                 req4retrackingValue !== "Yes" &&
