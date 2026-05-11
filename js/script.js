@@ -19,12 +19,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 localStorage.removeItem("tempDatabase");
                 showAlert("Previously saved notes (old records) have been deleted.");
             }
-
-            displaySavedNotesViewer();
         }
-
         sessionStorage.setItem("hasCheckedNotes", "true");
     }
+    displaySavedNotesViewer();
 });
 
 // Toggle Agent Details Row
@@ -848,7 +846,7 @@ function createIntentBasedForm() {
         upsell: [
             "", 
             "Yes - Accepted",
-            "Yes - Considering/Callback Requested",
+            "Yes - Upgrade Later",
             "No - Declined",
             "No - Ignored",
             "No - Undecided",
@@ -901,6 +899,7 @@ function createIntentBasedForm() {
             "Customer was requesting for ECA",
             "Customer was requesting for Promise to Pay",
             "Customer was requesting for Payment Due date Extension",
+            "Facilty type is VDSL/VVDSL",
             "Limited call time",
             "LOB is not applicable", 
             "Microbusiness Account", 
@@ -1031,8 +1030,8 @@ function createIntentBasedForm() {
                 "No Power Light",
                 "No VoIP/Tel/Phone Light",
                 "No WLAN light",
-                "Not Applicable-Copper",
-                "Not Applicable-Defective CPE",
+                "Not Applicable - Copper",
+                "Not Applicable - Defective CPE",
                 "Red LOS",
                 "Unable to provide information"
             ]},
@@ -1066,6 +1065,7 @@ function createIntentBasedForm() {
                 "Fiber cut OLT to LCP",
                 "Fix bad splices",
                 "Missing Micro-Filter",
+                "Not Applicable",
                 "Not applicable - Voice issue",
                 "No recommended action",
                 "Others/Error code",
@@ -1083,6 +1083,7 @@ function createIntentBasedForm() {
                 "— Select applicable Investigation 4 —",
                 "Aligned Record",
                 "Broken/Damaged Modem/ONU",
+                "Broken/Damaged Splitter/Microfilter",
                 "Broken/Damaged STB/SC",
                 "Broken/Damaged telset",
                 "Cannot Browse",
@@ -1111,6 +1112,7 @@ function createIntentBasedForm() {
                 "Loopback",
                 "Misaligned Record",
                 "Missing Channel/s",
+                "Network Trouble – All Services Down ",
                 "Network Trouble – Cannot Browse",
                 "Network Trouble – Cannot Browse via Mesh",
                 "Network Trouble – High Latency",
@@ -1592,11 +1594,13 @@ function createIntentBasedForm() {
                 "Aligned Record", 
                 "Awaiting Parent Case", 
                 "Broken/Damaged Modem/ONU", 
+                "Broken/Damaged Splitter/Microfilter",
                 "Cannot Browse",
                 "Cannot Browse via Mesh",
                 "Cannot Connect via LAN",
                 "Cannot Connect via WiFi",
 		        "Data Bind Port",
+                "FCR - Advised Physical Set-Up",
                 "FCR - Cannot Browse", 
                 "FCR - Cannot Connect via LAN", 
                 "FCR - Cannot Connect via WiFi", 
@@ -1605,6 +1609,7 @@ function createIntentBasedForm() {
                 "FCR - Slow/Intermittent Browsing",
                 "Individual Trouble", 
                 "Misaligned Record",
+                "Network Trouble - All Services Down ",
                 "Network Trouble - Cannot Browse",
                 "Network Trouble - Cannot Browse via Mesh",
                 "Node Down",
@@ -2060,8 +2065,8 @@ function createIntentBasedForm() {
                     showFields(["onuSerialNum", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved"]);
                     hideSpecificFields(["outageReference", "pcNumber", "option82Config", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 } else {
-                    showFields(["onuSerialNum", "modemLights", "cvReading", "rtaRequest", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "option82Config", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    showFields(["onuSerialNum", "cvReading", "rtaRequest", "remarks", "issueResolved"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "option82Config", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
                 }
                 
             }
@@ -13648,11 +13653,11 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
         { name: "subStatus", label: "Sub Status"},
         { name: "queue", label: "Queue"},
         { name: "ticketAge", label: "Ticket Age"},
+        { name: "remarks", label: "Remarks"},
         { name: "investigation1", label: "Investigation 1"},
         { name: "investigation2", label: "Investigation 2"},
         { name: "investigation3", label: "Investigation 3"},
         { name: "investigation4", label: "Investigation 4"},
-        { name: "remarks", label: "Remarks"},
         { name: "sla", label: "SLA"},
         { name: "offerALS",}
     ];
@@ -13662,8 +13667,8 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
         const blankVisibleFields = [];
 
         fields.forEach(field => {
-            // Exclude pcNumber explicitly
-            if (field.name === "pcNumber") return;
+            // Exclude pcNumber and sla explicitly
+            if (field.name === "pcNumber" || field.name === "sla") return;
 
             const fieldEl = document.querySelector(`[name="${field.name}"]`);
             if (!fieldEl) return;
@@ -14741,7 +14746,7 @@ function techNotesButtonHandler(showFloating = true) {
             { name: "statusReason"},
             { name: "subStatus"},
             { name: "queue", label: "Queue"},
-            { name: "ticketAge", label: "Ticket Age"},
+            { name: "ticketAge", label: "Case Age"},
             { name: "sla", label: "SLA"},
             { name: "reOpenStatsReason", label: "Re-Open Status Reason"},
 
@@ -14762,7 +14767,7 @@ function techNotesButtonHandler(showFloating = true) {
 
         const req4retrackingValue = document.querySelector('[name="req4retracking"]')?.value || "";
         const retrackingFields = ["stbID", "smartCardID", "accountNum", "cignalPlan", "exactExp"];
-		const skipByIntent = {
+        const skipByIntent = {
             formFfupRepair: [
                 "investigation1", "investigation2", "investigation3", "investigation4",
                 "contactName", "cbr", "availability", "address", "landmarks",
@@ -14770,10 +14775,11 @@ function techNotesButtonHandler(showFloating = true) {
             ]
         };
 
+
         fields.forEach(field => {
-			// Skip fields for Follow-up Repair intent
+            // Skip fields for Follow-up Repair intent
             if (skipByIntent[vars.selectedIntent]?.includes(field.name)) return;
-			
+
             // Skip retracking fields unless request is Yes or specific intent with stbID/smartCardID
             if (
                 req4retrackingValue !== "Yes" &&
@@ -14844,7 +14850,7 @@ function techNotesButtonHandler(showFloating = true) {
 
         const upsellMap = {
             "Yes - Accepted": "#UpsellAccepted",
-            "Yes - Considering/Callback Requested": "#UpgradeLater",
+            "Yes - Upgrade Later": "#UpgradeLater",
             "No - Declined": "#UpsellDeclined",
             "No - Ignored": "#UpsellIgnored",
             "No - Undecided": "#UpsellUndecided",
@@ -15218,7 +15224,7 @@ function nontechNotesButtonHandler(showFloating = true) {
 
         const upsellMap = {
             "Yes - Accepted": "#UpsellAccepted",
-            "Yes - Considering/Callback Requested": "#UpgradeLater",
+            "Yes - Upgrade Later": "#UpgradeLater",
             "No - Declined": "#UpsellDeclined",
             "No - Ignored": "#UpsellIgnored",
             "No - Undecided": "#UpsellUndecided",
@@ -17794,7 +17800,7 @@ function displaySavedNotesViewer() {
     viewer.innerHTML = "";
 
     if (Object.keys(savedData).length === 0) {
-        viewer.textContent = "No saved notes available.";
+        viewer.textContent = "";
         return;
     }
 
@@ -18261,6 +18267,25 @@ const instructions = [
 ];
 
 const versions = [
+    {
+        version: "V5.5.110526",
+        updates: [
+            {
+                title: "Improvements",
+                items: [
+                    "Added applicable investigations tagging and not eligible reason for upsell for <strong>Copper VDSL Accounts</strong>",
+                    "Streamlined troubleshooting for <strong>Copper VDSL</strong> by removing unnecessary modem light checks during all services downtime",
+                    "Updated <strong>“Upgrade Later”</strong> option to display <strong>#UpgradeLater</strong> tag in notes for better tracking of potential future upsell opportunities"
+                ]
+            },
+            {
+                title: "Fixes",
+                items: [
+                    "Fixed <strong>SLA alert</strong> for not applicable scenarios"
+                ]
+            }
+        ]
+    },
     {
         version: "V5.5.050526",
         updates: [
