@@ -1082,6 +1082,7 @@ function createIntentBasedForm() {
             { label: "Investigation 4", type: "select", name: "investigation4", options: [
                 "— Select applicable Investigation 4 —",
                 "Aligned Record",
+				"Broken/Damaged Cable/Cord",
                 "Broken/Damaged Modem/ONU",
                 "Broken/Damaged Splitter/Microfilter",
                 "Broken/Damaged STB/SC",
@@ -1593,6 +1594,7 @@ function createIntentBasedForm() {
                 "— Select applicable Investigation 4 —",
                 "Aligned Record", 
                 "Awaiting Parent Case", 
+				"Broken/Damaged Cable/Cord",
                 "Broken/Damaged Modem/ONU", 
                 "Broken/Damaged Splitter/Microfilter",
                 "Cannot Browse",
