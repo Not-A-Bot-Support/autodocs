@@ -15043,7 +15043,7 @@ function techNotesButtonHandler(showFloating = true) {
             },
             offerAccepted: {
                 "Yes - Accepted": "#UpsellAccepted",
-                "Yes - Upgrade Later": "#UpgradeLater",
+                "Yes - Accepted but with Open SO": "#UpsellLater",
                 "No - Declined": "#UpsellDeclined",
                 "No - Ignored": "#UpsellIgnored",
                 "No - Undecided": "#UpsellUndecided"
