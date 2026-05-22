@@ -842,15 +842,17 @@ function createIntentBasedForm() {
         "formReqTaxAdj", "formReqChgTelUnit", "formReqOcular", "formReqProofOfSub"
     ]
 
+    const disconnectedOption =
+        channelField.value === "CDT-HOTLINE"
+            ? "No - Disconnected Call"
+            : "No - Disconnected Chat";
+
     const UPSELL_OPTIONS = {
-        upsell: [
+        eligibleForUpsell: [
             "", 
-            "Yes - Accepted",
-            "Yes - Upgrade Later",
-            "No - Declined",
-            "No - Ignored",
-            "No - Undecided",
-            "NA - Not Eligible"
+            "Yes",
+            "No - Not Eligible",
+            disconnectedOption
         ],
         productsOffered: [
             "", 
@@ -858,10 +860,18 @@ function createIntentBasedForm() {
             "Mesh",
             "Plan Upgrade",
         ],
+        offerAccepted: [
+            "", 
+            "Yes - Accepted",
+            "Yes - Accepted but with Open SO",
+            "No - Declined",
+            "No - Ignored",
+            "No - Undecided"
+        ],
         declineReason: [
             "", 
             "Budget constraint", 
-            "No need / satisfied with current plan", 
+            "No need or satisfied with current plan", 
             "Time constraint", 
             "No reason stated", 
             "Poor service experience", 
@@ -907,6 +917,7 @@ function createIntentBasedForm() {
             "Poor LTE signal strength in the area",
             "Potential crisis", 
             "Prepaid Fiber",
+            "Prev Agent already offered upsell and cust declined",
             "Requested reconnection but has a broken promise and has not yet paid",
             "Technical incompatibility",
             "Unresolved AFTERSALES complaints", 
@@ -914,21 +925,23 @@ function createIntentBasedForm() {
         ]
     };
 
-    function handleUpsellChange(upsell) {
-        showFields(["productsOffered"]);
-
-        if (upsell.selectedIndex === 1 || upsell.selectedIndex === 2 || upsell.selectedIndex === 4 || upsell.selectedIndex === 5) {
+    function handleEligibleForUpsellChange(eligibleForUpsell) {
+        if (eligibleForUpsell.selectedIndex === 1) {
+            showFields(["productsOffered", "offerAccepted"]);
             hideSpecificFields(["declineReason", "notEligibleReason"]);
-
-        } else if (upsell.selectedIndex === 3) {
-            showFields(["declineReason"]);
-            hideSpecificFields(["notEligibleReason"]);
-
-        } else if (upsell.selectedIndex === 6) {
+        } else if (eligibleForUpsell.selectedIndex === 2) {
             showFields(["notEligibleReason"]);
-            hideSpecificFields(["productsOffered", "declineReason"]);
+            hideSpecificFields(["declineReason", "productsOffered", "offerAccepted"]);
         } else {
-            hideSpecificFields(["productsOffered", "declineReason", "notEligibleReason"]);
+            hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+        }
+    }
+
+    function handleUpsellDeclinedChange(offerAccepted) {
+        if (offerAccepted.selectedIndex === 3) {
+            showFields(["declineReason"]);
+        } else {
+            hideSpecificFields(["declineReason"]);
         }
     }
 
@@ -1082,7 +1095,7 @@ function createIntentBasedForm() {
             { label: "Investigation 4", type: "select", name: "investigation4", options: [
                 "— Select applicable Investigation 4 —",
                 "Aligned Record",
-				"Broken/Damaged Cable/Cord",
+                "Broken/Damaged Cable/Cord",
                 "Broken/Damaged Modem/ONU",
                 "Broken/Damaged Splitter/Microfilter",
                 "Broken/Damaged STB/SC",
@@ -1152,8 +1165,9 @@ function createIntentBasedForm() {
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
             { label: "Re-Open Status Reason", type: "textarea", name: "reOpenStatsReason", placeholder: "Indicate the reason for re-opening the ticket (Dispatched to Field Technician - Re-Open or Escalated to Network - Re-Open)."},
             // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -1238,7 +1252,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "Alternative Services", "offerALS");
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "upsell");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
@@ -1369,20 +1383,20 @@ function createIntentBasedForm() {
         queue.addEventListener("change", () => {
             resetAllFields(["subject1", "statusReason","subStatus", "queue"]);
             if (queue.value === "FM POLL" || queue.value === "CCARE OFFBOARD") {
-                showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "issueResolved", "upsell" ]);
-                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "productsOffered", "declineReason", "notEligibleReason" ]);
+                showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "issueResolved", "eligibleForUpsell" ]);
+                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "productsOffered", "offerAccepted", "offerAccepted", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
 
             }else if (queue.value === "Default Entity Queue") {
-                showFields(["ffupCount", "ticketAge", "remarks", "issueResolved", "upsell"]);
-                hideSpecificFields(["projRed", "ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "productsOffered", "declineReason", "notEligibleReason" ]);
+                showFields(["ffupCount", "ticketAge", "remarks", "issueResolved", "eligibleForUpsell"]);
+                hideSpecificFields(["projRed", "ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
 
             } else {
                 showFields(["projRed" ]);
-                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "upsell", "productsOffered", "declineReason", "notEligibleReason" ]);
+                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
             }
@@ -1402,23 +1416,23 @@ function createIntentBasedForm() {
             resetAllFields(["subject1", "statusReason","subStatus", "queue", "projRed"]);
             if (projRed.value === "Yes") {
                 if (queue.value === "SDM CHILD" || queue.value ==="SDM" || queue.value ==="FSMG" || queue.value ==="L2 RESOLUTION" ) {
-                    showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "rptCount", "upsell" ]);
-                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "availability", "address", "landmarks", "reOpenStatsReason", "productsOffered", "declineReason", "notEligibleReason" ]);
+                    showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell" ]);
+                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "availability", "address", "landmarks", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
                 } else {
-                    showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell" ]);
-                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "reOpenStatsReason", "productsOffered", "declineReason", "notEligibleReason" ]);
+                    showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell" ]);
+                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
                 }
 
                 updateToolLabelVisibility();
 
             } else if (projRed.value === "No"){
-                showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "upsell" ]);
-                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "productsOffered", "declineReason", "notEligibleReason" ]);
+                showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "eligibleForUpsell" ]);
+                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
 
             } else {
-                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "upsell", "productsOffered", "declineReason", "notEligibleReason" ]);
+                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "reOpenStatsReason", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
             }
@@ -1461,8 +1475,11 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
         updateToolLabelVisibility();
     } 
@@ -1594,7 +1611,7 @@ function createIntentBasedForm() {
                 "— Select applicable Investigation 4 —",
                 "Aligned Record", 
                 "Awaiting Parent Case", 
-				"Broken/Damaged Cable/Cord",
+                "Broken/Damaged Cable/Cord",
                 "Broken/Damaged Modem/ONU", 
                 "Broken/Damaged Splitter/Microfilter",
                 "Cannot Browse",
@@ -1633,8 +1650,9 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks"},
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
             // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -1758,7 +1776,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "upsell");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
         
 
         function createFieldRow(field) {
@@ -1980,10 +1998,10 @@ function createIntentBasedForm() {
             if (facility.value === "Fiber") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
-                    showFields(["onuSerialNum", "modemLights", "actualExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "issueResolved", "productsOffered", "declineReason", "notEligibleReason"]);
+                    showFields(["onuSerialNum", "modemLights", "actualExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "issueResolved", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                     if (channelField.value === "CDT-SOCMED") {
                         showFields(["resolution"]);
@@ -1992,15 +2010,15 @@ function createIntentBasedForm() {
                     }
                 } else {
                     showFields(["onuSerialNum", "modemLights", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 }
             } else if (facility.value === "Fiber - Radius") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
-                    showFields(["remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "cvReading", "rtaRequest", "actualExp", "issueResolved", "productsOffered", "declineReason", "notEligibleReason"]);
+                    showFields(["remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "cvReading", "rtaRequest", "actualExp", "issueResolved", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                     if (channelField.value === "CDT-SOCMED") {
                         showFields(["resolution"]);
@@ -2009,7 +2027,7 @@ function createIntentBasedForm() {
                     }
                 } else {
                     showAlert("This form is currently unavailable for customers with Fiber - Radius service.");
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                     const facilityField = document.querySelector('[name="facility"]');
                     if (facilityField) facilityField.value = "";
@@ -2017,10 +2035,10 @@ function createIntentBasedForm() {
                 }
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "issueResolved", "resolution", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "issueResolved", "resolution", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility();
         });
@@ -2031,13 +2049,13 @@ function createIntentBasedForm() {
             if (resType.value === "Yes") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
                     showAlert("This form is currently unavailable for customers with Fiber - DSL service.");
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                     const resTypeField = document.querySelector('[name="resType"]');
                     if (resTypeField) resTypeField.value = "";
@@ -2045,7 +2063,7 @@ function createIntentBasedForm() {
                 }
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility();
         });
@@ -2054,8 +2072,8 @@ function createIntentBasedForm() {
         outageStatus.addEventListener("change", () => {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
-                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "issueResolved", "availability", "address", "landmarks", "productsOffered", "declineReason", "notEligibleReason"]);
+                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
+                hideSpecificFields(["onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "issueResolved", "availability", "address", "landmarks", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -2065,10 +2083,10 @@ function createIntentBasedForm() {
             } else {
                 if (facility.value === "Fiber") {
                     showFields(["onuSerialNum", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "option82Config", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "option82Config", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
                     showFields(["onuSerialNum", "cvReading", "rtaRequest", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "option82Config", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "option82Config", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 }
                 
             }
@@ -2088,7 +2106,7 @@ function createIntentBasedForm() {
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
-                showFields(["resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else {
                 showFields(["upsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
@@ -2102,8 +2120,11 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
         updateToolLabelVisibility();
 
@@ -2221,6 +2242,7 @@ function createIntentBasedForm() {
                 "Idle Status [FEOL]",
                 "Misaligned Routing Index",
                 "No or incomplete profile at VOICE NMS",
+                "No SG7K profile",
                 "Not Applicable [Copper]",
                 "Not Applicable [NCE/InterOP]",
                 "Not Applicable [NMS GUI]",
@@ -2366,7 +2388,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "upsell");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
         
         function createFieldRow(field) {
             const row = document.createElement("tr");
@@ -2493,26 +2515,26 @@ function createIntentBasedForm() {
             if (facility.value === "Fiber") {
                 if (selectedValue === "form101_1" || selectedValue === "form101_2" || selectedValue === "form101_3" || selectedValue === "form102_1" || selectedValue === "form102_2" || selectedValue === "form102_3") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["resType", "serviceStatus", "services", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "serviceStatus", "services", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 } else if (selectedValue === "form103_1" || selectedValue === "form103_2") {
                     showFields(["serviceStatus", "onuSerialNum", "callType", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "services", "outageStatus", "outageReference", "pcNumber", "modemLights", "fsx1Status", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "services", "outageStatus", "outageReference", "pcNumber", "modemLights", "fsx1Status", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 }  else if (selectedValue === "form103_4" || selectedValue === "form103_5") {
                     showFields(["onuSerialNum", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "services", "outageStatus", "outageReference", "pcNumber", "modemLights", "callType", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "dmsVoipServiceStatus", "dmsRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "services", "outageStatus", "outageReference", "pcNumber", "modemLights", "callType", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "dmsVoipServiceStatus", "dmsRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 } else {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 }
             } else if (facility.value === "Fiber - Radius") {
                 showFields(["remarks", "issueResolved"]);
-                hideSpecificFields(["resType", "serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "investigation1", "investigation2", "investigation3", "investigation4", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "investigation1", "investigation2", "investigation3", "investigation4", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -2530,17 +2552,17 @@ function createIntentBasedForm() {
             if (resType.value === "Yes") {
                 if (selectedValue === "form101_1" || selectedValue === "form101_2") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["serviceStatus", "services", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "oltAndOnuConnectionType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["serviceStatus", "services", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "oltAndOnuConnectionType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 } else if (selectedValue === "form101_3") {
                     showFields(["services", "outageStatus"]);
-                    hideSpecificFields(["serviceStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["serviceStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 } else {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 }
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["serviceStatus", "services", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -2557,34 +2579,34 @@ function createIntentBasedForm() {
             if (outageStatus.value === "No" && facility.value === "Fiber") {
                 if (selectedValue === "form101_1" || selectedValue === "form101_2" || selectedValue === "form101_3") {
                     showFields(["onuSerialNum", "modemLights", "oltAndOnuConnectionType", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "callType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "callType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 } else {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 }
                 updateToolLabelVisibility();
             } else if (outageStatus.value === "No" && facility.value === "Copper VDSL") {
                 if (selectedValue === "form101_1" || selectedValue === "form101_2" || selectedValue === "form101_3") {
                     showFields(["onuSerialNum", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "modemLights", "callType", "oltAndOnuConnectionType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "modemLights", "callType", "oltAndOnuConnectionType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 } else {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 }
                 updateToolLabelVisibility();
             } else if (resType.value === "Yes" && services.value === "Voice Only" && outageStatus.value === "No") {
                 if (selectedValue === "form101_3") {
                     showFields(["onuSerialNum", "dmsVoipServiceStatus", "dmsRemarks", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "modemLights", "callType", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "modemLights", "callType", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 }
                 updateToolLabelVisibility();
             } else if (resType.value === "Yes" && services.value === "Bundled" && outageStatus.value === "No") {
                 showFields(["onuSerialNum", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageReference", "pcNumber", "modemLights", "callType", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
 
                 updateToolLabelVisibility();
             } else {
-                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
+                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
                 hideSpecificFields(["onuSerialNum", "modemLights", "callType", "oltAndOnuConnectionType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "issueResolved", "availability", "address", "landmarks"]);
 
                 if (channelField.value === "CDT-SOCMED") {
@@ -2621,7 +2643,7 @@ function createIntentBasedForm() {
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else {
                 showFields(["upsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
@@ -2857,8 +2879,9 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks"},
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
             // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -2991,7 +3014,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "upsell");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
         
         function createFieldRow(field) {
             const row = document.createElement("tr");
@@ -3234,27 +3257,27 @@ function createIntentBasedForm() {
             if (facility.value === "Fiber") {
                 if (selectedValue === "form500_1") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form500_2") {
                     showFields(["nmsSkinRemarks", "dmsRemarks", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "connectionMethod", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "connectionMethod", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 }
 
                 updateToolLabelVisibility();
             } else if (facility.value === "Fiber - Radius") {
                 if (selectedValue === "form500_1") {
                     showFields(["connectionMethod", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form500_3" || selectedValue === "form500_4") {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
                     showAlert("This form is currently unavailable for customers with Fiber - Radius service.");
                     resetAllFields([]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                     const facilityField = document.querySelector('[name="facility"]');
                     if (facilityField) facilityField.value = "";
@@ -3264,10 +3287,10 @@ function createIntentBasedForm() {
                 updateToolLabelVisibility();
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
 
             updateToolLabelVisibility();
@@ -3279,19 +3302,19 @@ function createIntentBasedForm() {
             if (resType.value === "Yes") {
                 if (selectedValue=== "form500_1") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form500_2") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 }
                 
                 updateToolLabelVisibility();
             } else {
                 showFields(["remarks", "issueResolved"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
 
             updateToolLabelVisibility();
@@ -3302,13 +3325,13 @@ function createIntentBasedForm() {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (selectedValue === "form500_1" && facility.value === "Fiber" && outageStatus.value === "No") {
                 showFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "option82Config", "dmsWifiState", "dmsLanPortStatus", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageReference", "pcNumber", "option82Config", "dmsWifiState", "dmsLanPortStatus", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else if (selectedValue === "form500_1" && facility.value === "Copper VDSL" && outageStatus.value === "No") {
                 showFields(["onuSerialNum", "intLightStatus", "wanLightStatus", "connectionMethod", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else {
-                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "onuRunStats", "option82Config", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks", "productsOffered", "declineReason", "notEligibleReason"]);
+                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
+                hideSpecificFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "onuRunStats", "option82Config", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
                 } else {
@@ -3390,7 +3413,7 @@ function createIntentBasedForm() {
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -3412,8 +3435,11 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
         const resolution = document.querySelector("[name='resolution']");
         const testedOk = document.querySelector("[name='testedOk']");
@@ -3574,8 +3600,9 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks"},
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
             // Cross-Sell/Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -3700,7 +3727,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "upsell");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
         
         function createFieldRow(field) {
             const row = document.createElement("tr");
@@ -3960,17 +3987,17 @@ function createIntentBasedForm() {
             resetAllFields(["facility"]);
             if (facility.value === "Fiber") {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["resType", "planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["resType", "planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 updateToolLabelVisibility(); 
             } else if (facility.value === "Fiber - Radius") {
                 showFields(["planDetails", "connectionMethod", "pingTestResult", "speedTestResult", "remarks", "issueResolved"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks","issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks","issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "testedOk" ,"issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["resType", "planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "testedOk" ,"issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility(); 
         });
@@ -3980,10 +4007,10 @@ function createIntentBasedForm() {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility(); 
         });
@@ -3992,8 +4019,8 @@ function createIntentBasedForm() {
         outageStatus.addEventListener("change", () => {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
-                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
-                hideSpecificFields(["planDetails", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks", "productsOffered", "declineReason", "notEligibleReason"]);
+                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
+                hideSpecificFields(["planDetails", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -4003,11 +4030,11 @@ function createIntentBasedForm() {
             } else {
                 if (facility.value === "Fiber") {
                     showFields(["planDetails", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "outageReference", "pcNumber", "deviceBrandAndModel", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "outageReference", "pcNumber", "deviceBrandAndModel", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 } else {
                     showFields(["planDetails", "connectionMethod", "pingTestResult", "speedTestResult", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell", "productsOffered", "declineReason", "notEligibleReason"]);   
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);   
                 }
                 updateToolLabelVisibility(); 
             }
@@ -4027,7 +4054,7 @@ function createIntentBasedForm() {
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -4049,8 +4076,11 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
         const resolution = document.querySelector("[name='resolution']");
         const testedOk = document.querySelector("[name='testedOk']");
@@ -4273,7 +4303,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "upsell");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
         
         function createFieldRow(field) {
             const row = document.createElement("tr");
@@ -4556,7 +4586,7 @@ function createIntentBasedForm() {
         outageStatus.addEventListener("change", () => {
             resetAllFields(["outageStatus"]);
             if (outageStatus.value === "Yes") {
-                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
+                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
                 hideSpecificFields(["onuSerialNum", "rxPower", "cvReading", "rtaRequest", "specificTimeframe", "pingTestResult", "gameNameAndServer", "gameServerIP", "pingTestResult2", "traceroutePLDT", "tracerouteExt", "issueResolved", "availability", "address", "landmarks"]);
 
                 if (channelField.value === "CDT-SOCMED") {
@@ -4566,14 +4596,14 @@ function createIntentBasedForm() {
                 }
             } else if (outageStatus.value === "No") {
                 showFields(["onuSerialNum", "rxPower", "cvReading", "rtaRequest", "specificTimeframe", "pingTestResult", "gameNameAndServer", "gameServerIP", "pingTestResult2", "traceroutePLDT", "tracerouteExt", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageReference", "pcNumber", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             }
             updateToolLabelVisibility();
         });
     
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else {
                 showFields(["upsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
@@ -4819,7 +4849,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "upsell");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
         
         function createFieldRow(field) {
             const row = document.createElement("tr");
@@ -4986,10 +5016,10 @@ function createIntentBasedForm() {
             resetAllFields(["facility"]);
             if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else if (facility.value === "Copper HDSL/NGN") {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -4998,7 +5028,7 @@ function createIntentBasedForm() {
                 }
             } else {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["resType", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["resType", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             }
             updateToolLabelVisibility();
         });
@@ -5007,10 +5037,10 @@ function createIntentBasedForm() {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -5025,7 +5055,7 @@ function createIntentBasedForm() {
         outageStatus.addEventListener("change", () => {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
-                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
+                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
                 hideSpecificFields(["rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "itRemarks", "issueResolved", "testedOk", "availability", "address", "landmarks"]);
 
                 if (channelField.value === "CDT-SOCMED") {
@@ -5035,10 +5065,10 @@ function createIntentBasedForm() {
                 }
             } else if (facility.value === "Fiber" && outageStatus.value === "No") {
                 showFields(["rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "itRemarks", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageReference", "pcNumber", "itRemarks", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else if ((facility.value === "Fiber - Radius" || facility.value === "Copper VDSL") && outageStatus.value === "No") {
                 showFields(["websiteURL", "errMsg", "otherDevice", "vpnBlocking", "vpnRequired", "otherISP", "itSupport", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "itRemarks", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageReference", "pcNumber", "rxPower", "ipAddress", "dmsInternetStatus", "connectedDevices", "itRemarks", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             }
             updateToolLabelVisibility();
         });
@@ -5053,7 +5083,7 @@ function createIntentBasedForm() {
     
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -5342,7 +5372,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "upsell");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
         
         function createFieldRow(field) {
             const row = document.createElement("tr");
@@ -5559,15 +5589,15 @@ function createIntentBasedForm() {
             if (accountType.value === "PLDT") {
                 if (selectedValue === "form510_1" || selectedValue === "form510_2") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 } else if (selectedValue === "form511_1" || selectedValue === "form511_2" || selectedValue === "form511_3" || selectedValue === "form511_4" || selectedValue === "form511_5") {
                     showFields(["rxPower", "req4retracking", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 } else if (selectedValue === "form512_1") {
                     showFields(["req4retracking", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 } else if (selectedValue === "form510_7") {
-                    showFields(["stbID", "smartCardID", "stbIpAddress", "tsMulticastAddress", "exactExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
+                    showFields(["stbID", "smartCardID", "stbIpAddress", "tsMulticastAddress", "exactExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
                     hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "cignalPlan", "issueResolved", "availability", "address", "landmarks"]);
 
                     if (channelField.value === "CDT-SOCMED") {
@@ -5577,16 +5607,16 @@ function createIntentBasedForm() {
                     }
                 } else {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 }
                 updateToolLabelVisibility();
             } else if (accountType.value === "RADIUS") {
                 if (selectedValue === "form510_1" || selectedValue === "form510_2" || selectedValue === "form511_1" || selectedValue === "form511_2" || selectedValue === "form511_3" || selectedValue === "form511_4" || selectedValue === "form511_5" || selectedValue === "form512_1") {
                     showFields(["req4retracking", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 } else {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 }
                 updateToolLabelVisibility();
             }
@@ -5595,7 +5625,7 @@ function createIntentBasedForm() {
         outageStatus.addEventListener("change", () => {
             resetAllFields(["accountType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
-                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "upsell"]);
+                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
                 hideSpecificFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "issueResolved", "availability", "address", "landmarks"]);
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -5604,7 +5634,7 @@ function createIntentBasedForm() {
                 }
             } else {
                 showFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "exactExp", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["outageReference", "pcNumber", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             }
             updateToolLabelVisibility();
         });
@@ -5674,7 +5704,7 @@ function createIntentBasedForm() {
 
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else {
                 showFields(["upsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
@@ -5825,7 +5855,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "upsell");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
         
         function createFieldRow(field) {
             const row = document.createElement("tr");
@@ -5927,7 +5957,7 @@ function createIntentBasedForm() {
     
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             } else {
                 showFields(["upsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "rptCount"]);
@@ -6063,7 +6093,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "upsell");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
         
         function createFieldRow(field) {
             const row = document.createElement("tr");
@@ -6246,11 +6276,11 @@ function createIntentBasedForm() {
         simLight.addEventListener("change", () => {
             resetAllFields(["simLight"]);
             if (simLight.value === "Off" && selectedValue === "form500_6") {
-                showFields(["minNumber", "onuSerialNum", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                showFields(["minNumber", "onuSerialNum", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
                 hideSpecificFields(["issueResolved"]);
             } else {
                 showFields(["issueResolved"]);
-                hideSpecificFields(["minNumber", "onuSerialNum", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "upsell"]);
+                hideSpecificFields(["minNumber", "onuSerialNum", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "rptCount", "eligibleForUpsell"]);
             }
             updateToolLabelVisibility();
         });
@@ -6717,8 +6747,9 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -6878,10 +6909,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     } else if (requestForms.includes(selectedValue)) { 
         const table = document.createElement("table");
@@ -6902,8 +6936,9 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -7089,10 +7124,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqAddressMod") { 
         const table = document.createElement("table");
@@ -7119,8 +7157,9 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -7275,11 +7314,14 @@ function createIntentBasedForm() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-        
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqSupRetAccNum" || selectedValue === "formReqSupChangeAccNum") { 
         const table = document.createElement("table");
@@ -7306,8 +7348,9 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -7549,10 +7592,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqDisconnection") { 
         const table = document.createElement("table");
@@ -7580,8 +7626,9 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -7823,10 +7870,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqDispute") { 
         const table = document.createElement("table");
@@ -7858,8 +7908,9 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
             // Ordertake prompt for Rebate Non Service
@@ -8048,7 +8099,6 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         const requestType = document.querySelector("[name='requestType']");
-
         requestType.addEventListener("change", () => {
             if (requestType.selectedIndex === 1) {
                 showFields(["ordertake"]);
@@ -8057,10 +8107,13 @@ function createIntentBasedForm() {
             }
         });
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     } else if (selectedValue === "formReqDowngrade") { 
         const table = document.createElement("table");
@@ -8089,8 +8142,9 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -8278,11 +8332,14 @@ function createIntentBasedForm() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-        
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     } else if (selectedValue === "formReqDDE") { 
         const table = document.createElement("table");
@@ -8309,8 +8366,9 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -8503,11 +8561,14 @@ function createIntentBasedForm() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-                
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+                
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqInmove") { 
         const table = document.createElement("table");
@@ -8529,8 +8590,9 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -8653,11 +8715,14 @@ function createIntentBasedForm() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-                
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+                
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqMigration") { 
         const table = document.createElement("table");
@@ -8679,10 +8744,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -8812,10 +8878,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqMisappPay" || selectedValue === "formReqReflectPay") { 
         const table = document.createElement("table");
@@ -8837,10 +8906,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -8983,11 +9053,14 @@ function createIntentBasedForm() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-                        
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+                        
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqReconnect") {
         const table = document.createElement("table");
@@ -9014,10 +9087,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ]},
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         const reconSpecificDefinition = {
@@ -9193,10 +9267,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqRefund") { 
         const table = document.createElement("table");
@@ -9225,10 +9302,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -9425,11 +9503,14 @@ function createIntentBasedForm() {
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-                    
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+                    
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqRelocation") { 
         const table = document.createElement("table");
@@ -9457,10 +9538,12 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
+            // Ordertake
             { label: "Ordertake?", type: "select", name: "ordertake", options: [
                 "", 
                 "Yes", 
@@ -9642,6 +9725,8 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+
         const requestType = document.querySelector("[name='requestType']");
         requestType.addEventListener("change", () => {
             if (requestType.selectedIndex === 2) {
@@ -9651,10 +9736,11 @@ function createIntentBasedForm() {
             }
         });
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
     } else if (selectedValue === "formReqSpecFeat") { 
         const table = document.createElement("table");
 
@@ -9682,10 +9768,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -9885,10 +9972,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     } else if (selectedValue === "formReqSpeedAddOn") { 
         const table = document.createElement("table");
@@ -9916,10 +10006,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -10078,10 +10169,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
         
     } else if (selectedValue === "formReqUfc") { 
         const table = document.createElement("table");
@@ -10108,10 +10202,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -10256,10 +10351,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     } else if (selectedValue === "formReqUpgrade") { 
         const table = document.createElement("table");
@@ -10290,10 +10388,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -10484,10 +10583,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     } else if (selectedValue === "formReqVAS") { 
         const table = document.createElement("table");
@@ -10519,10 +10621,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -10739,10 +10842,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     } else if (selectedValue === "formReqWireReroute") { 
         const table = document.createElement("table");
@@ -10769,10 +10875,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -10944,10 +11051,11 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     }
 
@@ -10965,15 +11073,15 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Upsell", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.upsell },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
-            const primaryFields = ["custConcern", "remarks", "upsell", "issueResolved"];
+            const primaryFields = ["custConcern", "remarks", "eligibleForUpsell", "issueResolved"];
             row.style.display = primaryFields.includes(field.name) ? "table-row" : "none";
 
 
@@ -11046,10 +11154,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
     } else if (selectedValue === "formCompMisappliedPayment") {
         const table = document.createElement("table");
 
@@ -11065,10 +11176,11 @@ function createIntentBasedForm() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createPromptRow() {
@@ -11226,10 +11338,11 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
         
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
     } else if (selectedValue === "formCompUnreflectedPayment") {
         const table = document.createElement("table");
 
@@ -11246,10 +11359,11 @@ function createIntentBasedForm() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createPromptRow() {
@@ -11425,10 +11539,11 @@ function createIntentBasedForm() {
             }
         });
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
     
     } else if (selectedValue === "formCompPersonnelIssue") {
         const table = document.createElement("table");
@@ -11447,10 +11562,11 @@ function createIntentBasedForm() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createPromptRow() {
@@ -11573,11 +11689,14 @@ function createIntentBasedForm() {
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-    
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+    
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
     } 
 
     // Non-Tech Inquiry
@@ -11600,10 +11719,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -11775,10 +11895,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     } else if (selectedValue === "formInqBillInterpret") {
         const table = document.createElement("table");
@@ -11802,10 +11925,11 @@ function createIntentBasedForm() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -11921,11 +12045,14 @@ function createIntentBasedForm() {
         const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-    
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+    
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     } else if (selectedValue === "formInqPermaDisc") {
         const table = document.createElement("table");
@@ -11947,10 +12074,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -12112,10 +12240,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
     
     } else if (selectedValue === "formInqOutsBal") {
         const table = document.createElement("table");
@@ -12142,10 +12273,11 @@ function createIntentBasedForm() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -12264,10 +12396,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
     
     } else if (selectedValue === "formInqRefund") {
         const table = document.createElement("table");
@@ -12289,10 +12424,11 @@ function createIntentBasedForm() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -12407,10 +12543,13 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
     
     }
 
@@ -12462,10 +12601,11 @@ function createIntentBasedForm() {
                 "No - Customer Declined Further Assistance",
                 "No - System Ended Chat"
             ] },
-            // Upsell
-            { label: "Upsell", type: "select", name: "upsell", options: UPSELL_OPTIONS.upsell },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
-            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
         ];
 
         function createDefinitionRow() {
@@ -12899,10 +13039,13 @@ function createIntentBasedForm() {
 
         updateFindingsOptions(findingsSelect.value);
 
-        hideSpecificFields(["declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const upsell = document.querySelector("[name='upsell']");
-        upsell.addEventListener("change", () => handleUpsellChange(upsell));
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
     }
 
@@ -14562,9 +14705,11 @@ function techNotesButtonHandler(showFloating = true) {
             { name: "effectiveDate", label: "Effectivity Date"},
             { name: "nomiMobileNum", label: "MOBILE #"},
 
-            // Upsell
+            // Cross-Sell/Upsell
+            { name: "eligibleForUpsell" },
             { name: "productsOffered", label: "OFFERED"},
-            { name: "declineReason", label: "DECLINE REASON"},
+            { name: "offerAccepted", label: "BUT THE ACCOUNT HAS AN OPEN SO"},
+            { name: "declineReason", label: "BUT CUST DECLINED DUE TO"},
             { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL DUE TO"},
         ];
 
@@ -14572,6 +14717,12 @@ function techNotesButtonHandler(showFloating = true) {
         let actionsTakenParts = [];
 
         const offerALS = document.querySelector('[name="offerALS"]')?.value || "";
+        const eligibleForUpsellValue = document.querySelector('[name="eligibleForUpsell"]')?.value || "";
+        const offerAcceptedValue = document.querySelector('[name="offerAccepted"]')?.value || "";
+
+        let productsOfferedText = "";
+        let declineReasonText = "";
+        let offerAcceptedText = "";
 
         fields.forEach(field => {
             const inputElement = document.querySelector(`[name="${field.name}"]`);
@@ -14592,21 +14743,42 @@ function techNotesButtonHandler(showFloating = true) {
                         "Offered ALS/Declined": "Offered ALS But Customer Declined",
                         "Offered ALS/No Confirmation": "Offered ALS But No Confirmation",
                         "Previous Agent Already Offered ALS": "Previous Agent Already Offered ALS"
-                        // "Not Applicable" intentionally omitted to skip
                     };
 
                     const alsValue = alsMessages[offerALS];
-
                     if (alsValue) actionsTakenParts.push(alsValue);
-                } else {
-                    if (field.name === "productsOffered" || field.name === "notEligibleReason") {
-                        actionsTakenParts.push((field.label ? `${field.label} ` : "") + value);
-                    } else {
-                        actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
+                } else if (field.name === "eligibleForUpsell") {
+                    const discoCallChatMsg = {
+                        "No - Disconnected Call": "UNABLE TO OFFER UPSELL AS THE CALL GOT DISCONNECTED",
+                        "No - Disconnected Chat": "UNABLE TO OFFER UPSELL AS THE CHAT WAS DISCONNECTED"
+                    };
+
+                    const discoCallChatValue = discoCallChatMsg[eligibleForUpsellValue];
+                    if (discoCallChatValue) actionsTakenParts.push(discoCallChatValue);
+                } else if (field.name === "productsOffered") {
+                    productsOfferedText = (field.label ? `${field.label} ` : "") + value;
+                } else if (field.name === "offerAccepted") {
+                    if (offerAcceptedValue === "Yes - Accepted but with Open SO") {
+                        offerAcceptedText = field.label || "";
                     }
+                } else if (field.name === "declineReason") {
+                    declineReasonText = (field.label ? `${field.label} ` : "") + value;
+                } else if (field.name === "notEligibleReason") {
+                    actionsTakenParts.push((field.label ? `${field.label} ` : "") + value);
+                } else {
+                    actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
                 }
             }
         });
+
+        // Combine productsOffered + declineReason into one sentence
+        if (productsOfferedText || offerAcceptedText || declineReasonText) {
+            actionsTakenParts.push(
+                [productsOfferedText, offerAcceptedText, declineReasonText]
+                    .filter(Boolean)
+                    .join(" ")
+            );
+        }
 
         const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
         const issueResolvedMap = {
@@ -14620,29 +14792,43 @@ function techNotesButtonHandler(showFloating = true) {
             actionsTakenParts.push(issueResolvedMap[issueResolvedValue]);
         }
 
-        const upsellValue = document.querySelector('[name="upsell"]')?.value || "";
+        // Upsell Mapping
         const upsellMap = {
-            "Yes - Accepted": "#UpsellAccepted",
-            "No - Declined": "#UpsellDeclined",
-            "No - Ignored": "#UpsellIgnored",
-            "No - Undecided": "#UpsellUndecided",
-            "NA - Not Eligible": "#UpsellNotEligible"
+            eligibleForUpsell: {
+                "No - Not Eligible": "#UpsellNotEligible",
+                "No - Disconnected Call": "",
+                "No - Disconnected Chat": "",
+            },
+            offerAccepted: {
+                "Yes - Accepted": "#UpsellAccepted",
+                "Yes - Accepted but with Open SO": "#UpsellLater",
+                "No - Declined": "#UpsellDeclined",
+                "No - Ignored": "#UpsellIgnored",
+                "No - Undecided": "#UpsellUndecided"
+            }
         };
 
-        const upsellNote =
-            channel === "CDT-HOTLINE"
-                ? (upsellMap[upsellValue] || "")
-                : "";
+        let hotlineUpsellNote = "";
+
+        if (channel === "CDT-HOTLINE") {
+            hotlineUpsellNote = "";
+
+            if (eligibleForUpsellValue in upsellMap.eligibleForUpsell) {
+                hotlineUpsellNote = upsellMap.eligibleForUpsell[eligibleForUpsellValue];
+            } else if (offerAcceptedValue in upsellMap.offerAccepted) {
+                hotlineUpsellNote = upsellMap.offerAccepted[offerAcceptedValue];
+            }
+        }
 
         return {
             actions: "A: " + actionsTakenParts.join("/ "),
-            upsellNote
+            hotlineUpsellNote
         };
     }
 
-    function formatActions(actions, upsellNote) {
+    function formatActions(actions, hotlineUpsellNote) {
         let result = actions.toUpperCase();
-        if (upsellNote) result += "\n\n" + upsellNote;
+        if (hotlineUpsellNote) result += "\n\n" + hotlineUpsellNote;
         return result;
     }
 
@@ -14848,21 +15034,36 @@ function techNotesButtonHandler(showFloating = true) {
             otherDetails = "OTHER DETAILS:\n" + otherDetails;
         }
 
-        const upsellValue = document.querySelector('[name="upsell"]')?.value || "";
-
+        // Upsell Mapping
         const upsellMap = {
-            "Yes - Accepted": "#UpsellAccepted",
-            "Yes - Upgrade Later": "#UpgradeLater",
-            "No - Declined": "#UpsellDeclined",
-            "No - Ignored": "#UpsellIgnored",
-            "No - Undecided": "#UpsellUndecided",
-            "NA - Not Eligible": "#UpsellNotEligible"
+            eligibleForUpsell: {
+                "No - Not Eligible": "#UpsellNotEligible",
+                "No - Disconnected Call": "",
+                "No - Disconnected Chat": "",
+            },
+            offerAccepted: {
+                "Yes - Accepted": "#UpsellAccepted",
+                "Yes - Upgrade Later": "#UpgradeLater",
+                "No - Declined": "#UpsellDeclined",
+                "No - Ignored": "#UpsellIgnored",
+                "No - Undecided": "#UpsellUndecided"
+            }
         };
 
-        const socmedUpsellNote =
-            channel === "CDT-SOCMED"
-                ? (upsellMap[upsellValue] || "")
-                : "";
+        const eligibleForUpsellValue = document.querySelector('[name="eligibleForUpsell"]')?.value || "";
+        const offerAcceptedValue = document.querySelector('[name="offerAccepted"]')?.value || "";
+
+        let socmedUpsellNote = "";
+
+        if (channel === "CDT-SOCMED") {
+            socmedUpsellNote = "";
+
+            if (eligibleForUpsellValue in upsellMap.eligibleForUpsell) {
+                socmedUpsellNote = upsellMap.eligibleForUpsell[eligibleForUpsellValue];
+            } else if (offerAcceptedValue in upsellMap.offerAccepted) {
+                socmedUpsellNote = upsellMap.offerAccepted[offerAcceptedValue];
+            }
+        }
 
         return {
             details: [
@@ -14896,12 +15097,12 @@ function techNotesButtonHandler(showFloating = true) {
     const selectedOptGroupLabel = vars.selectedOptGroupLabel ? `/ ${vars.selectedOptGroupLabel}` : "";
     const selectedIntentText = vars.selectedIntentText ? `/ ${vars.selectedIntentText}` : "";
 
-    const { actions, upsellNote } = constTechActionsTakenOutput();
+    const { actions, hotlineUpsellNote } = constTechActionsTakenOutput();
     const { details, socmedUpsellNote } = constOtherDetails();
 
     if (vars.selectedIntent === "formFfupRepair") {
         concernCopiedText = `${combinedInfo}\nC: ${channel}/ FOLLOW-UP REPAIR ${vars.ticketStatus}`;
-        actionsTakenCopiedText = formatActions(actions, upsellNote);
+        actionsTakenCopiedText = formatActions(actions, hotlineUpsellNote);
         otherDetailsCopiedText = details.toUpperCase();
 
         if (channel === "CDT-SOCMED" && socmedUpsellNote) {
@@ -14909,7 +15110,7 @@ function techNotesButtonHandler(showFloating = true) {
         }
     } else if (optGroupIntents.includes(vars.selectedIntent)) {
         concernCopiedText = `${combinedInfo}\nC: ${channel}${selectedOptGroupLabel}`;
-        actionsTakenCopiedText = formatActions(actions, upsellNote);
+        actionsTakenCopiedText = formatActions(actions, hotlineUpsellNote);
         otherDetailsCopiedText = details.toUpperCase();
 
         if (channel === "CDT-SOCMED" && socmedUpsellNote) {
@@ -14917,7 +15118,7 @@ function techNotesButtonHandler(showFloating = true) {
         }
     } else if (optTextIntents.includes(vars.selectedIntent)) {
         concernCopiedText = `${combinedInfo}\nC: ${channel}${selectedIntentText}`;
-        actionsTakenCopiedText = formatActions(actions, upsellNote);
+        actionsTakenCopiedText = formatActions(actions, hotlineUpsellNote);
         otherDetailsCopiedText = details.toUpperCase();
 
         if (channel === "CDT-SOCMED" && socmedUpsellNote) {
@@ -14925,7 +15126,7 @@ function techNotesButtonHandler(showFloating = true) {
         }
     } else if (alwaysOnIntents.includes(vars.selectedIntent)) {
         concernCopiedText = `${combinedInfo}\nC: ${channel}${selectedIntentText} (ALWAYS ON)`;
-        actionsTakenCopiedText = formatActions(actions, upsellNote);
+        actionsTakenCopiedText = formatActions(actions, hotlineUpsellNote);
         otherDetailsCopiedText = details.toUpperCase();
 
         if (channel === "CDT-SOCMED" && socmedUpsellNote) {
@@ -15148,14 +15349,22 @@ function nontechNotesButtonHandler(showFloating = true) {
             { name: "resolution"},
             { name: "remarks"},
 
-            // Upsell
+            // Cross-Sell/Upsell
+            { name: "eligibleForUpsell" },
             { name: "productsOffered", label: "OFFERED"},
-            { name: "declineReason", label: "DECLINE REASON"},
-            { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL DUE TO" }
+            { name: "offerAccepted", label: "OFFERED UPSELL BUT THE ACCOUNT HAS AN OPEN SO"},
+            { name: "declineReason", label: "CUST DECLINED OFFER DUE TO"},
+            { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL DUE TO"},
         ];
 
         const seenFields = new Set();
         let actionsTakenParts = [];
+
+        const eligibleForUpsellValue = document.querySelector('[name="eligibleForUpsell"]')?.value || "";
+        const offerAcceptedValue = document.querySelector('[name="offerAccepted"]')?.value || "";
+
+        let productsOfferedText = "";
+        let declineReasonText = "";
 
         fields.forEach(field => {
             const inputElement = document.querySelector(`[name="${field.name}"]`);
@@ -15183,7 +15392,23 @@ function nontechNotesButtonHandler(showFloating = true) {
 
             if (value && !seenFields.has(field.name)) {
                 seenFields.add(field.name);
-                if (field.name === "productsOffered" || field.name === "notEligibleReason") {
+                if (field.name === "eligibleForUpsell") {
+                    const discoCallChatMsg = {
+                        "No - Disconnected Call": "UNABLE TO OFFER UPSELL AS THE CALL GOT DISCONNECTED",
+                        "No - Disconnected Chat": "UNABLE TO OFFER UPSELL AS THE CHAT WAS DISCONNECTED"
+                    };
+
+                    const discoCallChatValue = discoCallChatMsg[eligibleForUpsellValue];
+                    if (discoCallChatValue) actionsTakenParts.push(discoCallChatValue);
+                } else if (field.name === "productsOffered") {
+                    productsOfferedText = (field.label ? `${field.label} ` : "") + value;
+                } else if (field.name === "offerAccepted") {
+                    if (offerAcceptedValue === "Yes - Accepted but with Open SO") {
+                        offerAcceptedText = field.label || "";
+                    }
+                } else if (field.name === "declineReason") {
+                    declineReasonText = (field.label ? `${field.label} ` : "") + value;
+                } else if (field.name === "notEligibleReason") {
                     actionsTakenParts.push((field.label ? `${field.label} ` : "") + value);
                 } else {
                     actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
@@ -15206,6 +15431,15 @@ function nontechNotesButtonHandler(showFloating = true) {
             }
         }
 
+        // Combine productsOffered + declineReason into one sentence
+        if (productsOfferedText || offerAcceptedText || declineReasonText) {
+            actionsTakenParts.push(
+                [productsOfferedText, offerAcceptedText, declineReasonText]
+                    .filter(Boolean)
+                    .join(" ")
+            );
+        }
+
         // Issue Resolved mapping
         const issueResolvedValue =
             document.querySelector('[name="issueResolved"]')?.value || "";
@@ -15221,19 +15455,29 @@ function nontechNotesButtonHandler(showFloating = true) {
             actionsTakenParts.push(issueResolvedMap[issueResolvedValue]);
         }
 
-        // Upsell mapping
-        const upsellValue = document.querySelector('[name="upsell"]')?.value || "";
-
+        // Upsell Mapping
         const upsellMap = {
-            "Yes - Accepted": "#UpsellAccepted",
-            "Yes - Upgrade Later": "#UpgradeLater",
-            "No - Declined": "#UpsellDeclined",
-            "No - Ignored": "#UpsellIgnored",
-            "No - Undecided": "#UpsellUndecided",
-            "NA - Not Eligible": "#UpsellNotEligible"
+            eligibleForUpsell: {
+                "No - Not Eligible": "#UpsellNotEligible",
+                "No - Disconnected Call": "",
+                "No - Disconnected Chat": "",
+            },
+            offerAccepted: {
+                "Yes - Accepted": "#UpsellAccepted",
+                "Yes - Accepted but with Open SO": "#UpsellLater",
+                "No - Declined": "#UpsellDeclined",
+                "No - Ignored": "#UpsellIgnored",
+                "No - Undecided": "#UpsellUndecided"
+            }
         };
 
-        const upsellNote = upsellMap[upsellValue] || "";
+        let upsellNote = "";
+
+        if (eligibleForUpsellValue in upsellMap.eligibleForUpsell) {
+            upsellNote = upsellMap.eligibleForUpsell[eligibleForUpsellValue];
+        } else if (offerAcceptedValue in upsellMap.offerAccepted) {
+            upsellNote = upsellMap.offerAccepted[offerAcceptedValue];
+        }
 
         // Ordertake mapping
         const ordertakeValue =
@@ -18269,6 +18513,30 @@ const instructions = [
 ];
 
 const versions = [
+    {
+        version: "V5.5.220526",
+        updates: [
+            {
+                title: "Updated #Upsell Tagging aligned with the updated 4 Steps Eligibility guidelines. See updated tagging below:",
+                items: [
+                    "<strong>#UpsellAccepted:</strong> The customer accepted the offered product, add-on, or upgrade during the interaction.",
+                    "<strong>#UpsellDeclined:</strong> The customer clearly declined or still rejected the offer even after the agent delivered a rebuttal spiel and explained the benefits of the offer.",
+                    "<strong>#UpsellUndecided:</strong> The customer is interested but has not made a final decision yet. They still need time to think or need to consult the account owner or family members.",
+                    "<strong>#UpsellIgnored:</strong> The offer was presented, but the customer gave no direct response and the call/chat got disconnected (Call - customer hang up/ Chat - end conversation).",
+                    "<strong>#UpsellNotEligible:</strong> The customer or account is not qualified for the offer based on system checking, account status, or service availability.",
+                    "<strong>#UpsellLater:</strong> The customer is interested in the upgrade or VAS add-on, but the account has an open Service Order (Barred, Reconnection and Relocation SO).",
+                    "<strong>No - Disconnected Call/Chat</strong> option under <strong>Eligible for Cross/Upsell:</strong> Use only for incomplete transactions, such as when there was no interaction with the customer or no troubleshooting was performed because the call got disconnected or the chat ended.",
+                ]
+            },
+            {
+                title: "Fixes",
+                items: [
+                    "Added <strong>No SG7K profile</strong> investigation 2 tagging for <strong>Cannot receive calls</strong> intent.",
+                    "Added <strong>Broken/Damaged Cable/Cord</strong> investigation 4 tagging for <strong>Damaged Modem Cable/Cord</strong> intent.",
+                ]
+            }
+        ]
+    },
     {
         version: "V5.5.110526",
         updates: [
