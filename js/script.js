@@ -15365,6 +15365,7 @@ function nontechNotesButtonHandler(showFloating = true) {
 
         let productsOfferedText = "";
         let declineReasonText = "";
+		let offerAcceptedText = "";
 
         fields.forEach(field => {
             const inputElement = document.querySelector(`[name="${field.name}"]`);
