@@ -18625,8 +18625,7 @@ const versions = [
                 title: "Fixes",
                 items: [
                     "Resolved the issue that prevented notes from being generated for <strong>Change Ownership</strong> intents.",
-                    "Fixed <strong>Offer ALS</strong> field bug to skip the field from generated notes when tagged as “Not Applicable.”",
-                    ""
+                    "Fixed <strong>Offer ALS</strong> field bug to skip the field from generated notes when tagged as “Not Applicable.”"
                 ]
             }
         ]
