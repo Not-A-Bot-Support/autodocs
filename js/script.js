@@ -5,9 +5,9 @@ Developed & Designed by: QA Ryan */
 
 // FIRST LOAD CHECK
 document.addEventListener("DOMContentLoaded", async () => {
-    const hasPrompted = sessionStorage.getItem("hasCheckedNotes");
+    const checkPrevSavedNotesPrompt = sessionStorage.getItem("hasCheckedNotes");
 
-    if (!hasPrompted) {
+    if (!checkPrevSavedNotesPrompt) {
         const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
 
         if (Object.keys(savedData).length > 0) {
@@ -500,6 +500,24 @@ function copyToClipboard(text) {
         .catch(err => console.error("Copy failed:", err));
 }
 
+// Get timer value
+function getCurrentTimerValue() {
+    const now = Date.now();
+
+    if (window.isRunning) {
+        return Math.floor((now - window.startTime + window.elapsedTime) / 1000);
+    } else {
+        return Math.floor(window.elapsedTime / 1000);
+    }
+}
+
+function formatTime(seconds) {
+    const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const secs = String(seconds % 60).padStart(2, '0');
+    return `${hrs}:${mins}:${secs}`;
+}
+
 // Show/Hide rows based on channel selection & Timers
 document.addEventListener('DOMContentLoaded', function() { 
     // ================================
@@ -545,9 +563,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // MAIN TIMER
     // ================================
     let timerInterval;
-    let startTime;
-    let elapsedTime = 0;
-    let isRunning = false;
+    window.startTime = 0;
+    window.elapsedTime = 0;
+    window.isRunning = false;
 
     const timerDisplay = document.getElementById('timerDisplay');
     const timerToggleButton = document.getElementById('timerToggleButton');
@@ -555,41 +573,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (timerDisplay) timerDisplay.textContent = formatTime(0);
 
-    function formatTime(seconds) {
-        const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
-        const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-        const secs = String(seconds % 60).padStart(2, '0');
-        return `${hrs}:${mins}:${secs}`;
-    }
-
     function updateDisplay() {
         const now = Date.now();
         const totalElapsedSeconds = Math.floor((now - startTime + elapsedTime) / 1000);
         timerDisplay.textContent = formatTime(totalElapsedSeconds);
     }
 
-    function handleTimer(action) {
+    window.handleTimer = function(action, skipConfirm = false) {
         if (action === 'start' && !isRunning) {
-            startTime = Date.now();
+            window.startTime = Date.now();
             timerInterval = setInterval(updateDisplay, 1000);
-            isRunning = true;
+            window.isRunning = true;
             timerToggleButton.textContent = 'Pause';
         } else if (action === 'pause' && isRunning) {
             clearInterval(timerInterval);
-            elapsedTime += Date.now() - startTime;
+            window.elapsedTime += Date.now() - window.startTime;
             isRunning = false;
             timerToggleButton.textContent = 'Resume';
         } else if (action === 'reset') {
-            showConfirm2("Are you sure you want to reset the timer?")
-            .then((confirmReset) => {
-                if (!confirmReset) return;
-
+            const doReset = () => {
                 clearInterval(timerInterval);
-                elapsedTime = 0;
+                window.elapsedTime = 0;
                 timerDisplay.textContent = formatTime(0);
-                isRunning = false;
+                window.isRunning = false;
                 timerToggleButton.textContent = 'Start';
-            });
+            };
+
+            if (skipConfirm) {
+                doReset(); // no alert
+            } else {
+                showConfirm2("Are you sure you want to reset the timer?")
+                .then((confirmReset) => {
+                    if (!confirmReset) return;
+                    doReset();
+                });
+            }
+        }
+    };
+
+    function autoStartTimerIfNeeded() {
+        const fields = [
+            document.querySelector('[name="sfCaseNum"]'),
+            document.querySelector('[name="custName"]'),
+            document.querySelector('[name="accountNum"]'),
+            document.querySelector('[name="landlineNum"]')
+        ];
+
+        const anyFilled = fields.some(field => field && field.value.trim() !== "");
+
+        if (anyFilled && !isRunning) {
+            handleTimer('start');
         }
     }
 
@@ -604,6 +637,15 @@ document.addEventListener('DOMContentLoaded', function() {
     timerResetButton?.addEventListener('click', function() {
         handleTimer('reset');
     });
+
+    document.addEventListener("input", function (e) {
+        const targetNames = ["sfCaseNum", "custName", "accountNum", "landlineNum"];
+
+        if (targetNames.includes(e.target.name)) {
+            autoStartTimerIfNeeded();
+        }
+    });
+
 });
 
 // Reset Dropdown options to default
@@ -852,7 +894,7 @@ function createIntentBasedForm() {
             "", 
             "Yes",
             "No - Not Eligible",
-            disconnectedOption
+            // disconnectedOption
         ],
         productsOffered: [
             "", 
@@ -863,7 +905,7 @@ function createIntentBasedForm() {
         offerAccepted: [
             "", 
             "Yes - Accepted",
-            "Yes - Accepted but with Open SO",
+            "Yes - Upsell Later",
             "No - Declined",
             "No - Ignored",
             "No - Undecided"
@@ -939,6 +981,9 @@ function createIntentBasedForm() {
         } else {
             hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
         }
+        setTimeout(() => {
+            handleTimer('pause', true);
+        }, 300);
     }
 
     function handleUpsellDeclinedChange(offerAccepted) {
@@ -1034,7 +1079,8 @@ function createIntentBasedForm() {
             { label: "Issue Resolved", type: "select", name: "issueResolved", options: [
                 "", 
                 "Yes", 
-                "No"
+                "No - Same Issue",
+                "No - Different Issue"
             ]},
 
             // CEP Investigation Tagging
@@ -1168,7 +1214,7 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks"},
             { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
-            { label: "Re-Open Status Reason", type: "textarea", name: "reOpenStatsReason", placeholder: "Indicate the reason for re-opening the ticket (Dispatched to Field Technician - Re-Open or Escalated to Network - Re-Open)."},
+            // { label: "Re-Open Status Reason", type: "textarea", name: "reOpenStatsReason", placeholder: "Indicate the reason for re-opening the ticket (Dispatched to Field Technician - Re-Open or Escalated to Network - Re-Open)."},
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -1199,9 +1245,9 @@ function createIntentBasedForm() {
 
             let url = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url = "https://pldt365.sharepoint.com/sites/LIT365/PLDT_INTERACTIVE_TROUBLESHOOTING_GUIDE/Pages/FOLLOW_UP_REPAIR.aspx?csf=1&web=1&e=NDfTRV";
+                url = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url = "https://pldt365.sharepoint.com/sites/LIT365/files/2023Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2023Advisories%2F07JULY%2FPLDT%5FWI%2FSOCMED%5FGENUINE%5FREPAIR%5FFFUP%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2023Advisories%2F07JULY%2FPLDT%5FWI";
+                url = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link.textContent = "Handling of Repair Follow-up";
@@ -1376,7 +1422,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -1391,8 +1437,8 @@ function createIntentBasedForm() {
         queue.addEventListener("change", () => {
             resetAllFields(["subject1", "statusReason","subStatus", "queue"]);
             if (queue.value === "FM POLL" || queue.value === "CCARE OFFBOARD") {
-                showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "issueResolved", "eligibleForUpsell" ]);
-                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "reOpenStatsReason", "productsOffered", "offerAccepted", "offerAccepted", "declineReason", "notEligibleReason" ]);
+                showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "issueResolved" ]);
+                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell", "productsOffered", "offerAccepted", "offerAccepted", "declineReason", "notEligibleReason" ]);
 
                 updateToolLabelVisibility();
 
@@ -1473,11 +1519,16 @@ function createIntentBasedForm() {
 
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
-            if (issueResolved.value === "No") {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "reOpenStatsReason" ]);
+            if (issueResolved.value === "No - Same Issue") {
+                showFields(["contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell" ]);
+                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4"]);
+                updateToolLabelVisibility();
+            } else if (issueResolved.value === "No - Different Issue") {
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell" ]);
                 updateToolLabelVisibility();
             } else {
-                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "reOpenStatsReason" ]);
+                showFields(["eligibleForUpsell"]);
+                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason" ]);
                 updateToolLabelVisibility();
             }
             updateToolLabelVisibility();
@@ -1688,9 +1739,9 @@ function createIntentBasedForm() {
 
             let url1 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link1.textContent = "CEP: Troubleshooting Guide";
@@ -1713,9 +1764,9 @@ function createIntentBasedForm() {
 
             let url2 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/GAMMA_HOTLINE_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=hca4FV&CID=ef14f697-102a-48ca-acb6-4702d734a5d7";
             } else if (channelField.value === "CDT-SOCMED") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/:u:/r/sites/PLDTCCareLIT365/SitePages/GAMMA_SOCMED_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=XCDJdx";
             }
 
             link2.textContent = "Gamma: Troubleshooting Guide";
@@ -1991,7 +2042,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -2118,7 +2169,7 @@ function createIntentBasedForm() {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
             } else {
-                showFields(["upsell"]);
+                showFields(["eligibleForUpsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
             }
 
@@ -2318,9 +2369,9 @@ function createIntentBasedForm() {
 
             let url1 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link1.textContent = "CEP: Troubleshooting Guide";
@@ -2343,9 +2394,9 @@ function createIntentBasedForm() {
 
             let url2 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/GAMMA_HOTLINE_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=hca4FV&CID=ef14f697-102a-48ca-acb6-4702d734a5d7";
             } else if (channelField.value === "CDT-SOCMED") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/:u:/r/sites/PLDTCCareLIT365/SitePages/GAMMA_SOCMED_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=XCDJdx";
             }
 
             link2.textContent = "Gamma: Troubleshooting Guide";
@@ -2510,7 +2561,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -2657,7 +2708,7 @@ function createIntentBasedForm() {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
             } else {
-                showFields(["upsell"]);
+                showFields(["eligibleForUpsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
             }
             
@@ -2921,9 +2972,9 @@ function createIntentBasedForm() {
 
             let url1 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link1.textContent = "CEP: Troubleshooting Guide";
@@ -2946,9 +2997,9 @@ function createIntentBasedForm() {
 
             let url2 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/GAMMA_HOTLINE_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=hca4FV&CID=ef14f697-102a-48ca-acb6-4702d734a5d7";
             } else if (channelField.value === "CDT-SOCMED") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/:u:/r/sites/PLDTCCareLIT365/SitePages/GAMMA_SOCMED_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=XCDJdx";
             }
 
             link2.textContent = "Gamma: Troubleshooting Guide";
@@ -3254,7 +3305,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -3437,7 +3488,7 @@ function createIntentBasedForm() {
                     hideSpecificFields(["resolution"]);
                 }
             } else {
-                showFields(["upsell"]);
+                showFields(["eligibleForUpsell"]);
                 hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
 
                 if (channelField.value === "CDT-SOCMED") {
@@ -3644,9 +3695,9 @@ function createIntentBasedForm() {
 
             let url1 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link1.textContent = "CEP: Troubleshooting Guide";
@@ -3669,9 +3720,9 @@ function createIntentBasedForm() {
 
             let url2 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/GAMMA_HOTLINE_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=hca4FV&CID=ef14f697-102a-48ca-acb6-4702d734a5d7";
             } else if (channelField.value === "CDT-SOCMED") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/:u:/r/sites/PLDTCCareLIT365/SitePages/GAMMA_SOCMED_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=XCDJdx";
             }
 
             link2.textContent = "Gamma: Troubleshooting Guide";
@@ -3987,7 +4038,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -4080,7 +4131,7 @@ function createIntentBasedForm() {
                     hideSpecificFields(["resolution"]);
                 }
             } else {
-                showFields(["upsell"]);
+                showFields(["eligibleForUpsell"]);
                 hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
 
                 if (channelField.value === "CDT-SOCMED") {
@@ -4221,9 +4272,9 @@ function createIntentBasedForm() {
 
             let url1 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link1.textContent = "CEP: Troubleshooting Guide";
@@ -4246,9 +4297,9 @@ function createIntentBasedForm() {
 
             let url2 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/GAMMA_HOTLINE_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=hca4FV&CID=ef14f697-102a-48ca-acb6-4702d734a5d7";
             } else if (channelField.value === "CDT-SOCMED") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/:u:/r/sites/PLDTCCareLIT365/SitePages/GAMMA_SOCMED_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=XCDJdx";
             }
 
             link2.textContent = "Gamma: Troubleshooting Guide";
@@ -4587,7 +4638,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -4623,7 +4674,7 @@ function createIntentBasedForm() {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
             } else {
-                showFields(["upsell"]);
+                showFields(["eligibleForUpsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
             }
 
@@ -4783,9 +4834,9 @@ function createIntentBasedForm() {
 
             let url1 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link1.textContent = "CEP: Troubleshooting Guide";
@@ -4808,9 +4859,9 @@ function createIntentBasedForm() {
 
             let url2 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/GAMMA_HOTLINE_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=hca4FV&CID=ef14f697-102a-48ca-acb6-4702d734a5d7";
             } else if (channelField.value === "CDT-SOCMED") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/:u:/r/sites/PLDTCCareLIT365/SitePages/GAMMA_SOCMED_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=XCDJdx";
             }
 
             link2.textContent = "Gamma: Troubleshooting Guide";
@@ -5012,7 +5063,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -5112,7 +5163,7 @@ function createIntentBasedForm() {
                     hideSpecificFields(["resolution"]);
                 }
             } else {
-                showFields(["upsell"]);
+                showFields(["eligibleForUpsell"]);
                 hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
 
                 if (channelField.value === "CDT-SOCMED") {
@@ -5307,9 +5358,9 @@ function createIntentBasedForm() {
 
             let url1 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link1.textContent = "CEP: Troubleshooting Guide";
@@ -5332,9 +5383,9 @@ function createIntentBasedForm() {
 
             let url2 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/GAMMA_HOTLINE_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=hca4FV&CID=ef14f697-102a-48ca-acb6-4702d734a5d7";
             } else if (channelField.value === "CDT-SOCMED") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/:u:/r/sites/PLDTCCareLIT365/SitePages/GAMMA_SOCMED_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=XCDJdx";
             }
 
             link2.textContent = "Gamma: Troubleshooting Guide";
@@ -5585,7 +5636,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -5726,7 +5777,7 @@ function createIntentBasedForm() {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
             } else {
-                showFields(["upsell"]);
+                showFields(["eligibleForUpsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
             }
 
@@ -5806,9 +5857,9 @@ function createIntentBasedForm() {
 
             let url1 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link1.textContent = "CEP: Troubleshooting Guide";
@@ -5831,9 +5882,9 @@ function createIntentBasedForm() {
 
             let url2 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/GAMMA_HOTLINE_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=hca4FV&CID=ef14f697-102a-48ca-acb6-4702d734a5d7";
             } else if (channelField.value === "CDT-SOCMED") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/:u:/r/sites/PLDTCCareLIT365/SitePages/GAMMA_SOCMED_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=XCDJdx";
             }
 
             link2.textContent = "Gamma: Troubleshooting Guide";
@@ -5964,7 +6015,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -5981,7 +6032,7 @@ function createIntentBasedForm() {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
             } else {
-                showFields(["upsell"]);
+                showFields(["eligibleForUpsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
             }
             updateToolLabelVisibility();
@@ -6058,9 +6109,9 @@ function createIntentBasedForm() {
 
             let url1 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link1.textContent = "CEP: Troubleshooting Guide";
@@ -6241,7 +6292,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -6310,7 +6361,7 @@ function createIntentBasedForm() {
     
         issueResolved.addEventListener("change", () => {
             if (issueResolved.value !== "No - for Ticket Creation") {
-                showFields(["upsell"]);
+                showFields(["eligibleForUpsell"]);
             }
             updateToolLabelVisibility(); 
         });
@@ -6436,9 +6487,9 @@ function createIntentBasedForm() {
 
             let url1 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
             } else if (channelField.value === "CDT-SOCMED") {
-                url1 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP%2FCEP%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20CEP";
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
             }
 
             link1.textContent = "CEP: Troubleshooting Guide";
@@ -6461,9 +6512,9 @@ function createIntentBasedForm() {
 
             let url2 = "#";
             if (channelField.value === "CDT-HOTLINE") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FHOTLINE%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/GAMMA_HOTLINE_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=hca4FV&CID=ef14f697-102a-48ca-acb6-4702d734a5d7";
             } else if (channelField.value === "CDT-SOCMED") {
-                url2 = "https://pldt365.sharepoint.com/sites/LIT365/files/2025Advisories/Forms/AllItems.aspx?id=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA%2FGAMMA%5FSOCMED%5FTROUBLESHOOTING%5FGUIDE%2Epdf&parent=%2Fsites%2FLIT365%2Ffiles%2F2025Advisories%2F02FEBRUARY%2FPLDT%20%2D%20GAMMA";
+                url2 = "https://pldt365.sharepoint.com/:u:/r/sites/PLDTCCareLIT365/SitePages/GAMMA_SOCMED_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=XCDJdx";
             }
 
             link2.textContent = "Gamma: Troubleshooting Guide";
@@ -6611,7 +6662,7 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["CEP", "SF/FUSE", "Endorse", "More"];
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
         const buttonHandlers = [
             ffupButtonHandler,
             techNotesButtonHandler,
@@ -6924,11 +6975,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -7139,11 +7189,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -7330,11 +7379,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -7607,11 +7655,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -7891,11 +7938,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -8131,11 +8177,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -8366,11 +8411,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -8595,11 +8639,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -8749,11 +8792,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -8911,11 +8953,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -9087,11 +9128,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -9299,11 +9339,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
 
@@ -9537,11 +9576,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -9758,11 +9796,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -10005,11 +10042,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -10202,11 +10238,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -10384,11 +10419,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -10616,11 +10650,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -10875,11 +10908,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -11084,11 +11116,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -11117,7 +11148,8 @@ function createIntentBasedForm() {
                 "No - System Ended Chat"
             ] },
             // Cross-Sell/Upsell
-            { label: "Eligible for Upsell", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.upsell },
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
@@ -11126,7 +11158,6 @@ function createIntentBasedForm() {
             const row = document.createElement("tr");
             const primaryFields = ["custConcern", "remarks", "eligibleForUpsell", "issueResolved"];
             row.style.display = primaryFields.includes(field.name) ? "table-row" : "none";
-
 
             const td = document.createElement("td");
             const divInput = document.createElement("div");
@@ -11187,11 +11218,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -11317,6 +11347,9 @@ function createIntentBasedForm() {
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
+            const primaryFields = ["custConcern", "ownership", "findings", "custAuth", "remarks", "eligibleForUpsell", "issueResolved"];
+            row.style.display = primaryFields.includes(field.name) ? "table-row" : "none";
+
             const td = document.createElement("td");
             const divInput = document.createElement("div");
             divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
@@ -11376,8 +11409,8 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
-        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
+        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
         
@@ -11500,8 +11533,8 @@ function createIntentBasedForm() {
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
-            const primaryFields = ["otherPaymentChannel"];
-            row.style.display = primaryFields.includes(field.name) ? "none" : "table-row";
+            const primaryFields = ["custConcern", "ownership", "paymentChannel", "custAuth", "remarks", "eligibleForUpsell", "issueResolved"];
+            row.style.display = primaryFields.includes(field.name) ? "table-row" : "none";
 
             const td = document.createElement("td");
             const divInput = document.createElement("div");
@@ -11568,8 +11601,8 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
-        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
+        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
@@ -11727,8 +11760,8 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
-        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
+        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, resetButtonHandler];
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
@@ -11928,11 +11961,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -12084,8 +12116,8 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
-        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
+        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
@@ -12278,8 +12310,8 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
-        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
+        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
@@ -12434,8 +12466,8 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
-        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
+        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
@@ -12581,8 +12613,8 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
-        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, saveFormData, resetButtonHandler];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
+        const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
@@ -12808,11 +12840,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -13207,11 +13238,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -13342,11 +13372,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             nontechNotesButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -13578,11 +13607,10 @@ function createIntentBasedForm() {
 
         form2Container.appendChild(table);
 
-        const buttonLabels = ["Generate", "SF Tagging", "💾 Save", "🔄 Reset"];
+        const buttonLabels = ["FUSE", "SF Tagging", "🔄 Reset"];
         const buttonHandlers = [
             bantayKableButtonHandler,
             sfTaggingButtonHandler,
-            saveFormData,
             resetButtonHandler,
         ];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
@@ -13618,6 +13646,7 @@ function createButtons(buttonLabels, buttonHandlers) {
     const isHotline = channelField === "CDT-HOTLINE";
     const isSocMed = channelField === "CDT-SOCMED";
     const isTech = lobField === "TECH";
+    const isNonTech = lobField === "NON-TECH";
 
     const buttonTable = document.createElement("table");
     let buttonIndex = 0;
@@ -13636,7 +13665,7 @@ function createButtons(buttonLabels, buttonHandlers) {
                 // 🔹 HOTLINE RULES
                 // =============================
                 if (isHotline) {
-                    if (label === "SF/FUSE") {
+                    if (label === "SF & FUSE") {
                         label = "FUSE";
                     }
 
@@ -13651,17 +13680,6 @@ function createButtons(buttonLabels, buttonHandlers) {
                 }
 
                 // =============================
-                // 🔹 SOCMED RULES
-                // =============================
-                if (isSocMed) {
-                    if (vars.selectedIntent === "formFfupRepair" && label === "CEP") {
-                        label = "CEP & FUSE";
-                    } else if (vars.selectedIntent === "formFfupRepair" && label === "SF/FUSE") {
-                        label = "Salesforce";
-                    }
-                }
-
-                // =============================
                 // 🔹 TECH CONCERN TYPE RULES
                 // =============================
                 if (!isTech) {
@@ -13671,12 +13689,33 @@ function createButtons(buttonLabels, buttonHandlers) {
                 }
 
                 // =============================
+                // 🔹 SOCMED RULES
+                // =============================
+                if (isSocMed && isNonTech && label === "FUSE") {
+                    label = "FUSE & SF";
+                }
+
+                // =============================
+                // 🔹 HOTLINE: REPLACE "MORE" WITH RESET BUTTON
+                // =============================
+                if (isHotline && label === "More") {
+                    const button = document.createElement("button");
+                    button.textContent = "🔄 Reset";
+                    button.onclick = () => resetButtonHandler(true);
+                    button.classList.add("form2-button");
+
+                    cell.appendChild(button);
+                    row.appendChild(cell);
+
+                    buttonIndex++;
+                    hasButton = true;
+                    break;
+                }
+
+                // =============================
                 // 🔹 CEP / MORE DROPDOWNS
                 // =============================
-                if (
-                    (label === "CEP" && vars.selectedIntent !== "formFfupRepair") ||
-                    (label === "More")
-                ) {
+                if ((label === "CEP" && vars.selectedIntent !== "formFfupRepair") || (label === "More")) {
                     const dropdown = document.createElement("div");
                     dropdown.classList.add("dropdown");
 
@@ -13708,7 +13747,7 @@ function createButtons(buttonLabels, buttonHandlers) {
                         subOptions = [];
 
                         subOptions.push(
-                            { label: "🔄 Reset", action: () => resetButtonHandler() }
+                            { label: "🔄 Reset", action: () => resetButtonHandler(true) }
                         );
 
                         // Hotline: NO SF Tagging
@@ -13721,10 +13760,6 @@ function createButtons(buttonLabels, buttonHandlers) {
                                 });
                             }
                         }
-
-                        subOptions.push(
-                            { label: "💾 Save", action: () => saveFormData() }
-                        );
                     }
 
                     subOptions.forEach(option => {
@@ -13737,6 +13772,12 @@ function createButtons(buttonLabels, buttonHandlers) {
                     dropdown.appendChild(mainButton);
                     dropdown.appendChild(dropdownContent);
                     cell.appendChild(dropdown);
+
+                    if (isNonTech && (label === "FUSE" || label === "FUSE & SF")) {
+                        cell.colSpan = 2;
+                        colIndex++;
+                    }
+
                     row.appendChild(cell);
 
                     mainButton.addEventListener("click", function (e) {
@@ -13771,6 +13812,12 @@ function createButtons(buttonLabels, buttonHandlers) {
                 button.classList.add("form2-button");
 
                 cell.appendChild(button);
+                
+                if (isNonTech && (label === "FUSE" || label === "FUSE & SF")) {
+                    cell.colSpan = 2;
+                    colIndex++;
+                }
+
                 row.appendChild(cell);
 
                 buttonIndex++;
@@ -13861,7 +13908,7 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
 
         fields.forEach(field => {
             // Exclude pcNumber and sla explicitly
-            if (field.name === "pcNumber" || field.name === "sla") return;
+            if (field.name === "pcNumber" || field.name === "sla" || field.name === "investigation1" || field.name === "investigation2" || field.name === "investigation3" || field.name === "investigation4") return;
 
             const fieldEl = document.querySelector(`[name="${field.name}"]`);
             if (!fieldEl) return;
@@ -13906,7 +13953,19 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
             const fieldElement = document.querySelector(`[name="${field.name}"]`);
             let value = getFieldValueIfVisible(field.name);
 
+            // Skip empty values or already processed fields
             if (!value || seenFields.has(field.name)) return;
+
+            // Skip Investigation 1-4 if selected index is 0
+            if (
+                ["investigation1", "investigation2", "investigation3", "investigation4"].includes(field.name)
+            ) {
+                const selectEl = document.querySelector(`[name="${field.name}"]`);
+
+                if (selectEl && selectEl.selectedIndex === 0) {
+                    return;
+                }
+            }
 
             seenFields.add(field.name);
 
@@ -14686,6 +14745,46 @@ function showCepFloatingDiv(labels, textToCopy) {
     };
 }
 
+// Validate Upsell fields before generating notes
+function validateUpsellFields() {
+    const eligible = document.querySelector('[name="eligibleForUpsell"]')?.value || "";
+    const offered = document.querySelector('[name="productsOffered"]')?.value || "";
+    const accepted = document.querySelector('[name="offerAccepted"]')?.value || "";
+    const decline = document.querySelector('[name="declineReason"]')?.value || "";
+    const notEligible = document.querySelector('[name="notEligibleReason"]')?.value || "";
+
+    if (!eligible) {
+        showAlert("Cannot generate notes. Please select *Eligible for Cross/Upsell.");
+        return false;
+    }
+
+    if (eligible === "Yes") {
+        if (!offered) {
+            showAlert("Cannot generate notes. Please select *Product/Service Offered.");
+            return false;
+        }
+
+        if (!accepted) {
+            showAlert("Cannot generate notes. Please select *Offer Accepted status.");
+            return false;
+        }
+
+        if (accepted === "No - Declined" && !decline) {
+            showAlert("Cannot generate notes. Please select *Decline Reason.");
+            return false;
+        }
+    }
+
+    if (eligible === "No - Not Eligible") {
+        if (!notEligible) {
+            showAlert("Cannot generate notes. Please select *Not Eligible Reason.");
+            return false;
+        }
+    }
+
+    return true;
+}
+
 // Generate FUSE and SF notes for Tech Intents
 function getSfFieldValueIfVisible(fieldName) {
     const vars = initializeVariables();
@@ -14704,7 +14803,12 @@ function getSfFieldValueIfVisible(fieldName) {
     return value;
 }
 
-function techNotesButtonHandler(showFloating = true) {
+function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
+    
+    // STOP execution if upsell is incomplete
+    if (!validateUpsellFields()) return;
+
+
     const vars = initializeVariables();
     const channel  = window.agentDetailsData?.channel || ""; 
 
@@ -14751,7 +14855,6 @@ function techNotesButtonHandler(showFloating = true) {
             // Cross-Sell/Upsell
             { name: "eligibleForUpsell" },
             { name: "productsOffered", label: "OFFERED"},
-            { name: "offerAccepted", label: "BUT THE ACCOUNT HAS AN OPEN SO"},
             { name: "declineReason", label: "BUT CUST DECLINED DUE TO"},
             { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL BEC THE"},
         ];
@@ -14800,10 +14903,6 @@ function techNotesButtonHandler(showFloating = true) {
                     if (discoCallChatValue) actionsTakenParts.push(discoCallChatValue);
                 } else if (field.name === "productsOffered") {
                     productsOfferedText = (field.label ? `${field.label} ` : "") + value;
-                } else if (field.name === "offerAccepted") {
-                    if (offerAcceptedValue === "Yes - Accepted but with Open SO") {
-                        offerAcceptedText = field.label || "";
-                    }
                 } else if (field.name === "declineReason") {
                     declineReasonText = (field.label ? `${field.label} ` : "") + value;
                 } else if (field.name === "notEligibleReason") {
@@ -14844,34 +14943,30 @@ function techNotesButtonHandler(showFloating = true) {
             },
             offerAccepted: {
                 "Yes - Accepted": "#UpsellAccepted",
-                "Yes - Accepted but with Open SO": "#UpsellLater",
+                "Yes - Upsell Later": "#UpsellLater",
                 "No - Declined": "#UpsellDeclined",
                 "No - Ignored": "#UpsellIgnored",
                 "No - Undecided": "#UpsellUndecided"
             }
         };
 
-        let hotlineUpsellNote = "";
+        let upsellNote = "";
 
-        if (channel === "CDT-HOTLINE") {
-            hotlineUpsellNote = "";
-
-            if (eligibleForUpsellValue in upsellMap.eligibleForUpsell) {
-                hotlineUpsellNote = upsellMap.eligibleForUpsell[eligibleForUpsellValue];
-            } else if (offerAcceptedValue in upsellMap.offerAccepted) {
-                hotlineUpsellNote = upsellMap.offerAccepted[offerAcceptedValue];
-            }
+        if (eligibleForUpsellValue in upsellMap.eligibleForUpsell) {
+            upsellNote = upsellMap.eligibleForUpsell[eligibleForUpsellValue];
+        } else if (offerAcceptedValue in upsellMap.offerAccepted) {
+            upsellNote = upsellMap.offerAccepted[offerAcceptedValue];
         }
 
         return {
             actions: "A: " + actionsTakenParts.join("/ "),
-            hotlineUpsellNote
+            upsellNote
         };
     }
 
-    function formatActions(actions, hotlineUpsellNote) {
+    function formatActions(actions, upsellNote) {
         let result = actions.toUpperCase();
-        if (hotlineUpsellNote) result += "\n\n" + hotlineUpsellNote;
+        if (upsellNote) result += "\n\n" + upsellNote;
         return result;
     }
 
@@ -15073,49 +15168,12 @@ function techNotesButtonHandler(showFloating = true) {
 
         let otherDetails = otherDetailsParts.join("/ ");
 
-        if (otherDetails) {
-            otherDetails = "OTHER DETAILS:\n" + otherDetails;
-        }
-
-        // Upsell Mapping
-        const upsellMap = {
-            eligibleForUpsell: {
-                "No - Not Eligible": "#UpsellNotEligible",
-                "No - Disconnected Call": "",
-                "No - Disconnected Chat": "",
-            },
-            offerAccepted: {
-                "Yes - Accepted": "#UpsellAccepted",
-                "Yes - Accepted but with Open SO": "#UpsellLater",
-                "No - Declined": "#UpsellDeclined",
-                "No - Ignored": "#UpsellIgnored",
-                "No - Undecided": "#UpsellUndecided"
-            }
-        };
-
-        const eligibleForUpsellValue = document.querySelector('[name="eligibleForUpsell"]')?.value || "";
-        const offerAcceptedValue = document.querySelector('[name="offerAccepted"]')?.value || "";
-
-        let socmedUpsellNote = "";
-
-        if (channel === "CDT-SOCMED") {
-            socmedUpsellNote = "";
-
-            if (eligibleForUpsellValue in upsellMap.eligibleForUpsell) {
-                socmedUpsellNote = upsellMap.eligibleForUpsell[eligibleForUpsellValue];
-            } else if (offerAcceptedValue in upsellMap.offerAccepted) {
-                socmedUpsellNote = upsellMap.offerAccepted[offerAcceptedValue];
-            }
-        }
-
         return {
             details: [
                 output.trim(),
                 retrackingOutput.trim(),
                 otherDetails
             ].filter(Boolean).join("\n\n"),
-
-            socmedUpsellNote
         };
 
     }
@@ -15128,11 +15186,12 @@ function techNotesButtonHandler(showFloating = true) {
     }
 
     const custName = formatField("CUST NAME", "custName");
-    const sfCaseNum = formatField("SF", "sfCaseNum");
+    const sfCaseNum = formatField("", "sfCaseNum");
     const minNumber = formatField("/ AFFECTED MIN", "minNumber");
+    const cepCaseNum = formatField("", "cepCaseNumber");
 
     const combinedInfo = [
-        custName, sfCaseNum, minNumber
+        custName, sfCaseNum, minNumber, cepCaseNum
     ]
         .filter(Boolean)
         .join("/ ");
@@ -15140,40 +15199,31 @@ function techNotesButtonHandler(showFloating = true) {
     const selectedOptGroupLabel = vars.selectedOptGroupLabel ? `/ ${vars.selectedOptGroupLabel}` : "";
     const selectedIntentText = vars.selectedIntentText ? `/ ${vars.selectedIntentText}` : "";
 
-    const { actions, hotlineUpsellNote } = constTechActionsTakenOutput();
-    const { details, socmedUpsellNote } = constOtherDetails();
+    const { actions, upsellNote } = constTechActionsTakenOutput();
+    const { details } = constOtherDetails();
+
+    const shouldShowOtherDetails = showOtherDetails && channel === "CDT-HOTLINE";
 
     if (vars.selectedIntent === "formFfupRepair") {
         concernCopiedText = `${combinedInfo}\nC: ${channel}/ FOLLOW-UP REPAIR ${vars.ticketStatus}`;
-        actionsTakenCopiedText = formatActions(actions, hotlineUpsellNote);
-        otherDetailsCopiedText = details.toUpperCase();
-
-        if (channel === "CDT-SOCMED" && socmedUpsellNote) {
-            otherDetailsCopiedText += "\n\n" + socmedUpsellNote;
-        }
+        actionsTakenCopiedText = formatActions(actions, upsellNote);
     } else if (optGroupIntents.includes(vars.selectedIntent)) {
         concernCopiedText = `${combinedInfo}\nC: ${channel}${selectedOptGroupLabel}`;
-        actionsTakenCopiedText = formatActions(actions, hotlineUpsellNote);
-        otherDetailsCopiedText = details.toUpperCase();
-
-        if (channel === "CDT-SOCMED" && socmedUpsellNote) {
-            otherDetailsCopiedText += "\n\n" + socmedUpsellNote;
+        actionsTakenCopiedText = formatActions(actions, upsellNote);
+        if (shouldShowOtherDetails) {
+            otherDetailsCopiedText = details.toUpperCase();
         }
     } else if (optTextIntents.includes(vars.selectedIntent)) {
         concernCopiedText = `${combinedInfo}\nC: ${channel}${selectedIntentText}`;
-        actionsTakenCopiedText = formatActions(actions, hotlineUpsellNote);
-        otherDetailsCopiedText = details.toUpperCase();
-
-        if (channel === "CDT-SOCMED" && socmedUpsellNote) {
-            otherDetailsCopiedText += "\n\n" + socmedUpsellNote;
+        actionsTakenCopiedText = formatActions(actions, upsellNote);
+        if (shouldShowOtherDetails) {
+            otherDetailsCopiedText = details.toUpperCase();
         }
     } else if (alwaysOnIntents.includes(vars.selectedIntent)) {
         concernCopiedText = `${combinedInfo}\nC: ${channel}${selectedIntentText} (ALWAYS ON)`;
-        actionsTakenCopiedText = formatActions(actions, hotlineUpsellNote);
-        otherDetailsCopiedText = details.toUpperCase();
-
-        if (channel === "CDT-SOCMED" && socmedUpsellNote) {
-            otherDetailsCopiedText += "\n\n" + socmedUpsellNote;
+        actionsTakenCopiedText = formatActions(actions, upsellNote);
+        if (shouldShowOtherDetails) {
+            otherDetailsCopiedText = details.toUpperCase();
         }
     }
 
@@ -15183,13 +15233,8 @@ function techNotesButtonHandler(showFloating = true) {
     let otherDetailsSections = [];
 
     if (otherDetailsCopiedText) {
-        if (channel === "CDT-SOCMED") {
-            // Display as-is (single section)
-            otherDetailsSections = [otherDetailsCopiedText];
-        } else {
-            // Split into sections
-            otherDetailsSections = splitIntoSections(otherDetailsCopiedText, 250);
-        }
+        // Split into sections
+        otherDetailsSections = splitIntoSections(otherDetailsCopiedText, 250);
     }
 
     const notes_part1 = [
@@ -15201,7 +15246,7 @@ function techNotesButtonHandler(showFloating = true) {
     const textToCopy = [
         notes_part1,
         otherDetailsSections.join("\n\n")
-    ].filter(Boolean).join("\n");
+    ].filter(Boolean).join("\n\n");
 
     if (showFloating) {
         showTechNotesFloatingDiv(notes_part1, otherDetailsSections);
@@ -15313,20 +15358,8 @@ function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
             copiedValues.appendChild(createCopySection("Part 2", notes_part2));
         }
     } else {
-        let combinedText = "";
-
         if (notes_part1.trim()) {
-            combinedText += notes_part1.trim();
-        }
-
-        if (Array.isArray(notes_part2) && notes_part2.length > 0) {
-            combinedText += (combinedText ? "\n\n" : "") + notes_part2.join("\n\n");
-        } else if (typeof notes_part2 === "string" && notes_part2.trim()) {
-            combinedText += (combinedText ? "\n\n" : "") + notes_part2;
-        }
-
-        if (combinedText) {
-            copiedValues.appendChild(createCopySection("", combinedText));
+            copiedValues.appendChild(createCopySection("", notes_part1));
         }
     }
  
@@ -15372,6 +15405,10 @@ function getFuseFieldValueIfVisible(fieldName) {
 }
 
 function nontechNotesButtonHandler(showFloating = true) {
+
+    // STOP execution if upsell is incomplete
+    if (!validateUpsellFields()) return;
+    
     const vars = initializeVariables();
     const channel  = window.agentDetailsData?.channel || ""; 
 
@@ -15395,7 +15432,6 @@ function nontechNotesButtonHandler(showFloating = true) {
             // Cross-Sell/Upsell
             { name: "eligibleForUpsell" },
             { name: "productsOffered", label: "OFFERED"},
-            { name: "offerAccepted", label: "OFFERED UPSELL BUT THE ACCOUNT HAS AN OPEN SO"},
             { name: "declineReason", label: "CUST DECLINED OFFER DUE TO"},
             { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL DUE TO"},
         ];
@@ -15446,10 +15482,6 @@ function nontechNotesButtonHandler(showFloating = true) {
                     if (discoCallChatValue) actionsTakenParts.push(discoCallChatValue);
                 } else if (field.name === "productsOffered") {
                     productsOfferedText = (field.label ? `${field.label} ` : "") + value;
-                } else if (field.name === "offerAccepted") {
-                    if (offerAcceptedValue === "Yes - Accepted but with Open SO") {
-                        offerAcceptedText = field.label || "";
-                    }
                 } else if (field.name === "declineReason") {
                     declineReasonText = (field.label ? `${field.label} ` : "") + value;
                 } else if (field.name === "notEligibleReason") {
@@ -15506,7 +15538,7 @@ function nontechNotesButtonHandler(showFloating = true) {
             },
             offerAccepted: {
                 "Yes - Accepted": "#UpsellAccepted",
-                "Yes - Accepted but with Open SO": "#UpsellLater",
+                "Yes - Upsell Later": "#UpsellLater",
                 "No - Declined": "#UpsellDeclined",
                 "No - Ignored": "#UpsellIgnored",
                 "No - Undecided": "#UpsellUndecided"
@@ -17625,32 +17657,50 @@ function resetForm2ContainerAndRebuildButtons() {
 
     const row = document.createElement("tr");
 
-    const buttonData = [
-        { label: "💾 Save", handler: saveFormData },
-        { label: "🔄 Reset", handler: resetButtonHandler },
-    ];
+    // Empty spacer cell (colspan=2)
+    const emptyTd = document.createElement("td");
+    emptyTd.colSpan = 3;
+    row.appendChild(emptyTd);
 
-    buttonData.forEach(({ label, handler }) => {
-        const td = document.createElement("td");
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "form1-button";
-        btn.tabIndex = -1;
-        btn.innerHTML = label;
-        btn.addEventListener("click", handler);
-        td.appendChild(btn);
-        row.appendChild(td);
-    });
+    // Button container cell (colspan=2)
+    const buttonTd = document.createElement("td");
+    // buttonTd.colSpan = 2;
+
+    const resetBtn = document.createElement("button");
+    resetBtn.type = "button";
+    resetBtn.id = "resetButton";
+    resetBtn.className = "form1-button";
+    resetBtn.tabIndex = -1;
+    resetBtn.innerHTML = "🔄 Reset";
+    resetBtn.addEventListener("click", () => resetButtonHandler(false));
+
+    buttonTd.appendChild(resetBtn);
+    row.appendChild(buttonTd);
 
     buttonTable.appendChild(row);
     form2Container.appendChild(buttonTable);
 }
 
 // Reset forms
-function resetButtonHandler() {
+function resetButtonHandler(requireSave = true) {
     showConfirm2("Are you sure you want to reset the form?")
     .then((userChoice) => {
         if (!userChoice) return;
+
+        let isSaved = true;
+
+        // Only attempt save if required
+        if (requireSave) {
+            isSaved = saveFormData();
+
+            // Block reset if validation failed
+            if (!isSaved) return;
+        }
+
+        // Block reset if validation failed
+        if (!isSaved) return;
+
+        handleTimer('reset', true);
 
         const agentName = document.getElementsByName("agentName")[0]; 
         const teamLead = document.getElementsByName("teamLead")[0]; 
@@ -17731,32 +17781,19 @@ function resetButtonHandler() {
 // Save generated notes to localStorage
 function saveFormData() {
     const selectedChannel = document.getElementById("channel")?.value?.trim();
+
     const sfCaseNumberElement = document.querySelector('[name="sfCaseNum"]');
     const sfCaseNumber = (sfCaseNumberElement?.value || "").trim();
 
-    const customerNameElement = document.querySelector('[name="custName"]');
-    const customerName = customerNameElement?.value.trim();
-
-    const accountNumberElement = document.querySelector('[name="accountNum"]');
-    const accountNumber = accountNumberElement?.value.trim();
-
     const missingFields = [];
-
-    if (!sfCaseNumberElement) {
-        showAlert("Case number field is missing on the form.");
-        return;
-    }
-
-    if (!customerName) missingFields.push("Customer Name*");
-    if (!accountNumber) missingFields.push("Account Number*");
 
     if (selectedChannel !== "CDT-HOTLINE") {
         if (!sfCaseNumber) missingFields.push("SF Case Number*");
     }
 
     if (missingFields.length > 0) {
-        showAlert(`We couldn’t save your notes. Please fill out the following fields:\n\n${missingFields.join("\n")}`);
-        return;
+        showAlert(`Auto-save Error. Please fill out the following fields:\n\n${missingFields.join("\n")}`);
+        return false;
     }
 
     const inquiryForms = [
@@ -17773,20 +17810,18 @@ function saveFormData() {
         specialInstButtonHandler(false)
     ].filter(Boolean);
 
-    const techNotes = techNotesButtonHandler(false);
-    const nontechNotes = `SF/FUSE NOTES:\n${nontechNotesButtonHandler(false)}`;
+    const techNotes = techNotesButtonHandler(false, false);
+    const nontechNotes = `SF & FUSE NOTES:\n${nontechNotesButtonHandler(false)}`;
 
-    const fuseNotes = Array.isArray(techNotes)
-        ? `SF/FUSE NOTES:\n${techNotes.join("\n")}`
-        : techNotes
-            ? `SF/FUSE NOTES:\n${techNotes}`
-            : "";
-
-    const cepNotes = newTicketNotes.length
-        ? `CEP NOTES:\n${newTicketNotes.join("\n")}`
+    const fuseNotes = techNotes
+        ? `SF & FUSE NOTES:\n${techNotes}`
         : "";
 
-    const bantayKableNotes = `SF/FUSE NOTES:\n${bantayKableButtonHandler(false)}`;
+    const cepNotes = newTicketNotes.length
+        ? `CEP NOTES:\n${newTicketNotes.join("\n\n")}`
+        : "";
+
+    const bantayKableNotes = `SF & FUSE NOTES:\n${bantayKableButtonHandler(false)}`;
     const nonTechIntents = [
         // Complaint
         "formReqNonServiceRebate", "formReqReconnection", "formCompMyHomeWeb", "formCompMisappliedPayment", "formCompUnreflectedPayment", "formCompPersonnelIssue",
@@ -17879,7 +17914,7 @@ function saveFormData() {
         combinedNotes = nontechNotes || bantayKableNotes || "";
     } else if (vars.selectedIntent === "formFfupRepair") {
         const labeledFfup = ffupNotes ? `CEP NOTES:\n${ffupNotes}` : "";
-        const labeledTech = techNotes ? `SF/FUSE NOTES:\n${techNotes}` : "";
+        const labeledTech = techNotes ? `SF & FUSE NOTES:\n${techNotes}` : "";
         combinedNotes = [labeledFfup, labeledTech].filter(Boolean).join("\n\n");
     } else {
         combinedNotes = [fuseNotes, cepNotes].filter(Boolean).join("\n\n");
@@ -17944,8 +17979,12 @@ function saveFormData() {
             .toUpperCase();
     }
 
+    const timerSeconds = getCurrentTimerValue();
+    const formattedTimer = formatTime(timerSeconds);
+
     const savedEntry = {
         timestamp: timestamp,
+        timerValue: formattedTimer,
         callId: fallbackKey,
         selectChannel: getValue("selectChannel"),
         agentName: getValue("agentName"),
@@ -17961,8 +18000,9 @@ function saveFormData() {
         Option82: getValue("Option82"),
         WOCAS: getValue("WOCAS"),
         combinedNotes: combinedNotes.toUpperCase(),
-        upsell: getValue("upsell"),
+        eligibleForUpsell: getValue("eligibleForUpsell"),
         productsOffered: getValue("productsOffered"),
+        offerAccepted: getValue("offerAccepted"),
         declineReason: getValue("declineReason"),
         notEligibleReason: getValue("notEligibleReason")
     };
@@ -17988,7 +18028,7 @@ function saveFormData() {
 
         if (!hasChanges) {
             showAlert("No changes detected. Notes were not updated.");
-            return;
+            return false;
         }
 
         // Replace existing entry with updated notes and timestamp
@@ -18011,13 +18051,18 @@ function saveFormData() {
             lastUpdated: ""
         };
 
-        showAlert("All set! Your notes have been saved.");
+        showAlert("Notes saved. Reset complete. Saved Notes Viewer updated.");
     }
 
     // Save back to localStorage
     localStorage.setItem("tempDatabase", JSON.stringify(savedData));
 
-    displaySavedNotesViewer();
+    // Refresh Saved Notes Viewer and reset timer
+    setTimeout(() => {
+        displaySavedNotesViewer();
+    }, 300);
+
+    return true;
 
 }
 
@@ -18111,18 +18156,26 @@ function displaySavedNotesViewer() {
     });
 
     for (const [key, entry] of sortedEntries) {
-        let block = "";
+        let viewerContent = "";
 
-        block += `SAVED ON: ${entry.timestamp}\n`;
+        viewerContent += `SAVED ON: ${entry.timestamp}\n`;
 
         if (entry.lastUpdated) {
-            block += `LAST UPDATED: ${entry.lastUpdated}\n`;
+            viewerContent += `LAST UPDATED: ${entry.lastUpdated}\n`;
         }
 
+        viewerContent += `TIMER: ${entry.timerValue}\n`;
+
         const appendIfValid = (label, value) => {
-            if (value !== undefined && value !== "undefined") {
-                block += `${label}: ${value}\n`;
-            }
+            if (!value) return;
+
+            const cleaned = value.toString().trim().toUpperCase();
+
+            const invalidValues = ["", "— PLEASE SELECT THE CORRECT INTENT/WOCAS —", "N/A", "n/a", "NA", "na"];
+
+            if (invalidValues.includes(cleaned)) return;
+
+            viewerContent += `${label}: ${value}\n`;
         };
 
         appendIfValid("SF CASE #", entry.sfCaseNumber);
@@ -18146,12 +18199,12 @@ function displaySavedNotesViewer() {
             }
         }
 
-        block += `\n${entry.combinedNotes}\n`;
-        block += "═".repeat(42) + "\n";
+        viewerContent += `\n${entry.combinedNotes}\n`;
+        viewerContent += "═".repeat(42) + "\n";
 
-        // Create <pre> block for formatting
+        // Create <pre> viewerContent for formatting
         const pre = document.createElement("pre");
-        pre.textContent = block;
+        pre.textContent = viewerContent;
 
         viewer.appendChild(pre);
     }
@@ -18181,10 +18234,18 @@ function exportDataAsTxt() {
             notepadContent += `LAST UPDATED: ${entry.lastUpdated}\n`;
         }
 
+        notepadContent += `TIMER: ${entry.timerValue}\n`;
+
         const appendIfValid = (label, value) => {
-            if (value !== undefined && value !== "undefined") {
-                notepadContent += `${label}: ${value}\n`;
-            }
+            if (!value) return;
+
+            const cleaned = value.toString().trim().toUpperCase();
+
+            const invalidValues = ["", "— PLEASE SELECT THE CORRECT INTENT/WOCAS —", "N/A", "n/a", "NA", "na"];
+
+            if (invalidValues.includes(cleaned)) return;
+
+            notepadContent += `${label}: ${value}\n`;
         };
 
         appendIfValid("SF CASE #", entry.sfCaseNumber);
@@ -18216,7 +18277,7 @@ function exportDataAsTxt() {
         }
 
         notepadContent += `\n${entry.combinedNotes}\n`;
-        notepadContent += "=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n\n";
+        notepadContent += "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n";
     }
 
     const currentDate = new Date();
@@ -18267,6 +18328,7 @@ function exportDataAsExcel() {
         excelData.push({
             "Saved On": entry.timestamp || "",
             "Modified On": entry.lastUpdated || "",
+            "Timer": entry.timerValue || "",
             "Channel": entry.selectChannel || "",
             "Agent Name": entry.agentName || "", 
             "Team Leader": entry.teamLead || "", 
@@ -18280,8 +18342,9 @@ function exportDataAsExcel() {
             "Service ID": serviceID,
             "Option82": option82,
             "Case Notes": entry.combinedNotes || "",
-            "Upsell": entry.upsell || "",
+            "Eligible for Upsell": entry.eligibleForUpsell || "",
             "Products Offered": entry.productsOffered || "",
+            "Offer Accepted": entry.offerAccepted || "",
             "Decline Reason": entry.declineReason || "",
             "Not Eligible Reason": entry.notEligibleReason || ""
         });
@@ -18332,15 +18395,17 @@ function deleteAllData() {
 
         localStorage.clear();
         showAlert("All data has been deleted successfully.");
-    });
 
-    displaySavedNotesViewer();
+        // Refresh Saved Notes Viewer after reset
+        setTimeout(() => {
+            displaySavedNotesViewer();
+        }, 300);
+    });
 }
 
 // Show appropriate buttons based on form state
 const primaryButtons = {
-  saveButton: saveFormData,
-  resetButton: resetButtonHandler
+  resetButton: () => resetButtonHandler(false)
 };
 
 Object.entries(primaryButtons).forEach(([id, handler]) => {
@@ -18608,6 +18673,33 @@ const upsellingTips = [
 
 const versions = [
     {
+        version: "V5.5.180626",
+        updates: [
+            {
+                title: "Enhancements",
+                items: [
+                    "<strong>Auto-save Feature:</strong> Automatically saves notes on reset and updates the Saved Notes viewer.",
+                    "<strong>Other Details removed:</strong> Optimized FUSE and Salesforce note output to prevent character limit overflow, ensuring upsell hashtag tagging is always captured.",
+                    "<strong>Timer Auto-trigger Added:</strong> The timer now starts automatically when the agent enters new case or call details.",
+                    "Improve button UIs for better user experience and easier navigation.",
+                    "Updated <strong>Tech Work Instruction links</strong> across all channels.",
+                    "Updated follow-up fields for <strong>FM POLL</strong> and <strong>CCARE OFFBOARD</strong> queues to align with the latest work instructions and ensure accurate follow-up case documentation.",
+                    "Removed <strong>No - Disconnected Call/Chat</strong> option under <strong>Eligible for Cross/Upsell:</strong> field to align with the latest Upsell Hashtag Guidelines.",
+                    "Implemented required <strong>Upsell fields</strong> to ensure accurate tagging of upsell opportunities and consistent documentation in notes output.",
+                ]
+            },
+            {
+                title: "Fixes",
+                items: [
+                    "<strong>Fixed form behavior issues:</strong> Resolved inconsistencies affecting all intents under NON-TECH Complaint VOC.",
+                    "<strong>#UpsellLater label updated</strong> Refined to reduce agent confusion and ensure more accurate tagging of potential future upsell opportunities.",
+                    "Fixed saved notes formatting reducing reduncies and improving readability in the <strong>Saved Notes viewer</strong> and <strong>Extracted Notes</strong>.",
+                    "Fixed issue where <strong>Upsell/Cross-sell</strong> fields were not displayed when generating forms for FCR cases."
+                ]
+            }
+        ]
+    },
+    {
         version: "V5.5.050626",
         updates: [
             {
@@ -18704,7 +18796,7 @@ const versions = [
                 "Enhanced generated notes by adding an <strong>“Other Details”</strong> section in Salesforce and FUSE, improving documentation accuracy and enabling easier tracking."
             ]},
             { title: "Fixes", items: [
-                "Resolved an issue causing repeated “Request for Retracking Submitted” entries in SF/FUSE notes and restored the ability for agents to provide retracking details across all applicable IPTV intents.",
+                "Resolved an issue causing repeated “Request for Retracking Submitted” entries in SF & FUSE notes and restored the ability for agents to provide retracking details across all applicable IPTV intents.",
             ]},
         ]
     },

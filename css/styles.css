@@ -525,7 +525,7 @@ textarea:focus {
 }
 
 input.input-and-button {
-    width: 75%;  
+    width: 76.4%;  
     padding: 0 5px;  
     line-height: 1.5px;
     box-sizing: border-box;
@@ -535,7 +535,7 @@ input.input-and-button {
 }
 
 select.input-and-button {
-    width: 75%;  
+    width: 76.4%;  
     padding: 0 5px;  
     line-height: 1.5px;
     box-sizing: border-box;
@@ -545,7 +545,7 @@ select.input-and-button {
 }
 
 button.input-and-button {
-    width: 25%;  
+    width: 23.6%;  
     padding: 0;  
     color: white;
     cursor: pointer;
@@ -1367,8 +1367,8 @@ button:active {
 /* FAB panel */
 #floatingPanel {
     position: fixed;
-    top: 40px;
-    left: 25px;
+    top: 15px;
+    left: 15px;
     display: flex;
     align-items: flex-start;
     z-index: 100;
