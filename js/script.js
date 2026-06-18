@@ -14753,30 +14753,37 @@ function validateUpsellFields() {
     const decline = document.querySelector('[name="declineReason"]')?.value || "";
     const notEligible = document.querySelector('[name="notEligibleReason"]')?.value || "";
 
-    if (!eligible) {
+    if (isFieldVisible("eligibleForUpsell") && !eligible) {
         showAlert("Cannot generate notes. Please select *Eligible for Cross/Upsell.");
         return false;
     }
 
     if (eligible === "Yes") {
-        if (!offered) {
+        if (isFieldVisible("productsOffered") && !offered) {
             showAlert("Cannot generate notes. Please select *Product/Service Offered.");
             return false;
         }
 
-        if (!accepted) {
+        if (isFieldVisible("offerAccepted") && !accepted) {
             showAlert("Cannot generate notes. Please select *Offer Accepted status.");
             return false;
         }
 
-        if (accepted === "No - Declined" && !decline) {
+        if (
+            accepted === "No - Declined" &&
+            isFieldVisible("declineReason") &&
+            !decline
+        ) {
             showAlert("Cannot generate notes. Please select *Decline Reason.");
             return false;
         }
     }
 
     if (eligible === "No - Not Eligible") {
-        if (!notEligible) {
+        if (
+            isFieldVisible("notEligibleReason") &&
+            !notEligible
+        ) {
             showAlert("Cannot generate notes. Please select *Not Eligible Reason.");
             return false;
         }
