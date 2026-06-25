@@ -692,11 +692,13 @@ function isFieldVisible(fieldName) {
     const fieldRow = field.closest("tr");
     const fieldStyle = window.getComputedStyle(field);
 
-    return field.offsetParent !== null &&  
+    return (
+        field.offsetParent !== null &&
         !(fieldRow?.style.display === "none" ||
-            fieldStyle.display === "none" ||
-            fieldStyle.visibility === "hidden" ||
-            fieldStyle.opacity === "0");
+          fieldStyle.display === "none" ||
+          fieldStyle.visibility === "hidden" ||
+          fieldStyle.opacity === "0")
+    );
 }
 
 // Get Field value only if it is visible
@@ -894,6 +896,7 @@ function createIntentBasedForm() {
             "", 
             "Yes",
             "No - Not Eligible",
+            "No - Not Eligible Intent",
             // disconnectedOption
         ],
         productsOffered: [
@@ -13885,7 +13888,7 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
         { name: "selectChannel"},
         { name: "pldtUser"},
         { name: "sfCaseNum", label: "SF#"},
-        { name: "cepCaseNumber", label: "Case #"},
+        { name: "cepCaseNumber", label: "CEP Case #"},
         { name: "pcNumber", label: "Parent Case"},
         { name: "ticketStatus", label: "Case Status"},
         { name: "ffupCount", label: "No. of Follow-Up(s)"},
@@ -14748,7 +14751,7 @@ function showCepFloatingDiv(labels, textToCopy) {
 // Validate Upsell fields before generating notes
 function validateUpsellFields() {
     const eligible = document.querySelector('[name="eligibleForUpsell"]')?.value || "";
-    const offered = document.querySelector('[name="productsOffered"]')?.value || "";
+    // const offered = document.querySelector('[name="productsOffered"]')?.value || "";
     const accepted = document.querySelector('[name="offerAccepted"]')?.value || "";
     const decline = document.querySelector('[name="declineReason"]')?.value || "";
     const notEligible = document.querySelector('[name="notEligibleReason"]')?.value || "";
@@ -14759,10 +14762,10 @@ function validateUpsellFields() {
     }
 
     if (eligible === "Yes") {
-        if (isFieldVisible("productsOffered") && !offered) {
-            showAlert("Cannot generate notes. Please select *Product/Service Offered.");
-            return false;
-        }
+        // if (isFieldVisible("productsOffered") && !offered) {
+        //     showAlert("Cannot generate notes. Please select *Product/Service Offered.");
+        //     return false;
+        // }
 
         if (isFieldVisible("offerAccepted") && !accepted) {
             showAlert("Cannot generate notes. Please select *Offer Accepted status.");
@@ -14903,7 +14906,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
                 } else if (field.name === "eligibleForUpsell") {
                     const discoCallChatMsg = {
                         "No - Disconnected Call": "UNABLE TO OFFER UPSELL AS THE CALL GOT DISCONNECTED",
-                        "No - Disconnected Chat": "UNABLE TO OFFER UPSELL AS THE CHAT WAS DISCONNECTED"
+                        "No - Disconnected Chat": "UNRESPONSIVE CUST/ CHAT ENDED BY SYSTEM"
                     };
 
                     const discoCallChatValue = discoCallChatMsg[eligibleForUpsellValue];
@@ -14945,6 +14948,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
         const upsellMap = {
             eligibleForUpsell: {
                 "No - Not Eligible": "#UpsellNotEligible",
+                "No - Not Eligible Intent": "#UpsellNotEligibleIntent",
                 "No - Disconnected Call": "",
                 "No - Disconnected Chat": "",
             },
@@ -15540,6 +15544,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         const upsellMap = {
             eligibleForUpsell: {
                 "No - Not Eligible": "#UpsellNotEligible",
+                "No - Not Eligible Intent": "#UpsellNotEligibleIntent",
                 "No - Disconnected Call": "",
                 "No - Disconnected Chat": "",
             },
@@ -18679,6 +18684,18 @@ const upsellingTips = [
 ];
 
 const versions = [
+    {
+        version: "V5.5.250626",
+        updates: [
+            {
+                title: "Upsell Enhancements",
+                items: [
+                    "Added <strong>#UpsellNotEligibleIntent</strong> option for Upsell/Cross-sell",
+                    "Removed the required-field validation for <strong>Products Offered</strong>.",
+                ]
+            }
+        ]
+    },
     {
         version: "V5.5.180626",
         updates: [
