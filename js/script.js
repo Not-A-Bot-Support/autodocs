@@ -886,18 +886,12 @@ function createIntentBasedForm() {
         "formReqTaxAdj", "formReqChgTelUnit", "formReqOcular", "formReqProofOfSub"
     ]
 
-    const disconnectedOption =
-        channelField.value === "CDT-HOTLINE"
-            ? "No - Disconnected Call"
-            : "No - Disconnected Chat";
-
     const UPSELL_OPTIONS = {
         eligibleForUpsell: [
             "", 
             "Yes",
             "No - Not Eligible",
             "No - Not Eligible Intent",
-            // disconnectedOption
         ],
         productsOffered: [
             "", 
@@ -995,6 +989,43 @@ function createIntentBasedForm() {
         } else {
             hideSpecificFields(["declineReason"]);
         }
+    }
+
+    const disconnectedOption =
+    channelField.value === "CDT-HOTLINE"
+        ? ["No - Disconnected Call"]
+        : ["No - Customer Ended Chat", "No - System Ended Chat"];
+
+    const techOption = 
+    lobValue === "TECH"
+        ? ["No - for Ticket Creation"]
+        : [];
+
+    const IR_OPTIONS = {
+        issueResolved: [
+            "", 
+            "Yes", 
+            ...techOption,
+            "No - Customer Declined Further Assistance",
+            "No - Customer is Not At Home",
+            ...disconnectedOption
+        ]
+    }
+
+    function handleIssueResolvedChange(issueResolved) {
+        if (issueResolved.selectedIndex === 2) {
+            showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+        } else {
+            showFields(["eligibleForUpsell"]);
+            hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
+        }
+
+        if (channelField.value === "CDT-SOCMED") {
+            showFields(["resolution"]);
+        } else {
+            hideSpecificFields(["resolution"]);
+        }
+        updateToolLabelVisibility();
     }
 
     // Tech Follow-Up
@@ -1607,15 +1638,7 @@ function createIntentBasedForm() {
             { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank."},
             { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “NDT-NIC with red LOS” DO NOT input the WOCAS!"},
             { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes", 
-                "No - for Ticket Creation",
-                "No - Customer is Unresponsive",
-                "No - Customer is Not At Home",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
                 "",
                 "Defective Modem / Missing Modem",
@@ -2168,21 +2191,7 @@ function createIntentBasedForm() {
         });
     
         const issueResolved = document.querySelector("[name='issueResolved']");
-        issueResolved.addEventListener("change", () => {
-            if (issueResolved.selectedIndex === 2) {
-                showFields(["resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-            } else {
-                showFields(["eligibleForUpsell"]);
-                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
-            }
-
-            if (channelField.value === "CDT-SOCMED") {
-                showFields(["resolution"]);
-            } else {
-                hideSpecificFields(["resolution"]);
-            }
-            updateToolLabelVisibility();
-        });
+        issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -2265,15 +2274,7 @@ function createIntentBasedForm() {
             { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken."},
             { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “Busy tone when dialing”. DO NOT input the WOCAS!"},
             { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes", 
-                "No - for Ticket Creation",
-                "No - Customer is Unresponsive",
-                "No - Customer is Not At Home",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
                 "",
                 "Defective Cable / Cord",
@@ -2707,22 +2708,7 @@ function createIntentBasedForm() {
         });
     
         const issueResolved = document.querySelector("[name='issueResolved']");
-        issueResolved.addEventListener("change", () => {
-            if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-            } else {
-                showFields(["eligibleForUpsell"]);
-                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
-            }
-            
-            if (channelField.value === "CDT-SOCMED") {
-                showFields(["resolution"]);
-            } else {
-                hideSpecificFields(["resolution"]);
-            }
-
-            updateToolLabelVisibility();
-        });
+        issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
         updateToolLabelVisibility();
 
@@ -2847,15 +2833,7 @@ function createIntentBasedForm() {
             ]},
             { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “NIC using WiFi”. DO NOT input the WOCAS!"},
             { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes", 
-                "No - for Ticket Creation",
-                "No - Customer is Unresponsive",
-                "No - Customer is Not At Home",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
                 "",
                 "Tested Ok",
@@ -3587,15 +3565,7 @@ function createIntentBasedForm() {
             { label: "Speedtest Result", type: "number", name: "speedTestResult", step: "any"},
             { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “Only Acquiring 180MBPS.” DO NOT input the WOCAS!"},
             { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes", 
-                "No - for Ticket Creation",
-                "No - Customer is Unresponsive",
-                "No - Customer is Not At Home",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
                 "",
                 "Tested Ok",
@@ -4196,15 +4166,7 @@ function createIntentBasedForm() {
             { label: "Traceroute PLDT side (Game Server IP Address)", type: "textarea", name: "traceroutePLDT", placeholder: "Hops with static.pldt.net suffix results. e.g. Hop 3 = PASS, Hop 4 = FAIL(RTO), Hop 5 = FAIL (42 ms), etc."},
             { label: "Traceroute External side (Game Server IP Address)", type: "textarea", name: "tracerouteExt", placeholder: "Last Hop Result. e.g. Hop 10 = PASS"},
             { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes", 
-                "No - for Ticket Creation",
-                "No - Customer is Unresponsive",
-                "No - Customer is Not At Home",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
                 "",
                 "Webpage Not Loading",
@@ -4653,8 +4615,6 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         const outageStatus = document.querySelector("[name='outageStatus']");
-        const issueResolved = document.querySelector("[name='issueResolved']");
-
         outageStatus.addEventListener("change", () => {
             resetAllFields(["outageStatus"]);
             if (outageStatus.value === "Yes") {
@@ -4673,21 +4633,8 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
     
-        issueResolved.addEventListener("change", () => {
-            if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-            } else {
-                showFields(["eligibleForUpsell"]);
-                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
-            }
-
-            if (channelField.value === "CDT-SOCMED") {
-                showFields(["resolution"]);
-            } else {
-                hideSpecificFields(["resolution"]);
-            }
-            updateToolLabelVisibility(); 
-        });
+        const issueResolved = document.querySelector("[name='issueResolved']");
+        issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
         updateToolLabelVisibility();
 
@@ -4757,15 +4704,7 @@ function createIntentBasedForm() {
             ] },
             { label: "IT Support Remarks (L2)", type: "textarea", name: "itRemarks"},
             { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes", 
-                "No - for Ticket Creation",
-                "No - Customer is Unresponsive",
-                "No - Customer is Not At Home",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
                 "",
                 "Tested Ok",
@@ -5259,15 +5198,7 @@ function createIntentBasedForm() {
             { label: "Tuned Services Multicast Address", type: "textarea", name: "tsMulticastAddress"},
             { label: "Actual Experience", type: "textarea", name: "exactExp", placeholder: "Please input the customer's actual experience. e.g. “With IP but no tune service multicast” DO NOT input the WOCAS!"},
             { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes", 
-                "No - for Ticket Creation",
-                "No - Customer is Unresponsive",
-                "No - Customer is Not At Home",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
                 "",
                 "Cignal Retracking",
@@ -5776,21 +5707,7 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
 
-        issueResolved.addEventListener("change", () => {
-            if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-            } else {
-                showFields(["eligibleForUpsell"]);
-                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
-            }
-
-            if (channelField.value === "CDT-SOCMED") {
-                showFields(["resolution"]);
-            } else {
-                hideSpecificFields(["resolution"]);
-            }
-            updateToolLabelVisibility();
-        });
+        issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
         updateToolLabelVisibility();
 
@@ -5799,15 +5716,7 @@ function createIntentBasedForm() {
 
         const fields = [
             { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes", 
-                "No - for Ticket Creation",
-                "No - Customer is Unresponsive",
-                "No - Customer is Not At Home",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
                 "— Select applicable Investigation 1 —",
@@ -6030,16 +5939,7 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         const issueResolved = document.querySelector("[name='issueResolved']");
-    
-        issueResolved.addEventListener("change", () => {
-            if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-            } else {
-                showFields(["eligibleForUpsell"]);
-                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
-            }
-            updateToolLabelVisibility();
-        });
+        issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
         updateToolLabelVisibility();
     } else if (alwaysOnForms.includes(selectedValue)) { 
@@ -6056,10 +5956,7 @@ function createIntentBasedForm() {
             { label: "Modem/ONU Serial #", type: "text", name: "onuSerialNum", placeholder: "Also available in DMS."},
             // Probe & Troubleshoot
             { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
                 "— Modem Light Status —",
@@ -6442,21 +6339,13 @@ function createIntentBasedForm() {
                 "Request Modem/ONU GUI Access [InterOP]"
             ]},
             { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
                 "",
                 "Defective Modem",
                 "Manual Troubleshooting",
                 "NMS Configuration",
             ]},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes", 
-                "No - for Ticket Creation",
-                "No - Customer is Unresponsive",
-                "No - Customer is Not At Home",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
             { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
             { label: "SLA / ETR", type: "text", name: "sla"},
             // Special Instructions
@@ -6678,11 +6567,6 @@ function createIntentBasedForm() {
 
         const accountType = document.querySelector("[name='accountType']");
         const custAuth = document.querySelector("[name='custAuth']");
-        const equipmentBrand = document.querySelector("[name='equipmentBrand']");
-        const modemBrand = document.querySelector("[name='modemBrand']");
-        const onuConnectionType = document.querySelector("[name='onuConnectionType']");
-        const issueResolved = document.querySelector("[name='issueResolved']");
-
         function handleCustAuthAndAccountTypeChange() {
             if (!custAuth.value || !accountType.value) {
                 return;
@@ -6748,6 +6632,10 @@ function createIntentBasedForm() {
         custAuth.addEventListener("change", handleCustAuthAndAccountTypeChange);
         accountType.addEventListener("change", handleCustAuthAndAccountTypeChange);
 
+        const equipmentBrand = document.querySelector("[name='equipmentBrand']");
+        const modemBrand = document.querySelector("[name='modemBrand']");
+        const onuConnectionType = document.querySelector("[name='onuConnectionType']");
+
         function updateONUConnectionType() {
             if (!equipmentBrand.value || !modemBrand.value) {
                 onuConnectionType.value = ""; 
@@ -6781,19 +6669,8 @@ function createIntentBasedForm() {
 
         updateONUConnectionType();
     
-        issueResolved.addEventListener("change", () => {
-            if (issueResolved.selectedIndex === 2) {
-                showFields(["cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions"]);
-
-                updateToolLabelVisibility();
-            } else {
-                hideSpecificFields(["cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions"]);
-
-                updateToolLabelVisibility();
-            }
-
-            updateToolLabelVisibility();
-        });
+        const issueResolved = document.querySelector("[name='issueResolved']");
+        issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
         updateToolLabelVisibility();
 
@@ -6819,13 +6696,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO/SR", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -7007,13 +6878,7 @@ function createIntentBasedForm() {
                 "NA"
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -7227,13 +7092,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -7417,13 +7276,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -7694,13 +7547,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Sagip OL Discount", type: "select", name: "sagipOLDiscount", options: [
                 "", 
@@ -7993,13 +7840,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO/SR", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -8226,13 +8067,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -8449,13 +8284,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -8672,13 +8501,7 @@ function createIntentBasedForm() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -8825,13 +8648,7 @@ function createIntentBasedForm() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -8986,13 +8803,7 @@ function createIntentBasedForm() {
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -9380,13 +9191,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -9615,13 +9420,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -9844,13 +9643,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO/SR", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -10081,13 +9874,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -10276,13 +10063,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -10461,13 +10242,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -10693,13 +10468,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -10946,13 +10715,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -11143,13 +10906,7 @@ function createIntentBasedForm() {
         const fields = [
             { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -11791,13 +11548,7 @@ function createIntentBasedForm() {
                 "NA"
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -12145,13 +11896,7 @@ function createIntentBasedForm() {
                 "NA"
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -12672,13 +12417,7 @@ function createIntentBasedForm() {
             { label: "VAS Product", type: "text", name: "vasProduct"},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO/SR #", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -14852,6 +14591,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
     function constTechActionsTakenOutput() {
         const fields = [
             // Remarks
+            { name: "outageStatus"},
             { name: "nmsSkinRemarks"},
             { name: "dmsRemarks"},
             { name: "remarks"},
@@ -14863,7 +14603,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
             { name: "nomiMobileNum", label: "MOBILE #"},
 
             // Cross-Sell/Upsell
-            { name: "eligibleForUpsell" },
+            // { name: "eligibleForUpsell" },
             { name: "productsOffered", label: "OFFERED"},
             { name: "declineReason", label: "BUT CUST DECLINED DUE TO"},
             { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL BEC THE"},
@@ -14903,15 +14643,23 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
 
                     const alsValue = alsMessages[offerALS];
                     if (alsValue) actionsTakenParts.push(alsValue);
-                } else if (field.name === "eligibleForUpsell") {
-                    const discoCallChatMsg = {
-                        "No - Disconnected Call": "UNABLE TO OFFER UPSELL AS THE CALL GOT DISCONNECTED",
-                        "No - Disconnected Chat": "UNRESPONSIVE CUST/ CHAT ENDED BY SYSTEM"
-                    };
+                } else if (field.name === "outageStatus") {
+                    const outageValue = value === "Yes" ? "Affected by a network outage" : "Not part of network outage";
+                    actionsTakenParts.push(outageValue);
 
-                    const discoCallChatValue = discoCallChatMsg[eligibleForUpsellValue];
-                    if (discoCallChatValue) actionsTakenParts.push(discoCallChatValue);
-                } else if (field.name === "productsOffered") {
+                }
+                
+                // else if (field.name === "eligibleForUpsell") {
+                //     const discoCallChatMsg = {
+                //         "No - Ghost Call": "GHOST CALL",
+                //         "No - Unresponsive Customer": "UNRESPONSIVE CUSTOMER"
+                //     };
+
+                //     const discoCallChatValue = discoCallChatMsg[eligibleForUpsellValue];
+                //     if (discoCallChatValue) actionsTakenParts.push(discoCallChatValue);
+                // } 
+                
+                else if (field.name === "productsOffered") {
                     productsOfferedText = (field.label ? `${field.label} ` : "") + value;
                 } else if (field.name === "declineReason") {
                     declineReasonText = (field.label ? `${field.label} ` : "") + value;
@@ -14935,9 +14683,12 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
         const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
         const issueResolvedMap = {
             "Yes": "Resolved",
-            "No - Customer is Unresponsive": "Customer is Unresponsive",
+            // "No - Customer is Unresponsive": "Customer was Unresponsive",
             "No - Customer Declined Further Assistance": "Customer Declined Further Assistance",
-            "No - System Ended Chat": "System Ended Chat"
+            "No - System Ended Chat": "System Ended Chat",
+            "No - Disconnected Call": "Call got Disconnected",
+            "No - Customer is Not At Home": "Customer was Not At Home",
+            "No - Customer Ended Chat": "Customer Ended Chat"
         };
 
         if (issueResolvedMap[issueResolvedValue]) {
@@ -14949,8 +14700,6 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
             eligibleForUpsell: {
                 "No - Not Eligible": "#UpsellNotEligible",
                 "No - Not Eligible Intent": "#UpsellNotEligibleIntent",
-                "No - Disconnected Call": "",
-                "No - Disconnected Chat": "",
             },
             offerAccepted: {
                 "Yes - Accepted": "#UpsellAccepted",
@@ -14997,7 +14746,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
             { name: "Option82", label: "Option82"},
             
             // Network Outage Status
-            { name: "outageStatus"},
+            // { name: "outageStatus"},
 
             // ONU Lights Status and Connection Type
             { name: "modemLights", label: "Modem Lights Status"},
@@ -15143,11 +14892,11 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
 
                 // Special cases
                 switch (field.name) {
-                    case "outageStatus":
-                        actionPart = value === "Yes"
-                            ? "Affected by a network outage"
-                            : "Not part of a network outage";
-                        break;
+                    // case "outageStatus":
+                    //     actionPart = value === "Yes"
+                    //         ? "Affected by a network outage"
+                    //         : "Not part of a network outage";
+                    //     break;
                     case "dmsSelfHeal":
                         actionPart = value === "Yes/Resolved"
                             ? "Performed self-heal and the issue was resolved"
@@ -15441,7 +15190,7 @@ function nontechNotesButtonHandler(showFloating = true) {
             { name: "remarks"},
 
             // Cross-Sell/Upsell
-            { name: "eligibleForUpsell" },
+            // { name: "eligibleForUpsell" },
             { name: "productsOffered", label: "OFFERED"},
             { name: "declineReason", label: "CUST DECLINED OFFER DUE TO"},
             { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL DUE TO"},
@@ -15483,15 +15232,17 @@ function nontechNotesButtonHandler(showFloating = true) {
 
             if (value && !seenFields.has(field.name)) {
                 seenFields.add(field.name);
-                if (field.name === "eligibleForUpsell") {
-                    const discoCallChatMsg = {
-                        "No - Disconnected Call": "UNABLE TO OFFER UPSELL AS THE CALL GOT DISCONNECTED",
-                        "No - Disconnected Chat": "UNABLE TO OFFER UPSELL AS THE CHAT WAS DISCONNECTED"
-                    };
+                // if (field.name === "eligibleForUpsell") {
+                //     const discoCallChatMsg = {
+                //         "No - Ghost Call": "GHOST CALL",
+                //         "No - Unresponsive Customer": "UNRESPONSIVE CUSTOMER"
+                //     };
 
-                    const discoCallChatValue = discoCallChatMsg[eligibleForUpsellValue];
-                    if (discoCallChatValue) actionsTakenParts.push(discoCallChatValue);
-                } else if (field.name === "productsOffered") {
+                //     const discoCallChatValue = discoCallChatMsg[eligibleForUpsellValue];
+                //     if (discoCallChatValue) actionsTakenParts.push(discoCallChatValue);
+                // } else 
+                    
+                if (field.name === "productsOffered") {
                     productsOfferedText = (field.label ? `${field.label} ` : "") + value;
                 } else if (field.name === "declineReason") {
                     declineReasonText = (field.label ? `${field.label} ` : "") + value;
@@ -15531,9 +15282,12 @@ function nontechNotesButtonHandler(showFloating = true) {
         const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
         const issueResolvedMap = {
             "Yes": "Resolved",
-            "No - Customer is Unresponsive": "Customer is Unresponsive",
+            // "No - Customer is Unresponsive": "Customer was Unresponsive",
             "No - Customer Declined Further Assistance": "Customer Declined Further Assistance",
-            "No - System Ended Chat": "System Ended Chat"
+            "No - System Ended Chat": "System Ended Chat",
+            "No - Disconnected Call": "Call got Disconnected",
+            "No - Customer is Not At Home": "Customer was Not At Home",
+            "No - Customer Ended Chat": "Customer Ended Chat"
         };
 
         if (issueResolvedMap[issueResolvedValue]) {
@@ -15545,8 +15299,8 @@ function nontechNotesButtonHandler(showFloating = true) {
             eligibleForUpsell: {
                 "No - Not Eligible": "#UpsellNotEligible",
                 "No - Not Eligible Intent": "#UpsellNotEligibleIntent",
-                "No - Disconnected Call": "",
-                "No - Disconnected Chat": "",
+                // "No - Disconnected Call": "",
+                // "No - Disconnected Chat": "",
             },
             offerAccepted: {
                 "Yes - Accepted": "#UpsellAccepted",
@@ -18685,12 +18439,23 @@ const upsellingTips = [
 
 const versions = [
     {
+        version: "V5.5.010726",
+        updates: [
+            {
+                title: "Improvements",
+                items: [
+                    "Optimized option selections for Upsell/Cross-sell and Issue Resolved fields to enhance user experience and streamline the process of selecting appropriate options.",
+                ]
+            }
+        ]
+    },
+    {
         version: "V5.5.250626",
         updates: [
             {
                 title: "Upsell Enhancements",
                 items: [
-                    "Added <strong>#UpsellNotEligibleIntent</strong> option for Upsell/Cross-sell",
+                    "Added <strong>#UpsellNotEligibleIntent</strong> option for Upsell/Cross-sell.",
                     "Removed the required-field validation for <strong>Products Offered</strong>.",
                 ]
             }
