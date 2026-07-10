@@ -890,8 +890,9 @@ function createIntentBasedForm() {
         eligibleForUpsell: [
             "", 
             "Yes",
+            "No - Intent Not Eligible",
             "No - Not Eligible",
-            "No - Not Eligible Intent",
+            "No - Out of Stock"
         ],
         productsOffered: [
             "", 
@@ -919,9 +920,9 @@ function createIntentBasedForm() {
         ],
         notEligibleReason: [
             "", 
-            "Account issue remained unresolved",
+            // "Account issue remained unresolved",
             "Account has been disconnected due to calamity requesting for reconnection",
-            "Account has pending issues", 
+            // "Account has pending issues", 
             "Account is a Microbusiness ", 
             "Account was barred", 
             "Account was inhibited", 
@@ -929,22 +930,22 @@ function createIntentBasedForm() {
             "Account was restricted",
             "Account was in PD",
             "Account was in PD and requesting for reconnection",
-            "Call was escalated",
-            "Case was escalated",
+            // "Call was escalated",
+            // "Case was escalated",
             "Case was tagged as Potential crisis", 
             "Customer already availed the product", 
             "Customer already availed the service", 
             "Customer already upgraded their plan", 
-            "Customer account issue remained unresolved",
-            "Customer account issue required follow-up",
-            "Customer concern remained unresolved",
-            "Customer concern required follow-up",
+            // "Customer account issue remained unresolved",
+            // "Customer account issue required follow-up",
+            // "Customer concern remained unresolved",
+            // "Customer concern required follow-up",
             "Customer requested Service Disconnection",
             "Customer requested VTD",
             "Customer requested Holiday Disconnection",
             "Customer was distressed", 
-            "Customer was in a hurry", 
-            "Customer was irate", 
+            // "Customer was in a hurry", 
+            // "Customer was irate", 
             "Customer was requesting a supervisor", 
             "Customer was requesting a manager", 
             "Customer was requesting to downgrade", 
@@ -953,17 +954,17 @@ function createIntentBasedForm() {
             "Customer was requesting for ECA",
             "Customer was requesting for Promise to Pay",
             "Customer was requesting for Payment Due date Extension",
-            "Customer's concern remained unresolved",
-            "Customer's concern required follow-up",
-            "Customer's account issue remained unresolved",
-            "Customer's account issue required follow-up",
+            // "Customer's concern remained unresolved",
+            // "Customer's concern required follow-up",
+            // "Customer's account issue remained unresolved",
+            // "Customer's account issue required follow-up",
             "Facilty type is VDSL/VVDSL",
             // "LOB is not applicable",
             "LTE signal strength in the area was poor",
             "Plan did not qualify for upsell",
             "Plan is Prepaid Fiber",
             "Prev Agent already offered upsell and cust declined",
-            "Time was limited",
+            // "Time was limited",
             "The cust requested a reconnection but has a broken promise and has not yet paid",
         ]
     };
@@ -972,7 +973,7 @@ function createIntentBasedForm() {
         if (eligibleForUpsell.selectedIndex === 1) {
             showFields(["productsOffered", "offerAccepted"]);
             hideSpecificFields(["declineReason", "notEligibleReason"]);
-        } else if (eligibleForUpsell.selectedIndex === 2) {
+        } else if (eligibleForUpsell.selectedIndex === 3) {
             showFields(["notEligibleReason"]);
             hideSpecificFields(["declineReason", "productsOffered", "offerAccepted"]);
         } else {
@@ -2349,6 +2350,12 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks"},
             { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -2709,6 +2716,12 @@ function createIntentBasedForm() {
     
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
+
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
         updateToolLabelVisibility();
 
@@ -4213,6 +4226,12 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks"},
             { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -4636,6 +4655,12 @@ function createIntentBasedForm() {
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
+
         updateToolLabelVisibility();
 
     } else if (selectiveBrowseForms.includes(selectedValue)) { 
@@ -4752,6 +4777,12 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks"},
             { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -5117,6 +5148,12 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
 
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
+
         function testedOkReso() {
             if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
                 hideSpecificFields(["availability", "address", "landmarks"]);
@@ -5268,6 +5305,12 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks"},
             { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -5709,6 +5752,12 @@ function createIntentBasedForm() {
 
         issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
+
         updateToolLabelVisibility();
 
     } else if (streamAppsForms.includes(selectedValue)) { 
@@ -5745,6 +5794,12 @@ function createIntentBasedForm() {
             { label: "Address", type: "textarea", name: "address"},
             { label: "Landmarks", type: "textarea", name: "landmarks"},
             { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -5941,6 +5996,12 @@ function createIntentBasedForm() {
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
+
         updateToolLabelVisibility();
     } else if (alwaysOnForms.includes(selectedValue)) { 
         const table = document.createElement("table");
@@ -5985,6 +6046,12 @@ function createIntentBasedForm() {
             { label: "Landmarks", type: "textarea", name: "landmarks"},
             { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -6266,6 +6333,12 @@ function createIntentBasedForm() {
             updateToolLabelVisibility(); 
         });
 
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
+
         updateIssueResolvedOptions(selectedValue);
         updateToolLabelVisibility();
 
@@ -6355,6 +6428,12 @@ function createIntentBasedForm() {
             { label: "Address", type: "textarea", name: "address"},
             { label: "Landmarks", type: "textarea", name: "landmarks" },
             { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
         ];
 
         function createInstructionsRow() {
@@ -6671,6 +6750,12 @@ function createIntentBasedForm() {
     
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
+
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
         updateToolLabelVisibility();
 
@@ -14699,7 +14784,8 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
         const upsellMap = {
             eligibleForUpsell: {
                 "No - Not Eligible": "#UpsellNotEligible",
-                "No - Not Eligible Intent": "#UpsellNotEligibleIntent",
+                "No - Intent Not Eligible": "#UpsellIntentNotEligible",
+                "No - Out of Stock": "#UpsellOutofStock",
             },
             offerAccepted: {
                 "Yes - Accepted": "#UpsellAccepted",
@@ -15298,9 +15384,8 @@ function nontechNotesButtonHandler(showFloating = true) {
         const upsellMap = {
             eligibleForUpsell: {
                 "No - Not Eligible": "#UpsellNotEligible",
-                "No - Not Eligible Intent": "#UpsellNotEligibleIntent",
-                // "No - Disconnected Call": "",
-                // "No - Disconnected Chat": "",
+                "No - Intent Not Eligible": "#UpsellIntentNotEligible",
+                "No - Out of Stock": "#UpsellOutofStock",
             },
             offerAccepted: {
                 "Yes - Accepted": "#UpsellAccepted",
@@ -18438,6 +18523,18 @@ const upsellingTips = [
 ];
 
 const versions = [
+    {
+        version: "V5.5.100726",
+        updates: [
+            {
+                title: "Improvements",
+                items: [
+                    "Updated Upsell hashtag tagging to align with the latest <strong>Upsell Hashtag Guidelines</strong>.",
+                    "Added <strong>Upsell/Cross-sell</strong> fields in all intents to ensure accurate tagging of upsell opportunities and consistent documentation in notes output.",
+                ]
+            }
+        ]
+    },
     {
         version: "V5.5.010726",
         updates: [
