@@ -1648,10 +1648,9 @@ function createIntentBasedForm() {
                 "Manual Troubleshooting",
                 "NMS Refresh / Configuration",
                 "No Configuration / Wrong Configuration",
+                "No Dial Tone and No Internet Connection",
                 "No PON Light",
-                "Self-Restored",
-                "Network / Outage",
-                "Zone"
+                "Self-Restored"
             ]},
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
@@ -2282,9 +2281,8 @@ function createIntentBasedForm() {
                 "Defective Telset / Missing Telset",
                 "Manual Troubleshooting",
                 "No Configuration / Wrong Configuration",
+                "No Dial Tone",
                 "Self-Restored",
-                "Network / Outage",
-                "Zone",
                 "Defective Telset",
                 "Defective Modem / Missing Modem",
                 "NMS Configuration" 
@@ -2501,11 +2499,11 @@ function createIntentBasedForm() {
 
                 if (field.name === "resolution") {
                     if (["form101_1", "form101_2", "form101_3", "form101_4"].includes(selectedValue)) {
-                        optionsToUse = field.options.filter((opt, idx) => idx === 0 || (idx >= 1 && idx <= 7));
+                        optionsToUse = field.options.filter((opt, idx) => idx === 0 || (idx >= 1 && idx <= 6));
                     } else if (["form102_1", "form102_2", "form102_3", "form102_4"].includes(selectedValue)) {
-                        optionsToUse = [field.options[0], field.options[1], field.options[3], field.options[8]];
+                        optionsToUse = [field.options[0], field.options[1], field.options[2], field.options[3]];
                     } else if (["form103_1", "form103_2", "form103_3", "form103_4", "form103_5"].includes(selectedValue)) {
-                        optionsToUse = [field.options[0], field.options[2], field.options[3], field.options[4], field.options[9], field.options[10]];
+                        optionsToUse = [field.options[0], field.options[1], field.options[2], field.options[3], field.options[4], field.options[9]];
                     }
                 }
 
@@ -2859,9 +2857,7 @@ function createIntentBasedForm() {
                 "NMS Refresh / Configuration",
                 "No Configuration / Wrong Configuration",
                 "No or Blinking DSL Light",
-                "Self-Restored",
-                "Zone",
-                "Network / Outage"
+                "Self-Restored"
             ]},
             { label: "Tested Ok? (Y/N)", type: "select", name: "testedOk", options: [
                 "", 
@@ -3587,9 +3583,7 @@ function createIntentBasedForm() {
                 "Manual Troubleshooting",
                 "Mismatch Option 82 / Service ID",
                 "NMS Refresh / Configuration",
-                "Slow Browsing",
-                "Zone",
-                "Network / Outage"
+                "Slow Browsing"
             ]},
             { label: "Tested Ok? (Y/N)", type: "select", name: "testedOk", options: [
                 "", 
@@ -4184,9 +4178,7 @@ function createIntentBasedForm() {
                 "",
                 "Webpage Not Loading",
                 "Failed RX",
-                "High Latency / Ping",
-                "Network / Outage",
-                "Zone"
+                "High Latency / Ping"
             ]},
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
@@ -18523,6 +18515,18 @@ const upsellingTips = [
 ];
 
 const versions = [
+    {
+        version: "V5.5.140726",
+        updates: [
+            {
+                title: "Improvements",
+                items: [
+                    "<strong>Social Media:</strong> Updated <strong>Salesforce Case</strong> tagging for Tech-Complaint intents. Removed <strong>Zone</strong> and <strong>Network / Outage</strong>. See <a href='https://pldt365.sharepoint.com/:x:/r/sites/LIT365/files/_layouts/15/Doc.aspx?sourcedoc=%7B440B477B-908F-485F-B22F-96847CEDA76D%7D&file=PLDT_SALESFORCE_CASE_TAGGING.xlsx&action=default&mobileredirect=true' target='_blank'>PLDT Salesforce Case Tagging</a> for guidance.",
+                    "Streamlined options under <strong>Not Eligible for Upsell</strong> reasons to align with updated upsell and cross-selling guidelines.",
+                ]
+            }
+        ]
+    },
     {
         version: "V5.5.100726",
         updates: [
