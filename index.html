@@ -84,9 +84,24 @@
                                 <div class="form1DivInput">
                                     <select id="channel" name="selectChannel">
                                         <option value="" disabled selected></option>
-                                        <!-- <option value="CDT-CCBO">CDT-CCBO</option> -->
                                         <option value="CDT-HOTLINE">CDT-HOTLINE</option>
                                         <option value="CDT-SOCMED">CDT-SOCMED</option>
+                                        <option value="CNDT_CCBO">CNDT_CCBO</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="case-origin-row" style="display: none;">
+                            <td colspan="2">
+                                <label for="case-origin">Case Origin*</label>
+                                <div class="form1DivInput">
+                                    <select id="case-origin" name="caseOrigin">
+                                        <option value="" disabled selected></option>
+                                        <option value="CHATBOT">CHATBOT</option>
+                                        <option value="CHATBOT_ORDERTAKE">CHATBOT_ORDERTAKE</option>
+                                        <option value="ORDERTAKE">ORDERTAKE</option>
+                                        <option value="WEBFORM">WEBFORM</option>
+                                        <option value="WEBFORM_ORDERTAKE">WEBFORM_ORDERTAKE</option>
                                     </select>
                                 </div>
                             </td>
@@ -209,287 +224,458 @@
                                 <div class="form1DivInput">
                                     <select id="selectIntent" name="slctFrm1">
                                         <option value="" disabled selected>— Please select the correct Intent/WOCAS —</option>
-                                        <!-- Tech Intents -->
-                                        <optgroup label="No Dial Tone and No Internet Connection">
-                                            <option data-group="smt_complaint" value="form100_1">All Services Down</option>
-                                            <option data-group="smt_complaint" value="form100_2">Red LOS</option>
-                                            <option data-group="smt_complaint" value="form100_3">Defective Modem - No Power Light</option>
-                                            <option data-group="smt_complaint" value="form100_4">Defective/Damaged Modem</option>
-                                            <option data-group="smt_complaint" value="form100_5">Damaged Modem Cable/Cord</option>
-                                            <option data-group="smt_complaint" value="form100_6">Uninstalled Modem (Fiber)</option>
-                                            <option data-group="smt_complaint" value="form100_7">Old Devices Not Working on WiFi6 Modem (Fiber)</option>
+                                        <!-- ====================================================================== -->
+                                        <!--                            SOCMED & HOTLINE                            -->
+                                        <!-- ====================================================================== -->
+
+                                        <!-- SocMed & Hotline Tech Intents -->
+                                        <optgroup label="No Dial Tone and No Internet Connection" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form100_1">All Services Down</option>
+                                            <option value="form100_2">Red LOS</option>
+                                            <option value="form100_3">Defective Modem - No Power Light</option>
+                                            <option value="form100_4">Defective/Damaged Modem</option>
+                                            <option value="form100_5">Damaged Modem Cable/Cord</option>
+                                            <option value="form100_6">Uninstalled Modem (Fiber)</option>
+                                            <option value="form100_7">Old Devices Not Working on WiFi6 Modem (Fiber)</option>
                                         </optgroup>
-                                        <optgroup label="No Internet Connection">
-                                            <option data-group="smt_complaint" value="form500_1">No Internet Connection</option>
-                                            <option data-group="smt_complaint" value="form500_2">Redirected to PLDT Payment Reminder Portal</option>
-                                            <option data-group="smt_complaint" value="form500_3">Defective Mesh</option>
-                                            <option data-group="smt_complaint" value="form500_4">Damaged Mesh</option>
+                                        <optgroup label="No Internet Connection" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form500_1">No Internet Connection</option>
+                                            <option value="form500_2">Redirected to PLDT Payment Reminder Portal</option>
+                                            <option value="form500_3">Defective Mesh</option>
+                                            <option value="form500_4">Damaged Mesh</option>
                                         </optgroup>
-                                        <optgroup label="Slow Internet/Intermittent Connection">
-                                            <option data-group="smt_complaint" value="form501_1">Slow Internet Connection</option>
-                                            <option data-group="smt_complaint" value="form501_2">Low Download/Upload Speed</option>
-                                            <option data-group="smt_complaint" value="form501_3">Availed SAO</option>
-                                            <option data-group="smt_complaint" value="form501_4">Frequent Disconnection</option>
-                                            <option data-group="smt_complaint" value="form501_5">Gaming - High Latency</option>
-                                            <option data-group="smt_complaint" value="form501_6">Gaming - Lag</option>
+                                        <optgroup label="Slow Internet/Intermittent Connection" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form501_1">Slow Internet Connection</option>
+                                            <option value="form501_2">Low Download/Upload Speed</option>
+                                            <option value="form501_3">Availed SAO</option>
+                                            <option value="form501_4">Frequent Disconnection</option>
+                                            <option value="form501_5">Gaming - High Latency</option>
+                                            <option value="form501_6">Gaming - Lag</option>
                                         </optgroup>
-                                        <optgroup label="No Dial Tone">
-                                            <option data-group="smt_complaint" value="form101_1">No Dial Tone</option>
-                                            <option data-group="smt_complaint" value="form101_2">Fast Busy Tone</option>
-                                            <option data-group="smt_complaint" value="form101_3">Defective Telset - NDT</option>
-                                            <option data-group="smt_complaint" value="form101_4">Defective/Damaged Telset</option>
+                                        <optgroup label="No Dial Tone" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form101_1">No Dial Tone</option>
+                                            <option value="form101_2">Fast Busy Tone</option>
+                                            <option value="form101_3">Defective Telset - NDT</option>
+                                            <option value="form101_4">Defective/Damaged Telset</option>
                                         </optgroup>
-                                        <optgroup label="Always On">
-                                            <option data-group="smt_complaint" value="form500_5">No Internet Connection</option>
-                                            <option data-group="smt_complaint" value="form501_7">Slow Internet Connection</option>
-                                            <option data-group="smt_complaint" value="form101_5">No Dial Tone</option>
-                                            <option data-group="smt_complaint" value="form510_9">No Audio/Video Output</option>
-                                            <option data-group="smt_complaint" value="form500_6">Check back-up Wi-Fi if working (Always On)</option>
+                                        <optgroup label="Always On" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form500_5">No Internet Connection</option>
+                                            <option value="form501_7">Slow Internet Connection</option>
+                                            <option value="form101_5">No Dial Tone</option>
+                                            <option value="form510_9">No Audio/Video Output</option>
+                                            <option value="form500_6">Check back-up Wi-Fi if working (Always On)</option>
                                         </optgroup>
-                                        <optgroup label="Poor Call Quality/Noisy Telephone Line">
-                                            <option data-group="smt_complaint" value="form102_1">Noisy Line</option>
-                                            <option data-group="smt_complaint" value="form102_2">Cut Calls</option>
-                                            <option data-group="smt_complaint" value="form102_3">Poor Reception/Transmission</option>
-                                            <option data-group="smt_complaint" value="form102_4">Defective Telset - Noisy Line</option>
-                                            <option data-group="smt_complaint" value="form102_5">Defective Telset - Cut Calls</option>
-                                            <option data-group="smt_complaint" value="form102_6">Defective Telset - Poor Reception/Transmission</option>
-                                            <option data-group="smt_complaint" value="form102_7">Damaged Telset Cable/Cord</option>
+                                        <optgroup label="Poor Call Quality/Noisy Telephone Line" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form102_1">Noisy Line</option>
+                                            <option value="form102_2">Cut Calls</option>
+                                            <option value="form102_3">Poor Reception/Transmission</option>
+                                            <option value="form102_4">Defective Telset - Noisy Line</option>
+                                            <option value="form102_5">Defective Telset - Cut Calls</option>
+                                            <option value="form102_6">Defective Telset - Poor Reception/Transmission</option>
+                                            <option value="form102_7">Damaged Telset Cable/Cord</option>
                                         </optgroup>
-                                        <optgroup label="Cannot Make a Call">
-                                            <option data-group="smt_complaint" value="form103_1">Cannot Make a Call</option>
-                                            <option data-group="smt_complaint" value="form103_2">No Outgoing Call</option>
-                                            <option data-group="smt_complaint" value="form103_3">Defective Telset - Number Keys</option>
+                                        <optgroup label="Cannot Make a Call" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form103_1">Cannot Make a Call</option>
+                                            <option value="form103_2">No Outgoing Call</option>
+                                            <option value="form103_3">Defective Telset - Number Keys</option>
                                         </optgroup>
-                                        <optgroup label="Cannot Receive a Call">
-                                            <option data-group="smt_complaint" value="form103_4">Cannot Receive Calls</option>
-                                            <option data-group="smt_complaint" value="form103_5">No Incoming Call</option>
+                                        <optgroup label="Cannot Receive a Call" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form103_4">Cannot Receive Calls</option>
+                                            <option value="form103_5">No Incoming Call</option>
                                         </optgroup>
-                                        <optgroup label="Selective Browsing Complaints">
-                                            <option data-group="smt_complaint" value="form502_1">Selective Browsing</option>
-                                            <option data-group="smt_complaint" value="form502_2">Cannot Load Specific Website</option>
+                                        <optgroup label="Selective Browsing Complaints" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form502_1">Selective Browsing</option>
+                                            <option value="form502_2">Cannot Load Specific Website</option>
                                         </optgroup>
-                                        <optgroup label="No Audio/Video Output">
-                                            <option data-group="smt_complaint" value="form510_1">No Audio/Video Output</option>
-                                            <option data-group="smt_complaint" value="form510_2">Cignal TV is Down/No Connection</option>
-                                            <option data-group="smt_complaint" value="form510_3">Defective Set-Top-Box</option>
-                                            <option data-group="smt_complaint" value="form510_4">Damaged Set-Top-Box</option>
-                                            <option data-group="smt_complaint" value="form510_5">Cannot Read Smart Card</option>
-                                            <option data-group="smt_complaint" value="form510_6">Defective HDMI/RCA</option>
-                                            <option data-group="smt_complaint" value="form510_7">No Channel</option>
-                                            <option data-group="smt_complaint" value="form510_8">Channel 001 Only</option>
+                                        <optgroup label="No Audio/Video Output" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form510_1">No Audio/Video Output</option>
+                                            <option value="form510_2">Cignal TV is Down/No Connection</option>
+                                            <option value="form510_3">Defective Set-Top-Box</option>
+                                            <option value="form510_4">Damaged Set-Top-Box</option>
+                                            <option value="form510_5">Cannot Read Smart Card</option>
+                                            <option value="form510_6">Defective HDMI/RCA</option>
+                                            <option value="form510_7">No Channel</option>
+                                            <option value="form510_8">Channel 001 Only</option>
                                         </optgroup>
-                                        <optgroup label="Poor Audio/Video Quality">
-                                            <option data-group="smt_complaint" value="form511_1">Poor Audio/Video Quality</option>
-                                            <option data-group="smt_complaint" value="form511_2">Picture Freezing</option>
-                                            <option data-group="smt_complaint" value="form511_3">Pixelated Video</option>
-                                            <option data-group="smt_complaint" value="form511_4">Out-of-Sync</option>
-                                            <option data-group="smt_complaint" value="form511_5">Loop Back Video</option>
+                                        <optgroup label="Poor Audio/Video Quality" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form511_1">Poor Audio/Video Quality</option>
+                                            <option value="form511_2">Picture Freezing</option>
+                                            <option value="form511_3">Pixelated Video</option>
+                                            <option value="form511_4">Out-of-Sync</option>
+                                            <option value="form511_5">Loop Back Video</option>
                                         </optgroup>
-                                        <optgroup label="Missing Set-Top-Box Functions">
-                                            <option data-group="smt_complaint" value="form512_1">Missing Channels</option>
-                                            <option data-group="smt_complaint" value="form512_2">Cannot Record Video</option>
-                                            <option data-group="smt_complaint" value="form512_3">Defective Remote Control</option>
+                                        <optgroup label="Missing Set-Top-Box Functions" data-group="socmed_hotline_tech_complaint">
+                                            <option value="form512_1">Missing Channels</option>
+                                            <option value="form512_2">Cannot Record Video</option>
+                                            <option value="form512_3">Defective Remote Control</option>
                                         </optgroup>
-                                        <optgroup label="Streaming Apps Issues">
-                                            <option data-group="smt_complaint" value="formStrmApps_1">Eufy is Not Working</option>
-                                            <option data-group="smt_complaint" value="formStrmApps_2">Stream TV is Not Working</option>
-                                            <option data-group="smt_complaint" value="formStrmApps_3">NETFLIX Problem</option>
-                                            <option data-group="smt_complaint" value="formStrmApps_4">VIU Problem</option>
-                                            <option data-group="smt_complaint" value="formStrmApps_5">HBO Max Problem</option>
+                                        <optgroup label="Streaming Apps Issues" data-group="socmed_hotline_tech_complaint">
+                                            <option value="formStrmApps_1">Eufy is Not Working</option>
+                                            <option value="formStrmApps_2">Stream TV is Not Working</option>
+                                            <option value="formStrmApps_3">NETFLIX Problem</option>
+                                            <option value="formStrmApps_4">VIU Problem</option>
+                                            <option value="formStrmApps_5">HBO Max Problem</option>
+                                        </optgroup>
+                                        <!-- SocMed & Hotline Tech Request Intent -->
+                                         <optgroup label="Change Configuration - Data" data-group="socmed_hotline_tech_request">
+                                            <option value="form300_1">Change of WiFi Name/Password</option>
+                                            <option value="form300_2">Request for Local User GUI Access</option>
+                                            <option value="form300_3">Request for Super Admin GUI Access</option>
+                                            <option value="form300_4">Change modem set-up from Route to Bridge Mode</option>
+                                            <option value="form300_5">Change modem set-up from Bridge to Route Mode</option>
+                                            <option value="form300_6">LAN Port Activation</option>
+                                            <option value="form300_7">Request for Public IP</option>
+                                            <option value="form300_8">Request for Private IP</option>
                                         </optgroup>
 
-                                        <!-- Tech Follow-Up Intent -->
-                                        <option value="formFfupRepair">Repair/Network Outage</option>
+                                        <!-- SocMed & Hotline Tech Follow-Up Intent -->
+                                        <option value="formFfupRepair" data-group="socmed_hotline_tech_follow-up">Repair/Network Outage</option>
 
-                                        <!--- Non-Tech Inquiry ---->
-                                        <optgroup label="Account">
-                                            <option data-group="inquiry" value="formInqAccSrvcStatus">Account/Service Status</option>
-                                            <option data-group="inquiry" value="formInqLockIn">Contract / Lock In</option>
-                                            <option data-group="inquiry" value="formInqCopyOfBill">Copy of Bill</option>
-                                            <option data-group="inquiry" value="formInqMyHomeAcc">My Home Account</option>
-                                            <option data-group="inquiry" value="formInqPlanDetails">Plan Details</option>
+                                        <!--- SocMed & Hotline Non-Tech Inquiry ---->
+                                        <optgroup label="Account" data-group="socmed_hotline_nontech_inquiry">
+                                            <option value="formInqAccSrvcStatus">Account/Service Status</option>
+                                            <option value="formInqLockIn">Contract / Lock In</option>
+                                            <option value="formInqCopyOfBill">Copy of Bill</option>
+                                            <option value="formInqMyHomeAcc">My Home Account</option>
+                                            <option value="formInqPlanDetails">Plan Details</option>
                                         </optgroup>
-                                        <optgroup label="Billing">
-                                            <option data-group="inquiry" value="formInqAda">Auto Debit Arrangement (ADA)</option>
-                                            <option data-group="inquiry" value="formInqRebCredAdj">Approved rebate / Credit Adjustment</option>
-                                            <option data-group="inquiry" value="formInqBalTransfer">Balance transfer</option>
-                                            <option data-group="inquiry" value="formInqBillInterpret">Bill Interpretation</option>
-                                            <option data-group="inquiry" value="formInqBrokenPromise">Broken Promise (Recon/DDE)</option>
-                                            <option data-group="inquiry" value="formInqCreditAdj">Credit Adjustment</option>
-                                            <option data-group="inquiry" value="formInqCredLimit">Credit Limit/Volume Base</option>
-                                            <option data-group="inquiry" value="formInqNSR">Dispute on Non Service</option>
-                                            <option data-group="inquiry" value="formInqDdate">Due date</option>
-                                            <option data-group="inquiry" value="formInqBillDdateExt">Due date extension</option>
-                                            <option data-group="inquiry" value="formInqEcaPip">ECA / Payment Installment Plan</option>
-                                            <option data-group="inquiry" value="formInqNewBill">New Bill</option>
-                                            <option data-group="inquiry" value="formInqOneTimeCharges">One Time Charges (PTF, Service Recon Fee)</option>
-                                            <option data-group="inquiry" value="formInqOutsBal">Outstanding Balance</option>
-                                            <option data-group="inquiry" value="formInqOverpay">Overpayment</option>
-                                            <option data-group="inquiry" value="formInqPayChannel">Payment Channel</option>
-                                            <option data-group="inquiry" value="formInqPayPosting">Payment Posting / Details</option>
-                                            <option data-group="inquiry" value="formInqPayRefund">Payment Refund</option>
-                                            <option data-group="inquiry" value="formInqPayUnreflected">Payment Unreflected</option>
-                                            <option data-group="inquiry" value="formInqDdateMod">Permanent Due Date Modification</option>
-                                            <option data-group="inquiry" value="formInqBillRefund">Refund</option>
-                                            <option data-group="inquiry" value="formInqSmsEmailBill">SMS/Email Bill clarification/Bill delivery</option>
-                                            <option data-group="inquiry" value="formInqTollUsage">Usage / Tolls (NDD,IDD,TOP-UP)</option>
+                                        <optgroup label="Billing" data-group="socmed_hotline_nontech_inquiry">
+                                            <option value="formInqAda">Auto Debit Arrangement (ADA)</option>
+                                            <option value="formInqRebCredAdj">Approved rebate / Credit Adjustment</option>
+                                            <option value="formInqBalTransfer">Balance transfer</option>
+                                            <option value="formInqBillInterpret">Bill Interpretation</option>
+                                            <option value="formInqBrokenPromise">Broken Promise (Recon/DDE)</option>
+                                            <option value="formInqCreditAdj">Credit Adjustment</option>
+                                            <option value="formInqCredLimit">Credit Limit/Volume Base</option>
+                                            <option value="formInqNSR">Dispute on Non Service</option>
+                                            <option value="formInqDdate">Due date</option>
+                                            <option value="formInqBillDdateExt">Due date extension</option>
+                                            <option value="formInqEcaPip">ECA / Payment Installment Plan</option>
+                                            <option value="formInqNewBill">New Bill</option>
+                                            <option value="formInqOneTimeCharges">One Time Charges (PTF, Service Recon Fee)</option>
+                                            <option value="formInqOutsBal">Outstanding Balance</option>
+                                            <option value="formInqOverpay">Overpayment</option>
+                                            <option value="formInqPayChannel">Payment Channel</option>
+                                            <option value="formInqPayPosting">Payment Posting / Details</option>
+                                            <option value="formInqPayRefund">Payment Refund</option>
+                                            <option value="formInqPayUnreflected">Payment Unreflected</option>
+                                            <option value="formInqDdateMod">Permanent Due Date Modification</option>
+                                            <option value="formInqBillRefund">Refund</option>
+                                            <option value="formInqSmsEmailBill">SMS/Email Bill clarification/Bill delivery</option>
+                                            <option value="formInqTollUsage">Usage / Tolls (NDD,IDD,TOP-UP)</option>
                                         </optgroup>
-                                        <optgroup label="Change Ownership">
-                                            <option data-group="inquiry" value="formInqCoRetain">Supersedure retain Account number</option>
-                                            <option data-group="inquiry" value="formInqCoChange">Supersedure with change account number</option>
+                                        <optgroup label="Change Ownership" data-group="socmed_hotline_nontech_inquiry">
+                                            <option value="formInqCoRetain">Supersedure retain Account number</option>
+                                            <option value="formInqCoChange">Supersedure with change account number</option>
                                         </optgroup>
-                                        <optgroup label="Disconnection">
-                                            <option data-group="inquiry" value="formInqPermaDisc">Permanent Disconnection</option>
-                                            <option data-group="inquiry" value="formInqTempDisc">Temporary Disconnection (VTD/HTD)</option>
+                                        <optgroup label="Disconnection" data-group="socmed_hotline_nontech_inquiry">
+                                            <option value="formInqPermaDisc">Permanent Disconnection</option>
+                                            <option value="formInqTempDisc">Temporary Disconnection (VTD/HTD)</option>
                                         </optgroup>
-                                        <optgroup label="Downgrade">
-                                            <option data-group="inquiry" value="formInqD1299">Plan 1299</option>
-                                            <option data-group="inquiry" value="formInqD1399">Plan 1399</option>
-                                            <option data-group="inquiry" value="formInqD1799">Plan 1799</option>
-                                            <option data-group="inquiry" value="formInqDOthers">Others</option>
+                                        <optgroup label="Downgrade" data-group="socmed_hotline_nontech_inquiry">
+                                            <option value="formInqD1299">Plan 1299</option>
+                                            <option value="formInqD1399">Plan 1399</option>
+                                            <option value="formInqD1499">Plan 1499</option>
+                                            <option value="formInqD1799">Plan 1799</option>
+                                            <option value="formInqD1899">Plan 1899</option>
+                                            <option value="formInqD2599">Plan 2599</option>
+                                            <option value="formInqDOthers">Others</option>
                                         </optgroup>
-                                        <option data-group="inquiry" value="formInqDdateExt">Permanent/Temporary Due Date Extension</option>
-                                        <option data-group="inquiry" value="formInqEntertainment">Entertainment (Lions Gate/HBO Go/Viu/Others)</option>
-                                        <option data-group="inquiry" value="formInqInmove">Inmove</option>
-                                        <option data-group="inquiry" value="formInqMigration">Migration</option>
-                                        <option data-group="inquiry" value="formInqProdAndPromo">Product & Promos</option>
-                                        <optgroup label="Referral Program">
-                                            <option data-group="inquiry" value="formInqHomeRefNC">HOME Referral New Connect</option>
-                                            <option data-group="inquiry" value="formInqHomeDisCredit">Inquiry on HOME discount crediting </option>
+                                        <option value="formInqDdateExt" data-group="socmed_hotline_nontech_inquiry">Permanent/Temporary Due Date Extension</option>
+                                        <option value="formInqEntertainment" data-group="socmed_hotline_nontech_inquiry">Entertainment (Lions Gate/HBO Go/Viu/Others)</option>
+                                        <option value="formInqInmove" data-group="socmed_hotline_nontech_inquiry">Inmove</option>
+                                        <option value="formInqMigration" data-group="socmed_hotline_nontech_inquiry">Migration</option>
+                                        <option value="formInqProdAndPromo" data-group="socmed_hotline_nontech_inquiry">Product & Promos</option>
+                                        <optgroup label="Referral Program" data-group="socmed_hotline_nontech_inquiry">
+                                            <option value="formInqHomeRefNC">HOME Referral New Connect</option>
+                                            <option value="formInqHomeDisCredit">Inquiry on HOME discount crediting </option>
                                         </optgroup>
-                                        <option data-group="inquiry" value="formInqRefund">Refund</option>
-                                        <option data-group="inquiry" value="formInqReloc">Relocation</option>
-                                        <option data-group="inquiry" value="formInqRewards">Rewards Program</option>
-                                        <optgroup label="Special Features">
-                                            <option data-group="inquiry" value="formInqDirectDial">NDD/IDD/DDD (Security Lock)</option>
-                                            <option data-group="inquiry" value="formInqBundle">SUPER BUNLDE / CALLER ID BUNDLE</option>
-                                            <option data-group="inquiry" value="formInqSfOthers">Others</option>
+                                        <option value="formInqRefund" data-group="socmed_hotline_nontech_inquiry">Refund</option>
+                                        <option value="formInqReloc" data-group="socmed_hotline_nontech_inquiry">Relocation</option>
+                                        <option value="formInqRewards" data-group="socmed_hotline_nontech_inquiry">Rewards Program</option>
+                                        <optgroup label="Special Features" data-group="socmed_hotline_nontech_inquiry">
+                                            <option value="formInqDirectDial">NDD/IDD/DDD (Security Lock)</option>
+                                            <option value="formInqBundle">SUPER BUNLDE / CALLER ID BUNDLE</option>
+                                            <option value="formInqSfOthers">Others</option>
                                         </optgroup>
-                                        <option data-group="inquiry" value="formInqSAO500">Speed Add On 500</option>
-                                        <optgroup label="UNLI FAM CALL">
-                                            <option data-group="inquiry" value="formInqUfcEnroll">UFC Enrollment</option>
-                                            <option data-group="inquiry" value="formInqUfcPromoMech">UFC Promo Mechanics</option>
+                                        <option value="formInqSAO500" data-group="socmed_hotline_nontech_inquiry">Speed Add On 500</option>
+                                        <optgroup label="UNLI FAM CALL" data-group="socmed_hotline_nontech_inquiry">
+                                            <option value="formInqUfcEnroll">UFC Enrollment</option>
+                                            <option value="formInqUfcPromoMech">UFC Promo Mechanics</option>
                                         </optgroup>
-                                        <optgroup label="Upgrade">
-                                            <option data-group="inquiry" value="formInqUpg1399">Plan 1399</option>
-                                            <option data-group="inquiry" value="formInqUpg1599">Plan 1599</option>
-                                            <option data-group="inquiry" value="formInqUpg1799">Plan 1799</option>
-                                            <option data-group="inquiry" value="formInqUpg2099">Plan 2099</option>
-                                            <option data-group="inquiry" value="formInqUpg2499">Plan 2499</option>
-                                            <option data-group="inquiry" value="formInqUpg2699">Plan 2699</option>
-                                            <option data-group="inquiry" value="formInqUpgOthers">Others</option>
+                                        <optgroup label="Upgrade" data-group="socmed_hotline_nontech_inquiry">
+                                            <option value="formInqUpg1399">Plan 1399</option>
+                                            <option value="formInqUpg1499">Plan 1499</option>
+                                            <option value="formInqUpg1599">Plan 1599</option>
+                                            <option value="formInqUpg1799">Plan 1799</option>
+                                            <option value="formInqUpg1899">Plan 1899</option>
+                                            <option value="formInqUpg2099">Plan 2099</option>
+                                            <option value="formInqUpg2499">Plan 2499</option>
+                                            <option value="formInqUpg2599">Plan 2599</option>
+                                            <option value="formInqUpg2699">Plan 2699</option>
+                                            <option value="formInqUpgOthers">Others</option>
                                         </optgroup>
-                                        <optgroup label="VAS">
-                                            <option data-group="inquiry" value="formInqVasAO">Always On</option>
-                                            <option data-group="inquiry" value="formInqVasIptv">Cignal/IPTV</option>
-                                            <option data-group="inquiry" value="formInqVasMOW">MyOwnWifi</option>
-                                            <option data-group="inquiry" value="formInqVasSAO">Speed Add On</option>
-                                            <option data-group="inquiry" value="formInqVasWMesh">Wifi Mesh</option>
-                                            <option data-group="inquiry" value="formInqVasOthers">Others</option>
+                                        <optgroup label="VAS" data-group="socmed_hotline_nontech_inquiry">
+                                            <option value="formInqVasAO">Always On</option>
+                                            <option value="formInqVasIptv">Cignal/IPTV</option>
+                                            <option value="formInqVasMOW">MyOwnWifi</option>
+                                            <option value="formInqVasSAO">Speed Add On</option>
+                                            <option value="formInqVasWMesh">Wifi Mesh</option>
+                                            <option value="formInqVasOthers">Others</option>
                                         </optgroup>
-                                        <option data-group="inquiry" value="formInqWireReRoute">Wire Re-Route</option>
+                                        <option value="formInqWireReRoute" data-group="socmed_hotline_nontech_inquiry">Wire Re-Route</option>
 
-                                        <!--- Non-Tech Complaint ---->
-                                        <option data-group="complaint" value="formCompMyHomeWeb">Cannot Open MyHome Website</option>
-                                        <option data-group="complaint" value="formCompMisappliedPayment">Misapplied Payment</option>
-                                        <option data-group="complaint" value="formCompPersonnelIssue">Personnel Issue</option>
-                                        <option data-group="complaint" value="formCompUnreflectedPayment">Unreflected Payment</option>
+                                        <!--- SocMed & Hotline Non-Tech Complaint ---->
+                                        <option value="formCompMyHomeWeb" data-group="socmed_hotline_nontech_complaint">Cannot Open MyHome Website</option>
+                                        <option value="formCompMisappliedPayment" data-group="socmed_hotline_nontech_complaint">Misapplied Payment</option>
+                                        <option value="formCompPersonnelIssue" data-group="socmed_hotline_nontech_complaint">Personnel Issue</option>
+                                        <option value="formCompUnreflectedPayment" data-group="socmed_hotline_nontech_complaint">Unreflected Payment</option>
 
-                                        <!--- Non-Tech Follow-Up ---->
-                                        <option data-group="follow-up" value="formFfupChangeOwnership">Change Ownership</option>
-                                        <option data-group="follow-up" value="formFfupChangeTelNum">Change Telephone Number</option>
-                                        <option data-group="follow-up" value="formFfupChangeTelUnit">Change Telephone Unit</option>
-                                        <option data-group="follow-up" value="formFfupDiscoVas">Disconnection (VAS)</option>
-                                        <option data-group="follow-up" value="formFfupDispute">Dispute</option>
-                                        <option data-group="follow-up" value="formFfupDowngrade">Downgrade</option>
-                                        <option data-group="follow-up" value="formFfupDDE">Due Date Extension</option>
-                                        <option data-group="follow-up" value="formFfupInmove">Inmove</option>
-                                        <option data-group="follow-up" value="formFfupMigration">Migration</option>
-                                        <option data-group="follow-up" value="formFfupMisappPay">Misapplied Payment</option>
-                                        <option data-group="follow-up" value="formFfupNewApp">New Application</option>
-                                        <option data-group="follow-up" value="formFfupOcular">Ocular Inspection</option>
-                                        <option data-group="follow-up" value="formFfupOverpay">Overpayment</option>
-                                        <option data-group="follow-up" value="formFfupPermaDisco">Permanent Disconnection</option>
-                                        <optgroup label="Reconnection">
-                                            <option data-group="follow-up" value="formFfupRenew">Reconnection - RENEW</option>
-                                            <option data-group="follow-up" value="formFfupResume">Reconnection - RESUME</option>
-                                            <option data-group="follow-up" value="formFfupUnbar">Reconnection - UNBAR</option>
+                                        <!--- SocMed & Hotline Non-Tech Follow-Up ---->
+                                        <option value="formFfupChangeOwnership" data-group="socmed_hotline_nontech_follow-up">Change Ownership</option>
+                                        <option value="formFfupChangeTelNum" data-group="socmed_hotline_nontech_follow-up">Change Telephone Number</option>
+                                        <option value="formFfupChangeTelUnit" data-group="socmed_hotline_nontech_follow-up">Change Telephone Unit</option>
+                                        <option value="formFfupDiscoVas" data-group="socmed_hotline_nontech_follow-up">Disconnection (VAS)</option>
+                                        <option value="formFfupDispute" data-group="socmed_hotline_nontech_follow-up">Dispute</option>
+                                        <option value="formFfupDowngrade" data-group="socmed_hotline_nontech_follow-up">Downgrade</option>
+                                        <option value="formFfupDDE" data-group="socmed_hotline_nontech_follow-up">Due Date Extension</option>
+                                        <option value="formFfupInmove" data-group="socmed_hotline_nontech_follow-up">Inmove</option>
+                                        <option value="formFfupMigration" data-group="socmed_hotline_nontech_follow-up">Migration</option>
+                                        <option value="formFfupMisappPay" data-group="socmed_hotline_nontech_follow-up">Misapplied Payment</option>
+                                        <option value="formFfupNewApp" data-group="socmed_hotline_nontech_follow-up">New Application</option>
+                                        <option value="formFfupOcular" data-group="socmed_hotline_nontech_follow-up">Ocular Inspection</option>
+                                        <option value="formFfupOverpay" data-group="socmed_hotline_nontech_follow-up">Overpayment</option>
+                                        <option value="formFfupPermaDisco" data-group="socmed_hotline_nontech_follow-up">Permanent Disconnection</option>
+                                        <optgroup label="Reconnection" data-group="socmed_hotline_nontech_follow-up">
+                                            <option value="formFfupRenew">Reconnection - RENEW</option>
+                                            <option value="formFfupResume">Reconnection - RESUME</option>
+                                            <option value="formFfupUnbar">Reconnection - UNBAR</option>
                                         </optgroup>
-                                        <optgroup label="Refund">
-                                            <option data-group="follow-up" value="formFfupCustDependency">Customer Dependency</option>
-                                            <option data-group="follow-up" value="formFfupAMSF">Proactive AMSF (New Connect)</option>
-                                            <option data-group="follow-up" value="formFfupFinalAcc">Reactive Final Account</option>
-                                            <option data-group="follow-up" value="formFfupOverpayment">Reactive Overpayment</option>
-                                            <option data-group="follow-up" value="formFfupWrongBiller">Reactive Wrong Biller</option>
+                                        <optgroup label="Refund" data-group="socmed_hotline_nontech_follow-up">
+                                            <option value="formFfupCustDependency">Customer Dependency</option>
+                                            <option value="formFfupAMSF">Proactive AMSF (New Connect)</option>
+                                            <option value="formFfupFinalAcc">Reactive Final Account</option>
+                                            <option value="formFfupOverpayment">Reactive Overpayment</option>
+                                            <option value="formFfupWrongBiller">Reactive Wrong Biller</option>
                                         </optgroup>
-                                        <option data-group="follow-up" value="formFfupReloc">Relocation</option>
-                                        <option data-group="follow-up" value="formFfupRelocCid">Relocation - CID Creation</option>
-                                        <option data-group="follow-up" value="formFfupSpecialFeat">Special Features</option>
-                                        <option data-group="follow-up" value="formFfupSAO">Speed Add On 500</option>
-                                        <option data-group="follow-up" value="formFfupTempDisco">Temporary Disconnection (VTD/HTD)</option>
-                                        <option data-group="follow-up" value="formFfupUP">Unreflected Payment</option>
-                                        <option data-group="follow-up" value="formFfupUpgrade">Upgrade</option>
-                                        <optgroup label="VAS">
-                                            <option data-group="follow-up" value="formFfupVasAct">VAS Activation</option>
-                                            <option data-group="follow-up" value="formFfupVasDel">VAS Delivery</option>
+                                        <option value="formFfupReloc" data-group="socmed_hotline_nontech_follow-up">Relocation</option>
+                                        <option value="formFfupRelocCid" data-group="socmed_hotline_nontech_follow-up">Relocation - CID Creation</option>
+                                        <option value="formFfupSpecialFeat" data-group="socmed_hotline_nontech_follow-up">Special Features</option>
+                                        <option value="formFfupSAO" data-group="socmed_hotline_nontech_follow-up">Speed Add On 500</option>
+                                        <option value="formFfupTempDisco" data-group="socmed_hotline_nontech_follow-up">Temporary Disconnection (VTD/HTD)</option>
+                                        <option value="formFfupUP" data-group="socmed_hotline_nontech_follow-up">Unreflected Payment</option>
+                                        <option value="formFfupUpgrade" data-group="socmed_hotline_nontech_follow-up">Upgrade</option>
+                                        <optgroup label="VAS" data-group="socmed_hotline_nontech_follow-up">
+                                            <option value="formFfupVasAct">VAS Activation</option>
+                                            <option value="formFfupVasDel">VAS Delivery</option>
                                         </optgroup>
-                                        <option data-group="follow-up" value="formFfupReroute">Wire Re-Route</option>
-                                        <option data-group="follow-up" value="formFfupWT">Withholding Tax Adjustment</option>
+                                        <option value="formFfupReroute" data-group="socmed_hotline_nontech_follow-up">Wire Re-Route</option>
+                                        <option value="formFfupWT" data-group="socmed_hotline_nontech_follow-up">Withholding Tax Adjustment</option>
 
-                                        <!--- Non-Tech Request --->
-                                        <option data-group="request" value="formReqAccMgt">Account Management</option>
-                                        <option data-group="request" value="formReqAddressMod">Address Modification (Record)</option>
-                                        <optgroup label="Change Configuration - Data">
-                                            <option data-group="request" value="form300_1">Change of WiFi Name/Password</option>
-                                            <option data-group="request" value="form300_2">Request for Local User GUI Access</option>
-                                            <option data-group="request" value="form300_3">Request for Super Admin GUI Access</option>
-                                            <option data-group="request" value="form300_4">Change modem set-up from Route to Bridge Mode</option>
-                                            <option data-group="request" value="form300_5">Change modem set-up from Bridge to Route Mode</option>
-                                            <option data-group="request" value="form300_6">LAN Port Activation</option>
-                                            <option data-group="request" value="form300_7">Request for Public IP</option>
-                                            <option data-group="request" value="form300_8">Request for Private IP</option>
+                                        <!--- SocMed & Hotline Non-Tech Request --->
+                                        <option value="formReqAccMgt" data-group="socmed_hotline_nontech_request">Account Management</option>
+                                        <option value="formReqAddressMod" data-group="socmed_hotline_nontech_request">Address Modification (Record)</option>
+                                        <optgroup label="Change Ownership" data-group="socmed_hotline_nontech_request">
+                                            <option value="formReqSupRetAccNum">Supersedure retain Account number</option>
+                                            <option value="formReqSupChangeAccNum">Supersedure with change account number</option>
                                         </optgroup>
-                                        <optgroup label="Change Ownership">
-                                            <option data-group="request" value="formReqSupRetAccNum">Supersedure retain Account number</option>
-                                            <option data-group="request" value="formReqSupChangeAccNum">Supersedure with change account number</option>
-                                        </optgroup>
-                                        <option data-group="request" value="formReqChgTelUnit">Change Telephone Unit</option>
-                                        <option data-group="request" value="formReqDisconnection">Disconnection</option>
-                                        <option data-group="request" value="formReqDispute">Dispute</option>
-                                        <option data-group="request" value="formReqDowngrade">Downgrade</option>
-                                        <option data-group="request" value="formReqDDE">Due Date Extension</option>
-                                        <option data-group="request" value="formReqInmove">Inmove</option>
-                                        <option data-group="request" value="formReqMigration">Migration</option>
-                                        <option data-group="request" value="formReqMisappPay">Misapplied Payment</option>
-                                        <option data-group="request" value="formReqOcular">Ocular Inspection/AMEND SAM</option>
-                                        <option data-group="request" value="formReqProofOfSub">Proof of PLDT Subscription</option>
-                                        <option data-group="request" value="formReqReconnect">Reconnection</option>
-                                        <option data-group="request" value="formReqRefund">Refund</option>
-                                        <option data-group="request" value="formReqRelocation">Relocation</option>
-                                        <option data-group="request" value="formReqSpecFeat">Special Features</option>
-                                        <option data-group="request" value="formReqSpeedAddOn">Speed Add On 500</option>
-                                        <option data-group="request" value="formReqUfc">Unli Fam Call</option>
-                                        <option data-group="request" value="formReqReflectPay">Unreflected Payment</option>
-                                        <option data-group="request" value="formReqUpgrade">Upgrade</option>
-                                        <option data-group="request" value="formReqVAS">VAS</option>
-                                        <option data-group="request" value="formReqTaxAdj">Withholding Tax Adjustment</option>
-                                        <option data-group="request" value="formReqWireReroute">Wire Re-Route</option>
+                                        <option value="formReqChgTelUnit" data-group="socmed_hotline_nontech_request">Change Telephone Unit</option>
+                                        <option value="formReqDisconnection" data-group="socmed_hotline_nontech_request">Disconnection</option>
+                                        <option value="formReqDispute" data-group="socmed_hotline_nontech_request">Dispute</option>
+                                        <option value="formReqDowngrade" data-group="socmed_hotline_nontech_request">Downgrade</option>
+                                        <option value="formReqDDE" data-group="socmed_hotline_nontech_request">Due Date Extension</option>
+                                        <option value="formReqInmove" data-group="socmed_hotline_nontech_request">Inmove</option>
+                                        <option value="formReqMigration" data-group="socmed_hotline_nontech_request">Migration</option>
+                                        <option value="formReqMisappPay" data-group="socmed_hotline_nontech_request">Misapplied Payment</option>
+                                        <option value="formReqOcular" data-group="socmed_hotline_nontech_request">Ocular Inspection/AMEND SAM</option>
+                                        <option value="formReqProofOfSub" data-group="socmed_hotline_nontech_request">Proof of PLDT Subscription</option>
+                                        <option value="formReqReconnect" data-group="socmed_hotline_nontech_request">Reconnection</option>
+                                        <option value="formReqRefund" data-group="socmed_hotline_nontech_request">Refund</option>
+                                        <option value="formReqRelocation" data-group="socmed_hotline_nontech_request">Relocation</option>
+                                        <option value="formReqSpecFeat" data-group="socmed_hotline_nontech_request">Special Features</option>
+                                        <option value="formReqSpeedAddOn" data-group="socmed_hotline_nontech_request">Speed Add On 500</option>
+                                        <option value="formReqUfc" data-group="socmed_hotline_nontech_request">Unli Fam Call</option>
+                                        <option value="formReqReflectPay" data-group="socmed_hotline_nontech_request">Unreflected Payment</option>
+                                        <option value="formReqUpgrade" data-group="socmed_hotline_nontech_request">Upgrade</option>
+                                        <option value="formReqVAS" data-group="socmed_hotline_nontech_request">VAS</option>
+                                        <option value="formReqTaxAdj" data-group="socmed_hotline_nontech_request">Withholding Tax Adjustment</option>
+                                        <option value="formReqWireReroute" data-group="socmed_hotline_nontech_request">Wire Re-Route</option>
 
-                                        <!--- Others ---->
-                                        <option data-group="others" value="othersWebForm">Webform</option>
-                                        <option data-group="others" value="others164">Bantay Kable (164)</option>
-                                        <option data-group="others" value="othersEntAcc">Enterprise Account</option>
-                                        <option data-group="others" value="othersHomeBro">Home Bro</option>
-                                        <option data-group="others" value="othersSmart">SMART</option>
-                                        <option data-group="others" value="othersSME177">SME-177 Concern</option>
-                                        <option data-group="others" value="othersToolsDown">Tools Downtime</option>
-                                        <optgroup label="Transfer">
-                                            <option data-group="others" value="othersAO">PHW / Always On</option>
-                                            <option data-group="others" value="othersRepair">Repair</option>
-                                            <option data-group="others" value="othersBillAndAcc">Billing and Accts</option>
+                                        <!--- SocMed & Hotline Others ---->
+                                        <option value="othersWebForm" data-group="socmed_hotline_others" >Webform</option>
+                                        <option value="others164" data-group="socmed_hotline_others">Bantay Kable (164)</option>
+                                        <option value="othersEntAcc" data-group="socmed_hotline_others">Enterprise Account</option>
+                                        <option value="othersHomeBro" data-group="socmed_hotline_others">Home Bro</option>
+                                        <option value="othersSmart" data-group="socmed_hotline_others">SMART</option>
+                                        <option value="othersSME177" data-group="socmed_hotline_others">SME-177 Concern</option>
+                                        <option value="othersToolsDown" data-group="socmed_hotline_others">Tools Downtime</option>
+                                        <optgroup label="Transfer" data-group="socmed_hotline_others">
+                                            <option value="othersAO">PHW / Always On</option>
+                                            <option value="othersRepair">Repair</option>
+                                            <option value="othersBillAndAcc">Billing and Accts</option>
                                         </optgroup>
-                                        <optgroup label="Unsuccessful Transaction">
-                                            <option data-group="others" value="othersUT">Failed Authentication / Prank Call / Short Call</option>
+                                        <optgroup label="Unsuccessful Transaction" data-group="socmed_hotline_others">
+                                            <option value="othersUT">Failed Authentication / Prank Call / Short Call</option>
+                                        </optgroup>
+
+
+                                        <!-- ====================================================================== -->
+                                        <!--                                  CCBO                                  -->
+                                        <!-- ====================================================================== -->
+
+                                        <!--- CCBO Non-Tech Request --->
+                                        <option value="ccbo_formReqBillAdjust" data-group="ccbo_nontech_request">Billing Adjustment</option>
+                                        <optgroup label="Change Ownership" data-group="ccbo_nontech_request">
+                                            <option value="ccbo_formReqSupRetAccNum">Supersedure retain Account number</option>
+                                            <option value="ccbo_formReqSupChangeAccNum">Supersedure with change account number</option>
+                                        </optgroup>
+                                        <option value="ccbo_formReqChangeTelNum" data-group="ccbo_nontech_request">Change Telephone Number</option>
+                                        <option value="ccbo_formReqCignalIPTV" data-group="ccbo_nontech_request">Cignal/IPTV</option>
+                                        <option value="ccbo_formReqTempDisco" data-group="ccbo_nontech_request">Disconnection (HD/VTD)</option>
+                                        <option value="ccbo_formReqDowngrade" data-group="ccbo_nontech_request">Downgrade</option>
+                                        <option value="ccbo_formReqInmove" data-group="ccbo_nontech_request">Inmove</option>
+                                        <!-- <option data-group="ccbo_request" value="formReqMigration">Migration</option> -->
+                                        <option value="ccbo_formReqPermaDisco" data-group="ccbo_nontech_request">Permanent Disconnection</option>
+                                        <option value="ccbo_formReqReconnect" data-group="ccbo_nontech_request">Reconnection</option>
+                                        <option value="ccbo_formReqRelocation" data-group="ccbo_nontech_request">Relocation</option>
+                                        <option value="ccbo_formReqSpecFeat" data-group="ccbo_nontech_request">Special Features</option>
+                                        <option value="ccbo_formReqUpgrade" data-group="ccbo_nontech_request">Upgrade</option>
+                                        <option value="ccbo_formReqOthers" data-group="ccbo_nontech_request">Others</option>
+
+                                        <!--- CCBO Non-Tech Inquiry ---->
+                                        <option value="ccbo_formInqBill" data-group="ccbo_nontech_inquiry">Billing Inquiry</option>
+                                        <option value="ccbo_formInqDowngrade" data-group="ccbo_nontech_inquiry">Downgrade</option>
+                                        <option value="ccbo_formInqChangeTelNum" data-group="ccbo_nontech_inquiry">Change Telephone Number</option>
+                                        <option value="ccbo_formInqSpecialFeatures" data-group="ccbo_nontech_inquiry">Special Features</option>
+                                        <option value="ccbo_formInqUpgrade" data-group="ccbo_nontech_inquiry">Upgrade</option>
+                                        <option value="ccbo_formInqOthers" data-group="ccbo_nontech_inquiry">Others</option>
+
+                                        <!--- CCBO Non-Tech Complaint ---->
+                                        <option value="ccbo_formCompMisappPay" data-group="ccbo_nontech_complaint" >Misapplied Payment</option>
+                                        <option value="ccbo_formCompMistreat" data-group="ccbo_nontech_complaint">Mistreat</option>
+                                        <option value="ccbo_formCompOthers" data-group="ccbo_nontech_complaint">Others</option>
+
+                                        <!--- CCBO Non-Tech Follow-Up ---->
+                                        <option value="ccbo_formFfupBillAdjust" data-group="ccbo_nontech_follow-up">Bill Adjustment</option>
+                                        <option value="ccbo_formFfupCignalIPTV" data-group="ccbo_nontech_follow-up">Cignal/IPTV</option>
+                                        <option value="ccbo_formFfupChangeOwnership" data-group="ccbo_nontech_follow-up">Change Ownership</option>
+                                        <option value="ccbo_formFfupChangeTelNum" data-group="ccbo_nontech_follow-up">Change Telephone Number</option>
+                                        <option value="ccbo_formFfupDowngrade" data-group="ccbo_nontech_follow-up">Downgrade</option>
+                                        <option value="ccbo_formFfupInmove" data-group="ccbo_nontech_follow-up">Inmove</option>
+                                        <option value="ccbo_formFfupMisappPay" data-group="ccbo_nontech_follow-up">Misapplied Payment</option>
+                                        <option value="ccbo_formFfupPermaDisco" data-group="ccbo_nontech_follow-up">Permanent Disconnection</option>
+                                        <option value="ccbo_formFfupReconnect" data-group="ccbo_nontech_follow-up">Reconnection</option>
+                                        <option value="ccbo_formFfupReloc" data-group="ccbo_nontech_follow-up">Relocation</option>
+                                        <option value="ccbo_formFfupSpecialFeat" data-group="ccbo_nontech_follow-up">Special Features</option>
+                                        <option value="ccbo_formFfupTempDisco" data-group="ccbo_nontech_follow-up">Temporary Disconnection</option>
+                                        <option value="ccbo_formFfupUpgrade" data-group="ccbo_nontech_follow-up">Upgrade</option>
+                                        <option value="ccbo_formFfupOthers" data-group="ccbo_nontech_follow-up">Others</option>
+
+                                        <!--- CCBO Others ---->
+                                        <option value="ccbo_others164" data-group="ccbo_others">Bantay Kable (164)</option>
+
+                                        <!-- CCBO Tech Intents -->
+                                        <optgroup label="No Dial Tone and No Internet Connection" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form100_1">All Services Down</option>
+                                            <option value="ccbo_form100_2">Red LOS</option>
+                                            <option value="ccbo_form100_3">Defective Modem - No Power Light</option>
+                                            <option value="ccbo_form100_4">Defective/Damaged Modem</option>
+                                            <option value="ccbo_form100_5">Damaged Modem Cable/Cord</option>
+                                            <option value="ccbo_form100_6">Uninstalled Modem (Fiber)</option>
+                                            <option value="ccbo_form100_7">Old Devices Not Working on WiFi6 Modem (Fiber)</option>
+                                        </optgroup>
+                                        <optgroup label="No Internet Connection" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form500_1">No Internet Connection</option>
+                                            <option value="ccbo_form500_2">Redirected to PLDT Payment Reminder Portal</option>
+                                            <option value="ccbo_form500_3">Defective Mesh</option>
+                                            <option value="ccbo_form500_4">Damaged Mesh</option>
+                                        </optgroup>
+                                        <optgroup label="Slow Internet/Intermittent Connection" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form501_1">Slow Internet Connection</option>
+                                            <option value="ccbo_form501_2">Low Download/Upload Speed</option>
+                                            <option value="ccbo_form501_3">Availed SAO</option>
+                                            <option value="ccbo_form501_4">Frequent Disconnection</option>
+                                            <option value="ccbo_form501_5">Gaming - High Latency</option>
+                                            <option value="ccbo_form501_6">Gaming - Lag</option>
+                                        </optgroup>
+                                        <optgroup label="No Dial Tone" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form101_1">No Dial Tone</option>
+                                            <option value="ccbo_form101_2">Fast Busy Tone</option>
+                                            <option value="ccbo_form101_3">Defective Telset - NDT</option>
+                                            <option value="ccbo_form101_4">Defective/Damaged Telset</option>
+                                        </optgroup>
+                                        <optgroup label="Always On" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form500_5">No Internet Connection</option>
+                                            <option value="ccbo_form501_7">Slow Internet Connection</option>
+                                            <option value="ccbo_form101_5">No Dial Tone</option>
+                                            <option value="ccbo_form510_9">No Audio/Video Output</option>
+                                            <option value="ccbo_form500_6">Check back-up Wi-Fi if working (Always On)</option>
+                                        </optgroup>
+                                        <optgroup label="Poor Call Quality/Noisy Telephone Line" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form102_1">Noisy Line</option>
+                                            <option value="ccbo_form102_2">Cut Calls</option>
+                                            <option value="ccbo_form102_3">Poor Reception/Transmission</option>
+                                            <option value="ccbo_form102_4">Defective Telset - Noisy Line</option>
+                                            <option value="ccbo_form102_5">Defective Telset - Cut Calls</option>
+                                            <option value="ccbo_form102_6">Defective Telset - Poor Reception/Transmission</option>
+                                            <option value="ccbo_form102_7">Damaged Telset Cable/Cord</option>
+                                        </optgroup>
+                                        <optgroup label="Cannot Make a Call" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form103_1">Cannot Make a Call</option>
+                                            <option value="ccbo_form103_2">No Outgoing Call</option>
+                                            <option value="ccbo_form103_3">Defective Telset - Number Keys</option>
+                                        </optgroup>
+                                        <optgroup label="Cannot Receive a Call" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form103_4">Cannot Receive Calls</option>
+                                            <option value="ccbo_form103_5">No Incoming Call</option>
+                                        </optgroup>
+                                        <optgroup label="Selective Browsing Complaints" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form502_1">Selective Browsing</option>
+                                            <option value="ccbo_form502_2">Cannot Load Specific Website</option>
+                                        </optgroup>
+                                        <optgroup label="No Audio/Video Output" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form510_1">No Audio/Video Output</option>
+                                            <option value="ccbo_form510_2">Cignal TV is Down/No Connection</option>
+                                            <option value="ccbo_form510_3">Defective Set-Top-Box</option>
+                                            <option value="ccbo_form510_4">Damaged Set-Top-Box</option>
+                                            <option value="ccbo_form510_5">Cannot Read Smart Card</option>
+                                            <option value="ccbo_form510_6">Defective HDMI/RCA</option>
+                                            <option value="ccbo_form510_7">No Channel</option>
+                                            <option value="ccbo_form510_8">Channel 001 Only</option>
+                                        </optgroup>
+                                        <optgroup label="Poor Audio/Video Quality" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form511_1">Poor Audio/Video Quality</option>
+                                            <option value="ccbo_form511_2">Picture Freezing</option>
+                                            <option value="ccbo_form511_3">Pixelated Video</option>
+                                            <option value="ccbo_form511_4">Out-of-Sync</option>
+                                            <option value="ccbo_form511_5">Loop Back Video</option>
+                                        </optgroup>
+                                        <optgroup label="Missing Set-Top-Box Functions" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_form512_1">Missing Channels</option>
+                                            <option value="ccbo_form512_2">Cannot Record Video</option>
+                                            <option value="ccbo_form512_3">Defective Remote Control</option>
+                                        </optgroup>
+                                        <optgroup label="Streaming Apps Issues" data-group="ccbo_tech_complaint">
+                                            <option value="ccbo_formStrmApps_1">Eufy is Not Working</option>
+                                            <option value="ccbo_formStrmApps_2">Stream TV is Not Working</option>
+                                            <option value="ccbo_formStrmApps_3">NETFLIX Problem</option>
+                                            <option value="ccbo_formStrmApps_4">VIU Problem</option>
+                                            <option value="ccbo_formStrmApps_5">HBO Max Problem</option>
+                                        </optgroup>
+
+                                        <!-- CCBO Tech Follow-Up Intent -->
+                                        <option value="ccbo_formFfupRepair" data-group="ccbo_tech_follow-up">Repair/Network Outage</option>
+
+                                        <!-- CCBO Tech Request Intent -->
+                                        <optgroup label="Change Configuration - Data" data-group="ccbo_tech_request">
+                                            <option value="ccbo_form300_1">Change of WiFi Name/Password</option>
+                                            <option value="ccbo_form300_2">Request for Local User GUI Access</option>
+                                            <option value="ccbo_form300_3">Request for Super Admin GUI Access</option>
+                                            <option value="ccbo_form300_4">Change modem set-up from Route to Bridge Mode</option>
+                                            <option value="ccbo_form300_5">Change modem set-up from Bridge to Route Mode</option>
+                                            <option value="ccbo_form300_6">LAN Port Activation</option>
+                                            <option value="ccbo_form300_7">Request for Public IP</option>
+                                            <option value="ccbo_form300_8">Request for Private IP</option>
                                         </optgroup>
                                     </select>
                                 </div>

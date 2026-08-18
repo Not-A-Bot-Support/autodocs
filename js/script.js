@@ -5,6 +5,8 @@ Developed & Designed by: QA Ryan */
 
 // FIRST LOAD CHECK
 document.addEventListener("DOMContentLoaded", async () => {
+    document.getElementById('case-origin-row').style.display = 'none';
+
     const checkPrevSavedNotesPrompt = sessionStorage.getItem("hasCheckedNotes");
 
     if (!checkPrevSavedNotesPrompt) {
@@ -27,68 +29,206 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Toggle Agent Details Row
 window.agentDetailsData = {};
+window.agentDetailsHideTimer = null;
+
+// function toggleCaseOriginField() {
+//     const channel = document.getElementById('channel').value.trim();
+//     const caseOriginRow = document.getElementById('case-origin-row');
+
+//     if (channel === 'CNDT_CCBO') {
+//         caseOriginRow.style.display = '';
+
+//         // Cancel any pending hide timer
+//         if (window.agentDetailsHideTimer) {
+//             clearTimeout(window.agentDetailsHideTimer);
+//             window.agentDetailsHideTimer = null;
+//         }
+
+//         // Ensure rows stay visible until Case Origin is chosen
+//         document.getElementById('agent-details-header-row').style.display = '';
+//         document.getElementById('agent-and-tl-details-row').style.display = '';
+//         document.getElementById('user-and-channel-row').style.display = '';
+//     } else {
+//         caseOriginRow.style.display = 'none';
+//         document.getElementById('case-origin').value = '';
+//     }
+// }
+
+function toggleCaseOriginField() {
+    const channel = document.getElementById('channel').value.trim();
+
+    // document.getElementById('case-origin-row').style.display = 'none';
+
+    if (channel === 'CNDT_CCBO') {
+        showAlert('This section is currently under construction and is not yet available.');
+    }
+}
 
 function checkAndStoreAgentDetails() {
     const agentName = document.getElementById('agent-name').value.trim();
-    const teamLead  = document.getElementById('team-lead').value.trim();
-    const pldtUser  = document.getElementById('pldt-user').value.trim();
-    const channel   = document.getElementById('channel').value.trim();
+    const teamLead = document.getElementById('team-lead').value.trim();
+    const pldtUser = document.getElementById('pldt-user').value.trim();
+    const channel = document.getElementById('channel').value.trim();
+    // const caseOrigin = document.getElementById('case-origin').value.trim();
 
-    const allFilled = agentName && teamLead && pldtUser && channel;
+    const isCCBO = channel === 'CNDT_CCBO';
+
+    // Case Origin is only required for CCBO
+    // Prevent CCBO from proceeding until Case Origin is selected
+    // if (isCCBO && !caseOrigin) {
+    //     if (window.agentDetailsHideTimer) {
+    //         clearTimeout(window.agentDetailsHideTimer);
+    //         window.agentDetailsHideTimer = null;
+    //     }
+
+    //     document.getElementById('agent-details-header-row').style.display = '';
+    //     document.getElementById('agent-and-tl-details-row').style.display = '';
+    //     document.getElementById('user-and-channel-row').style.display = '';
+    //     document.getElementById('case-origin-row').style.display = '';
+
+    //     return;
+    // }
+
+    const allFilled = isCCBO
+        ? (agentName && teamLead && pldtUser && channel)
+        : (agentName && teamLead && pldtUser && channel);
 
     if (allFilled) {
-        // Store values globally
         window.agentDetailsData = {
             agentName,
             teamLead,
             pldtUser,
-            channel
+            channel,
+            // caseOrigin: isCCBO ? caseOrigin : ''
         };
 
-        // Hide rows after 10 seconds
-        setTimeout(() => {
+        if (window.agentDetailsHideTimer) {
+            clearTimeout(window.agentDetailsHideTimer);
+        }
+
+        // Do not start timer for CCBO
+        if (isCCBO) {
+            return;
+        }
+
+        window.agentDetailsHideTimer = setTimeout(() => {
             document.getElementById('agent-details-header-row').style.display = 'none';
             document.getElementById('agent-and-tl-details-row').style.display = 'none';
             document.getElementById('user-and-channel-row').style.display = 'none';
+
+            // Hide Case Origin row only if CCBO
+            if (isCCBO) {
+                 document.getElementById('case-origin-row').style.display = 'none';
+            }
         }, 10000);
     }
 }
 
+// Reset Fields below Channel
+function resetFieldsBelowChannel() {
+    lobSelect.value = "";
+    vocSelect.value = "";
+    intentSelect.value = "";
+
+    [
+        "landline-num-row",
+        "service-id-row",
+        "option82-row",
+        "intent-wocas-row",
+        "wocas-row"
+    ].forEach(id => {
+        const row = document.getElementById(id);
+        if (row) row.style.display = "none";
+    });
+}
+
+// Reset Fields below Case Origin
+function resetFieldsBelowCaseOrigin() {
+
+    lobSelect.value = "";
+    vocSelect.value = "";
+    intentSelect.value = "";
+
+    [
+        "landline-num-row",
+        "service-id-row",
+        "option82-row",
+        "intent-wocas-row",
+        "wocas-row"
+    ].forEach(id => {
+        const row = document.getElementById(id);
+        if (row) row.style.display = "none";
+    });
+}
+
+
 // Run when user types or selects
+// ['agent-name', 'team-lead', 'pldt-user', 'channel', 'case-origin'].forEach(id => {
 ['agent-name', 'team-lead', 'pldt-user', 'channel'].forEach(id => {
     const el = document.getElementById(id);
-    el.addEventListener('input', checkAndStoreAgentDetails);
-    el.addEventListener('change', checkAndStoreAgentDetails);
+
+    el.addEventListener('input', () => {
+        if (id === 'channel') {
+            toggleCaseOriginField();
+        }
+        checkAndStoreAgentDetails();
+    });
+
+    el.addEventListener('change', () => {
+
+        if (id === 'channel') {
+            resetFieldsBelowChannel();
+            toggleCaseOriginField();
+        }
+
+        // if (id === 'case-origin') {
+        //     resetFieldsBelowCaseOrigin();
+        // }
+
+        checkAndStoreAgentDetails();
+    });
+
 });
 
 // Show Agent Details Temporarily
 function showAgentDetailsTemporarily(duration = 10000) {
-    const rows = [
-        document.getElementById('agent-details-header-row'),
-        document.getElementById('agent-and-tl-details-row'),
-        document.getElementById('user-and-channel-row')
-    ];
+    const channel = document.getElementById('channel').value.trim();
+    const isCCBO = channel === 'CNDT_CCBO';
 
-    rows.forEach(row => {
-        row.style.display = '';
-    });
+    document.getElementById('agent-details-header-row').style.display = '';
+    document.getElementById('agent-and-tl-details-row').style.display = '';
+    document.getElementById('user-and-channel-row').style.display = '';
+
+    // document.getElementById('case-origin-row').style.display = isCCBO ? '' : 'none';
 
     if (window.agentDetailsHideTimer) {
         clearTimeout(window.agentDetailsHideTimer);
     }
 
+    // Do not start timer for CCBO
+    if (isCCBO) {
+        return;
+    }
+
     window.agentDetailsHideTimer = setTimeout(() => {
-        rows.forEach(row => {
-            row.style.display = 'none';
-        });
+        document.getElementById('agent-details-header-row').style.display = 'none';
+        document.getElementById('agent-and-tl-details-row').style.display = 'none';
+        document.getElementById('user-and-channel-row').style.display = 'none';
+
+        if (isCCBO) {
+            document.getElementById('case-origin-row').style.display = 'none';
+        }
     }, duration);
 }
+
+// Initial page load check
+toggleCaseOriginField();
 
 // Channel, Concern Type, and VOC Options
 const LOB_OPTIONS = [
     { value: "", text: ""},
+    { value: "NON-TECH", text: "NON-TECH" },
     { value: "TECH", text: "TECH"},
-    { value: "NON-TECH", text: "NON-TECH" }
 ];
 
 const TECH_VOC_ALLOWED = [
@@ -98,30 +238,33 @@ const TECH_VOC_ALLOWED = [
     "OTHERS"
 ];
 
-const TECH_COMPLAINT_GROUPS = [
-    "Always On",
-    "No Dial Tone and No Internet Connection",
-    "No Internet Connection",
-    "Slow Internet/Intermittent Connection",
-    "No Dial Tone",
-    "Poor Call Quality/Noisy Telephone Line",
-    "Cannot Make a Call",
-    "Cannot Receive a Call",
-    "Selective Browsing Complaints",
-    "No Audio/Video Output",
-    "Poor Audio/Video Quality",
-    "Missing Set-Top-Box Functions",
-    "Streaming Apps Issues",
-    "formCompMyHomeWeb",
-    "formCompPersonnelIssue"
-];
+const SOCMED_HOTLINE_TECH_GROUP_MAP = {
+    "COMPLAINT": "socmed_hotline_tech_complaint",
+    "FOLLOW-UP": "socmed_hotline_tech_follow-up",
+    "REQUEST": "socmed_hotline_tech_request",
+    "OTHERS": "socmed_hotline_others"
+};
 
-const NON_TECH_GROUP_MAP = {
-    "INQUIRY": "inquiry",
-    "COMPLAINT": "complaint",
-    "FOLLOW-UP": "follow-up",
-    "REQUEST": "request",
-    "OTHERS": "others"
+const SOCMED_HOTLINE_NON_TECH_GROUP_MAP = {
+    "INQUIRY": "socmed_hotline_nontech_inquiry",
+    "COMPLAINT": "socmed_hotline_nontech_complaint",
+    "FOLLOW-UP": "socmed_hotline_nontech_follow-up",
+    "REQUEST": "socmed_hotline_nontech_request",
+    "OTHERS": "socmed_hotline_others"
+};
+
+const CCBO_NON_TECH_GROUP_MAP = {
+    "INQUIRY": "ccbo_nontech_inquiry",
+    "COMPLAINT": "ccbo_nontech_complaint",
+    "FOLLOW-UP": "ccbo_nontech_follow-up",
+    "REQUEST": "ccbo_nontech_request"
+};
+
+const CCBO_TECH_GROUP_MAP = {
+    "COMPLAINT": "ccbo_tech_complaint",
+    "FOLLOW-UP": "ccbo_tech_follow-up",
+    "REQUEST": "ccbo_tech_request",
+    "OTHERS": "ccbo_others"
 };
 
 // Global variables
@@ -185,33 +328,49 @@ const channelField = document.getElementById("channel");
 
 if (channelField) {
     channelField.addEventListener("change", () => {
+
         lobSelect.innerHTML = "";
 
-        // Always show the non-selectable blank option first
         const blankOption = document.createElement("option");
         blankOption.value = "";
         blankOption.textContent = "";
         blankOption.disabled = true;
         blankOption.selected = true;
+
         lobSelect.appendChild(blankOption);
 
-        if (channelField.value !== "") {
-            // Show only valid LOBs when channel is selected
+        if (channelField.value === "CNDT_CCBO") {
+
+            ["NON-TECH", "TECH"].forEach(value => {
+                const opt = document.createElement("option");
+                opt.value = value;
+                opt.textContent = value;
+                lobSelect.appendChild(opt);
+            });
+
+        } else {
+
             allLobOptions.forEach(optData => {
-                if (optData.value !== "") { // skip the blank
+
+                if (optData.value !== "") {
+
                     const opt = document.createElement("option");
+
                     opt.value = optData.value;
                     opt.textContent = optData.text;
+
                     lobSelect.appendChild(opt);
                 }
+
             });
         }
 
-        vocSelect.innerHTML = "";  // Reset VOC
+        vocSelect.innerHTML = "";
     });
 }
 
 function handleLobChange() {
+    const channelValue = channelField.value;
     const lobSelectedValue = lobSelect.value;
 
     vocSelect.innerHTML = "";
@@ -222,12 +381,58 @@ function handleLobChange() {
     }
 
     allVocOptions.forEach(option => {
+
+        if (option.value === "") {
+            return;
+        }
+
+        // CCBO TECH
         if (
-            (lobSelectedValue === "TECH" && TECH_VOC_ALLOWED.includes(option.value)) ||
-            (lobSelectedValue === "NON-TECH" && option.value !== "")
+            channelValue === "CNDT_CCBO" &&
+            lobSelectedValue === "TECH"
+        ) {
+
+            if (
+                ["COMPLAINT", "FOLLOW-UP", "REQUEST", "OTHERS"]
+                .includes(option.value)
+            ) {
+                vocSelect.appendChild(option);
+            }
+
+            return;
+        }
+
+        // CCBO NON-TECH
+        if (
+            channelValue === "CNDT_CCBO" &&
+            lobSelectedValue === "NON-TECH"
+        ) {
+
+            if (
+                ["INQUIRY", "COMPLAINT", "FOLLOW-UP", "REQUEST"]
+                .includes(option.value)
+            ) {
+                vocSelect.appendChild(option);
+            }
+
+            return;
+        }
+
+        // CDT-HOTLINE / CDT-SOCMED TECH
+        if (
+            lobSelectedValue === "TECH" &&
+            TECH_VOC_ALLOWED.includes(option.value)
         ) {
             vocSelect.appendChild(option);
         }
+
+        // CDT-HOTLINE / CDT-SOCMED NON-TECH
+        else if (
+            lobSelectedValue === "NON-TECH"
+        ) {
+            vocSelect.appendChild(option);
+        }
+
     });
 
     vocSelect.selectedIndex = 0;
@@ -264,7 +469,11 @@ function handleVocChange() {
     }
 
     // Populate Intent/WOCAS Options
-    populateIntentSelect(lobValue, vocValue);
+    populateIntentSelect(
+        channelField.value,
+        lobValue,
+        vocValue
+    );
 
     intentSelect.selectedIndex = 0;
 }
@@ -295,66 +504,89 @@ function updateRowsVisibility(lobValue, vocValue) {
     }
 }
 
-function populateIntentSelect(lobValue, vocValue) {
+function populateIntentSelect(channelValue, lobValue, vocValue) {
+
+    if (channelValue === "CNDT_CCBO") {
+
+        if (lobValue === "TECH") {
+
+            const group = CCBO_TECH_GROUP_MAP[vocValue];
+
+            if (group) {
+                populateByGroup(group);
+            }
+
+            return;
+        }
+
+        if (lobValue === "NON-TECH") {
+
+            const group = CCBO_NON_TECH_GROUP_MAP[vocValue];
+
+            if (group) {
+                populateByGroup(group);
+            }
+
+            return;
+        }
+    }
+
+    // CDT-HOTLINE / CDT-SOCMED
+
     if (lobValue === "TECH") {
-        if (vocValue === "COMPLAINT") {
-            allIntentChildren.forEach(el => {
-                if (el.tagName === "OPTGROUP" && TECH_COMPLAINT_GROUPS.includes(el.label)) {
-                    intentSelect.appendChild(el.cloneNode(true));
-                } else if (el.tagName === "OPTION" && TECH_COMPLAINT_GROUPS.includes(el.value)) {
-                    intentSelect.appendChild(el.cloneNode(true));
-                }
-            });
-        } else if (vocValue === "FOLLOW-UP") {
-            allIntentChildren.forEach(el => {
-                if (el.tagName === "OPTION" && el.value === "formFfupRepair") {
-                    intentSelect.appendChild(el.cloneNode(true));
-                }
-            });
-        } else if (vocValue === "REQUEST") {
-            allIntentChildren.forEach(el => {
-                if (el.tagName === "OPTGROUP" && el.label === "Change Configuration - Data") {
-                    intentSelect.appendChild(el.cloneNode(true));
-                }
-            });
-        } else {
-            const group = "others";
+
+        const group =
+            SOCMED_HOTLINE_TECH_GROUP_MAP[vocValue];
+
+        if (group) {
             populateByGroup(group);
         }
-    } else if (lobValue === "NON-TECH") {
-        const group = NON_TECH_GROUP_MAP[vocValue];
-        populateByGroup(group, vocValue, lobValue);
+    }
+
+    else if (lobValue === "NON-TECH") {
+
+        const group =
+            SOCMED_HOTLINE_NON_TECH_GROUP_MAP[vocValue];
+
+        if (group) {
+            populateByGroup(group);
+        }
     }
 }
 
 function populateByGroup(group, vocValue = null, lobValue = null) {
+
     allIntentChildren.forEach(el => {
 
-        // Block ONLY for NON-TECH
         if (
             lobValue === "NON-TECH" &&
-            el.tagName === "OPTGROUP" &&
-            el.label === "Change Configuration - Data"
+            el.tagName === "OPTGROUP"
         ) {
             return;
         }
 
-        if (el.tagName === "OPTION" && el.dataset.group === group) {
-            intentSelect.appendChild(el.cloneNode(true));
-        } 
-        else if (el.tagName === "OPTGROUP") {
-
-            const matchingOptions = Array.from(el.children).filter(
-                opt => opt.dataset.group === group
+        // Standalone options
+        if (
+            el.tagName === "OPTION" &&
+            el.dataset.group === group
+        ) {
+            intentSelect.appendChild(
+                el.cloneNode(true)
             );
-
-            if (matchingOptions.length > 0) {
-                const newGroup = el.cloneNode(false);
-                matchingOptions.forEach(opt => newGroup.appendChild(opt.cloneNode(true)));
-                intentSelect.appendChild(newGroup);
-            }
         }
+
+        // Optgroups
+        else if (
+            el.tagName === "OPTGROUP" &&
+            el.dataset.group === group
+        ) {
+            intentSelect.appendChild(
+                el.cloneNode(true)
+            );
+        }
+
     });
+
 }
 
 function registerEventHandlers() {
@@ -395,6 +627,22 @@ function autoExpandTextarea(event) {
 }
 
 document.addEventListener('input', autoExpandTextarea);
+
+document.addEventListener(
+    "wheel",
+        function (event) {
+            const activeElement = document.activeElement;
+
+            if (
+            activeElement &&
+            activeElement.tagName === "INPUT" &&
+            activeElement.type === "number"
+            ) {
+            event.preventDefault();
+            }
+        },
+        { passive: false }
+);
 
 // Copy to Clipboard Command
 function resolveCopyValue(rawValue = "", type = null) {
@@ -524,6 +772,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // SHOW/HIDE ROWS BASED ON CHANNEL
     // ================================
     const channelSelect = document.getElementById("channel");
+    const caseOriginSelect = document.getElementById("case-origin");
+    const caseOriginValue = caseOriginSelect?.value;
 
     const rows = {
         caseAccountHeader: document.getElementById("case-and-account-header-row"),
@@ -537,24 +787,89 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     function updateChannelRows() {
-        if (!channelSelect.value) return;
-
+        const isCCBO = channelSelect.value === "CNDT_CCBO";
         const isSocMed = channelSelect.value === "CDT-SOCMED";
-        const isCCBO = channelSelect.value === "CDT-CCBO";
+        const isHotline = channelSelect.value === "CDT-HOTLINE";
 
-        rows.caseAccountHeader.style.display = "";
-        rows.custName.style.display = "";
-        rows.accNum.style.display = "";
-        rows.phoneNum.style.display = "";
-        rows.lobVoc.style.display = "";
-        rows.caseNum.style.display = (isSocMed || isCCBO) ? "" : "none";
-        rows.buttonsRow.style.display = "";
+        // if (isCCBO) {
+        //     rows.caseOrigin.style.display = "";
+        //     rows.caseAccountHeader.style.display = "none";
+        //     rows.caseNum.style.display = "none";
+        //     rows.custName.style.display = "none";
+        //     rows.accNum.style.display = "none";
+        //     rows.phoneNum.style.display = "none";
+        //     rows.lobVoc.style.display = "none";
+        //     rows.buttonsRow.style.display = "none";
+        // } else 
+            
+        if (isHotline || isSocMed) {
+            rows.caseOrigin.style.display = "none";
+            rows.caseAccountHeader.style.display = "";
+            rows.caseNum.style.display = isSocMed ? "" : "none";
+            rows.custName.style.display = "";
+            rows.accNum.style.display = "";
+            rows.phoneNum.style.display = "";
+            rows.lobVoc.style.display = "";
+            rows.buttonsRow.style.display = "";
+        } else {
+            rows.caseOrigin.style.display = "none";
+            rows.caseAccountHeader.style.display = "none";
+            rows.caseNum.style.display = "none";
+            rows.custName.style.display = "none";
+            rows.accNum.style.display = "none";
+            rows.phoneNum.style.display = "none";
+            rows.lobVoc.style.display = "none";
+            rows.buttonsRow.style.display = "none";
+        }
     }
 
-    channelSelect?.addEventListener("change", updateChannelRows);
+    function updateCaseOriginRows() {
+        const isCCBO = channelSelect.value === "CNDT_CCBO";
 
-    // Run once on load
-    updateChannelRows();
+        // Case Origin rules only apply to CCBO
+        if (!isCCBO) return;
+
+        const caseOriginSelect = document.getElementById("case-origin");
+        const caseOriginValue = caseOriginSelect?.value;
+
+        if (!caseOriginValue) {
+            rows.caseAccountHeader.style.display = "none";
+            rows.caseNum.style.display = "none";
+            rows.custName.style.display = "none";
+            rows.accNum.style.display = "none";
+            rows.phoneNum.style.display = "none";
+            rows.lobVoc.style.display = "none";
+            rows.buttonsRow.style.display = "none";
+            return;
+        } else if (caseOriginValue === "ORDERTAKE") {
+            rows.caseAccountHeader.style.display = "";
+            rows.caseNum.style.display = "none";
+            rows.custName.style.display = "";
+            rows.accNum.style.display = "";
+            rows.phoneNum.style.display = "";
+            rows.lobVoc.style.display = "";
+            rows.buttonsRow.style.display = "";
+        } else {
+            rows.caseAccountHeader.style.display = "";
+            rows.caseNum.style.display = "";
+            rows.custName.style.display = "";
+            rows.accNum.style.display = "";
+            rows.phoneNum.style.display = "";
+            rows.lobVoc.style.display = "";
+            rows.buttonsRow.style.display = "";
+        }
+
+    }
+
+    function refreshRows() {
+        updateChannelRows();
+        updateCaseOriginRows();
+    }
+
+    channelSelect?.addEventListener("change", refreshRows);
+    caseOriginSelect?.addEventListener("change", refreshRows);
+
+    refreshRows();
 
     if (typeof initializeFormElements === "function") initializeFormElements();
     if (typeof registerEventHandlers === "function") registerEventHandlers();
@@ -792,6 +1107,7 @@ function initializeVariables() {
         affectedTool: q('[name="affectedTool"]'),
         requestType: q('[name="requestType"]'),
         vasProduct: q('[name="vasProduct"]'),
+        othersConcern: q('[name="othersConcern"]'),
     };
 }
 
@@ -867,7 +1183,7 @@ function createIntentBasedForm() {
     ]
 
     const inquiryForms = [
-        "formInqAccSrvcStatus", "formInqLockIn", "formInqCopyOfBill", "formInqMyHomeAcc", "formInqPlanDetails", "formInqAda", "formInqRebCredAdj", "formInqBalTransfer", "formInqBrokenPromise", "formInqCreditAdj", "formInqCredLimit", "formInqNSR", "formInqDdate", "formInqBillDdateExt", "formInqEcaPip", "formInqNewBill", "formInqOneTimeCharges", "formInqOverpay", "formInqPayChannel", "formInqPayPosting", "formInqPayRefund", "formInqPayUnreflected", "formInqDdateMod", "formInqBillRefund", "formInqSmsEmailBill", "formInqTollUsage", "formInqCoRetain", "formInqCoChange", "formInqTempDisc", "formInqD1299", "formInqD1399", "formInqD1799", "formInqDOthers", "formInqDdateExt", "formInqEntertainment", "formInqInmove", "formInqMigration", "formInqProdAndPromo", "formInqHomeRefNC", "formInqHomeDisCredit", "formInqReloc", "formInqRewards", "formInqDirectDial", "formInqBundle", "formInqSfOthers", "formInqSAO500", "formInqUfcEnroll", "formInqUfcPromoMech", "formInqUpg1399", "formInqUpg1599", "formInqUpg1799", "formInqUpg2099", "formInqUpg2499", "formInqUpg2699", "formInqUpgOthers", "formInqVasAO", "formInqVasIptv", "formInqVasMOW", "formInqVasSAO", "formInqVasWMesh", "formInqVasOthers", "formInqWireReRoute"
+        "formInqAccSrvcStatus", "formInqLockIn", "formInqCopyOfBill", "formInqMyHomeAcc", "formInqPlanDetails", "formInqAda", "formInqRebCredAdj", "formInqBalTransfer", "formInqBrokenPromise", "formInqCreditAdj", "formInqCredLimit", "formInqNSR", "formInqDdate", "formInqBillDdateExt", "formInqEcaPip", "formInqNewBill", "formInqOneTimeCharges", "formInqOverpay", "formInqPayChannel", "formInqPayPosting", "formInqPayRefund", "formInqPayUnreflected", "formInqDdateMod", "formInqBillRefund", "formInqSmsEmailBill", "formInqTollUsage", "formInqCoRetain", "formInqCoChange", "formInqTempDisc", "formInqD1299", "formInqD1399", "formInqD1499", "formInqD1799", "formInqD1899", "formInqD2599", "formInqDOthers", "formInqDdateExt", "formInqEntertainment", "formInqInmove", "formInqMigration", "formInqProdAndPromo", "formInqHomeRefNC", "formInqHomeDisCredit", "formInqReloc", "formInqRewards", "formInqDirectDial", "formInqBundle", "formInqSfOthers", "formInqSAO500", "formInqUfcEnroll", "formInqUfcPromoMech", "formInqUpg1399", "formInqUpg1499", "formInqUpg1599", "formInqUpg1799", "formInqUpg1899", "formInqUpg2099", "formInqUpg2499", "formInqUpg2599", "formInqUpg2699", "formInqUpgOthers", "formInqVasAO", "formInqVasIptv", "formInqVasMOW", "formInqVasSAO", "formInqVasWMesh", "formInqVasOthers", "formInqWireReRoute"
     ]
 
     const othersForms = [
@@ -903,6 +1219,7 @@ function createIntentBasedForm() {
         offerAccepted: [
             "", 
             "Yes - Accepted",
+            "Yes - Direct",
             "Yes - Upsell Later",
             "No - Declined",
             "No - Ignored",
@@ -924,6 +1241,7 @@ function createIntentBasedForm() {
             "Account has been disconnected due to calamity requesting for reconnection",
             // "Account has pending issues", 
             "Account is a Microbusiness ", 
+            "Account tenure requirement not met.",
             "Account was barred", 
             "Account was inhibited", 
             "Account was not yet active", 
@@ -985,7 +1303,7 @@ function createIntentBasedForm() {
     }
 
     function handleUpsellDeclinedChange(offerAccepted) {
-        if (offerAccepted.selectedIndex === 3) {
+        if (offerAccepted.selectedIndex === 4) {
             showFields(["declineReason"]);
         } else {
             hideSpecificFields(["declineReason"]);
@@ -1027,6 +1345,47 @@ function createIntentBasedForm() {
             hideSpecificFields(["resolution"]);
         }
         updateToolLabelVisibility();
+    }
+
+    function handleIssueResolvedWithTestedOkChange(issueResolved) {
+        if (issueResolved.selectedIndex === 2) {
+            showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+
+            if (channelField.value === "CDT-SOCMED") {
+                showFields(["resolution"]);
+                hideSpecificFields(["testedOk"]);
+            } else {
+                showFields(["testedOk"]);
+                hideSpecificFields(["resolution"]);
+            }
+        } else {
+            showFields(["eligibleForUpsell"]);
+            hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
+
+            if (channelField.value === "CDT-SOCMED") {
+                showFields(["resolution"]);
+            } else {
+                hideSpecificFields(["resolution"]);
+            }
+        }
+        updateToolLabelVisibility();
+    }
+
+    // CCBO NON-TECH BUTTONS
+    function renderButtons() {
+        const oldTable = document.getElementById("form2ButtonTable");
+        if (oldTable) oldTable.remove();
+
+        const buttonLabels = ["SF & FUSE", "🔄 Reset"];
+        const buttonHandlers = [
+            nontechNotesButtonHandler,
+            resetButtonHandler
+        ];
+
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        buttonTable.id = "form2ButtonTable";
+
+        form2Container.appendChild(buttonTable);
     }
 
     // Tech Follow-Up
@@ -2650,7 +3009,7 @@ function createIntentBasedForm() {
             resetAllFields(["facility", "resType", "services", "serviceStatus", "outageStatus"]);
             if (outageStatus.value === "No" && facility.value === "Fiber") {
                 if (selectedValue === "form101_1" || selectedValue === "form101_2" || selectedValue === "form101_3") {
-                    showFields(["onuSerialNum", "modemLights", "oltAndOnuConnectionType", "actualExp", "remarks", "issueResolved"]);
+                    showFields(["onuSerialNum", "modemLights", "oltAndOnuConnectionType", "actualExp", "remarks", "issueResolved", ]);
                     hideSpecificFields(["outageReference", "pcNumber", "callType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
                 } else {
                     showFields(["remarks", "issueResolved"]);
@@ -3466,29 +3825,7 @@ function createIntentBasedForm() {
         });
         
         const issueResolved = document.querySelector("[name='issueResolved']");
-        issueResolved.addEventListener("change", () => {
-            if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-
-                if (channelField.value === "CDT-SOCMED") {
-                    showFields(["resolution"]);
-                    hideSpecificFields(["testedOk"]);
-                } else {
-                    showFields(["testedOk"]);
-                    hideSpecificFields(["resolution"]);
-                }
-            } else {
-                showFields(["eligibleForUpsell"]);
-                hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
-
-                if (channelField.value === "CDT-SOCMED") {
-                    showFields(["resolution"]);
-                } else {
-                    hideSpecificFields(["resolution"]);
-                }
-            }
-            updateToolLabelVisibility();
-        });
+        issueResolved.addEventListener("change", () => handleIssueResolvedWithTestedOkChange(issueResolved));
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -4099,29 +4436,7 @@ function createIntentBasedForm() {
         });
 
         const issueResolved = document.querySelector("[name='issueResolved']");
-        issueResolved.addEventListener("change", () => {
-            if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-
-                if (channelField.value === "CDT-SOCMED") {
-                    showFields(["resolution"]);
-                    hideSpecificFields(["testedOk"]);
-                } else {
-                    showFields(["testedOk"]);
-                    hideSpecificFields(["resolution"]);
-                }
-            } else {
-                showFields(["eligibleForUpsell"]);
-                hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
-
-                if (channelField.value === "CDT-SOCMED") {
-                    showFields(["resolution"]);
-                } else {
-                    hideSpecificFields(["resolution"]);
-                }
-            }
-            updateToolLabelVisibility();
-        });
+        issueResolved.addEventListener("change", () => handleIssueResolvedWithTestedOkChange(issueResolved));
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -5116,29 +5431,7 @@ function createIntentBasedForm() {
             }
         });
     
-        issueResolved.addEventListener("change", () => {
-            if (issueResolved.selectedIndex === 2) {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-
-                if (channelField.value === "CDT-SOCMED") {
-                    showFields(["resolution"]);
-                    hideSpecificFields(["testedOk"]);
-                } else {
-                    showFields(["testedOk"]);
-                    hideSpecificFields(["resolution"]);
-                }
-            } else {
-                showFields(["eligibleForUpsell"]);
-                hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
-
-                if (channelField.value === "CDT-SOCMED") {
-                    showFields(["resolution"]);
-                } else {
-                    hideSpecificFields(["resolution"]);
-                }
-            }
-            updateToolLabelVisibility();
-        });
+        issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -5617,13 +5910,6 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         const accountType = document.querySelector("[name='accountType']");
-        const outageStatus = document.querySelector("[name='outageStatus']");
-        const equipmentBrand = document.querySelector("[name='equipmentBrand']");
-        const modemBrand = document.querySelector("[name='modemBrand']");
-        const onuConnectionType = document.querySelector("[name='onuConnectionType']");
-        const req4retracking = document.querySelector("[name='req4retracking']");
-        const issueResolved = document.querySelector("[name='issueResolved']");
-
         accountType.addEventListener("change", () => {
             resetAllFields(["accountType"]);
             if (accountType.value === "PLDT") {
@@ -5662,6 +5948,7 @@ function createIntentBasedForm() {
             }
         });
     
+        const outageStatus = document.querySelector("[name='outageStatus']");
         outageStatus.addEventListener("change", () => {
             resetAllFields(["accountType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
@@ -5678,6 +5965,10 @@ function createIntentBasedForm() {
             }
             updateToolLabelVisibility();
         });
+
+        const equipmentBrand = document.querySelector("[name='equipmentBrand']");
+        const modemBrand = document.querySelector("[name='modemBrand']");
+        const onuConnectionType = document.querySelector("[name='onuConnectionType']");
 
         function updateONUConnectionType() {
             if (!equipmentBrand.value || !modemBrand.value) {
@@ -5723,6 +6014,7 @@ function createIntentBasedForm() {
             }
         });
     
+        const req4retracking = document.querySelector("[name='req4retracking']");
         req4retracking.addEventListener("change", () => {
             // const isForm510 = selectedValue === "form510_1" || selectedValue === "form510_2";
 
@@ -5742,6 +6034,7 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
 
+        const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
@@ -6009,7 +6302,7 @@ function createIntentBasedForm() {
             { label: "Modem/ONU Serial #", type: "text", name: "onuSerialNum", placeholder: "Also available in DMS."},
             // Probe & Troubleshoot
             { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["",]},
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
                 "— Modem Light Status —",
@@ -6283,6 +6576,7 @@ function createIntentBasedForm() {
                         "No - Customer is Unresponsive",
                         "No - Customer is Not At Home",
                         "No - Customer Declined Further Assistance",
+                        "No - Customer Ended Chat",
                         "No - System Ended Chat"
                     ]
                     : [
@@ -6291,6 +6585,7 @@ function createIntentBasedForm() {
                         "No - Customer is Unresponsive",
                         "No - Customer is Not At Home",
                         "No - Customer Declined Further Assistance",
+                        "No - Customer Ended Chat",
                         "No - System Ended Chat"
                     ];
 
@@ -6304,8 +6599,6 @@ function createIntentBasedForm() {
 
 
         const simLight = document.querySelector("[name='simLight']");
-        const issueResolved = document.querySelector("[name='issueResolved']");
-
         simLight.addEventListener("change", () => {
             resetAllFields(["simLight"]);
             if (simLight.value === "Off" && selectedValue === "form500_6") {
@@ -6318,6 +6611,7 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
     
+        const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.value !== "No - for Ticket Creation") {
                 showFields(["eligibleForUpsell"]);
@@ -6638,6 +6932,11 @@ function createIntentBasedForm() {
 
         const accountType = document.querySelector("[name='accountType']");
         const custAuth = document.querySelector("[name='custAuth']");
+        const equipmentBrand = document.querySelector("[name='equipmentBrand']");
+        const modemBrand = document.querySelector("[name='modemBrand']");
+        const onuConnectionType = document.querySelector("[name='onuConnectionType']");
+        const issueResolved = document.querySelector("[name='issueResolved']");
+
         function handleCustAuthAndAccountTypeChange() {
             if (!custAuth.value || !accountType.value) {
                 return;
@@ -6703,10 +7002,6 @@ function createIntentBasedForm() {
         custAuth.addEventListener("change", handleCustAuthAndAccountTypeChange);
         accountType.addEventListener("change", handleCustAuthAndAccountTypeChange);
 
-        const equipmentBrand = document.querySelector("[name='equipmentBrand']");
-        const modemBrand = document.querySelector("[name='modemBrand']");
-        const onuConnectionType = document.querySelector("[name='onuConnectionType']");
-
         function updateONUConnectionType() {
             if (!equipmentBrand.value || !modemBrand.value) {
                 onuConnectionType.value = ""; 
@@ -6740,8 +7035,19 @@ function createIntentBasedForm() {
 
         updateONUConnectionType();
     
-        const issueResolved = document.querySelector("[name='issueResolved']");
-        issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
+        issueResolved.addEventListener("change", () => {
+            if (issueResolved.selectedIndex === 2) {
+                showFields(["cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions"]);
+
+                updateToolLabelVisibility();
+            } else {
+                hideSpecificFields(["cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions"]);
+
+                updateToolLabelVisibility();
+            }
+
+            updateToolLabelVisibility();
+        });
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -7874,19 +8180,19 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["sagipOLDiscount", "eligibleForUpsell", "offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
 
-        const requestType = document.querySelector("[name='requestType']");
-        requestType.addEventListener("change", () => {
-            resetAllFields(["custAuth", "requestType"]);
-            if (requestType.selectedIndex === 2) {
-                showFields(["sagipOLDiscount"]);
-                hideSpecificFields(["eligibleForUpsell", "offerAccepted", "declineReason", "notEligibleReason"]);
-            } else {
-                showFields(["eligibleForUpsell"]);
-                hideSpecificFields(["sagipOLDiscount", "offerAccepted", "declineReason", "notEligibleReason"]);
-            }
-        });
+        // const requestType = document.querySelector("[name='requestType']");
+        // requestType.addEventListener("change", () => {
+        //     resetAllFields(["custAuth", "requestType"]);
+        //     if (requestType.selectedIndex === 2) {
+        //         showFields(["sagipOLDiscount"]);
+        //         hideSpecificFields(["eligibleForUpsell", "offerAccepted", "declineReason", "notEligibleReason"]);
+        //     } else {
+        //         showFields(["eligibleForUpsell"]);
+        //         hideSpecificFields(["sagipOLDiscount", "offerAccepted", "declineReason", "notEligibleReason"]);
+        //     }
+        // });
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -8139,7 +8445,10 @@ function createIntentBasedForm() {
                 "", 
                 "Plan 1299",
                 "Plan 1399",
+                "Plan 1499",
                 "Plan 1799",
+                "Plan 1899",
+                "Plan 2599",
                 "Others"
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
@@ -8195,13 +8504,21 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Processing of SO for downgrade from a higher plan to Fiber Unli Plan 1299.";
-            
 
             const li2 = document.createElement("li");
-            li2.textContent = "Processing of SO for downgrade from a higher plan to Plan 1399 with Cignal subscription.";
+            li2.textContent = "Processing of SO for downgrade from a higher plan to Plan 1399.";
+            
+            const li5 = document.createElement("li");
+            li5.textContent = "Processing of SO for downgrade from a higher plan to Plan 1499.";
 
             const li3 = document.createElement("li");
-            li3.textContent = "Processing of SO for downgrade from a higher plan to Plan 1799 with Cignal subscription.";
+            li3.textContent = "Processing of SO for downgrade from a higher plan to Plan 1799.";
+
+            const li6 = document.createElement("li");
+            li6.textContent = "Processing of SO for downgrade from a higher plan to Plan 1899.";
+
+            const li7 = document.createElement("li");
+            li7.textContent = "Processing of SO for downgrade from a higher plan to Plan 2599.";
 
             const li4 = document.createElement("li");
             li4.textContent = "Requests for downgrade to a lower subscription plan.";
@@ -8210,8 +8527,14 @@ function createIntentBasedForm() {
                 ul.appendChild(li1);
             } else if (requestType === "Plan 1399") {
                 ul.appendChild(li2);
+            } else if (requestType === "Plan 1499") {
+                ul.appendChild(li5);
             } else if (requestType === "Plan 1799") {
                 ul.appendChild(li3);
+            } else if (requestType === "Plan 1899") {
+                ul.appendChild(li6);
+            } else if (requestType === "Plan 2599") {
+                ul.appendChild(li7);
             } else {
                 ul.appendChild(li4);
             }
@@ -9054,13 +9377,7 @@ function createIntentBasedForm() {
                 "Tactical"
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”, “PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: [
-                "",
-                "Yes",
-                "No - Customer is Unresponsive",
-                "No - Customer Declined Further Assistance",
-                "No - System Ended Chat"
-            ]},
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -10140,7 +10457,7 @@ function createIntentBasedForm() {
             ] },
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
             { label: "SO", type: "text", name: "srNum"},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
+           { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -10311,9 +10628,12 @@ function createIntentBasedForm() {
             { label: "Type of Request", type: "select", name: "requestType", options: [
                 "", 
                 "Plan 1399",
+                "Plan 1499",
                 "Plan 1599",
                 "Plan 1799",
+                "Plan 1899",
                 "Plan 2099",
+                "Plan 2599",
                 "Plan 2699",
                 "Others"
             ] },
@@ -10370,6 +10690,9 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Customer was requesting for the upgrade of service into plan 1399.";
+
+            const li9 = document.createElement("li");
+            li9.textContent = "Customer was requesting for the upgrade of service into plan 1499.";
             
             const li2 = document.createElement("li");
             li2.textContent = "Customer was requesting for the upgrade of service into plan 1599.";
@@ -10377,8 +10700,14 @@ function createIntentBasedForm() {
             const li3 = document.createElement("li");
             li3.textContent = "Customer was requesting for the upgrade of service into plan 1799.";
 
+            const li10 = document.createElement("li");
+            li10.textContent = "Customer was requesting for the upgrade of service into plan 1899.";
+
             const li4 = document.createElement("li");
             li4.textContent = "Customer was requesting for the upgrade of service into plan 2099.";
+
+            const li11 = document.createElement("li");
+            li11.textContent = "Customer was requesting for the upgrade of service into plan 2599.";
 
             const li5 = document.createElement("li");
             li5.textContent = "Customer was requesting for the upgrade of service into plan 2699.";
@@ -10388,12 +10717,18 @@ function createIntentBasedForm() {
 
             if (requestType === "Plan 1399") {
                 ul.appendChild(li1);
+            } else if (requestType === "Plan 1499") {
+                ul.appendChild(li9);
             } else if (requestType === "Plan 1599") {
                 ul.appendChild(li2);
             } else if (requestType === "Plan 1799") {
                 ul.appendChild(li3);
+            } else if (requestType === "Plan 1899") {
+                ul.appendChild(li10);
             } else if (requestType === "Plan 2099") {
                 ul.appendChild(li4);
+            } else if (requestType === "Plan 2599") {
+                ul.appendChild(li11);
             } else if (requestType === "Plan 2699") {
                 ul.appendChild(li5);
             } else {
@@ -11085,7 +11420,7 @@ function createIntentBasedForm() {
                 "NA"
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -11271,7 +11606,7 @@ function createIntentBasedForm() {
                 "NA"
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -11474,7 +11809,7 @@ function createIntentBasedForm() {
                 "Telesales"
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -11677,7 +12012,10 @@ function createIntentBasedForm() {
                 formInqTempDisc: "Inquiries about temporary disconnection due to migration, hospitalization, or vacation",
                 formInqD1299: "Inquiries about downgrading to Fiber Unli Plan 1299",
                 formInqD1399: "Inquiries about downgrading to Fiber Unli Plan 1399",
+                formInqD1499: "Inquiries about downgrading to Fiber Unli Plan 1499",
                 formInqD1799: "Inquiries about downgrading to Fiber Unli Plan 1799",
+                formInqD1899: "Inquiries about downgrading to Fiber Unli Plan 1899",
+                formInqD2599: "Inquiries about downgrading to Fiber Unli Plan 2599",
                 formInqDOthers: "Inquiries about the process for downgrading service",
                 formInqDdateExt: "Inquiries about extension of due date, either temporary or permanent",
                 formInqEntertainment: "Inquiries about availing entertainment add-ons",
@@ -11695,10 +12033,13 @@ function createIntentBasedForm() {
                 formInqUfcEnroll: "Inquiries about the enrollment process for UnliFamCall",
                 formInqUfcPromoMech: "Inquiries about the UnliFamCall promo, including how to avail, inclusions, and details",
                 formInqUpg1399: "Inquiries about service upgrades for Fiber Unli Plan 1399 (details, fees, SLA)",
+                formInqUpg1499: "Inquiries about service upgrades for Fiber Unli Plan 1499 (details, fees, SLA)",
                 formInqUpg1599: "Inquiries about service upgrades for Fiber Unli Plan 1599 (details, fees, SLA)",
                 formInqUpg1799: "Inquiries about service upgrades for Fiber Unli Plan 1799 (details, fees, SLA)",
+                formInqUpg1899: "Inquiries about service upgrades for Fiber Unli Plan 1899 (details, fees, SLA)",
                 formInqUpg2099: "Inquiries about service upgrades for Fiber Unli Plan 2099 (details, fees, SLA)",
                 formInqUpg2499: "Inquiries about service upgrades for Fiber Unli Plan 2499 (details, fees, SLA)",
+                formInqUpg2599: "Inquiries about service upgrades for Fiber Unli Plan 2599 (details, fees, SLA)",
                 formInqUpg2699: "Inquiries about service upgrades for Fiber Unli Plan 2699 (details, fees, SLA)",
                 formInqUpgOthers: "Inquiries about service upgrades, including details, fees, and plans not in tagging",
                 formInqVasAO: "Inquiries about Always On, including fees, SLA, and eligibility",
@@ -11830,7 +12171,7 @@ function createIntentBasedForm() {
                 "NA"
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -12172,7 +12513,7 @@ function createIntentBasedForm() {
                 "NA"
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -12323,7 +12664,7 @@ function createIntentBasedForm() {
                 "NA"
             ]},
             { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["", "Yes", "No - Customer is Unresponsive", "No - Customer Declined Further Assistance", "No - System Ended Chat"] },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -13451,11 +13792,314 @@ function createIntentBasedForm() {
         document.querySelector("#cust-name").addEventListener("input", copyFrm1Values);
         document.querySelector("#landline-num").addEventListener("input", copyFrm1Values);
     }
+
+    // ============================================== //
+    //                      CCBO                      //
+    // ============================================== //
+
+    // Non-Tech Intents
+    else if (selectedValue === "ccbo_formReqBillAdjust" || selectedValue === "ccbo_formFfupBillAdjust") { 
+        const table = document.createElement("table");
+
+        const fields = [
+            { label: "Callout Attempt", type: "select", name: "calloutAttempt", options: [
+                "", 
+                "1st", 
+                "2nd",
+                "NA - Happy Path",
+                "NA - Complete Requirements"
+            ]},
+            { label: "Type of Request", type: "select", name: "requestType", options: [
+                "", 
+                "Rebate Non Service",
+                "Rentals - MSF",
+                "Rentals - Lionsgate play/Netflix",
+                "Rentals - NRC- Cost of Unit/Gadgets",
+                "Rentals- Service Connection Charge",
+                "Usage - Tolls (UnliFam Call)",
+                "Usage - Other Tolls",
+                "Others"
+            ] },
+            { label: "Other Concern", type: "text", name: "othersConcern", placeholder: "Describe the customer's concern."},
+            { label: "Request Status", type: "select", name: "ffupStatus", options: [
+                "", 
+                "Beyond SLA", 
+                "Within SLA"
+            ]},
+            // Actions Taken & Other Details
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "CASIO Notes", type: "textarea", name: "casio"},
+            { label: "SO/SR", type: "text", name: "srNum"},
+            // Callout Details - Primary
+            { label: "Primary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails1", placeholder: "Copy all and paste here."},
+            { label: "Result", type: "select", name: "outboundResult1", options: [
+                "", 
+                "Answered",
+                "No Answer",
+                "Unattended"
+            ] },
+            // Secondary
+            { label: "Same w/ Primary #?", type: "select", name: "checkSecondaryNum", options: [
+                "", 
+                "Yes",
+                "No"
+            ] },
+            { label: "Secondary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails2", placeholder: "Copy all and paste here"},
+            { label: "Result", type: "select", name: "outboundResult2", options: [
+                "", 
+                "Answered",
+                "No Answer",
+                "Unattended"
+            ] },
+            // Landline
+            { label: "Landline Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails3", placeholder: "Copy all and paste here."},
+            { label: "Result", type: "select", name: "outboundResult3", options: [
+                "", 
+                "Answered",
+                "No Answer",
+                "Unattended"
+            ] },
+            { label: "SMS Sent? Y/N", type: "select", name: "smsSent", options: [
+                "", 
+                "Yes",
+                "No"
+            ] },
+            { label: "Case Status", type: "select", name: "caseStatus", options: [
+                "", 
+                "Closed Engage",
+                "Closed - Escalated",
+                "Closed - Resolved",
+                "Manage"
+            ] },
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests or follow-ups related to disputes or rebate processing for charges involving non-service periods, Monthly Service Fees (MSF), Value-Added Services (VAS), and toll usage.";
+            ul.appendChild(li);
+
+            // Work Instructions link
+            const linkLi = document.createElement("li");
+            linkLi.innerHTML = `See <a href="https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/CCBO_HANDLING_BILL_ADJUSTMENT_VIA_WEB_FORM.aspx" target="_blank">Cust Care Back Office (CCBO) Handling Bill Adjustment Via Web Form</a> for detailed handling procedures and work instructions.`;
+            ul.appendChild(linkLi);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            row.style.display = field.name === "calloutAttempt" ? "table-row" : "none"; 
+
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "toolLabel") {
+                const row = document.createElement("tr");
+                row.className = "tool-label-row";
+                row.dataset.relatedTo = field.relatedTo;
+
+                const td = document.createElement("td");
+                const div = document.createElement("div");
+
+                div.className = "formToolLabel";
+                div.textContent = field.label.replace("// ", ""); // cleaner display
+
+                td.appendChild(div);
+                row.appendChild(td);
+
+                return row;
+            } else if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index)=> {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = field.name === "remarks" ? 4 : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function insertToolLabel(fields, label, relatedFieldName) {
+            fields.splice(
+                fields.findIndex(f => f.name === relatedFieldName),
+                0,
+                {
+                    label: `// ${label}`,
+                    type: "toolLabel",
+                    name: `toolLabel-${label.toLowerCase().replace(/\s/g, "-")}`,
+                    relatedTo: relatedFieldName
+                }
+            );
+        }
+
+        const enhancedFields = [...fields];
+
+        insertToolLabel(enhancedFields, "Primary Contact", "cosmoDetails1");
+        insertToolLabel(enhancedFields, "Secondary Contact", "checkSecondaryNum");
+        insertToolLabel(enhancedFields, "Landline", "cosmoDetails3");
+        insertToolLabel(enhancedFields, "Actions Taken & Other Details", "remarks");
+        
+        table.appendChild(createDefinitionRow());
+
+        enhancedFields.forEach((field) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+        });
+
+        function updateToolLabelVisibility() {
+            const allToolLabels = document.querySelectorAll(".tool-label-row");
+            allToolLabels.forEach(labelRow => {
+                const relatedName = labelRow.dataset.relatedTo;
+                const relatedInput = document.querySelector(`[name="${relatedName}"]`);
+                if (relatedInput) {
+                    const relatedRow = relatedInput.closest("tr");
+                    labelRow.style.display = (relatedRow && relatedRow.style.display !== "none") ? "table-row" : "none";
+                }
+            });
+        }
+
+        form2Container.appendChild(table);
+
+        const calloutAttempt = document.querySelector("[name='calloutAttempt']");
+        calloutAttempt.addEventListener("change", () => {
+            resetAllFields(["calloutAttempt"]);
+            if (calloutAttempt.selectedIndex === 1) {
+                showFields(["requestType", "remarks", "cosmoDetails1", "outboundResult1", "smsSent", "caseStatus"]);
+                if (selectedValue === "ccbo_formFfupBillAdjust") {
+                    showFields(["ffupStatus"]);
+                    hideSpecificFields(["casio", "srNum"]);
+                } else {
+                    showFields(["casio", "srNum"]);
+                    hideSpecificFields(["ffupStatus"]);
+                }
+                hideSpecificFields(["checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            } else if (calloutAttempt.selectedIndex === 2) {
+                showFields(["cosmoDetails1", "outboundResult1", "remarks", "smsSent", "caseStatus"]);
+                hideSpecificFields(["requestType", "ffupStatus", "casio", "srNum", "checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            } else {
+                showFields(["requestType", "remarks", "smsSent", "caseStatus"]);
+                if (selectedValue === "ccbo_formFfupBillAdjust") {
+                    showFields(["ffupStatus"]);
+                    hideSpecificFields(["casio", "srNum"])
+                } else {
+                    showFields(["casio", "srNum"]);
+                    hideSpecificFields(["ffupStatus"]);
+                }
+                hideSpecificFields(["cosmoDetails1", "outboundResult1", "checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            }
+            updateToolLabelVisibility();
+            renderButtons();
+        });
+
+        const requestType = document.querySelector("[name='requestType']");
+        requestType.addEventListener("change", () => {
+            if (requestType.value === "Others") {
+                showFields(["othersConcern"]);
+            } else {
+                hideSpecificFields(["othersConcern"]);
+            }
+        });
+
+        const outboundResult1 = document.querySelector("[name='outboundResult1']");
+        if (outboundResult1) {
+            outboundResult1.addEventListener("change", () => {
+                if (outboundResult1.selectedIndex === 2 || outboundResult1.selectedIndex === 3) {
+                    showFields(["checkSecondaryNum"]);
+                } else {
+                    hideSpecificFields(["checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        const checkSecondaryNum = document.querySelector("[name='checkSecondaryNum']");
+        if (checkSecondaryNum) {
+            checkSecondaryNum.addEventListener("change", () => {
+                if (checkSecondaryNum.selectedIndex === 2) {
+                    showFields(["cosmoDetails2", "outboundResult2"]);
+                    hideSpecificFields(["cosmoDetails3", "outboundResult3"]);
+                } else {
+                    showFields(["cosmoDetails3", "outboundResult3"]);
+                    hideSpecificFields(["cosmoDetails2", "outboundResult2"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        const outboundResult2 = document.querySelector("[name='outboundResult2']");
+        if (outboundResult2) {
+            outboundResult2.addEventListener("change", () => {
+                if (outboundResult2.selectedIndex === 2 || outboundResult2.selectedIndex === 3) {
+                    showFields(["cosmoDetails3", "outboundResult3"]);
+                } else {
+                    hideSpecificFields(["cosmoDetails3", "outboundResult3"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        updateToolLabelVisibility();
+    }
 }
 
 document.getElementById("selectIntent").addEventListener("change", createIntentBasedForm);
 
-// Create Buttons helper
+// Create PLDT Home Buttons helper
 function createButtons(buttonLabels, buttonHandlers) {
     const vars = initializeVariables();
 
@@ -13464,6 +14108,7 @@ function createButtons(buttonLabels, buttonHandlers) {
 
     const isHotline = channelField === "CDT-HOTLINE";
     const isSocMed = channelField === "CDT-SOCMED";
+    const isCCBO = channelField === "CNDT_CCBO"
     const isTech = lobField === "TECH";
     const isNonTech = lobField === "NON-TECH";
 
@@ -13476,6 +14121,111 @@ function createButtons(buttonLabels, buttonHandlers) {
 
         for (let colIndex = 0; colIndex < 4; colIndex++) {
             const cell = document.createElement("td");
+
+            // =============================
+            // 🔹 CCBO NON-TECH LAYOUT
+            // =============================
+            if (isCCBO && isNonTech && vars.selectedIntent === "ccbo_formFfupRepair") {
+
+                // 1st button spans first 2 columns
+                if (buttonIndex === 0 && colIndex === 0) {
+                    const button = document.createElement("button");
+                    button.textContent = buttonLabels[buttonIndex];
+                    button.onclick = buttonHandlers[buttonIndex];
+                    button.classList.add("form2-button");
+
+                    cell.colSpan = 2;
+                    cell.appendChild(button);
+                    row.appendChild(cell);
+
+                    buttonIndex++;
+                    hasButton = true;
+
+                    colIndex++; // skip next column
+                    continue;
+                }
+
+                // skip column already occupied
+                if (colIndex === 1) {
+                    continue;
+                }
+
+                // 2nd button
+                if (buttonIndex === 1 && colIndex === 2) {
+                    const button = document.createElement("button");
+                    button.textContent = buttonLabels[buttonIndex];
+                    button.onclick = buttonHandlers[buttonIndex];
+                    button.classList.add("form2-button");
+
+                    cell.appendChild(button);
+                    row.appendChild(cell);
+
+                    buttonIndex++;
+                    hasButton = true;
+                    continue;
+                }
+
+                // 3rd button
+                if (buttonIndex === 2 && colIndex === 3) {
+                    const button = document.createElement("button");
+                    button.textContent = buttonLabels[buttonIndex];
+                    button.onclick = buttonHandlers[buttonIndex];
+                    button.classList.add("form2-button");
+
+                    cell.appendChild(button);
+                    row.appendChild(cell);
+
+                    buttonIndex++;
+                    hasButton = true;
+                    continue;
+                }
+
+                row.appendChild(cell);
+                continue;
+            }
+
+            // =============================
+            // 🔹 CCBO NON-TECH LAYOUT
+            // =============================
+            if (isCCBO && isNonTech) {
+                if (buttonIndex === 0 && colIndex === 0) {
+                    const button = document.createElement("button");
+                    button.textContent = "SF & FUSE";
+                    button.onclick = buttonHandlers[0];
+                    button.classList.add("form2-button");
+
+                    cell.colSpan = 2; // occupies columns 1 and 2
+                    cell.appendChild(button);
+                    row.appendChild(cell);
+
+                    buttonIndex++;
+                    hasButton = true;
+
+                    colIndex += 1; // skip column 2
+                    continue;
+                }
+
+                // Skip columns 2 and 3
+                if (colIndex === 2) {
+                    row.appendChild(cell);
+                    continue;
+                }
+
+                // Column 4
+                if (buttonIndex === 1 && colIndex === 3) {
+                    const button = document.createElement("button");
+                    button.textContent = "🔄 Reset";
+                    button.onclick = () => resetButtonHandler(true);
+                    button.classList.add("form2-button");
+
+                    cell.appendChild(button);
+                    row.appendChild(cell);
+
+                    buttonIndex++;
+                    hasButton = true;
+                    continue;
+                }
+            }
 
             while (buttonIndex < buttonLabels.length) {
                 let label = buttonLabels[buttonIndex];
@@ -13600,6 +14350,18 @@ function createButtons(buttonLabels, buttonHandlers) {
                     row.appendChild(cell);
 
                     mainButton.addEventListener("click", function (e) {
+
+                        if (label === "CEP") {
+                            const lob = document.getElementById("lob")?.value;
+                            const calloutAttempt =
+                                document.querySelector("[name='calloutAttempt']")?.value;
+
+                            if (lob === "TECH" && calloutAttempt === "2nd") {
+                                showAlert("This option is not available.");
+                                return;
+                            }
+                        }
+
                         e.stopPropagation();
                         dropdownContent.classList.toggle("show");
                         mainButton.classList.toggle("active");
@@ -14567,7 +15329,7 @@ function showCepFloatingDiv(labels, textToCopy) {
 // Validate Upsell fields before generating notes
 function validateUpsellFields() {
     const eligible = document.querySelector('[name="eligibleForUpsell"]')?.value || "";
-    // const offered = document.querySelector('[name="productsOffered"]')?.value || "";
+    const offered = document.querySelector('[name="productsOffered"]')?.value || "";
     const accepted = document.querySelector('[name="offerAccepted"]')?.value || "";
     const decline = document.querySelector('[name="declineReason"]')?.value || "";
     const notEligible = document.querySelector('[name="notEligibleReason"]')?.value || "";
@@ -14578,10 +15340,10 @@ function validateUpsellFields() {
     }
 
     if (eligible === "Yes") {
-        // if (isFieldVisible("productsOffered") && !offered) {
-        //     showAlert("Cannot generate notes. Please select *Product/Service Offered.");
-        //     return false;
-        // }
+        if (isFieldVisible("productsOffered") && !offered) {
+            showAlert("Cannot generate notes. Please select *Product/Service Offered.");
+            return false;
+        }
 
         if (isFieldVisible("offerAccepted") && !accepted) {
             showAlert("Cannot generate notes. Please select *Offer Accepted status.");
@@ -14634,7 +15396,6 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
     // STOP execution if upsell is incomplete
     if (!validateUpsellFields()) return;
 
-
     const vars = initializeVariables();
     const channel  = window.agentDetailsData?.channel || ""; 
 
@@ -14682,7 +15443,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
             // Cross-Sell/Upsell
             // { name: "eligibleForUpsell" },
             { name: "productsOffered", label: "OFFERED"},
-            { name: "declineReason", label: "BUT CUST DECLINED DUE TO"},
+            { name: "declineReason", label: "BUT CUST DECLINED"},
             { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL BEC THE"},
         ];
 
@@ -14692,6 +15453,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
         const offerALS = document.querySelector('[name="offerALS"]')?.value || "";
         const eligibleForUpsellValue = document.querySelector('[name="eligibleForUpsell"]')?.value || "";
         const offerAcceptedValue = document.querySelector('[name="offerAccepted"]')?.value || "";
+        const lobValue = document.getElementById("lob")?.value || "";
 
         let productsOfferedText = "";
         let declineReasonText = "";
@@ -14720,7 +15482,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
 
                     const alsValue = alsMessages[offerALS];
                     if (alsValue) actionsTakenParts.push(alsValue);
-                } else if (field.name === "outageStatus") {
+                }  else if (field.name === "outageStatus") {
                     const outageValue = value === "Yes" ? "Affected by a network outage" : "Not part of network outage";
                     actionsTakenParts.push(outageValue);
 
@@ -14728,8 +15490,8 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
                 
                 // else if (field.name === "eligibleForUpsell") {
                 //     const discoCallChatMsg = {
-                //         "No - Ghost Call": "GHOST CALL",
-                //         "No - Unresponsive Customer": "UNRESPONSIVE CUSTOMER"
+                //         "No - Disconnected Call": "UNABLE TO OFFER UPSELL AS THE CALL GOT DISCONNECTED",
+                //         "No - Disconnected Chat": "UNABLE TO OFFER UPSELL AS THE CHAT WAS DISCONNECTED"
                 //     };
 
                 //     const discoCallChatValue = discoCallChatMsg[eligibleForUpsellValue];
@@ -14739,7 +15501,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
                 else if (field.name === "productsOffered") {
                     productsOfferedText = (field.label ? `${field.label} ` : "") + value;
                 } else if (field.name === "declineReason") {
-                    declineReasonText = (field.label ? `${field.label} ` : "") + value;
+                    declineReasonText = (field.label ? `${field.label} - ` : "") + value;
                 } else if (field.name === "notEligibleReason") {
                     actionsTakenParts.push((field.label ? `${field.label} ` : "") + value);
                 } else {
@@ -14760,12 +15522,9 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
         const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
         const issueResolvedMap = {
             "Yes": "Resolved",
-            // "No - Customer is Unresponsive": "Customer was Unresponsive",
+            "No - Customer is Unresponsive": "Customer is Unresponsive",
             "No - Customer Declined Further Assistance": "Customer Declined Further Assistance",
-            "No - System Ended Chat": "System Ended Chat",
-            "No - Disconnected Call": "Call got Disconnected",
-            "No - Customer is Not At Home": "Customer was Not At Home",
-            "No - Customer Ended Chat": "Customer Ended Chat"
+            "No - System Ended Chat": "System Ended Chat"
         };
 
         if (issueResolvedMap[issueResolvedValue]) {
@@ -14776,11 +15535,12 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
         const upsellMap = {
             eligibleForUpsell: {
                 "No - Not Eligible": "#UpsellNotEligible",
-                "No - Intent Not Eligible": "#UpsellIntentNotEligible",
+                "No - Intent Not Eligible": "#UpsellNotEligibleIntents",
                 "No - Out of Stock": "#UpsellOutofStock",
             },
             offerAccepted: {
                 "Yes - Accepted": "#UpsellAccepted",
+                "Yes - Direct": "#UpsellDirect",
                 "Yes - Upsell Later": "#UpsellLater",
                 "No - Declined": "#UpsellDeclined",
                 "No - Ignored": "#UpsellIgnored",
@@ -15249,9 +16009,25 @@ function nontechNotesButtonHandler(showFloating = true) {
     
     const vars = initializeVariables();
     const channel  = window.agentDetailsData?.channel || ""; 
+    const caseOrigin  = window.agentDetailsData?.caseOrigin || ""; 
+    const calloutAttempt = getFuseFieldValueIfVisible("calloutAttempt");
 
     let concernCopiedText = "";
     let actionsTakenCopiedText = "";
+    let outboundDetailsCopiedText = "";
+
+    function getCasioFieldValue(fieldName) {
+        let field = null;
+
+        if (!field) {
+            field = document.querySelector(`[name="${fieldName}"]`);
+        }
+
+        if (!field) return "";
+
+        // No replacement for linebreaks
+        return (field.value || "").trim();
+    }
 
     function constructFuseOutput() {
         const fields = [
@@ -15267,10 +16043,12 @@ function nontechNotesButtonHandler(showFloating = true) {
             { name: "resolution"},
             { name: "remarks"},
 
+            // CCBO Callout Details
+            { name: "calloutAttempt"},
+
             // Cross-Sell/Upsell
-            // { name: "eligibleForUpsell" },
             { name: "productsOffered", label: "OFFERED"},
-            { name: "declineReason", label: "CUST DECLINED OFFER DUE TO"},
+            { name: "declineReason", label: "CUST DECLINED OFFER"},
             { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL DUE TO"},
         ];
 
@@ -15310,22 +16088,19 @@ function nontechNotesButtonHandler(showFloating = true) {
 
             if (value && !seenFields.has(field.name)) {
                 seenFields.add(field.name);
-                // if (field.name === "eligibleForUpsell") {
-                //     const discoCallChatMsg = {
-                //         "No - Ghost Call": "GHOST CALL",
-                //         "No - Unresponsive Customer": "UNRESPONSIVE CUSTOMER"
-                //     };
 
-                //     const discoCallChatValue = discoCallChatMsg[eligibleForUpsellValue];
-                //     if (discoCallChatValue) actionsTakenParts.push(discoCallChatValue);
-                // } else 
-                    
                 if (field.name === "productsOffered") {
                     productsOfferedText = (field.label ? `${field.label} ` : "") + value;
                 } else if (field.name === "declineReason") {
-                    declineReasonText = (field.label ? `${field.label} ` : "") + value;
+                    declineReasonText = (field.label ? `${field.label} - ` : "") + value;
                 } else if (field.name === "notEligibleReason") {
                     actionsTakenParts.push((field.label ? `${field.label} ` : "") + value);
+                } else if (field.name === "calloutAttempt") {
+                    if (["NA - Happy Path", "NA - Complete Requirements"].includes(value)) {
+                        actionsTakenParts.push(
+                            (field.label ? `${field.label}: ` : "") + value.replace("NA - ", "")
+                        );
+                    }
                 } else {
                     actionsTakenParts.push((field.label ? `${field.label}: ` : "") + value);
                 }
@@ -15360,12 +16135,10 @@ function nontechNotesButtonHandler(showFloating = true) {
         const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
         const issueResolvedMap = {
             "Yes": "Resolved",
-            // "No - Customer is Unresponsive": "Customer was Unresponsive",
+            "No - Customer is Unresponsive": "Customer is Unresponsive",
             "No - Customer Declined Further Assistance": "Customer Declined Further Assistance",
-            "No - System Ended Chat": "System Ended Chat",
-            "No - Disconnected Call": "Call got Disconnected",
-            "No - Customer is Not At Home": "Customer was Not At Home",
-            "No - Customer Ended Chat": "Customer Ended Chat"
+            "No - Customer Ended Chat": "Customer Ended Chat",
+            "No - System Ended Chat": "System Ended Chat"
         };
 
         if (issueResolvedMap[issueResolvedValue]) {
@@ -15376,11 +16149,12 @@ function nontechNotesButtonHandler(showFloating = true) {
         const upsellMap = {
             eligibleForUpsell: {
                 "No - Not Eligible": "#UpsellNotEligible",
-                "No - Intent Not Eligible": "#UpsellIntentNotEligible",
+                "No - Intent Not Eligible": "#UpsellNotEligibleIntents",
                 "No - Out of Stock": "#UpsellOutofStock",
             },
             offerAccepted: {
                 "Yes - Accepted": "#UpsellAccepted",
+                "Yes - Direct": "#UpsellDirect",
                 "Yes - Upsell Later": "#UpsellLater",
                 "No - Declined": "#UpsellDeclined",
                 "No - Ignored": "#UpsellIgnored",
@@ -15407,8 +16181,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         let sagipNote = sagipNoteMap[sagipOLDiscountValue] || "";
 
         // Ordertake mapping
-        const ordertakeValue =
-            document.querySelector('[name="ordertake"]')?.value || "";
+        const ordertakeValue = document.querySelector('[name="ordertake"]')?.value || "";
 
         let otNote = "";
 
@@ -15429,6 +16202,12 @@ function nontechNotesButtonHandler(showFloating = true) {
             ? "A: " + cleanedParts.join("/ ").toUpperCase()
             : "";
 
+        // CCBO CASIO field
+        const casio = getCasioFieldValue("casio");
+        if (casio) {
+            actionsTaken += (actionsTaken ? "\n" : "") + casio;
+        }
+        
         // Append upsell note (DO NOT uppercase)
         if (upsellNote) {
             actionsTaken += (actionsTaken ? "\n\n" : "") + upsellNote;
@@ -15436,7 +16215,7 @@ function nontechNotesButtonHandler(showFloating = true) {
 
         // Append sagip note (DO NOT uppercase)
         if (sagipNote) {
-            actionsTaken += (actionsTaken ? "\n\n" : "") + sagipNote;
+            actionsTaken += (actionsTaken ? " " : "") + sagipNote;
         }
 
         // Append ordertake note (decide if uppercase or not)
@@ -15460,10 +16239,141 @@ function nontechNotesButtonHandler(showFloating = true) {
     function formatField(label, name, prefix = "/") {
         if (!isFieldVisible(name) || !vars[name]) return "";
 
-        const prefixPart = prefix ? `${prefix} ` : "";
+        const actualPrefix = channel === "CNDT_CCBO" ? "" : prefix;
+
+        const prefixPart = actualPrefix ? `${actualPrefix} ` : "";
         const labelPart = label ? `${label}: ` : "";
 
         return `${prefixPart}${labelPart}${vars[name]}`;
+    }
+
+    function constructOutboundDetails() {
+        const fields = [
+            { name: "calloutAttempt"},
+            { name: "cosmoDetails1"},
+            { name: "outboundResult1"},
+            { name: "checkSecondaryNum"},
+            { name: "cosmoDetails2"},
+            { name: "outboundResult2"},
+            { name: "cosmoDetails3"},
+            { name: "outboundResult3"},
+            { name: "remarks"},
+            { name: "srNum"},
+            { name: "casio"},
+            { name: "smsSent"},
+            { name: "caseStatus"},
+        ];
+
+        const seenFields = new Set();
+        let outboundDetailParts = [];
+
+        fields.forEach(field => {
+            const inputElement = document.querySelector(`[name="${field.name}"]`);
+            let value;
+
+            // Skip remarks unless calloutAttempt is 2nd     
+            if (
+                ["remarks", "srNum", "casio"].includes(field.name) &&
+                calloutAttempt !== "2nd"
+            ) {
+                return;
+            }
+
+            value = getFuseFieldValueIfVisible(field.name);
+
+            if (inputElement && inputElement.tagName === "SELECT" && inputElement.selectedIndex === 0) {
+                return;
+            }
+
+            if (value && !seenFields.has(field.name)) {
+                seenFields.add(field.name);
+
+                if (field.name === "calloutAttempt") {
+                    const calloutMap = {
+                        "1st": "1st Callout",
+                        "2nd": "Updated 2nd Callout",
+                        "NA - Happy Path": "",
+                        "NA - Complete Requirements": ""
+                    };
+
+                    const mappedValue = calloutMap[value];
+
+                    const outbound1 = getFuseFieldValueIfVisible("outboundResult1");
+                    const outbound2 = getFuseFieldValueIfVisible("outboundResult2");
+                    const outbound3 = getFuseFieldValueIfVisible("outboundResult3");
+
+                    const callOutcome =
+                        [outbound1, outbound2, outbound3].includes("Answered")
+                            ? "Successful"
+                            : "Unsuccessful";
+
+                    if (mappedValue !== "") {
+                        outboundDetailParts.push(`${mappedValue} ${callOutcome}`);
+                    }
+                } else if (field.name === "remarks") {
+                    outboundDetailParts.push(`Actions taken: ${value}`);
+                } else if (field.name === "checkSecondaryNum") {
+                    const checkSecondaryNumMap = {
+                        "Yes": "Sec# Same as Primary #",
+                        "No": ""
+                    };
+
+                    const mappedValue = checkSecondaryNumMap[value];
+
+                    if (mappedValue !== "") {
+                        outboundDetailParts.push(mappedValue || value);
+                    }
+                } else if (field.name === "smsSent") {
+                    const smsMap = {
+                        "Yes": "SMS Sent",
+                        "No": ""
+                    };
+
+                    const mappedValue = smsMap[value];
+
+                    if (mappedValue !== "") {
+                        outboundDetailParts.push(mappedValue || value);
+                    }
+                } else {
+                    let modifiedValue = value;
+
+                    if (["cosmoDetails1", "cosmoDetails2", "cosmoDetails3"].includes(field.name)) {
+                        const nameMapping = {
+                            cosmoDetails1: "Primary",
+                            cosmoDetails2: "Secondary",
+                            cosmoDetails3: "Landline"
+                        };
+
+                        modifiedValue = modifiedValue
+                            .replace(/Name:/gi, `${nameMapping[field.name]}:`)
+                            .replace(/\/?\s*Queue:\s*Outbound\s*\/?/gi, "/")
+                            .replace(/\/?\s*Message:\s*/gi, "/ ")
+                            .replace(/\/{2,}/g, "/")
+                            .replace(/^\/|\/$/g, "")
+                            .trim();
+
+                        if (!modifiedValue) {
+                            return;
+                        }
+                    }
+                    
+                    if (modifiedValue) {
+                        outboundDetailParts.push(
+                            (field.label ? `${field.label}: ` : "") + modifiedValue
+                        );
+                    }
+                }
+            }
+        });
+
+        console.log(outboundDetailParts);
+
+        return outboundDetailParts
+            .flatMap(part => part.split("/ "))
+            .map(part => part.trim())
+            .filter(Boolean)
+            .join("/ ");
+
     }
 
     const custName = formatField("CUST NAME", "custName", "");
@@ -15502,6 +16412,10 @@ function nontechNotesButtonHandler(showFloating = true) {
 
     const reqBasedReqType = [
         "formReqAccMgt", "formReqAddressMod", "formReqDisconnection", "formReqDispute", "formReqDowngrade", "formReqReconnect", "formReqRefund", "formReqVAS", "formReqSupRetAccNum", "formReqSupChangeAccNum"
+    ];
+
+    const basedOnSelectedIntentAndRequestTypeCCBO = [
+        "ccbo_formReqBillAdjust", "ccbo_formInqBill", "ccbo_formCompMistreat", "ccbo_formReqSpecFeat", "ccbo_formInqSpecialFeatures"
     ];
     
     // non-Tech Complaints
@@ -15658,26 +16572,40 @@ function nontechNotesButtonHandler(showFloating = true) {
 
     // Others
     else if (othersForms.includes(vars.selectedIntent)) {
-
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}${insertCustConcern(vars.custConcern)}`;
         actionsTakenCopiedText = constructFuseOutput();
+    }
+
+    // CCBO Non-Tech Requests
+    else if (basedOnSelectedIntentAndRequestTypeCCBO.includes(vars.selectedIntent)) {
+        if (calloutAttempt !== "2nd") {
+            if (vars.requestType === "Others") {
+                concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC:  ${vars.selectedIntentText} - ${vars.othersConcern}`;
+            } else {
+                concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC: ${vars.selectedIntentText} - ${vars.requestType}`;
+            }
+            actionsTakenCopiedText = constructFuseOutput();
+            outboundDetailsCopiedText = constructOutboundDetails();
+        } else {
+            outboundDetailsCopiedText = constructOutboundDetails();
+        }
 
     }
 
     concernCopiedText = concernCopiedText.toUpperCase();
 
     const textToCopyGroups = [
-        [concernCopiedText, actionsTakenCopiedText].filter(Boolean).join("\n"),
+        [concernCopiedText, actionsTakenCopiedText, outboundDetailsCopiedText].filter(Boolean).join("\n"),
     ].filter(Boolean);
 
     if (showFloating) {
-        showFuseFloatingDiv(concernCopiedText, actionsTakenCopiedText);
+        showFuseFloatingDiv(concernCopiedText, actionsTakenCopiedText, outboundDetailsCopiedText);
     }
 
     return textToCopyGroups;
 }
 
-function showFuseFloatingDiv(concernCopiedText, actionsTakenCopiedText) {
+function showFuseFloatingDiv(concernCopiedText, actionsTakenCopiedText, outboundDetailsCopiedText) {
     const floatingDiv = document.getElementById("floatingDiv");
     const overlay = document.getElementById("overlay");
 
@@ -15703,7 +16631,7 @@ function showFuseFloatingDiv(concernCopiedText, actionsTakenCopiedText) {
     }
 
     const combinedSections = [
-        [addUniqueText(concernCopiedText), addUniqueText(actionsTakenCopiedText)].filter(Boolean).join("\n"),
+        [addUniqueText(concernCopiedText), addUniqueText(actionsTakenCopiedText), addUniqueText(outboundDetailsCopiedText)].filter(Boolean).join("\n"),
     ];
 
     combinedSections.forEach(text => {
@@ -17549,11 +18477,13 @@ function resetButtonHandler(requireSave = true) {
         const teamLead = document.getElementsByName("teamLead")[0]; 
         const pldtUser = document.getElementsByName("pldtUser")[0]; 
         const Channel = document.getElementsByName("selectChannel")[0];
+        const caseOrigin = document.getElementsByName("caseOrigin")[0];
 
         const agentNameValue = agentName.value;
         const teamLeadValue = teamLead.value;
         const pldtUserValue = pldtUser.value;
         const ChannelValue = Channel.value;
+        const caseOriginValue = caseOrigin.value;
 
         document.getElementById("frm1").reset();
 
@@ -17561,6 +18491,7 @@ function resetButtonHandler(requireSave = true) {
         teamLead.value = teamLeadValue;
         pldtUser.value = pldtUserValue;
         Channel.value = ChannelValue;
+        caseOrigin.value = caseOriginValue;
 
         resetForm2ContainerAndRebuildButtons();
 
@@ -18515,6 +19446,23 @@ const upsellingTips = [
 ];
 
 const versions = [
+    {
+        version: "V5.5.180826",
+        updates: [
+            {
+                title: "Improvements",
+                items: [
+                    "Added <strong>#UpsellDirect</strong> option for Upsell/Cross-sell to align with the updated <strong>Upsell Hashtag Guidelines</strong>.",
+                    "Added <strong>Upsell/Cross-sell</strong> field in <strong>Permanent Disconnection</strong> intent to ensure accurate tagging of upsell opportunities and consistent documentation in notes output.",
+                    "Added <strong>Account Tenure Requirement</strong> option in <strong>Upsell/Cross-sell Not Eligible Reasons</strong> field.",
+                    "Updated <strong>Fiber Unli Plans</strong> for upgrade and downgrade inquiries or requests.",
+                    "Updated <strong>Issue Resolved</strong> field options of Non-Tech intents.",
+                    "Improved <strong>Decline Reason</strong> notes output for better clarity and consistency in documentation.",
+                    "Disabled mouse wheel input on number fields to prevent accidental value changes while scrolling."
+                ]
+            }
+        ]
+    },
     {
         version: "V5.5.140726",
         updates: [
