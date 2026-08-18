@@ -1213,6 +1213,7 @@ function createIntentBasedForm() {
         productsOffered: [
             "", 
             "Always On",
+			"Cordless Telset",
             "Mesh",
             "Plan Upgrade",
         ],
@@ -2709,7 +2710,7 @@ function createIntentBasedForm() {
             { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
-            // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
