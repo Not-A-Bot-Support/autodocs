@@ -1213,7 +1213,7 @@ function createIntentBasedForm() {
         productsOffered: [
             "", 
             "Always On",
-			"Cordless Telset",
+            "Cordless Telset",
             "Mesh",
             "Plan Upgrade",
         ],
@@ -15330,7 +15330,7 @@ function showCepFloatingDiv(labels, textToCopy) {
 // Validate Upsell fields before generating notes
 function validateUpsellFields() {
     const eligible = document.querySelector('[name="eligibleForUpsell"]')?.value || "";
-    const offered = document.querySelector('[name="productsOffered"]')?.value || "";
+    // const offered = document.querySelector('[name="productsOffered"]')?.value || "";
     const accepted = document.querySelector('[name="offerAccepted"]')?.value || "";
     const decline = document.querySelector('[name="declineReason"]')?.value || "";
     const notEligible = document.querySelector('[name="notEligibleReason"]')?.value || "";
@@ -15341,10 +15341,10 @@ function validateUpsellFields() {
     }
 
     if (eligible === "Yes") {
-        if (isFieldVisible("productsOffered") && !offered) {
-            showAlert("Cannot generate notes. Please select *Product/Service Offered.");
-            return false;
-        }
+        // if (isFieldVisible("productsOffered") && !offered) {
+        //     showAlert("Cannot generate notes. Please select *Product/Service Offered.");
+        //     return false;
+        // }
 
         if (isFieldVisible("offerAccepted") && !accepted) {
             showAlert("Cannot generate notes. Please select *Offer Accepted status.");
@@ -19447,6 +19447,17 @@ const upsellingTips = [
 ];
 
 const versions = [
+    {
+        version: "V5.5.190826",
+        updates: [
+            {
+                title: "Fix",
+                items: [
+                    "Resolved a bug that prevented agents from generating notes when the Products/Services Offered field was left blank.",
+                ]
+            }
+        ]
+    },
     {
         version: "V5.5.180826",
         updates: [
