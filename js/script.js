@@ -1211,11 +1211,19 @@ function createIntentBasedForm() {
             "No - Out of Stock"
         ],
         productsOffered: [
-            "", 
+            "",
+            "Add-on: IPTV",
+            "Add-on: Wifi Mesh",
             "Always On",
             "Cordless Telset",
-            "Mesh",
-            "Plan Upgrade",
+            "Eufy Camera",
+            "Home Referral Program",
+            "New Plan Application",
+            "Speed Add On 500",
+            "Stream TV",
+            "Upgrade (Plan to Plan)",
+            "Samsung X",
+            "2025 Speedboost Promo for Fiber Plans"
         ],
         offerAccepted: [
             "", 
@@ -7083,6 +7091,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
@@ -7242,7 +7251,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -7265,6 +7274,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
@@ -7450,7 +7460,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -7479,6 +7489,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
@@ -7634,7 +7645,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
         
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -7663,6 +7674,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
@@ -7904,7 +7916,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -7940,6 +7952,7 @@ function createIntentBasedForm() {
                 "NA"
             ] },
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
@@ -8181,7 +8194,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         // const requestType = document.querySelector("[name='requestType']");
         // requestType.addEventListener("change", () => {
@@ -8227,6 +8240,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -8423,7 +8437,7 @@ function createIntentBasedForm() {
             }
         });
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -8457,6 +8471,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
@@ -8659,7 +8674,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
         
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -8688,6 +8703,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
@@ -8881,7 +8897,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -8905,6 +8921,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
@@ -9028,7 +9045,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -9052,6 +9069,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -9183,7 +9201,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -9207,6 +9225,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -9352,7 +9371,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                         
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -9381,6 +9400,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -9558,7 +9578,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -9589,6 +9609,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -9788,7 +9809,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                     
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -9818,6 +9839,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -10002,7 +10024,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const requestType = document.querySelector("[name='requestType']");
         requestType.addEventListener("change", () => {
@@ -10041,6 +10063,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -10242,7 +10265,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -10272,6 +10295,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -10432,7 +10456,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -10461,6 +10485,7 @@ function createIntentBasedForm() {
            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -10607,7 +10632,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -10643,6 +10668,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -10850,7 +10876,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -10884,6 +10910,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -11102,7 +11129,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -11131,6 +11158,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -11304,6 +11332,8 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
@@ -11322,6 +11352,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
@@ -11400,7 +11431,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -11424,6 +11455,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -11586,6 +11618,8 @@ function createIntentBasedForm() {
         const buttonHandlers = [nontechNotesButtonHandler, sfTaggingButtonHandler, resetButtonHandler];
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
+
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
         
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -11610,6 +11644,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -11788,6 +11823,8 @@ function createIntentBasedForm() {
             }
         });
 
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
@@ -11813,6 +11850,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -11939,7 +11977,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
     
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -11964,6 +12002,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -12143,7 +12182,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -12175,6 +12214,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -12294,7 +12334,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
     
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -12318,6 +12358,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -12482,7 +12523,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -12517,6 +12558,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -12638,7 +12680,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -12668,6 +12710,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -12785,7 +12828,7 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -12839,6 +12882,7 @@ function createIntentBasedForm() {
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
@@ -13274,7 +13318,7 @@ function createIntentBasedForm() {
 
         updateFindingsOptions(findingsSelect.value);
 
-        hideSpecificFields(["offerAccepted", "declineReason", "notEligibleReason"]);
+        hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
@@ -14925,7 +14969,7 @@ function cepCaseDescription(showAddlDetails = true) {
     return caseDescription;
 }
 
-function cepCaseNotes() {
+function cepCaseNotes(includeSpecialInst = true) {
     const vars = initializeVariables();
 
     const techIntents = [
@@ -15160,12 +15204,16 @@ function cepCaseNotes() {
     }
 
     const notes = constructCaseNotes();
-    return notes;
+    // return notes;
 
     // If Special Instructions is needed in the future
-    // const specialInst = includeSpecialInst ? (specialInstButtonHandler(false) || "").toUpperCase() : "";
+    const specialInst = includeSpecialInst
+        ? (specialInstButtonHandler(false) || "").toUpperCase() 
+        : "";
 
-    // return [notes, specialInst].filter(Boolean).join("\n\n");
+    return [notes, specialInst]
+        .filter(Boolean)
+        .join("\n\n");
 
 }
 
@@ -15243,7 +15291,7 @@ function cepButtonHandler(showFloating = true, filter = []) {
     const dataMap = {
         Title: (cepCaseTitle() || "").toUpperCase(),
         Description: (cepCaseDescription(true) || "").toUpperCase(),
-        "Case Notes in Timeline": (cepCaseNotes() || "").toUpperCase(),
+        "Case Notes in Timeline": (cepCaseNotes(true) || "").toUpperCase(),
         "Special Instructions": (specialInstButtonHandler(true) || "").toUpperCase()
     };
 
@@ -18581,7 +18629,7 @@ function saveFormData() {
     const newTicketNotes = [
         cepCaseTitle(),
         cepCaseDescription(false),
-        cepCaseNotes(),
+        cepCaseNotes(false),
         specialInstButtonHandler(false)
     ].filter(Boolean);
 
@@ -19447,6 +19495,25 @@ const upsellingTips = [
 ];
 
 const versions = [
+    {
+        version: "V5.5.010926",
+        updates: [
+            {
+                title: "Enhancements",
+                items: [
+                    "Updated the <strong>Products/Services Offered</strong> field options to reflect the latest <strong>PLDT Product Offerings</strong>.",
+                    "Added <strong>Special Instructions</strong> to the generated <strong>CEP Case Notes in Timeline</strong>."
+                ]
+            },
+            {
+                title: "Fixes",
+                items: [
+                    "Resolved a formatting issue where generated endorsement notes were incorrectly separated into multiple sections.",
+                    "Improved layout handling to prevent content overflow issues."
+                ]
+            }
+        ]
+    },
     {
         version: "V5.5.190826",
         updates: [
