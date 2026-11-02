@@ -27,40 +27,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     displaySavedNotesViewer();
 });
 
+// Paste Event Handler for Notepad
+document.querySelector('.notepad').addEventListener('paste', function (e) {
+    e.preventDefault();
+
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+
+    selection.deleteFromDocument();
+    selection.getRangeAt(0).insertNode(document.createTextNode(text));
+
+    selection.collapseToEnd();
+});
+
 // Toggle Agent Details Row
 window.agentDetailsData = {};
 window.agentDetailsHideTimer = null;
 
-// function toggleCaseOriginField() {
-//     const channel = document.getElementById('channel').value.trim();
-//     const caseOriginRow = document.getElementById('case-origin-row');
-
-//     if (channel === 'CNDT_CCBO') {
-//         caseOriginRow.style.display = '';
-
-//         // Cancel any pending hide timer
-//         if (window.agentDetailsHideTimer) {
-//             clearTimeout(window.agentDetailsHideTimer);
-//             window.agentDetailsHideTimer = null;
-//         }
-
-//         // Ensure rows stay visible until Case Origin is chosen
-//         document.getElementById('agent-details-header-row').style.display = '';
-//         document.getElementById('agent-and-tl-details-row').style.display = '';
-//         document.getElementById('user-and-channel-row').style.display = '';
-//     } else {
-//         caseOriginRow.style.display = 'none';
-//         document.getElementById('case-origin').value = '';
-//     }
-// }
-
 function toggleCaseOriginField() {
     const channel = document.getElementById('channel').value.trim();
-
-    // document.getElementById('case-origin-row').style.display = 'none';
+    const caseOriginRow = document.getElementById('case-origin-row');
 
     if (channel === 'CNDT_CCBO') {
-        showAlert('This section is currently under construction and is not yet available.');
+        caseOriginRow.style.display = '';
+
+        // Cancel any pending hide timer
+        if (window.agentDetailsHideTimer) {
+            clearTimeout(window.agentDetailsHideTimer);
+            window.agentDetailsHideTimer = null;
+        }
+
+        // Ensure rows stay visible until Case Origin is chosen
+        document.getElementById('agent-details-header-row').style.display = '';
+        document.getElementById('agent-and-tl-details-row').style.display = '';
+        document.getElementById('user-and-channel-row').style.display = '';
+    } else {
+        caseOriginRow.style.display = 'none';
+        document.getElementById('case-origin').value = '';
     }
 }
 
@@ -69,28 +74,28 @@ function checkAndStoreAgentDetails() {
     const teamLead = document.getElementById('team-lead').value.trim();
     const pldtUser = document.getElementById('pldt-user').value.trim();
     const channel = document.getElementById('channel').value.trim();
-    // const caseOrigin = document.getElementById('case-origin').value.trim();
+    const caseOrigin = document.getElementById('case-origin').value.trim();
 
     const isCCBO = channel === 'CNDT_CCBO';
 
     // Case Origin is only required for CCBO
     // Prevent CCBO from proceeding until Case Origin is selected
-    // if (isCCBO && !caseOrigin) {
-    //     if (window.agentDetailsHideTimer) {
-    //         clearTimeout(window.agentDetailsHideTimer);
-    //         window.agentDetailsHideTimer = null;
-    //     }
+    if (isCCBO && !caseOrigin) {
+        if (window.agentDetailsHideTimer) {
+            clearTimeout(window.agentDetailsHideTimer);
+            window.agentDetailsHideTimer = null;
+        }
 
-    //     document.getElementById('agent-details-header-row').style.display = '';
-    //     document.getElementById('agent-and-tl-details-row').style.display = '';
-    //     document.getElementById('user-and-channel-row').style.display = '';
-    //     document.getElementById('case-origin-row').style.display = '';
+        document.getElementById('agent-details-header-row').style.display = '';
+        document.getElementById('agent-and-tl-details-row').style.display = '';
+        document.getElementById('user-and-channel-row').style.display = '';
+        document.getElementById('case-origin-row').style.display = '';
 
-    //     return;
-    // }
+        return;
+    }
 
     const allFilled = isCCBO
-        ? (agentName && teamLead && pldtUser && channel)
+        ? (agentName && teamLead && pldtUser && channel && caseOrigin)
         : (agentName && teamLead && pldtUser && channel);
 
     if (allFilled) {
@@ -99,7 +104,7 @@ function checkAndStoreAgentDetails() {
             teamLead,
             pldtUser,
             channel,
-            // caseOrigin: isCCBO ? caseOrigin : ''
+            caseOrigin: isCCBO ? caseOrigin : ''
         };
 
         if (window.agentDetailsHideTimer) {
@@ -107,9 +112,9 @@ function checkAndStoreAgentDetails() {
         }
 
         // Do not start timer for CCBO
-        if (isCCBO) {
-            return;
-        }
+        // if (isCCBO) {
+        //     return;
+        // }
 
         window.agentDetailsHideTimer = setTimeout(() => {
             document.getElementById('agent-details-header-row').style.display = 'none';
@@ -118,7 +123,7 @@ function checkAndStoreAgentDetails() {
 
             // Hide Case Origin row only if CCBO
             if (isCCBO) {
-                 document.getElementById('case-origin-row').style.display = 'none';
+                document.getElementById('case-origin-row').style.display = 'none';
             }
         }, 10000);
     }
@@ -135,7 +140,7 @@ function resetFieldsBelowChannel() {
         "service-id-row",
         "option82-row",
         "intent-wocas-row",
-        "wocas-row"
+        // "wocas-row"
     ].forEach(id => {
         const row = document.getElementById(id);
         if (row) row.style.display = "none";
@@ -154,7 +159,7 @@ function resetFieldsBelowCaseOrigin() {
         "service-id-row",
         "option82-row",
         "intent-wocas-row",
-        "wocas-row"
+        // "wocas-row"
     ].forEach(id => {
         const row = document.getElementById(id);
         if (row) row.style.display = "none";
@@ -163,8 +168,8 @@ function resetFieldsBelowCaseOrigin() {
 
 
 // Run when user types or selects
-// ['agent-name', 'team-lead', 'pldt-user', 'channel', 'case-origin'].forEach(id => {
-['agent-name', 'team-lead', 'pldt-user', 'channel'].forEach(id => {
+['agent-name', 'team-lead', 'pldt-user', 'channel', 'case-origin'].forEach(id => {
+    // ['agent-name', 'team-lead', 'pldt-user', 'channel'].forEach(id => {
     const el = document.getElementById(id);
 
     el.addEventListener('input', () => {
@@ -181,9 +186,9 @@ function resetFieldsBelowCaseOrigin() {
             toggleCaseOriginField();
         }
 
-        // if (id === 'case-origin') {
-        //     resetFieldsBelowCaseOrigin();
-        // }
+        if (id === 'case-origin') {
+            resetFieldsBelowCaseOrigin();
+        }
 
         checkAndStoreAgentDetails();
     });
@@ -199,16 +204,16 @@ function showAgentDetailsTemporarily(duration = 10000) {
     document.getElementById('agent-and-tl-details-row').style.display = '';
     document.getElementById('user-and-channel-row').style.display = '';
 
-    // document.getElementById('case-origin-row').style.display = isCCBO ? '' : 'none';
+    document.getElementById('case-origin-row').style.display = isCCBO ? '' : 'none';
 
     if (window.agentDetailsHideTimer) {
         clearTimeout(window.agentDetailsHideTimer);
     }
 
     // Do not start timer for CCBO
-    if (isCCBO) {
-        return;
-    }
+    // if (isCCBO) {
+    //     return;
+    // }
 
     window.agentDetailsHideTimer = setTimeout(() => {
         document.getElementById('agent-details-header-row').style.display = 'none';
@@ -226,15 +231,15 @@ toggleCaseOriginField();
 
 // Channel, Concern Type, and VOC Options
 const LOB_OPTIONS = [
-    { value: "", text: ""},
+    { value: "", text: "" },
     { value: "NON-TECH", text: "NON-TECH" },
-    { value: "TECH", text: "TECH"},
+    { value: "TECH", text: "TECH" },
 ];
 
 const TECH_VOC_ALLOWED = [
-    "COMPLAINT", 
-    "FOLLOW-UP", 
-    "REQUEST", 
+    "COMPLAINT",
+    "FOLLOW-UP",
+    "REQUEST",
     "OTHERS"
 ];
 
@@ -269,7 +274,8 @@ const CCBO_TECH_GROUP_MAP = {
 
 // Global variables
 let lobSelect, vocSelect, intentSelect;
-let serviceIDRow, option82Row, intentWocasRow, wocasRow;
+let serviceIDRow, option82Row, intentWocasRow;
+// , wocasRow;
 let allLobOptions, allVocOptions, allIntentChildren, placeholderClone;
 
 function initializeFormElements() {
@@ -279,7 +285,7 @@ function initializeFormElements() {
     serviceIDRow = document.getElementById("service-id-row");
     option82Row = document.getElementById("option82-row");
     intentWocasRow = document.getElementById("intent-wocas-row");
-    wocasRow = document.getElementById("wocas-row");
+    // wocasRow = document.getElementById("wocas-row");
 
     if (!lobSelect || !vocSelect || !intentSelect) {
         console.error("Required form elements not found");
@@ -328,6 +334,9 @@ const channelField = document.getElementById("channel");
 
 if (channelField) {
     channelField.addEventListener("change", () => {
+        const form2Container = document.getElementById("form2Container");
+
+        form2Container.innerHTML = "";
 
         lobSelect.innerHTML = "";
 
@@ -394,7 +403,7 @@ function handleLobChange() {
 
             if (
                 ["COMPLAINT", "FOLLOW-UP", "REQUEST", "OTHERS"]
-                .includes(option.value)
+                    .includes(option.value)
             ) {
                 vocSelect.appendChild(option);
             }
@@ -410,7 +419,7 @@ function handleLobChange() {
 
             if (
                 ["INQUIRY", "COMPLAINT", "FOLLOW-UP", "REQUEST"]
-                .includes(option.value)
+                    .includes(option.value)
             ) {
                 vocSelect.appendChild(option);
             }
@@ -449,7 +458,7 @@ function handleVocChange() {
     hideRow(serviceIDRow);
     hideRow(option82Row);
     hideRow(intentWocasRow);
-    hideRow(wocasRow);
+    // hideRow(wocasRow);
 
     if (vocValue === "") {
         intentSelect.innerHTML = "";
@@ -481,7 +490,7 @@ function handleVocChange() {
 function updateRowsVisibility(lobValue, vocValue) {
     if (lobValue === "TECH") {
         if (vocValue === "FOLLOW-UP") {
-            showRowAndScroll(wocasRow);
+            // showRowAndScroll(wocasRow);
             hideRow(serviceIDRow);
             hideRow(option82Row);
             showRowAndScroll(intentWocasRow);
@@ -489,15 +498,15 @@ function updateRowsVisibility(lobValue, vocValue) {
             showRowAndScroll(serviceIDRow);
             showRowAndScroll(option82Row);
             showRowAndScroll(intentWocasRow);
-            showRowAndScroll(wocasRow);
+            // showRowAndScroll(wocasRow);
         } else { // INQUIRY & OTHERS
-            hideRow(wocasRow);
+            // hideRow(wocasRow);
             hideRow(serviceIDRow);
             hideRow(option82Row);
             showRowAndScroll(intentWocasRow);
         }
     } else if (lobValue === "NON-TECH") {
-        hideRow(wocasRow);
+        // hideRow(wocasRow);
         hideRow(serviceIDRow);
         hideRow(option82Row);
         showRowAndScroll(intentWocasRow);
@@ -608,7 +617,7 @@ function typeWriter(text, element, delay = 50) {
     }
 
     typingInterval = setInterval(() => {
-        if (index < text.length) {            
+        if (index < text.length) {
             element.innerHTML += text.charAt(index);
             index++;
         } else {
@@ -630,18 +639,18 @@ document.addEventListener('input', autoExpandTextarea);
 
 document.addEventListener(
     "wheel",
-        function (event) {
-            const activeElement = document.activeElement;
+    function (event) {
+        const activeElement = document.activeElement;
 
-            if (
+        if (
             activeElement &&
             activeElement.tagName === "INPUT" &&
             activeElement.type === "number"
-            ) {
+        ) {
             event.preventDefault();
-            }
-        },
-        { passive: false }
+        }
+    },
+    { passive: false }
 );
 
 // Copy to Clipboard Command
@@ -767,7 +776,7 @@ function formatTime(seconds) {
 }
 
 // Show/Hide rows based on channel selection & Timers
-document.addEventListener('DOMContentLoaded', function() { 
+document.addEventListener('DOMContentLoaded', function () {
     // ================================
     // SHOW/HIDE ROWS BASED ON CHANNEL
     // ================================
@@ -779,6 +788,7 @@ document.addEventListener('DOMContentLoaded', function() {
         caseAccountHeader: document.getElementById("case-and-account-header-row"),
         custName: document.getElementById("cust-name-row"),
         caseNum: document.getElementById("case-num-row"),
+        wocas: document.getElementById("wocas-row"),
         accNum: document.getElementById("acc-num-row"),
         phoneNum: document.getElementById("phone-num-row"),
         lobVoc: document.getElementById("lob-and-voc-row"),
@@ -791,21 +801,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const isSocMed = channelSelect.value === "CDT-SOCMED";
         const isHotline = channelSelect.value === "CDT-HOTLINE";
 
-        // if (isCCBO) {
-        //     rows.caseOrigin.style.display = "";
-        //     rows.caseAccountHeader.style.display = "none";
-        //     rows.caseNum.style.display = "none";
-        //     rows.custName.style.display = "none";
-        //     rows.accNum.style.display = "none";
-        //     rows.phoneNum.style.display = "none";
-        //     rows.lobVoc.style.display = "none";
-        //     rows.buttonsRow.style.display = "none";
-        // } else 
-            
-        if (isHotline || isSocMed) {
+        if (isCCBO) {
+            rows.caseOrigin.style.display = "";
+            rows.caseAccountHeader.style.display = "none";
+            rows.caseNum.style.display = "none";
+            rows.custName.style.display = "none";
+            rows.wocas.style.display = "none";
+            rows.accNum.style.display = "none";
+            rows.phoneNum.style.display = "none";
+            rows.lobVoc.style.display = "none";
+            rows.buttonsRow.style.display = "none";
+        } else if (isHotline || isSocMed) {
             rows.caseOrigin.style.display = "none";
             rows.caseAccountHeader.style.display = "";
             rows.caseNum.style.display = isSocMed ? "" : "none";
+            rows.wocas.style.display = "";
             rows.custName.style.display = "";
             rows.accNum.style.display = "";
             rows.phoneNum.style.display = "";
@@ -816,6 +826,7 @@ document.addEventListener('DOMContentLoaded', function() {
             rows.caseAccountHeader.style.display = "none";
             rows.caseNum.style.display = "none";
             rows.custName.style.display = "none";
+            rows.wocas.style.display = "none";
             rows.accNum.style.display = "none";
             rows.phoneNum.style.display = "none";
             rows.lobVoc.style.display = "none";
@@ -894,7 +905,7 @@ document.addEventListener('DOMContentLoaded', function() {
         timerDisplay.textContent = formatTime(totalElapsedSeconds);
     }
 
-    window.handleTimer = function(action, skipConfirm = false) {
+    window.handleTimer = function (action, skipConfirm = false) {
         if (action === 'start' && !isRunning) {
             window.startTime = Date.now();
             timerInterval = setInterval(updateDisplay, 1000);
@@ -918,10 +929,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 doReset(); // no alert
             } else {
                 showConfirm2("Are you sure you want to reset the timer?")
-                .then((confirmReset) => {
-                    if (!confirmReset) return;
-                    doReset();
-                });
+                    .then((confirmReset) => {
+                        if (!confirmReset) return;
+                        doReset();
+                    });
             }
         }
     };
@@ -941,7 +952,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    timerToggleButton?.addEventListener('click', function() {
+    timerToggleButton?.addEventListener('click', function () {
         if (isRunning) {
             handleTimer('pause');
         } else {
@@ -949,7 +960,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    timerResetButton?.addEventListener('click', function() {
+    timerResetButton?.addEventListener('click', function () {
         handleTimer('reset');
     });
 
@@ -967,8 +978,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function resetAllFields(excludeFields = []) {
     const selects = document.querySelectorAll("#form2Container select");
     selects.forEach(select => {
-        if (!excludeFields.includes(select.name)) { 
-            select.selectedIndex = 0; 
+        if (!excludeFields.includes(select.name)) {
+            select.selectedIndex = 0;
         }
     });
 }
@@ -1010,9 +1021,9 @@ function isFieldVisible(fieldName) {
     return (
         field.offsetParent !== null &&
         !(fieldRow?.style.display === "none" ||
-          fieldStyle.display === "none" ||
-          fieldStyle.visibility === "hidden" ||
-          fieldStyle.opacity === "0")
+            fieldStyle.display === "none" ||
+            fieldStyle.visibility === "hidden" ||
+            fieldStyle.opacity === "0")
     );
 }
 
@@ -1040,10 +1051,10 @@ function initializeVariables() {
     };
 
     const selectIntentElement = document.querySelector("#selectIntent");
-    const selectedIntentText = selectIntentElement 
-        ? selectIntentElement.selectedOptions[0].textContent.trim() 
+    const selectedIntentText = selectIntentElement
+        ? selectIntentElement.selectedOptions[0].textContent.trim()
         : "";
-    
+
     let selectedOptGroupLabel = "";
     if (selectIntentElement && selectIntentElement.selectedOptions.length > 0) {
         const selectedOption = selectIntentElement.selectedOptions[0];
@@ -1108,6 +1119,14 @@ function initializeVariables() {
         requestType: q('[name="requestType"]'),
         vasProduct: q('[name="vasProduct"]'),
         othersConcern: q('[name="othersConcern"]'),
+        cvReading: q('[name="cvReading"]'),
+        cvErrorCode: q('[name="cvErrorCode"]'),
+        download1: q('[name="download1"]'),
+        download2: q('[name="download2"]'),
+        upload1: q('[name="upload1"]'),
+        upload2: q('[name="upload2"]'),
+        ping_1: q('[name="ping_1"]'),
+        ping_2: q('[name="ping_2"]'),
     };
 }
 
@@ -1161,7 +1180,7 @@ function createIntentBasedForm() {
     ];
 
     const sicForms = [
-        "form501_1", "form501_2", "form501_3", "form501_4"
+        "form501_1", "form501_2", "form501_3"
     ];
 
     const selectiveBrowseForms = [
@@ -1204,7 +1223,7 @@ function createIntentBasedForm() {
 
     const UPSELL_OPTIONS = {
         eligibleForUpsell: [
-            "", 
+            "",
             "Yes",
             "No - Intent Not Eligible",
             "No - Not Eligible",
@@ -1223,10 +1242,11 @@ function createIntentBasedForm() {
             "Stream TV",
             "Upgrade (Plan to Plan)",
             "Samsung X",
-            "2025 Speedboost Promo for Fiber Plans"
+            "2025 Speedboost Promo for Fiber Plans",
+            "Not Applicable"
         ],
         offerAccepted: [
-            "", 
+            "",
             "Yes - Accepted",
             "Yes - Direct",
             "Yes - Upsell Later",
@@ -1235,34 +1255,34 @@ function createIntentBasedForm() {
             "No - Undecided"
         ],
         declineReason: [
-            "", 
-            "Budget constraint", 
-            "No need or satisfied with current plan", 
-            "Time constraint", 
+            "",
+            "Budget constraint",
+            "No need or satisfied with current plan",
+            "Time constraint",
             // "No reason stated", 
             "Not interested",
-            "Poor service experience", 
+            "Poor service experience",
             "Not decision-maker"
         ],
         notEligibleReason: [
-            "", 
+            "",
             // "Account issue remained unresolved",
             "Account has been disconnected due to calamity requesting for reconnection",
             // "Account has pending issues", 
-            "Account is a Microbusiness ", 
+            "Account is a Microbusiness ",
             "Account tenure requirement not met.",
-            "Account was barred", 
-            "Account was inhibited", 
-            "Account was not yet active", 
+            "Account was barred",
+            "Account was inhibited",
+            "Account was not yet active",
             "Account was restricted",
             "Account was in PD",
             "Account was in PD and requesting for reconnection",
             // "Call was escalated",
             // "Case was escalated",
-            "Case was tagged as Potential crisis", 
-            "Customer already availed the product", 
-            "Customer already availed the service", 
-            "Customer already upgraded their plan", 
+            "Case was tagged as Potential crisis",
+            "Customer already availed the product",
+            "Customer already availed the service",
+            "Customer already upgraded their plan",
             // "Customer account issue remained unresolved",
             // "Customer account issue required follow-up",
             // "Customer concern remained unresolved",
@@ -1270,13 +1290,13 @@ function createIntentBasedForm() {
             "Customer requested Service Disconnection",
             "Customer requested VTD",
             "Customer requested Holiday Disconnection",
-            "Customer was distressed", 
+            "Customer was distressed",
             // "Customer was in a hurry", 
             // "Customer was irate", 
-            "Customer was requesting a supervisor", 
-            "Customer was requesting a manager", 
-            "Customer was requesting to downgrade", 
-            "Customer was requesting for upgrade", 
+            "Customer was requesting a supervisor",
+            "Customer was requesting a manager",
+            "Customer was requesting to downgrade",
+            "Customer was requesting for upgrade",
             "Customer was requesting for a specific PLDT product",
             "Customer was requesting for ECA",
             "Customer was requesting for Promise to Pay",
@@ -1320,19 +1340,19 @@ function createIntentBasedForm() {
     }
 
     const disconnectedOption =
-    channelField.value === "CDT-HOTLINE"
-        ? ["No - Disconnected Call"]
-        : ["No - Customer Ended Chat", "No - System Ended Chat"];
+        channelField.value === "CDT-HOTLINE"
+            ? ["No - Disconnected Call"]
+            : ["No - Customer Ended Chat", "No - System Ended Chat"];
 
-    const techOption = 
-    lobValue === "TECH"
-        ? ["No - for Ticket Creation"]
-        : [];
+    const techOption =
+        lobValue === "TECH"
+            ? ["No - for Ticket Creation"]
+            : [];
 
     const IR_OPTIONS = {
         issueResolved: [
-            "", 
-            "Yes", 
+            "",
+            "Yes",
             ...techOption,
             "No - Customer Declined Further Assistance",
             "No - Customer is Not At Home",
@@ -1342,10 +1362,10 @@ function createIntentBasedForm() {
 
     function handleIssueResolvedChange(issueResolved) {
         if (issueResolved.selectedIndex === 2) {
-            showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+            showFields(["actualExp", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
         } else {
             showFields(["eligibleForUpsell"]);
-            hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
+            hideSpecificFields(["actualExp", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
         }
 
         if (channelField.value === "CDT-SOCMED") {
@@ -1358,7 +1378,7 @@ function createIntentBasedForm() {
 
     function handleIssueResolvedWithTestedOkChange(issueResolved) {
         if (issueResolved.selectedIndex === 2) {
-            showFields(["investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+            showFields(["actualExp", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
 
             if (channelField.value === "CDT-SOCMED") {
                 showFields(["resolution"]);
@@ -1369,7 +1389,7 @@ function createIntentBasedForm() {
             }
         } else {
             showFields(["eligibleForUpsell"]);
-            hideSpecificFields(["testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
+            hideSpecificFields(["actualExp", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount"]);
 
             if (channelField.value === "CDT-SOCMED") {
                 showFields(["resolution"]);
@@ -1398,225 +1418,264 @@ function createIntentBasedForm() {
     }
 
     // Tech Follow-Up
-    if (selectedValue === "formFfupRepair") { 
+    if (selectedValue === "formFfupRepair") {
         const table = document.createElement("table");
 
         const fields = [
             // Visual Audit
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
-            { label: "Parent Case", type: "number", name: "pcNumber", placeholder: "Leave blank if not applicable"},
-            { label: "Status Reason", type: "select", name: "statusReason", options: [
-                "", 
-                "Awaiting Cignal Resolution", 
-                "Dispatched to Field Technician",
-                "Dispatched to Field Technician - Re-Open",
-                "Escalated to 3rd Party Vendor",
-                "Escalated to CCARE CIGNAL SUPPORT",
-                "Escalated to CCBO", 
-                "Escalated to L2", 
-                "Escalated to Network", 
-                "Escalated to Network - Re-Open", 
-                "TOK No Answer", 
-                "TOK Under Observation" ]},
-            { label: "Sub Status", type: "select", name: "subStatus", options: [
-                "", 
-                "Associated with the Parent Case",
-                "Disassociated from the Parent Case",
-                "Extracted to OFSC",
-                "Extracted to SDM",
-                "Extracted to SDM - Re-Open",
-                "Extraction to OFSC Failed - Fallout",
-                "Extraction to OFSC Failed - Retry Limit Exceeded",
-                "Extraction to SDM Failed - Fallout",
-                "Extraction to SDM Failed - Retry Limit Exceeded",
-                "Last Mile Resolved - Confirmed in OFSC",
-                "Network Resolved - Awaiting Customer Confirmation",
-                "Network Resolved - Last Mile",
-                "Non Tech Escalation - Return Ticket",
-                "Non Tech Escalation - Return Ticket Last Mile",
-                "Not Done - Return Ticket",
-                "Not Done - Return Ticket Network Outage" ]},
-            { label: "Subject 1", type: "select", name: "subject1", options: [
-                "", 
-                "Data", 
-                "IPTV",
-                "Voice",
-                "Voice and Data" ]},
-            { label: "Queue", type: "select", name: "queue", options: [
-                "", 
-                "FM POLL", 
-                "CCARE OFFBOARD",
-                "SDM CHILD",
-                "SDM", 
-                "FSMG", 
-                "OFSC", 
-                "PMA", 
-                "SYSTEM SUPPORT", 
-                "VAS SUPPORT", 
-                "CCARE CIGNAL", 
-                "L2 RESOLUTION", 
-                "Default Entity Queue" ]}, 
-            { label: "Auto Ticket (Red Tagging)", type: "select", name: "projRed", options: [
-                "", 
-                "Yes", 
-                "No" ]},
-            { label: "Case Status", type: "select", name: "ticketStatus", options: [
-                "", 
-                "Beyond SLA", 
-                "Within SLA" ]},
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "Parent Case", type: "number", name: "pcNumber", placeholder: "Leave blank if not applicable" },
+            {
+                label: "Status Reason", type: "select", name: "statusReason", options: [
+                    "",
+                    "Awaiting Cignal Resolution",
+                    "Dispatched to Field Technician",
+                    "Dispatched to Field Technician - Re-Open",
+                    "Escalated to 3rd Party Vendor",
+                    "Escalated to CCARE CIGNAL SUPPORT",
+                    "Escalated to CCBO",
+                    "Escalated to L2",
+                    "Escalated to Network",
+                    "Escalated to Network - Re-Open",
+                    "TOK No Answer",
+                    "TOK Under Observation"]
+            },
+            {
+                label: "Sub Status", type: "select", name: "subStatus", options: [
+                    "",
+                    "Associated with the Parent Case",
+                    "Disassociated from the Parent Case",
+                    "Extracted to OFSC",
+                    "Extracted to SDM",
+                    "Extracted to SDM - Re-Open",
+                    "Extraction to OFSC Failed - Fallout",
+                    "Extraction to OFSC Failed - Retry Limit Exceeded",
+                    "Extraction to SDM Failed - Fallout",
+                    "Extraction to SDM Failed - Retry Limit Exceeded",
+                    "Last Mile Resolved - Confirmed in OFSC",
+                    "Network Resolved - Awaiting Customer Confirmation",
+                    "Network Resolved - Last Mile",
+                    "Non Tech Escalation - Return Ticket",
+                    "Non Tech Escalation - Return Ticket Last Mile",
+                    "Not Done - Return Ticket",
+                    "Not Done - Return Ticket Network Outage"]
+            },
+            {
+                label: "Subject 1", type: "select", name: "subject1", options: [
+                    "",
+                    "Data",
+                    "IPTV",
+                    "Voice",
+                    "Voice and Data",
+                    "NA"]
+            },
+            {
+                label: "Queue", type: "select", name: "queue", options: [
+                    "",
+                    "FM POLL",
+                    "CCARE OFFBOARD",
+                    "SDM CHILD",
+                    "SDM",
+                    "FSMG",
+                    "OFSC",
+                    "PMA",
+                    "SYSTEM SUPPORT",
+                    "VAS SUPPORT",
+                    "CCARE CIGNAL",
+                    "L2 RESOLUTION",
+                    "Default Entity Queue"]
+            },
+            {
+                label: "Auto Ticket (Project Red)", type: "select", name: "projRed", options: [
+                    "",
+                    "Yes",
+                    "No"]
+            },
+            {
+                label: "Case Status", type: "select", name: "ticketStatus", options: [
+                    "",
+                    "Beyond SLA",
+                    "Within SLA"]
+            },
             // Offer Alternative Services
-            { label: "Offer ALS", type: "select", name: "offerALS", options: [
-                "", 
-                "Offered ALS/Accepted", 
-                "Offered ALS/Declined", 
-                "Offered ALS/No Confirmation", 
-                "Previous Agent Already Offered ALS",
-                "Not Applicable" // Tickets beyond 24 hrs but still within the 36 hrs threshold for offering ALS.
-            ]},
-            { label: "Alternative Services Package Offered", type: "textarea", name: "alsPackOffered", placeholder: "(i.e. 10GB Open Access data, 5GB/day for Youtube, NBA, Cignal and iWantTFC, Unlimited call to Smart/TNT/SUN, Unlimited text to all network and 500MB of data for Viber, Messenger, WhatsApp and Telegram valid for 7 days)"},
-            { label: "Effectivity Date", type: "date", name: "effectiveDate"},
-            { label: "Nominated Mobile Number", type: "number", name: "nomiMobileNum"},
-            { label: "No. of Follow-Up(s)", type: "select", name: "ffupCount", options: ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Multiple" ]},
-            { label: "Case Age (HH:MM)", type: "text", name: "ticketAge"},
-            { label: "Actions Taken/ Decline Reason for ALS", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved", type: "select", name: "issueResolved", options: [
-                "", 
-                "Yes", 
-                "No - Same Issue",
-                "No - Different Issue"
-            ]},
+            {
+                label: "Offer ALS", type: "select", name: "offerALS", options: [
+                    "",
+                    "Offered ALS/Accepted",
+                    "Offered ALS/Declined",
+                    "Offered ALS/No Confirmation",
+                    "Previous Agent Already Offered ALS",
+                    "Not Applicable" // Tickets beyond 24 hrs but still within the 36 hrs threshold for offering ALS.
+                ]
+            },
+            {
+                label: "ALS Package Offered", type: "select", name: "alsPackOffered", options: [
+                    "",
+                    "SMART PREPAID/TNT/SMART BRO PREPAID DATA OFFER",
+                    "SMART PREPAID VOICE OFFER",
+                    "SMART PREPAID VOICE AND DATA OFFER",
+                    "TNT VOICE OFFER",
+                    "TNT VOICE AND DATA OFFER",
+                    "PHW",
+                    "Not Applicable" // None offered yet
+                ]
+            },
+            // { label: "Alternative Services Package Offered", type: "textarea", name: "alsPackOffered", placeholder: "(i.e. 10GB Open Access data, 5GB/day for Youtube, NBA, Cignal and iWantTFC, Unlimited call to Smart/TNT/SUN, Unlimited text to all network and 500MB of data for Viber, Messenger, WhatsApp and Telegram valid for 7 days)"},
+            { label: "Effectivity Date", type: "date", name: "effectiveDate" },
+            { label: "Nominated Mobile Number", type: "number", name: "nomiMobileNum" },
+            { label: "No. of Follow-Up(s)", type: "select", name: "ffupCount", options: ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Multiple"] },
+            { label: "Case Age (HH:MM)", type: "text", name: "ticketAge" },
+            { label: "Actions Taken/ Decline Reason for ALS", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            {
+                label: "Issue Resolved", type: "select", name: "issueResolved", options: [
+                    "",
+                    "Yes",
+                    "No - Same Issue",
+                    "No - Different Issue"
+                ]
+            },
 
             // CEP Investigation Tagging
-            { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Modem Light Status —",
-                "Normal Status",
-                "Blinking/No PON/FIBR/ADSL light",
-                "No Internet Light",
-                "No LAN light",
-                "No Power Light",
-                "No VoIP/Tel/Phone Light",
-                "No WLAN light",
-                "Not Applicable - Copper",
-                "Not Applicable - Defective CPE",
-                "Red LOS",
-                "Unable to provide information"
-            ]},
-            { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— NMS Skin Result", 
-                "Correct profile at Voice NMS",
-                "Correct SG7K profile",
-                "Failed RX",
-                "Idle Status – FEOL",
-                "LOS/Down",
-                "No acquired IP address - Native",
-                "No or incomplete profile at Voice NMS",
-                "No SG7K profile",
-                "Not Applicable – InterOp",
-                "Not Applicable – NCE/InterOp",
-                "Not Applicable – NMS GUI",
-                "Not Applicable – Voice only – Fiber",
-                "Null Value",
-                "Passed RX",
-                "Power is Off/Down",
-                "Register – Failed Status – FEOL",
-                "Up/Active",
-                "VLAN configuration issue"                    
-            ]},
-            { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Clearview Reading —",
-                "Defective/Faulty ONU",
-                "Failed to collect line card information",
-                "Fiber cut LCP to NAP",
-                "Fiber cut NAP to ONU",
-                "Fiber cut OLT to LCP",
-                "Fix bad splices",
-                "Missing Micro-Filter",
-                "Not Applicable",
-                "Not applicable - Voice issue",
-                "No recommended action",
-                "Others/Error code",
-                "Rogue ONU",
-                "Severely Degraded",
-                "The ONU appears to be disconnected",
-                "The ONU is off",
-                "The ONU is out of service",
-                "The ONU performance is degraded",
-                "Unbalanced Pair",
-                "Without line problem detected",
-                "Without line problem detected – Link quality degraded",
-            ]},
-            { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "Aligned Record",
-                "Broken/Damaged Cable/Cord",
-                "Broken/Damaged Modem/ONU",
-                "Broken/Damaged Splitter/Microfilter",
-                "Broken/Damaged STB/SC",
-                "Broken/Damaged telset",
-                "Cannot Browse",
-                "Cannot Browse via Mesh",
-                "Cannot Browse via LAN",
-                "Cannot Browse via WiFi",
-                "Cannot Make Call",
-                "Cannot Make/Receive Call",
-                "Cannot Reach Specific Website",
-                "Cannot Read Smart Card",
-                "Cannot Receive Call",
-                "Change Set Up Route to Bridge and vice-versa",
-                "Change Set Up Route to Bridge and vice-versa – InterOp",
-                "Cignal IRN Created – Missing Channel",
-                "Cignal IRN Created – No Audio/Video Output",
-                "Cignal IRN Created – Poor Audio/Video Quality",
-                "Content",
-                "Data Bind Port",
-                "Defective STB/SC/Accessories/Physical Set Up",
-                "Defective Wifi Mesh/Physical Set Up",
-                "Fast Busy/ With Recording",
-                "Freeze",
-                "High Latency",
-                "Individual Trouble",
-                "IPTV Trouble",
-                "Loopback",
-                "Misaligned Record",
-                "Missing Channel/s",
-                "Network Trouble – All Services Down ",
-                "Network Trouble – Cannot Browse",
-                "Network Trouble – Cannot Browse via Mesh",
-                "Network Trouble – High Latency",
-                "Network Trouble – Selective Browsing",
-                "Network Trouble – Slow Internet Connection",
-                "Network Trouble – Slow/Intermittent Browsing",
-                "No Audio/Video Output with Test Channel",
-                "No Audio/Video Output without Test Channel",
-                "No Ring Back Tone",
-                "Node Down",
-                "Noisy Line",
-                "Out of Sync",
-                "Pixelated",
-                "Primary Trouble",
-                "Recording Error",
-                "Redirected to PLDT Sites",
-                "Remote Control Issues",
-                "Request Modem/ONU GUI Access",
-                "Request Modem/ONU GUI Access – InterOp",
-                "Secondary Trouble",
-                "Slow/Intermittent Browsing",
-                "STB not Synched",
-                "Too Long to Boot Up",
-                "With Historical Alarms",
-                "With Ring Back Tone",
-                "Without Historical Alarms"
-            ] },
-            { label: "SLA / ETR", type: "text", name: "sla", placeholder: "Leave blank if not applicable"},
-            
+            {
+                label: "Investigation 1", type: "select", name: "investigation1", options: [
+                    "— Modem Light Status —",
+                    "Normal Status",
+                    "Blinking/No PON/FIBR/ADSL light",
+                    "No Internet Light",
+                    "No LAN light",
+                    "No Power Light",
+                    "No VoIP/Tel/Phone Light",
+                    "No WLAN light",
+                    "Not Applicable - Copper",
+                    "Not Applicable - Defective CPE",
+                    "Red LOS",
+                    "Unable to provide information"
+                ]
+            },
+            {
+                label: "Investigation 2", type: "select", name: "investigation2", options: [
+                    "— NMS Skin Result",
+                    "Correct profile at Voice NMS",
+                    "Correct SG7K profile",
+                    "Failed RX",
+                    "Idle Status – FEOL",
+                    "LOS/Down",
+                    "No acquired IP address - Native",
+                    "No or incomplete profile at Voice NMS",
+                    "No SG7K profile",
+                    "Not Applicable – InterOp",
+                    "Not Applicable – NCE/InterOp",
+                    "Not Applicable – NMS GUI",
+                    "Not Applicable – Voice only – Fiber",
+                    "Null Value",
+                    "Passed RX",
+                    "Power is Off/Down",
+                    "Register – Failed Status – FEOL",
+                    "Up/Active",
+                    "VLAN configuration issue"
+                ]
+            },
+            {
+                label: "Investigation 3", type: "select", name: "investigation3", options: [
+                    "— Clearview Reading —",
+                    "Defective/Faulty ONU",
+                    "Failed to collect line card information",
+                    "Fiber cut LCP to NAP",
+                    "Fiber cut NAP to ONU",
+                    "Fiber cut OLT to LCP",
+                    "Fix bad splices",
+                    "Missing Micro-Filter",
+                    "Not Applicable",
+                    "Not applicable - Voice issue",
+                    "No recommended action",
+                    "Others/Error code",
+                    "Rogue ONU",
+                    "Severely Degraded",
+                    "The ONU appears to be disconnected",
+                    "The ONU is off",
+                    "The ONU is out of service",
+                    "The ONU performance is degraded",
+                    "Unbalanced Pair",
+                    "Without line problem detected",
+                    "Without line problem detected – Link quality degraded",
+                ]
+            },
+            {
+                label: "Investigation 4", type: "select", name: "investigation4", options: [
+                    "— Select applicable Investigation 4 —",
+                    "Aligned Record",
+                    "Broken/Damaged Cable/Cord",
+                    "Broken/Damaged Modem/ONU",
+                    "Broken/Damaged Splitter/Microfilter",
+                    "Broken/Damaged STB/SC",
+                    "Broken/Damaged telset",
+                    "Cannot Browse",
+                    "Cannot Browse via Mesh",
+                    "Cannot Browse via LAN",
+                    "Cannot Browse via WiFi",
+                    "Cannot Make Call",
+                    "Cannot Make/Receive Call",
+                    "Cannot Reach Specific Website",
+                    "Cannot Read Smart Card",
+                    "Cannot Receive Call",
+                    "Change Set Up Route to Bridge and vice-versa",
+                    "Change Set Up Route to Bridge and vice-versa – InterOp",
+                    "Cignal IRN Created – Missing Channel",
+                    "Cignal IRN Created – No Audio/Video Output",
+                    "Cignal IRN Created – Poor Audio/Video Quality",
+                    "Content",
+                    "Data Bind Port",
+                    "Defective STB/SC/Accessories/Physical Set Up",
+                    "Defective Wifi Mesh/Physical Set Up",
+                    "Fast Busy/ With Recording",
+                    "Freeze",
+                    "High Latency",
+                    "Individual Trouble",
+                    "IPTV Trouble",
+                    "Loopback",
+                    "Misaligned Record",
+                    "Missing Channel/s",
+                    "Network Trouble – All Services Down ",
+                    "Network Trouble – Cannot Browse",
+                    "Network Trouble – Cannot Browse via Mesh",
+                    "Network Trouble – High Latency",
+                    "Network Trouble – Selective Browsing",
+                    "Network Trouble – Slow Internet Connection",
+                    "Network Trouble – Slow/Intermittent Browsing",
+                    "No Audio/Video Output with Test Channel",
+                    "No Audio/Video Output without Test Channel",
+                    "No Ring Back Tone",
+                    "Node Down",
+                    "Noisy Line",
+                    "Out of Sync",
+                    "Pixelated",
+                    "Primary Trouble",
+                    "Recording Error",
+                    "Redirected to PLDT Sites",
+                    "Remote Control Issues",
+                    "Request Modem/ONU GUI Access",
+                    "Request Modem/ONU GUI Access – InterOp",
+                    "Secondary Trouble",
+                    "Slow/Intermittent Browsing",
+                    "STB not Synched",
+                    "Too Long to Boot Up",
+                    "With Historical Alarms",
+                    "With Ring Back Tone",
+                    "Without Historical Alarms"
+                ]
+            },
+
+            // Ticket Details
+            { label: "SLA / ETR", type: "text", name: "sla", placeholder: "Leave blank if not applicable" },
+
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
-            { label: "Landmarks", type: "textarea", name: "landmarks"},
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
-            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             // { label: "Re-Open Status Reason", type: "textarea", name: "reOpenStatsReason", placeholder: "Indicate the reason for re-opening the ticket (Dispatched to Field Technician - Re-Open or Escalated to Network - Re-Open)."},
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -1631,7 +1690,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -1684,7 +1743,7 @@ function createIntentBasedForm() {
                     relatedTo: relatedFieldName
                 }
             );
-        }      
+        }
 
         function insertToolLabel(fields, label, relatedFieldName) {
             fields.splice(
@@ -1704,13 +1763,20 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "Visual Audit", "cepCaseNumber");
         insertNoteRow(enhancedFields, "queue");
         insertToolLabel(enhancedFields, "Alternative Services", "offerALS");
+        insertToolLabel(enhancedFields, "Other Ticket Details", "sla");
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
         insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
-            row.style.display = (field.name === "cepCaseNumber" || field.name === "pcNumber" || field.name === "subject1" || field.name === "subject2" || field.name === "queue" || field.name === "statusReason" || field.name === "subStatus") ? "table-row" : "none";
+            const enabledFields = [
+                "cepCaseNumber", "pcNumber", "statusReason", "subStatus", "subject1", "queue", "ticketStatus", "ffupCount", "ticketAge", "remarks"
+            ];
+
+            row.style.display = enabledFields.includes(field.name)
+                ? "table-row"
+                : "none";
 
             const td = document.createElement("td");
             const divInput = document.createElement("div");
@@ -1783,8 +1849,8 @@ function createIntentBasedForm() {
                 input.className = "form2-textarea";
                 input.rows =
                     (field.name === "remarks") ? 5 :
-                    (field.name === "alsPackOffered") ? 4 :
-                    (field.name === "specialInstructions" || field.name === "reOpenStatsReason") ? 3 : 2;
+                        (field.name === "alsPackOffered") ? 4 :
+                            (field.name === "specialInstructions" || field.name === "reOpenStatsReason") ? 3 : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -1808,7 +1874,7 @@ function createIntentBasedForm() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow()); 
+        table.appendChild(createInstructionsRow());
         enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
 
         function updateToolLabelVisibility() {
@@ -1835,25 +1901,25 @@ function createIntentBasedForm() {
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-        
+
         const queue = document.querySelector("[name='queue']");
         queue.addEventListener("change", () => {
-            resetAllFields(["subject1", "statusReason","subStatus", "queue"]);
+            resetAllFields(["subject1", "statusReason", "subStatus", "queue"]);
             if (queue.value === "FM POLL" || queue.value === "CCARE OFFBOARD") {
-                showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "issueResolved" ]);
-                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell", "productsOffered", "offerAccepted", "offerAccepted", "declineReason", "notEligibleReason" ]);
+                showFields(["issueResolved"]);
+                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell", "productsOffered", "offerAccepted", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 updateToolLabelVisibility();
 
-            }else if (queue.value === "Default Entity Queue") {
-                showFields(["ffupCount", "ticketAge", "remarks", "issueResolved", "eligibleForUpsell"]);
-                hideSpecificFields(["projRed", "ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
+            } else if (queue.value === "Default Entity Queue") {
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                hideSpecificFields(["projRed", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 updateToolLabelVisibility();
 
             } else {
-                showFields(["projRed" ]);
-                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
+                showFields(["projRed"]);
+                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 updateToolLabelVisibility();
             }
@@ -1870,26 +1936,26 @@ function createIntentBasedForm() {
 
         const projRed = document.querySelector("[name='projRed']");
         projRed.addEventListener("change", () => {
-            resetAllFields(["subject1", "statusReason","subStatus", "queue", "projRed"]);
+            resetAllFields(["subject1", "statusReason", "subStatus", "queue", "projRed"]);
             if (projRed.value === "Yes") {
-                if (queue.value === "SDM CHILD" || queue.value ==="SDM" || queue.value ==="FSMG" || queue.value ==="L2 RESOLUTION" ) {
-                    showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell" ]);
-                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
+                if (queue.value === "SDM CHILD" || queue.value === "SDM" || queue.value === "FSMG" || queue.value === "L2 RESOLUTION") {
+                    showFields(["sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "availability", "address", "landmarks", "specialInstructions", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
-                    showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell" ]);
-                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
+                    showFields(["sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 }
 
                 updateToolLabelVisibility();
 
-            } else if (projRed.value === "No"){
-                showFields(["ticketStatus", "ffupCount", "ticketAge", "remarks", "eligibleForUpsell" ]);
-                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
+            } else if (projRed.value === "No") {
+                showFields(["eligibleForUpsell"]);
+                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 updateToolLabelVisibility();
 
             } else {
-                hideSpecificFields(["ticketStatus", "offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "ffupCount", "ticketAge", "remarks", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason" ]);
+                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum", "issueResolved", "investigation1", "investigation2", "investigation3", "investigation4", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 updateToolLabelVisibility();
             }
@@ -1899,39 +1965,54 @@ function createIntentBasedForm() {
         const ticketStatus = document.querySelector("[name='ticketStatus']");
         ticketStatus.addEventListener("change", () => {
             if (ticketStatus.value === "Beyond SLA") {
-                showFields(["offerALS" ]);
-                updateToolLabelVisibility();
+                showFields(["offerALS"]);
+                hideSpecificFields(["sla"]);
             } else {
-                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum" ]);
-                updateToolLabelVisibility();
+                if (projRed.value === "Yes") {
+                    showFields(["sla"]);
+                } else {
+                    hideSpecificFields(["sla"]);
+                }
+                hideSpecificFields(["offerALS", "alsPackOffered", "effectiveDate", "nomiMobileNum"]);
             }
             updateToolLabelVisibility();
         });
 
         const offerALS = document.querySelector("[name='offerALS']");
         offerALS.addEventListener("change", () => {
-            if (offerALS.value === "Offered ALS/Accepted") {
-                showFields(["alsPackOffered", "effectiveDate", "nomiMobileNum" ]);
-            } else if (offerALS.value === "Offered ALS/Declined") {
-                showFields(["alsPackOffered" ]);
-                hideSpecificFields(["effectiveDate", "nomiMobileNum" ]);
+            if (offerALS.value === "Offered ALS/Accepted" || offerALS.value === "Offered ALS/Declined") {
+                showFields(["alsPackOffered"]);
+                hideSpecificFields(["effectiveDate", "nomiMobileNum"]);
             } else {
-                hideSpecificFields(["alsPackOffered", "effectiveDate", "nomiMobileNum" ]);
+                hideSpecificFields(["alsPackOffered", "effectiveDate", "nomiMobileNum"]);
+            }
+        });
+
+        const alsPackOffered = document.querySelector("[name='alsPackOffered']");
+        alsPackOffered.addEventListener("change", () => {
+            if (offerALS.value === "Offered ALS/Accepted") {
+                if (alsPackOffered.value === "Not Applicable") {
+                    hideSpecificFields(["effectiveDate", "nomiMobileNum"]);
+                } else {
+                    showFields(["effectiveDate", "nomiMobileNum"]);
+                }
+            } else {
+                hideSpecificFields(["effectiveDate", "nomiMobileNum"]);
             }
         });
 
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.value === "No - Same Issue") {
-                showFields(["contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell" ]);
+                showFields(["contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell"]);
                 hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4"]);
                 updateToolLabelVisibility();
             } else if (issueResolved.value === "No - Different Issue") {
-                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell" ]);
+                showFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason", "eligibleForUpsell"]);
                 updateToolLabelVisibility();
             } else {
                 showFields(["eligibleForUpsell"]);
-                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason" ]);
+                hideSpecificFields(["investigation1", "investigation2", "investigation3", "investigation4", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "reOpenStatsReason"]);
                 updateToolLabelVisibility();
             }
             updateToolLabelVisibility();
@@ -1944,165 +2025,221 @@ function createIntentBasedForm() {
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
         updateToolLabelVisibility();
-    } 
-    
+    }
+
     // Tech Complaints
-    else if (voiceAndDataForms.includes(selectedValue)) { 
-        
+    else if (voiceAndDataForms.includes(selectedValue)) {
+
         const table = document.createElement("table");
 
         const fields = [
             // Visual Audit
-            { label: "Account/Facility Type", type: "select", name: "facility", options: [
-                "", 
-                "Fiber", 
-                "Fiber - Radius", 
-                "Copper VDSL", 
-                "Copper HDSL/NGN" 
-            ]},
-            { label: "Res. Vertical Address", type: "select", name: "resType", options: [
-                "Bldg., Condo, etc.", 
-                "Yes", 
-                "No"
-            ]},
+            {
+                label: "Account/Facility Type", type: "select", name: "facility", options: [
+                    "",
+                    "Fiber",
+                    "Fiber - Radius",
+                    "Copper VDSL",
+                    "Copper HDSL/NGN"
+                ]
+            },
+            {
+                label: "Res. Vertical Address", type: "select", name: "resType", options: [
+                    "Bldg., Condo, etc.",
+                    "Yes",
+                    "No"
+                ]
+            },
             { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"] },
-            { label: "Source Reference", type: "select", name: "outageReference", options: [
-                "— Network Outage Source —", 
-                "FUSE Outage Tab", 
-                "Lit365 Downtime Advisory",
-                "Clearview",
-                "CEP Affected Services Tab"
-            ]},
-            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
-            { label: "Modem Lights Status", type: "select", name: "modemLights", options: [
-                "", 
-                "Red Power Light", 
-                "No Power Light",
-                "PON Light Blinking",
-                "Red LOS",
-                "NO LOS light / Power and PON Lights Steady Green"
-            ]},
-            // BSMP/Clearview
-            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU"},
-            { label: "Latest RTA Request (L2)", type: "text", name: "rtaRequest"},
+            {
+                label: "Source Reference", type: "select", name: "outageReference", options: [
+                    "— Network Outage Source —",
+                    "FUSE Outage Tab",
+                    "Lit365 Downtime Advisory",
+                    "Clearview",
+                    "CEP Affected Services Tab"
+                ]
+            },
+            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS." },
+            {
+                label: "Modem Lights Status", type: "select", name: "modemLights", options: [
+                    "",
+                    "Red Power Light",
+                    "No Power Light",
+                    "PON Light Blinking",
+                    "No PON Light",
+                    "Red LOS",
+                    "Power and PON Lights Steady Green/No LOS light"
+                ]
+            },
+            // Clearview
+            { label: "CV Tool Downtime?", type: "select", name: "cvToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "cvEsolveTicketNum" },
+            // { label: "Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
+            { label: "Clearview Reading", type: "select", name: "cvReading", options: [
+                    "",
+                    "Defective/Faulty ONU",
+                    "Failed to collect line card information",
+                    "Fix bad splices",
+                    "Line Problem Detected - LCP to NAP",
+                    "Line Problem Detected - NAP to ONU",
+                    "Line Problem Detected - OLT to LCP",
+                    "No recommended action",
+                    "Others/Error Code",
+                    "The ONU appears to be disconnected",
+                    "The ONU is OFF",
+                    "The ONU is out of service",
+                    "The ONU performance is degraded",
+                    "Without Line Problem Detected",
+                ]
+            },
+            { label: "Clearview Error Code/Msg", type: "text", name: "cvErrorCode" },
+            { label: "Completion Date (L2)", type: "text", name: "rtaRequest" },
             // NMS Skin
-            { label: "ONU Status/RUNSTAT", type: "select", name: "onuRunStats", options: [
-                "", 
-                "UP",
-                "Active",
-                "LOS",
-                "Down",
-                "Power is Off",
-                "Power is Down",
-                "/N/A"
-            ]},
-            { label: "RX Power", type: "number", name: "rxPower", step: "any"},
-            { label: "VLAN (L2)", type: "text", name: "vlan"},
-            { label: "Option82 Config", type: "select", name: "option82Config", options: [
-                "", 
-                "Aligned", 
-                "Misaligned"
-            ]},
-            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank."},
-            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “NDT-NIC with red LOS” DO NOT input the WOCAS!"},
-            { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "NMS Tool Downtime?", type: "select", name: "nmsToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "nmsEsolveTicketNum" },
+            {
+                label: "NMS: ONU Status/RUNSTAT", type: "select", name: "nmsOnuStats", options: [
+                    "",
+                    "UP",
+                    "Active",
+                    "LOS",
+                    "Down",
+                    "Power is Off",
+                    "Power is Down"
+                ]
+            },
+            // DMS Standalone
+            { label: "DMS Tool Downtime?", type: "select", name: "dmsToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "dmsEsolveTicketNum" },
+            {
+                label: "DMS: ONU Status", type: "select", name: "dmsOnuStats", options: [
+                    "— Check Online Status in DMS —",
+                    "Check Mark",
+                    "X Mark",
+                    "Failed to Refresh",
+                    "No Record Found"
+                ]
+            },
+            { label: "RX Power", type: "number", name: "rxPower", step: "any", placeholder: "Available in FUSE, NMS or CV" },
+            { label: "VLAN (L2)", type: "text", name: "vlan", placeholder: "Available in NMS or DMS" },
+            {
+                label: "Option82 Config", type: "select", name: "option82Config", options: [
+                    "— Check FUSE, CEP, CV, & NMS (EAAA & SAAA) —",
+                    "Aligned",
+                    "Misaligned"
+                ]
+            },
+            // { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank."},
+            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
-            { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
-                "",
-                "Defective Modem / Missing Modem",
-                "Defective Splitter / Defective Microfilter",
-                "LOS",
-                "Manual Troubleshooting",
-                "NMS Refresh / Configuration",
-                "No Configuration / Wrong Configuration",
-                "No Dial Tone and No Internet Connection",
-                "No PON Light",
-                "Self-Restored"
-            ]},
+            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “NDT-NIC with red LOS” DO NOT input the WOCAS!" },
+            {
+                label: "FLM Findings/Resolution", type: "select", name: "resolution", options: [
+                    "",
+                    "Defective Modem / Missing Modem",
+                    "Defective Splitter / Defective Microfilter",
+                    "LOS",
+                    "Manual Troubleshooting",
+                    "NMS Refresh / Configuration",
+                    "No Configuration / Wrong Configuration",
+                    "No Dial Tone and No Internet Connection",
+                    "No PON Light",
+                    "Self-Restored"
+                ]
+            },
             // CEP Investigation Tagging
-            { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Modem Light Status —",
-                "Red LOS",
-                "Blinking/No PON/FIBR/ADSL",
-                "Normal Status",
-                "No Power Light",
-                "Not Applicable [Copper]",
-                "Not Applicable [Defective CPE]",
-                "Not Applicable [via Store]",
-                "Unable to provide information"
-            ]},
-            { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— NMS: ONU Status/RUNSTAT —", 
-                "UP/Active", 
-                "LOS/Down", 
-                "Power is Off/Down", 
-                "Null Value",
-                "Not Applicable [via Store]",
-                "Not Applicable [NMS GUI]",
-                "Passed RX",
-                "Failed RX"
-            ]},
-            { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Clearview Reading —",
-                "Defective/Faulty ONU",
-                "Failed to collect line card information", 
-                "Fibercut LCP to NAP", 
-                "Fibercut NAP to ONU", 
-                "Fibercut OLT to LCP", 
-                "Fix bad splices",
-                "No recommended action", 
-                "Not Applicable",
-                "Others/Error Code", 
-                "The ONU appears to be disconnected", 
-                "The ONU is OFF", 
-                "The ONU is out of service", 
-                "The ONU performance is degraded",
-                "Without Line Problem Detected", 
-            ]},
-            { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "Aligned Record", 
-                "Awaiting Parent Case", 
-                "Broken/Damaged Cable/Cord",
-                "Broken/Damaged Modem/ONU", 
-                "Broken/Damaged Splitter/Microfilter",
-                "Cannot Browse",
-                "Cannot Browse via Mesh",
-                "Cannot Connect via LAN",
-                "Cannot Connect via WiFi",
-		        "Data Bind Port",
-                "FCR - Advised Physical Set-Up",
-                "FCR - Cannot Browse", 
-                "FCR - Cannot Connect via LAN", 
-                "FCR - Cannot Connect via WiFi", 
-                "FCR - Device - Advised Physical Set-Up",
-                "FCR - Low BW profile",
-                "FCR - Slow/Intermittent Browsing",
-                "Individual Trouble", 
-                "Misaligned Record",
-                "Network Trouble - All Services Down ",
-                "Network Trouble - Cannot Browse",
-                "Network Trouble - Cannot Browse via Mesh",
-                "Node Down",
-                "Not Applicable [via Store]",
-                "Redirected to PLDT Sites",
-                "Node Down", 
-                "Not Applicable [via Store]", 
-                "Primary Trouble", 
-                "Secondary Trouble"
-            ] },
+            {
+                label: "Investigation 1", type: "select", name: "investigation1", options: [
+                    "— Modem Light Status —",
+                    "Red LOS",
+                    "Blinking/No PON/FIBR/ADSL",
+                    "Normal Status",
+                    "No Power Light",
+                    "Not Applicable [Copper]",
+                    "Not Applicable [Defective CPE]",
+                    "Not Applicable [via Store]",
+                    "Unable to provide information"
+                ]
+            },
+            {
+                label: "Investigation 2", type: "select", name: "investigation2", options: [
+                    "— NMS: ONU Status/RUNSTAT —",
+                    "UP/Active",
+                    "LOS/Down",
+                    "Power is Off/Down",
+                    "Null Value",
+                    "Not Applicable [via Store]",
+                    "Not Applicable [NMS GUI]",
+                    "Passed RX",
+                    "Failed RX"
+                ]
+            },
+            {
+                label: "Investigation 3", type: "select", name: "investigation3", options: [
+                    "— Clearview Reading —",
+                    "Defective/Faulty ONU",
+                    "Failed to collect line card information",
+                    "Fibercut LCP to NAP",
+                    "Fibercut NAP to ONU",
+                    "Fibercut OLT to LCP",
+                    "Fix bad splices",
+                    "No recommended action",
+                    "Not Applicable",
+                    "Others/Error Code",
+                    "The ONU appears to be disconnected",
+                    "The ONU is OFF",
+                    "The ONU is out of service",
+                    "The ONU performance is degraded",
+                    "Without Line Problem Detected",
+                ]
+            },
+            {
+                label: "Investigation 4", type: "select", name: "investigation4", options: [
+                    "— Select applicable Investigation 4 —",
+                    "Aligned Record",
+                    "Awaiting Parent Case",
+                    "Broken/Damaged Cable/Cord",
+                    "Broken/Damaged Modem/ONU",
+                    "Broken/Damaged Splitter/Microfilter",
+                    "Cannot Browse",
+                    "Cannot Browse via Mesh",
+                    "Cannot Connect via LAN",
+                    "Cannot Connect via WiFi",
+                    "Data Bind Port",
+                    "FCR - Advised Physical Set-Up",
+                    "FCR - Cannot Browse",
+                    "FCR - Cannot Connect via LAN",
+                    "FCR - Cannot Connect via WiFi",
+                    "FCR - Device - Advised Physical Set-Up",
+                    "FCR - Low BW profile",
+                    "FCR - Slow/Intermittent Browsing",
+                    "Individual Trouble",
+                    "Misaligned Record",
+                    "Network Trouble - All Services Down ",
+                    "Network Trouble - Cannot Browse",
+                    "Network Trouble - Cannot Browse via Mesh",
+                    "Node Down",
+                    "Not Applicable [via Store]",
+                    "Redirected to PLDT Sites",
+                    "Node Down",
+                    "Not Applicable [via Store]",
+                    "Primary Trouble",
+                    "Secondary Trouble"
+                ]
+            },
             // Ticket Details
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
-            { label: "SLA / ETR", type: "text", name: "sla"},
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "SLA / ETR", type: "text", name: "sla" },
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
-            { label: "Landmarks", type: "textarea", name: "landmarks"},
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
-            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -2116,7 +2253,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -2183,14 +2320,14 @@ function createIntentBasedForm() {
 
             return row;
         }
-                    
+
         function insertNoteRow(fields, toolLabelName) {
             const index = fields.findIndex(f => f.name === toolLabelName);
             if (index !== -1) {
                 fields.splice(index + 1, 0, {
                     type: "noteRow",
                     name: "onuStatChecklist",
-                    relatedTo: "onuRunStats"
+                    relatedTo: "nmsToolStatus"
                 });
             }
         }
@@ -2223,19 +2360,21 @@ function createIntentBasedForm() {
 
         insertToolLabel(enhancedFields, "Visual Audit", "facility");
         insertEscaChecklistRow(enhancedFields, "outageStatus");
-        insertToolLabel(enhancedFields, "NMS Skin", "onuRunStats");
-        insertNoteRow(enhancedFields, "toolLabel-nms-skin");      
-        insertToolLabel(enhancedFields, "BSMP/Clearview", "cvReading");
-        insertToolLabel(enhancedFields, "Probe & Troubleshoot", "actualExp");
+        insertToolLabel(enhancedFields, "NMS Skin", "nmsToolStatus");
+        insertNoteRow(enhancedFields, "toolLabel-nms-skin");
+        insertToolLabel(enhancedFields, "Clearview", "cvToolStatus");
+        insertToolLabel(enhancedFields, "DMS", "dmsToolStatus");
+        insertToolLabel(enhancedFields, "RX Power, VLAN & Option 82 Configuration", "rxPower");
+        insertToolLabel(enhancedFields, "Probe & Troubleshoot", "remarks");
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
         insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
-        
+
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
-            row.style.display = field.name === "facility" ? "table-row" : "none"; 
+            row.style.display = field.name === "facility" ? "table-row" : "none";
 
             const td = document.createElement("td");
             const divInput = document.createElement("div");
@@ -2376,10 +2515,10 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                if (field.name === "onuRunStats") {
+                if (field.name === "nmsOnuStats") {
                     input.id = field.name;
                 }
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -2416,7 +2555,7 @@ function createIntentBasedForm() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow()); 
+        table.appendChild(createInstructionsRow());
         enhancedFields.forEach(field => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -2453,10 +2592,10 @@ function createIntentBasedForm() {
             if (facility.value === "Fiber") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "onuSerialNum", "modemLights", "option82Config", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
-                    showFields(["onuSerialNum", "modemLights", "actualExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "issueResolved", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    showFields(["onuSerialNum", "modemLights", "actualExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "issueResolved", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                     if (channelField.value === "CDT-SOCMED") {
                         showFields(["resolution"]);
@@ -2465,15 +2604,15 @@ function createIntentBasedForm() {
                     }
                 } else {
                     showFields(["onuSerialNum", "modemLights", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "option82Config", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 }
             } else if (facility.value === "Fiber - Radius") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
-                    showFields(["remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "cvReading", "rtaRequest", "actualExp", "issueResolved", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    showFields(["remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "actualExp", "issueResolved", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                     if (channelField.value === "CDT-SOCMED") {
                         showFields(["resolution"]);
@@ -2482,7 +2621,7 @@ function createIntentBasedForm() {
                     }
                 } else {
                     showAlert("This form is currently unavailable for customers with Fiber - Radius service.");
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                     const facilityField = document.querySelector('[name="facility"]');
                     if (facilityField) facilityField.value = "";
@@ -2490,27 +2629,27 @@ function createIntentBasedForm() {
                 }
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "issueResolved", "resolution", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "issueResolved", "resolution", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility();
         });
-    
+
         const resType = document.querySelector("[name='resType']");
         resType.addEventListener("change", () => {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
                 if (selectedValue === "form100_1" || selectedValue === "form100_2" || selectedValue === "form100_3") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form100_4" || selectedValue === "form100_5") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
                     showAlert("This form is currently unavailable for customers with Fiber - DSL service.");
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "remarks", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                     const resTypeField = document.querySelector('[name="resType"]');
                     if (resTypeField) resTypeField.value = "";
@@ -2518,17 +2657,17 @@ function createIntentBasedForm() {
                 }
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "option82Config", "modemLights", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
             updateToolLabelVisibility();
         });
-    
+
         const outageStatus = document.querySelector("[name='outageStatus']");
         outageStatus.addEventListener("change", () => {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
-                hideSpecificFields(["onuSerialNum", "option82Config", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "issueResolved", "availability", "address", "landmarks", "specialInstructions", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["onuSerialNum", "option82Config", "modemLights", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "vlan", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "actualExp", "issueResolved", "availability", "address", "landmarks", "specialInstructions", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -2537,27 +2676,128 @@ function createIntentBasedForm() {
                 }
             } else {
                 if (facility.value === "Fiber") {
-                    showFields(["onuSerialNum", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "cvReading", "rtaRequest", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "option82Config", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    showFields(["onuSerialNum", "modemLights", "cvToolStatus", "nmsToolStatus", "rxPower", "vlan", "remarks", "issueResolved"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "nmsOnuStats", "cvEsolveTicketNum", "cvReading", "rtaRequest", "nmsEsolveTicketNum", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "option82Config", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
-                    showFields(["onuSerialNum", "cvReading", "rtaRequest", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "modemLights", "onuRunStats", "rxPower", "vlan", "nmsSkinRemarks", "option82Config", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    showFields(["onuSerialNum", "cvToolStatus", "remarks", "issueResolved"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "modemLights", "cvEsolveTicketNum", "cvReading", "rtaRequest", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "rxPower", "vlan", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "option82Config", "actualExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 }
-                
+
             }
             updateToolLabelVisibility();
         });
 
-        const onuRunStats = document.querySelector("[name='onuRunStats']");
-        onuRunStats.addEventListener("change", () => {
-            if (onuRunStats.value === "UP" || onuRunStats.value === "Active") {
+        const modemLights = document.querySelector("[name='modemLights']");
+        modemLights.addEventListener("change", () => {
+            resetAllFields(["facility", "resType", "outageStatus", "modemLights", "cvToolStatus"]);
+            hideSpecificFields(["nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "option82Config"]);
+            updateToolLabelVisibility();
+        });
+
+        const cvToolStatus = document.querySelector("[name='cvToolStatus']");
+        cvToolStatus.addEventListener("change", () => {
+            if (cvToolStatus.value === "No") {
+                showFields(["cvReading", "rtaRequest"]);
+                hideSpecificFields(["cvEsolveTicketNum"]);
+            } else {
+                showFields(["cvEsolveTicketNum"]);
+                hideSpecificFields(["cvReading", "rtaRequest"]);
+            }
+            updateToolLabelVisibility();
+        });
+
+        const cvReading = document.querySelector("[name='cvReading']");
+        cvReading.addEventListener("change", () => {
+            if (cvReading.value === "Others/Error Code") {
+                showFields(["cvErrorCode"]);
+            } else {
+                hideSpecificFields(["cvErrorCode"]);
+            }
+        });
+
+        const nmsToolStatus = document.querySelector("[name='nmsToolStatus']");
+        nmsToolStatus.addEventListener("change", () => {
+            if (nmsToolStatus.value === "No") {
+                showFields(["nmsOnuStats"]);
+                hideSpecificFields(["nmsEsolveTicketNum", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "option82Config"]);
+            } else {
+                showFields(["nmsEsolveTicketNum", "dmsToolStatus"]);
+                hideSpecificFields(["nmsOnuStats", "option82Config"]);
+            }
+            updateToolLabelVisibility();
+        });
+
+        const nmsOnuStats = document.querySelector("[name='nmsOnuStats']");
+        nmsOnuStats.addEventListener("change", () => {
+            if (
+                ["PON Light Blinking", "No PON Light"].includes(modemLights.value) &&
+                ["UP", "Active"].includes(nmsOnuStats.value)
+            ) {
+                showFields(["option82Config"]);
+            } else if (
+                modemLights.value === "Power and PON Lights Steady Green/No LOS light" &&
+                ["UP", "Active"].includes(nmsOnuStats.value)
+            ) {
                 showFields(["option82Config"]);
             } else {
                 hideSpecificFields(["option82Config"]);
             }
             updateToolLabelVisibility();
         });
-    
+
+        const dmsToolStatus = document.querySelector("[name='dmsToolStatus']");
+        dmsToolStatus.addEventListener("change", () => {
+            if (dmsToolStatus.value === "No") {
+                showFields(["dmsOnuStats", "vlan"]);
+                hideSpecificFields(["dmsEsolveTicketNum", "option82Config"]);
+            } else {
+                showFields(["dmsEsolveTicketNum"]);
+                hideSpecificFields(["dmsOnuStats", "option82Config", "vlan"]);
+            }
+            updateToolLabelVisibility();
+        });
+
+        const dmsOnuStats = document.querySelector("[name='dmsOnuStats']");
+        dmsOnuStats.addEventListener("change", () => {
+            if (
+                ["PON Light Blinking", "No PON Light"].includes(modemLights.value) &&
+                dmsOnuStats.value === "Check Mark"
+            ) {
+                showFields(["option82Config"]);
+            } else if (
+                modemLights.value === "Power and PON Lights Steady Green/No LOS light" &&
+                dmsOnuStats.value === "Check Mark"
+            ) {
+                showFields(["option82Config"]);
+            } else {
+                hideSpecificFields(["option82Config"]);
+            }
+            updateToolLabelVisibility();
+        });
+
+        const option82Config = document.querySelector("[name='option82Config']");
+        option82Config.addEventListener("change", () => {
+            const dmsOnuStats = document.querySelector("[name='dmsOnuStats']");
+            const nmsOnuStats = document.querySelector("[name='nmsOnuStats']");
+            if (
+                ["Aligned", "Misaligned"].includes(option82Config.value) &&
+                ["PON Light Blinking", "No PON Light"].includes(modemLights.value) &&
+                (
+                    ["UP", "Active"].includes(nmsOnuStats.value) ||
+                    ["Check Mark", "X Mark"].includes(dmsOnuStats.value)
+                )
+            ) {
+                showAlert("Navigate to Step 5.17.1 and apply the appropriate Investigation Matrix Tagging based on the findings of your troubleshooting.");
+                return true;
+            } else if (option82Config.value === "Aligned" && modemLights.value === "Power and PON Lights Steady Green/No LOS light") {
+                showAlert(`Advise the customer to turn the modem off and back on after 20 seconds. Then, ask whether the issue has been resolved.\n\nIf Yes, tag the case as FCR.\n\nIf No, update the WOCAS Based Intent field to No Internet Connection and proceed with No Internet Connection Troubleshooting.`);
+                return true;
+            } else {
+                showAlert(`Escalate to L2 with the following investigation matrix tagging:\n\nInvestigation 1: Normal Status\nInvestigation 2: Up/Active\nInvestigation 3: Without Line Problem\nInvestigation 4: Misaligned Record`);
+                return true;
+            }
+        });
+
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
@@ -2569,153 +2809,179 @@ function createIntentBasedForm() {
 
         updateToolLabelVisibility();
 
-    } else if (voiceForms.includes(selectedValue)) { 
+    } else if (voiceForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
             // Visual Audit
-            { label: "Account/Facility Type", type: "select", name: "facility", options: [
-                "", 
-                "Fiber", 
-                "Fiber - Radius", 
-                "Copper VDSL", 
-                "Copper HDSL/NGN" 
-            ]},
-            { label: "Res. Vertical Address", type: "select", name: "resType", options: [
-                "Bldg., Condo, etc.", 
-                "Yes", 
-                "No"
-            ]},
-            { label: "Service Status", type: "select", name: "serviceStatus", options: [
-                "", 
-                "Active", 
-                "Barred", 
-            ]},
-            { label: "Services", type: "select", name: "services", options: [
-                "", 
-                "Bundled", 
-                "Voice Only", 
-            ]},
+            {
+                label: "Account/Facility Type", type: "select", name: "facility", options: [
+                    "",
+                    "Fiber",
+                    "Fiber - Radius",
+                    "Copper VDSL",
+                    "Copper HDSL/NGN"
+                ]
+            },
+            {
+                label: "Res. Vertical Address", type: "select", name: "resType", options: [
+                    "Bldg., Condo, etc.",
+                    "Yes",
+                    "No"
+                ]
+            },
+            {
+                label: "Service Status", type: "select", name: "serviceStatus", options: [
+                    "",
+                    "Active",
+                    "Barred",
+                ]
+            },
+            {
+                label: "Services", type: "select", name: "services", options: [
+                    "",
+                    "Bundled",
+                    "Voice Only",
+                ]
+            },
             { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"] },
-            { label: "Source Reference", type: "select", name: "outageReference", options: [
-                "— Network Outage Source —", 
-                "FUSE Outage Tab", 
-                "Lit365 Downtime Advisory",
-                "Clearview",
-                "CEP Affected Services Tab"
-            ]},
-            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
-            { label: "Modem Lights Status", type: "select", name: "modemLights", options: [
-                "", 
-                "Red Power Light", 
-                "No Power Light",
-                "PON Light Blinking",
-                "Red LOS",
-                "No VoIP Light",
-                "No Tel Light",
-                "No Phone1 Light",
-                "NO LOS light / Power and PON Lights Steady Green / VoIP/Tel/Phone1 Steady Green",
-                "NO LOS light / Power and PON Lights Steady Green / VoIP/Tel/Phone1 Blinking Green"
-            ]},
-            { label: "Call Type", type: "select", name: "callType", options: [
-                "", 
-                "Local", 
-                "Domestic",
-                "International"
-            ]},
+            {
+                label: "Source Reference", type: "select", name: "outageReference", options: [
+                    "— Network Outage Source —",
+                    "FUSE Outage Tab",
+                    "Lit365 Downtime Advisory",
+                    "Clearview",
+                    "CEP Affected Services Tab"
+                ]
+            },
+            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS." },
+            {
+                label: "Modem Lights Status", type: "select", name: "modemLights", options: [
+                    "",
+                    "Red Power Light",
+                    "No Power Light",
+                    "PON Light Blinking",
+                    "Red LOS",
+                    "No VoIP Light",
+                    "No Tel Light",
+                    "No Phone1 Light",
+                    "NO LOS light / Power and PON Lights Steady Green / VoIP/Tel/Phone1 Steady Green",
+                    "NO LOS light / Power and PON Lights Steady Green / VoIP/Tel/Phone1 Blinking Green"
+                ]
+            },
+            {
+                label: "Call Type", type: "select", name: "callType", options: [
+                    "",
+                    "Local",
+                    "Domestic",
+                    "International"
+                ]
+            },
             // NMS Skin
-            { label: "OLT & ONU Conn. Type", type: "select", name: "oltAndOnuConnectionType", options: [
-                "", 
-                "FEOL - InterOp", 
-                "FEOL - Non-interOp", 
-                "HUOL - InterOp",
-                "HUOL - Non-interOp"
-            ]},
-            { label: "FXS1 Status", type: "text", name: "fsx1Status"},
-            { label: "Routing Index", type: "text", name: "routingIndex"},
-            { label: "Call Source", type: "text", name: "callSource"},
-            { label: "LDN Set", type: "text", name: "ldnSet"},
-            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank."},
+            {
+                label: "OLT & ONU Conn. Type", type: "select", name: "oltAndOnuConnectionType", options: [
+                    "",
+                    "FEOL - InterOp",
+                    "FEOL - Non-interOp",
+                    "HUOL - InterOp",
+                    "HUOL - Non-interOp"
+                ]
+            },
+            { label: "FXS1 Status", type: "text", name: "fsx1Status" },
+            { label: "Routing Index", type: "text", name: "routingIndex" },
+            { label: "Call Source", type: "text", name: "callSource" },
+            { label: "LDN Set", type: "text", name: "ldnSet" },
+            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank." },
             // DMS
-            { label: "Voice Status", type: "text", name: "dmsVoipServiceStatus"},
-            { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken."},
-            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “Busy tone when dialing”. DO NOT input the WOCAS!"},
-            { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Voice Status", type: "text", name: "dmsVoipServiceStatus" },
+            { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken." },
+            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “Busy tone when dialing”. DO NOT input the WOCAS!" },
+            { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
-            { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
-                "",
-                "Defective Cable / Cord",
-                "Defective Telset / Missing Telset",
-                "Manual Troubleshooting",
-                "No Configuration / Wrong Configuration",
-                "No Dial Tone",
-                "Self-Restored",
-                "Defective Telset",
-                "Defective Modem / Missing Modem",
-                "NMS Configuration" 
-            ]},
+            {
+                label: "FLM Findings/Resolution", type: "select", name: "resolution", options: [
+                    "",
+                    "Defective Cable / Cord",
+                    "Defective Telset / Missing Telset",
+                    "Manual Troubleshooting",
+                    "No Configuration / Wrong Configuration",
+                    "No Dial Tone",
+                    "Self-Restored",
+                    "Defective Telset",
+                    "Defective Modem / Missing Modem",
+                    "NMS Configuration"
+                ]
+            },
             // CEP Investigation Tagging
-            { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Modem Light Status —",
-                "Blinking/No PON/FIBR/ADSL",
-                "No VoIP/Phone/Tel Light",
-                "Normal Status",
-                "Not Applicable [Copper]",
-                "Not Applicable [Defective CPE]",
-                "Not Applicable [via Store]",
-                "RED LOS",
-                "Unable to provide information"
-            ]},
-            { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— NMS Parameters —",
-                "Correct profile at VOICE NMS",
-                "Correct SG7K profile",
-                "Idle Status [FEOL]",
-                "Misaligned Routing Index",
-                "No or incomplete profile at VOICE NMS",
-                "No SG7K profile",
-                "Not Applicable [Copper]",
-                "Not Applicable [NCE/InterOP]",
-                "Not Applicable [NMS GUI]",
-                "Not Applicable [via Store]",
-                "Not Applicable [Voice Only - Fiber]",
-                "Register- failed Status [FEOL]"                    
-            ]},
-            { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Clearview Reading —",
-                "Not Applicable",
-                "Not Applicable [Voice Issue]",
-                "The ONU performance is degraded"
-            ]},
-            { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "Awaiting Parent Case",
-                "Primary Trouble",
-                "Secondary Trouble",
-                "Broken/Damaged Modem/ONU",
-                "Broken/Damaged Telset",
-                "Cannot Make Call",
-                "Cannot Make/Receive Call",
-                "Fast Busy/With Recording",
-                "FCR - Cannot Receive Call",
-                "FCR - With Ring Back Tone",
-                "No Ring Back tone",
-                "Noisy Line",
-                "Not Applicable [via Store]",
-                "With Ring Back Tone"
-            ] },
+            {
+                label: "Investigation 1", type: "select", name: "investigation1", options: [
+                    "— Modem Light Status —",
+                    "Blinking/No PON/FIBR/ADSL",
+                    "No VoIP/Phone/Tel Light",
+                    "Normal Status",
+                    "Not Applicable [Copper]",
+                    "Not Applicable [Defective CPE]",
+                    "Not Applicable [via Store]",
+                    "RED LOS",
+                    "Unable to provide information"
+                ]
+            },
+            {
+                label: "Investigation 2", type: "select", name: "investigation2", options: [
+                    "— NMS Parameters —",
+                    "Correct profile at VOICE NMS",
+                    "Correct SG7K profile",
+                    "Idle Status [FEOL]",
+                    "Misaligned Routing Index",
+                    "No or incomplete profile at VOICE NMS",
+                    "No SG7K profile",
+                    "Not Applicable [Copper]",
+                    "Not Applicable [NCE/InterOP]",
+                    "Not Applicable [NMS GUI]",
+                    "Not Applicable [via Store]",
+                    "Not Applicable [Voice Only - Fiber]",
+                    "Register- failed Status [FEOL]"
+                ]
+            },
+            {
+                label: "Investigation 3", type: "select", name: "investigation3", options: [
+                    "— Clearview Reading —",
+                    "Not Applicable",
+                    "Not Applicable [Voice Issue]",
+                    "The ONU performance is degraded"
+                ]
+            },
+            {
+                label: "Investigation 4", type: "select", name: "investigation4", options: [
+                    "— Select applicable Investigation 4 —",
+                    "Awaiting Parent Case",
+                    "Primary Trouble",
+                    "Secondary Trouble",
+                    "Broken/Damaged Modem/ONU",
+                    "Broken/Damaged Telset",
+                    "Cannot Make Call",
+                    "Cannot Make/Receive Call",
+                    "Fast Busy/With Recording",
+                    "FCR - Cannot Receive Call",
+                    "FCR - With Ring Back Tone",
+                    "No Ring Back tone",
+                    "Noisy Line",
+                    "Not Applicable [via Store]",
+                    "With Ring Back Tone"
+                ]
+            },
             // Ticket Details
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
-            { label: "SLA / ETR", type: "text", name: "sla"},
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "SLA / ETR", type: "text", name: "sla" },
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
-            { label: "Landmarks", type: "textarea", name: "landmarks"},
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
-            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -2729,7 +2995,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -2828,7 +3094,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
         insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
-        
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
             row.style.display = field.name === "facility" ? "table-row" : "none";
@@ -2876,24 +3142,24 @@ function createIntentBasedForm() {
                 }
 
                 optionsToUse.forEach((optionText, index) => {
-                const option = document.createElement("option");
-                option.value = optionText;
-                option.textContent = optionText;
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
 
-                if (index === 0) {
-                    option.disabled = true;
-                    option.selected = true;
-                    option.style.fontStyle = "italic";
-                }
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
 
-                input.appendChild(option);
+                    input.appendChild(option);
                 });
 
             } else if (field.type === "textarea") {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") ? 5 : 
+                input.rows = (field.name === "remarks") ? 5 :
                     (field.name === "specialInstructions") ? 3 : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
@@ -2913,7 +3179,7 @@ function createIntentBasedForm() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow()); 
+        table.appendChild(createInstructionsRow());
         enhancedFields.forEach(field => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -2926,10 +3192,10 @@ function createIntentBasedForm() {
                 const relatedNames = relatedNamesRaw.split(",").map(s => s.trim()).filter(Boolean);
 
                 const shouldShow = relatedNames.some(name => {
-                const relatedInput = document.querySelector(`[name="${name}"]`);
-                if (!relatedInput) return false;
-                const relatedRow = relatedInput.closest("tr");
-                return relatedRow && relatedRow.style.display !== "none";
+                    const relatedInput = document.querySelector(`[name="${name}"]`);
+                    if (!relatedInput) return false;
+                    const relatedRow = relatedInput.closest("tr");
+                    return relatedRow && relatedRow.style.display !== "none";
                 });
 
                 labelRow.style.display = shouldShow ? "table-row" : "none";
@@ -2948,7 +3214,7 @@ function createIntentBasedForm() {
 
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
-        
+
         const facility = document.querySelector("[name='facility']");
         facility.addEventListener("change", () => {
             resetAllFields(["facility"]);
@@ -2959,7 +3225,7 @@ function createIntentBasedForm() {
                 } else if (selectedValue === "form103_1" || selectedValue === "form103_2") {
                     showFields(["serviceStatus", "onuSerialNum", "callType", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "actualExp", "remarks", "issueResolved"]);
                     hideSpecificFields(["resType", "services", "outageStatus", "outageReference", "pcNumber", "modemLights", "fsx1Status", "dmsVoipServiceStatus", "dmsRemarks", "oltAndOnuConnectionType", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
-                }  else if (selectedValue === "form103_4" || selectedValue === "form103_5") {
+                } else if (selectedValue === "form103_4" || selectedValue === "form103_5") {
                     showFields(["onuSerialNum", "actualExp", "remarks", "issueResolved"]);
                     hideSpecificFields(["resType", "services", "outageStatus", "outageReference", "pcNumber", "modemLights", "callType", "oltAndOnuConnectionType", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "dmsVoipServiceStatus", "dmsRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
                 } else {
@@ -2985,7 +3251,7 @@ function createIntentBasedForm() {
 
             updateToolLabelVisibility();
         });
-    
+
         const resType = document.querySelector("[name='resType']");
         resType.addEventListener("change", () => {
             resetAllFields(["facility", "resType"]);
@@ -3018,7 +3284,7 @@ function createIntentBasedForm() {
             resetAllFields(["facility", "resType", "services", "serviceStatus", "outageStatus"]);
             if (outageStatus.value === "No" && facility.value === "Fiber") {
                 if (selectedValue === "form101_1" || selectedValue === "form101_2" || selectedValue === "form101_3") {
-                    showFields(["onuSerialNum", "modemLights", "oltAndOnuConnectionType", "actualExp", "remarks", "issueResolved", ]);
+                    showFields(["onuSerialNum", "modemLights", "oltAndOnuConnectionType", "actualExp", "remarks", "issueResolved",]);
                     hideSpecificFields(["outageReference", "pcNumber", "callType", "dmsVoipServiceStatus", "dmsRemarks", "fsx1Status", "routingIndex", "callSource", "ldnSet", "nmsSkinRemarks", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
                 } else {
                     showFields(["remarks", "issueResolved"]);
@@ -3079,7 +3345,7 @@ function createIntentBasedForm() {
                 hideSpecificFields(["fsx1Status"]);
             }
         });
-    
+
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
@@ -3091,215 +3357,216 @@ function createIntentBasedForm() {
 
         updateToolLabelVisibility();
 
-    } else if (nicForms.includes(selectedValue)) { 
+    } else if (nicForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
             // Visual Audit
             { label: "Account/Facility Type", type: "select", name: "facility", options: [
-                "", 
-                "Fiber", 
-                "Fiber - Radius", 
-                "Copper VDSL", 
-                "Copper HDSL/NGN" 
-            ]},
+                    "",
+                    "Fiber",
+                    "Fiber - Radius",
+                    "Copper VDSL",
+                    "Copper HDSL/NGN"
+                ]
+            },
             { label: "Res. Vertical Address", type: "select", name: "resType", options: [
-                "Bldg., Condo, etc.", 
-                "Yes", 
-                "No"
-            ]},
-            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"]},
+                    "Bldg., Condo, etc.",
+                    "Yes",
+                    "No"
+                ]
+            },
+            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"] },
             { label: "Source Reference", type: "select", name: "outageReference", options: [
-                "— Network Outage Source —", 
-                "FUSE Outage Tab", 
-                "Lit365 Downtime Advisory",
-                "Clearview",
-                "CEP Affected Services Tab"
-            ]},
-            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
-            { label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
-                "", 
-                "FEOL", 
-                "HUOL"
-            ]},
-            { label: "Modem Brand", type: "select", name: "modemBrand", options: [
-                "", 
-                "FHTT", 
-                "HWTC", 
-                "ZTEG",
-                "AZRD",
-                "PRLN",
-                "Other Brands"
-            ]},
-            { label: "ONU Connection Type", type: "select", name: "onuConnectionType", options: [
-                "", 
-                "InterOp", 
-                "Non-interOp"
-            ]},
-            { label: "ONU Model (L2)", type: "text", name: "onuModel", placeholder: "Available in DMS."},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
+                    "— Network Outage Source —",
+                    "FUSE Outage Tab",
+                    "Lit365 Downtime Advisory",
+                    "Clearview",
+                    "CEP Affected Services Tab"
+                ]
+            },
+            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
+            { label: "ONU Model (L2)", type: "text", name: "onuModel", placeholder: "Available in DMS." },
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS." },
             { label: "Internet Light Status", type: "select", name: "intLightStatus", options: [
-                "", 
-                "Steady Green", 
-                "Blinking Green",
-                "No Light",
-                "No Internet Light Indicator"
-            ]},
+                    "",
+                    "Steady Green",
+                    "Blinking Green",
+                    "No Light",
+                    "No Internet Light Indicator"
+                ]
+            },
             { label: "WAN Light Status", type: "select", name: "wanLightStatus", options: [
-                "", 
-                "Steady Green", 
-                "Blinking Green",
-                "No Light"
-            ]},
+                    "",
+                    "Steady Green",
+                    "Blinking Green",
+                    "No Light"
+                ]
+            },
             // Clearview
-            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU"},
-            { label: "Latest RTA Request (L2)", type: "text", name: "rtaRequest"},
+            { label: "CV Tool Downtime?", type: "select", name: "cvToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "cvEsolveTicketNum" },
+            // { label: "Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
+            { label: "Clearview Reading", type: "select", name: "cvReading", options: [
+                    "",
+                    "Failed to collect line card information",
+                    "Fix bad splices",
+                    "Missing Micro-Filter",
+                    "Others/Error Code",
+                    "Rogue ONU",
+                    "Severely Degraded",
+                    "The ONU performance is degraded",
+                    "Unbalanced Pair",
+                    "Without Line Problem Detected"
+                ]
+            },
+            { label: "Clearview Error Code/Msg", type: "text", name: "cvErrorCode" },
+            { label: "Completion Date (L2)", type: "text", name: "rtaRequest" },
             // NMS Skin
-            { label: "ONU Status/RUNSTAT", type: "select", name: "onuRunStats", options: [
-                "", 
-                "UP",
-                "Active",
-                "LOS",
-                "Down",
-                "Power is Off",
-                "Power is Down",
-                "/N/A"
-            ]},
-            { label: "RX Power", type: "number", name: "rxPower", step: "any", placeholder: "Also available in DMS"},
-            { label: "VLAN (L2)", type: "text", name: "vlan", placeholder: "Also available in DMS"},
-            { label: "IP Address (L2)", type: "text", name: "ipAddress", placeholder: "Also available in DMS"},
-            { label: "No. of Conn. Devices (L2)", type: "text", name: "connectedDevices", placeholder: "Also available in DMS"},
-            { label: "Option82 Config (L2)", type: "select", name: "option82Config", options: [
-                "", 
-                "Aligned", 
-                "Misaligned"
-            ]},
-            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank."},
-            // DMS
-            { label: "Internet/Data Status(L2)", type: "select", name: "dmsInternetStatus", options: ["", "Online", "Offline" ]},
-            { label: "Performed Self Heal?", type: "select", name: "dmsSelfHeal", options: [
-                "", 
-                "Yes/Resolved", 
-                "Yes/Unresolved", 
-                "No"
-            ]},
-            { label: "Other Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken."},
+            { label: "NMS Tool Downtime?", type: "select", name: "nmsToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "nmsEsolveTicketNum" },
+            { label: "NMS: ONU Status", type: "select", name: "nmsOnuStats", options: [
+                    "",
+                    "UP",
+                    "Active",
+                    "LOS",
+                    "Down",
+                    "Power is Off",
+                    "Power is Down",
+                    "N/A"
+                ]
+            },
+            // DMS Standalone
+            { label: "DMS Tool Downtime?", type: "select", name: "dmsToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "dmsEsolveTicketNum" },
+            { label: "DMS: ONU Status", type: "select", name: "dmsOnuStats", options: [
+                    "— Check Online Status in DMS —",
+                    "Check Mark",
+                    "X Mark",
+                    "Failed to Refresh",
+                    "No Record Found"
+                ]
+            },
+            // RX and VLAN
+            { label: "RX Power", type: "number", name: "rxPower", step: "any", placeholder: "Available in FUSE, CV & NMS" },
+            { label: "VLAN (L2)", type: "text", name: "vlan", placeholder: "Available in NMS & DMS" },
+            { label: "IP Address (L2)", type: "text", name: "ipAddress", placeholder: "Available in NMS & DMS" },
+            { label: "No. of Conn. Devices (L2)", type: "text", name: "connectedDevices", placeholder: "Available in NMS & DMS" },
             // Probing
-            { label: "Connection Method", type: "select", name: "connectionMethod", options: [
-                "", 
-                "WiFi", 
-                "LAN"
-            ]},
-            { label: "WiFi State (DMS)", type: "select", name: "dmsWifiState", options: [
-                "", 
-                "On", 
-                "Off"
-            ]},
-            { label: "LAN Port Status (DMS)", type: "select", name: "dmsLanPortStatus", options: [
-                "", 
-                "Disabled", 
-                "Enabled"
-            ]},
+            { label: "Connected via?", type: "select", name: "connectionMethod", options: [
+                    "",
+                    "WiFi",
+                    "LAN"
+                ]
+            },
             { label: "Mesh Type", type: "select", name: "meshtype", options: [
-                "", 
-                "TP-LINK", 
-                "Tenda"
-            ]},
+                    "",
+                    "TP-LINK",
+                    "Tenda"
+                ]
+            },
             { label: "Mesh Ownership", type: "select", name: "meshOwnership", options: [
-                "", 
-                "PLDT-owned", 
-                "Subs-owned"
-            ]},
-            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “NIC using WiFi”. DO NOT input the WOCAS!"},
-            { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+                    "",
+                    "PLDT-owned",
+                    "Subs-owned"
+                ]
+            },
+            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
-            { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
-                "",
-                "Tested Ok",
-                "Cannot Browse",
-                "Defective Mesh",
-                "Defective Modem / Missing Modem",
-                "Manual Troubleshooting",
-                "Mesh Configuration",
-                "Mismatch Option 82 / Service ID",
-                "NMS Refresh / Configuration",
-                "No Configuration / Wrong Configuration",
-                "No or Blinking DSL Light",
-                "Self-Restored"
-            ]},
+            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “NIC using WiFi”. DO NOT input the WOCAS!" },
+            { label: "FLM Findings/Resolution", type: "select", name: "resolution", options: [
+                    "",
+                    "Tested Ok",
+                    "Cannot Browse",
+                    "Defective Mesh",
+                    "Defective Modem / Missing Modem",
+                    "Manual Troubleshooting",
+                    "Mesh Configuration",
+                    "Mismatch Option 82 / Service ID",
+                    "NMS Refresh / Configuration",
+                    "No Configuration / Wrong Configuration",
+                    "No or Blinking DSL Light",
+                    "Self-Restored"
+                ]
+            },
             { label: "Tested Ok? (Y/N)", type: "select", name: "testedOk", options: [
-                "", 
-                "Yes", 
-                "No"
-            ] },
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Modem Light Status —",
-                "No Internet Light",
-                "No LAN light",
-                "No WLAN light",
-                "Normal Status",
-                "Not Applicable [Copper]",
-                "Not Applicable [via Store]",
-                "Unable to provide information"
-            ]},
+                    "— Modem Light Status —",
+                    "No Internet Light",
+                    "No LAN light",
+                    "No WLAN light",
+                    "Normal Status",
+                    "Not Applicable [Copper]",
+                    "Not Applicable [via Store]",
+                    "Unable to provide information"
+                ]
+            },
             { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— NMS Parameters —",
-                "VLAN Configuration issue",
-                "Up/Active",
-                "Null Value",
-                "Not Applicable [NMS GUI]",
-                "Not Applicable [InterOP]",
-                "Not Applicable [via Store]",
-                "No acquired IP address [Native]",
-                "Failed RX",
-            ]},
+                    "— NMS Parameters —",
+                    "VLAN Configuration issue",
+                    "Up/Active",
+                    "Null Value",
+                    "Not Applicable [NMS GUI]",
+                    "Not Applicable [InterOP]",
+                    "Not Applicable [via Store]",
+                    "No acquired IP address [Native]",
+                    "Failed RX",
+                ]
+            },
             { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Clearview Reading —",
-                "Failed to collect line card information",
-                "Fix bad splices",
-                "Missing Micro-Filter",
-                "Others/Error Code",
-                "Rogue ONU",
-                "Severely Degraded",
-                "The ONU performance is degraded",
-                "Unbalanced Pair",
-                "Without Line Problem Detected"
-            ]},
+                    "— Clearview Reading —",
+                    "Failed to collect line card information",
+                    "Fix bad splices",
+                    "Missing Micro-Filter",
+                    "Others/Error Code",
+                    "Rogue ONU",
+                    "Severely Degraded",
+                    "The ONU performance is degraded",
+                    "Unbalanced Pair",
+                    "Without Line Problem Detected"
+                ]
+            },
             { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "Awaiting Parent Case",
-                "Cannot Browse",
-                "Cannot Browse via Mesh",
-                "Cannot Connect via LAN",
-                "Cannot Connect via WiFi",
-                "Data Bind Port",
-                "FCR - Cannot Browse",
-                "FCR - Cannot Connect via LAN",
-                "FCR - Cannot Connect via Mesh",
-                "FCR - Cannot Connect via WiFi",
-                "FCR - Device - Advised Physical Set-Up",
-                "FCR - Device for Replacement in Store",
-                "FCR - Redirected to PLDT Sites",
-                "Individual Trouble",
-                "Network Trouble - Cannot Browse",
-                "Network Trouble - Cannot Browse via Mesh",
-                "Node Down",
-                "Not Applicable [via Store]",
-                "Redirected to PLDT Sites",
-                "Secondary Trouble"
-            ]},
+                    "— Select applicable Investigation 4 —",
+                    "Awaiting Parent Case",
+                    "Cannot Browse",
+                    "Cannot Browse via Mesh",
+                    "Cannot Connect via LAN",
+                    "Cannot Connect via WiFi",
+                    "Data Bind Port",
+                    "FCR - Cannot Browse",
+                    "FCR - Cannot Connect via LAN",
+                    "FCR - Cannot Connect via Mesh",
+                    "FCR - Cannot Connect via WiFi",
+                    "FCR - Device - Advised Physical Set-Up",
+                    "FCR - Device for Replacement in Store",
+                    "FCR - Redirected to PLDT Sites",
+                    "Individual Trouble",
+                    "Network Trouble - Cannot Browse",
+                    "Network Trouble - Cannot Browse via Mesh",
+                    "Node Down",
+                    "Not Applicable [via Store]",
+                    "Redirected to PLDT Sites",
+                    "Secondary Trouble"
+                ]
+            },
             // Ticket Details
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
-            { label: "SLA / ETR", type: "text", name: "sla"},
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "SLA / ETR", type: "text", name: "sla" },
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
-            { label: "Landmarks", type: "textarea", name: "landmarks"},
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
-            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -3313,7 +3580,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -3387,7 +3654,7 @@ function createIntentBasedForm() {
                 fields.splice(index + 1, 0, {
                     type: "noteRow",
                     name: "onuStatChecklist",
-                    relatedTo: "onuRunStats"
+                    relatedTo: "nmsToolStatus"
                 });
             }
         }
@@ -3428,19 +3695,21 @@ function createIntentBasedForm() {
 
         insertToolLabel(enhancedFields, "Visual Audit", "facility");
         insertEscaChecklistRow(enhancedFields, "outageStatus");
-        insertToolLabel(enhancedFields, "NMS Skin", ["onuRunStats", "nmsSkinRemarks"]);
+        insertToolLabel(enhancedFields, "Modem/ONU Details", ["onuModel"]);
+        insertToolLabel(enhancedFields, "NMS Skin", ["nmsToolStatus"]);
         insertNoteRow(enhancedFields, "toolLabel-nms-skin");
-        insertToolLabel(enhancedFields, "BSMP/Clearview", "cvReading");
-        insertToolLabel(enhancedFields, "DMS", "dmsInternetStatus");
+        insertToolLabel(enhancedFields, "Clearview", "cvToolStatus");
+        insertToolLabel(enhancedFields, "DMS", "dmsToolStatus");
+        insertToolLabel(enhancedFields, "Other Network Fields", "rxPower");
         insertToolLabel(enhancedFields, "Probe & Troubleshoot", ["connectionMethod", "meshtype"]);
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
         insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
-        
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
-            row.style.display = field.name === "facility" ? "table-row" : "none"; 
+            row.style.display = field.name === "facility" ? "table-row" : "none";
 
             const td = document.createElement("td");
             const divInput = document.createElement("div");
@@ -3599,7 +3868,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -3616,7 +3885,7 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") ? 5 : 
+                input.rows = (field.name === "remarks") ? 5 :
                     (field.name === "specialInstructions") ? 3 : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
@@ -3635,9 +3904,9 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
-        enhancedFields.forEach(field => table.appendChild(createFieldRow(field))); 
+
+        table.appendChild(createInstructionsRow());
+        enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
 
         function updateToolLabelVisibility() {
             const updateVisibility = (selector) => {
@@ -3680,64 +3949,64 @@ function createIntentBasedForm() {
             if (facility.value === "Fiber") {
                 if (selectedValue === "form500_1") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "onuModel", "onuSerialNum", "intLightStatus", "wanLightStatus", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form500_2") {
-                    showFields(["nmsSkinRemarks", "dmsRemarks", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "connectionMethod", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    showFields(["actualExp", "remarks", "issueResolved"]);
+                    hideSpecificFields(["resType", "outageReference", "pcNumber", "onuSerialNum", "intLightStatus", "wanLightStatus", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "onuModel", "connectionMethod", "meshtype", "meshOwnership", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "intLightStatus", "wanLightStatus", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "onuModel", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
                 }
 
                 updateToolLabelVisibility();
             } else if (facility.value === "Fiber - Radius") {
                 if (selectedValue === "form500_1") {
                     showFields(["connectionMethod", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "intLightStatus", "wanLightStatus", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "onuModel", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form500_3" || selectedValue === "form500_4") {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "intLightStatus", "wanLightStatus", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "onuModel", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
                     showAlert("This form is currently unavailable for customers with Fiber - Radius service.");
                     resetAllFields([]);
-                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "intLightStatus", "wanLightStatus", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "onuModel", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                     const facilityField = document.querySelector('[name="facility"]');
                     if (facilityField) facilityField.value = "";
                     return;
                 }
-                
+
                 updateToolLabelVisibility();
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "intLightStatus", "wanLightStatus", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "onuModel", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "intLightStatus", "wanLightStatus", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "onuModel", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
 
             updateToolLabelVisibility();
         });
-    
+
         const resType = document.querySelector("[name='resType']");
         resType.addEventListener("change", () => {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
-                if (selectedValue=== "form500_1") {
+                if (selectedValue === "form500_1") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "onuModel", "intLightStatus", "wanLightStatus", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else if (selectedValue === "form500_2") {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "onuModel", "intLightStatus", "wanLightStatus", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 } else {
                     showFields(["meshtype", "meshOwnership", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "onuModel", "intLightStatus", "wanLightStatus", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "connectionMethod", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 }
-                
+
                 updateToolLabelVisibility();
             } else {
                 showFields(["remarks", "issueResolved"]);
-                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "onuSerialNum", "onuModel", "intLightStatus", "wanLightStatus", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "connectionMethod", "meshtype", "meshOwnership", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
 
             updateToolLabelVisibility();
@@ -3747,14 +4016,14 @@ function createIntentBasedForm() {
         outageStatus.addEventListener("change", () => {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (selectedValue === "form500_1" && facility.value === "Fiber" && outageStatus.value === "No") {
-                showFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "option82Config", "dmsWifiState", "dmsLanPortStatus", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                showFields(["onuSerialNum", "onuModel", "intLightStatus", "wanLightStatus", "cvToolStatus", "nmsToolStatus", "dmsToolStatus", "rxPower", "vlan", "ipAddress", "connectedDevices", "connectionMethod", "remarks", "issueResolved"]);
+                hideSpecificFields(["outageReference", "pcNumber", "cvEsolveTicketNum", "cvReading", "rtaRequest", "nmsEsolveTicketNum", "nmsOnuStats", "dmsEsolveTicketNum", "dmsOnuStats", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else if (selectedValue === "form500_1" && facility.value === "Copper VDSL" && outageStatus.value === "No") {
                 showFields(["onuSerialNum", "intLightStatus", "wanLightStatus", "connectionMethod", "remarks", "issueResolved"]);
-                hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "option82Config", "onuRunStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageReference", "pcNumber", "onuModel", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
-                hideSpecificFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "intLightStatus", "wanLightStatus", "onuRunStats", "option82Config", "rxPower", "vlan", "ipAddress", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "dmsInternetStatus", "onuModel", "dmsWifiState", "dmsLanPortStatus", "dmsSelfHeal", "dmsRemarks", "connectionMethod", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks", "specialInstructions", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["onuModel", "onuSerialNum", "intLightStatus", "wanLightStatus", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "rtaRequest", "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "rxPower", "vlan", "ipAddress", "connectedDevices", "connectionMethod", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks", "specialInstructions", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
                 } else {
@@ -3764,72 +4033,74 @@ function createIntentBasedForm() {
             updateToolLabelVisibility();
         });
 
-        const onuRunStats = document.querySelector("[name='onuRunStats']");
-        onuRunStats.addEventListener("change", () => {
-            if (onuRunStats.value === "UP" || onuRunStats.value === "Active") {
-                showFields(["option82Config"]);
+        const cvToolStatus = document.querySelector("[name='cvToolStatus']");
+        cvToolStatus.addEventListener("change", () => {
+            if (cvToolStatus.value === "No") {
+                showFields(["cvReading", "rtaRequest"]);
+                hideSpecificFields(["cvEsolveTicketNum"]);
             } else {
-                hideSpecificFields(["option82Config"]);
+                showFields(["cvEsolveTicketNum"]);
+                hideSpecificFields(["cvReading", "rtaRequest"]);
             }
             updateToolLabelVisibility();
         });
 
-        const equipmentBrand = document.querySelector("[name='equipmentBrand']");
-        const modemBrand = document.querySelector("[name='modemBrand']");
-        const onuConnectionType = document.querySelector("[name='onuConnectionType']");
-
-        function updateONUConnectionType() {
-            if (!equipmentBrand.value || !modemBrand.value) {
-                onuConnectionType.value = ""; 
-                onuConnectionType.dispatchEvent(new Event("change")); 
-                return;
+        const cvReading = document.querySelector("[name='cvReading']");
+        cvReading.addEventListener("change", () => {
+            if (cvReading.value === "Others/Error Code") {
+                showFields(["cvErrorCode"]);
+            } else {
+                hideSpecificFields(["cvErrorCode"]);
             }
+        });
 
-            const newValue =
-                (equipmentBrand.value === "FEOL" && modemBrand.value === "FHTT") ||
-                (equipmentBrand.value === "HUOL" && modemBrand.value === "HWTC")
-                    ? "Non-interOp"
-                    : "InterOp";
+        const nmsToolStatus = document.querySelector("[name='nmsToolStatus']");
+        const dmsToolStatus = document.querySelector("[name='dmsToolStatus']");
+        const dmsOnuStats = document.querySelector("[name='dmsOnuStats']");
 
-            if (onuConnectionType.value !== newValue) {
-                onuConnectionType.value = ""; 
-                onuConnectionType.dispatchEvent(new Event("change")); 
-
-                setTimeout(() => {
-                    onuConnectionType.value = newValue; 
-                    onuConnectionType.dispatchEvent(new Event("change")); 
-                }, 0);
+        // VLAN, IP Address, and Connected Devices Handler
+        function updateNetworkFields() {
+            if (nmsToolStatus.value === "Yes" && dmsToolStatus.value === "Yes") {
+                hideSpecificFields(["vlan", "ipAddress", "connectedDevices"]);
+            } else if (nmsToolStatus.value === "Yes" && dmsOnuStats.value === "No Record Found") {
+                hideSpecificFields(["vlan", "ipAddress", "connectedDevices"]);
+            } else {
+                showFields(["vlan", "ipAddress", "connectedDevices"]);
             }
         }
 
-        onuConnectionType.addEventListener("mousedown", (event) => {
-            event.preventDefault();
-        });
-
-        equipmentBrand.addEventListener("change", updateONUConnectionType);
-        modemBrand.addEventListener("change", updateONUConnectionType);
-
-        updateONUConnectionType();
-
-        onuConnectionType.addEventListener("change", () => {
-            if (onuConnectionType.value === "Non-interOp") {
-                showFields(["vlan", "ipAddress", "connectedDevices"]);
+        nmsToolStatus.addEventListener("change", () => {
+            if (nmsToolStatus.value === "No") {
+                showFields(["nmsOnuStats"]);
+                hideSpecificFields(["nmsEsolveTicketNum"]);
             } else {
-                hideSpecificFields(["vlan", "ipAddress", "connectedDevices"]);
+                showFields(["nmsEsolveTicketNum"]);
+                hideSpecificFields(["nmsOnuStats"]);
             }
             updateToolLabelVisibility();
+            updateNetworkFields();
         });
-    
-        const connectionMethod = document.querySelector("[name='connectionMethod']");
-        connectionMethod.addEventListener("change", () => {
-            if (connectionMethod.value === "WiFi") {
-                showFields(["dmsWifiState"]);
-                hideSpecificFields(["dmsLanPortStatus"]);
-            } else if (connectionMethod.value === "LAN") {
-                showFields(["dmsLanPortStatus"]);
-                hideSpecificFields(["dmsWifiState"]);
+
+        dmsToolStatus.addEventListener("change", () => {
+            if (dmsToolStatus.value === "No") {
+                showFields(["dmsOnuStats"]);
+                hideSpecificFields(["dmsEsolveTicketNum"]);
             } else {
-                hideSpecificFields(["dmsWifiState", "dmsLanPortStatus"]);
+                showFields(["dmsEsolveTicketNum"]);
+                hideSpecificFields(["dmsOnuStats"]);
+            }
+            updateToolLabelVisibility();
+            updateNetworkFields();
+        });
+
+        dmsOnuStats.addEventListener("change", () => {
+            updateNetworkFields();
+            if (dmsOnuStats.value === "No Record Found") {
+                showAlert("Select this option only if the device cannot be pulled up in DMS after searching with all available identifiers, including the IP Address, MAC Address, Serial Number, and Phone Number.");
+                return true;
+            } else if (dmsOnuStats.value === "Failed to Refresh") {
+                showAlert(`Select this option only if DMS loads the device details and displays a "Failed to Refresh" message.`);
+                return true;
             }
         });
         
@@ -3846,10 +4117,14 @@ function createIntentBasedForm() {
         const testedOk = document.querySelector("[name='testedOk']");
 
         function testedOkReso() {
-            if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
-                hideSpecificFields(["availability", "address", "landmarks"]);
+            if (issueResolved.value === "No - for Ticket Creation") {
+                if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
+                    hideSpecificFields(["availability", "address", "landmarks"]);
+                } else {
+                    showFields(["availability", "address", "landmarks"]);
+                }
             } else {
-                showFields(["availability", "address", "landmarks"]);
+                hideSpecificFields(["availability", "address", "landmarks"]);
             }
             updateToolLabelVisibility();
         }
@@ -3858,139 +4133,183 @@ function createIntentBasedForm() {
         testedOk.addEventListener("change", testedOkReso);
 
         updateToolLabelVisibility();
-    } else if (sicForms.includes(selectedValue)) { 
+    } else if (sicForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
             // Visual Audit
             { label: "Account/Facility Type", type: "select", name: "facility", options: [
-                "", 
-                "Fiber", 
-                "Fiber - Radius", 
-                "Copper VDSL", 
-                "Copper HDSL/NGN" 
-            ]},
+                    "",
+                    "Fiber",
+                    "Fiber - Radius",
+                    "Copper VDSL",
+                    "Copper HDSL/NGN"
+                ]
+            },
             { label: "Res. Vertical Address", type: "select", name: "resType", options: [
-                "Bldg., Condo, etc.", 
-                "Yes", 
-                "No"
-            ]},
-            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"]},
+                    "Bldg., Condo, etc.",
+                    "Yes",
+                    "No"
+                ]
+            },
+            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"] },
             { label: "Source Reference", type: "select", name: "outageReference", options: [
-                "— Network Outage Source —", 
-                "FUSE Outage Tab", 
-                "Lit365 Downtime Advisory",
-                "Clearview",
-                "CEP Affected Services Tab"
-            ]},
-            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
-            { label: "Plan Details (L2)", type: "textarea", name: "planDetails", placeholder: "Please specify the plan details as indicated in FUSE.\ne.g. “Plan 2699 at 1GBPS”"},
-            { label: "ONU Model (L2)", type: "text", name: "onuModel", placeholder: "Available in DMS."},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
+                    "— Network Outage Source —",
+                    "FUSE Outage Tab",
+                    "Lit365 Downtime Advisory",
+                    "Clearview",
+                    "CEP Affected Services Tab"
+                ]
+            },
+            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
+            { label: "Plan Details (L2)", type: "textarea", name: "planDetails", placeholder: "Please specify the plan details as indicated in FUSE.\ne.g. “Plan 2699 at 1GBPS”" },
+            { label: "ONU Model (L2)", type: "text", name: "onuModel", placeholder: "Available in DMS." },
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS." },
+            { label: "Download (Mbps)", type: "number", name: "download1", step: "any" },
+            { label: "Upload (Mbps)", type: "number", name: "upload1", step: "any" },
+            { label: "Ping (ms)", type: "number", name: "ping_1", step: "any" },
+            // Clearview
+            { label: "CV Tool Downtime?", type: "select", name: "cvToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "cvEsolveTicketNum" },
+            { label: "Clearview Reading", type: "select", name: "cvReading", options: [
+                    "",
+                    "Fix bad splices",
+                    "Missing Micro-Filter",
+                    "Others/Error Code",
+                    "Rogue ONU",
+                    "Severely Degraded",
+                    "The ONU performance is degraded",
+                    "Unbalanced Pair",
+                    "Without Line Problem Detected",
+                    "Without Line Problem Detected - Link Quality Degraded"
+                ]
+            },
+            { label: "Clearview Error Code/Msg", type: "text", name: "cvErrorCode" },
+            { label: "Completion Date (L2)", type: "text", name: "rtaRequest" },
+            { label: "With Historical Alarms", type: "select", name: "historicalAlarm", options: ["", "Yes", "No"] },
+            { label: "Type of Alarm", type: "text", name: "typeOfAlarm" },
             // NMS Skin
-            { label: "RX Power", type: "number", name: "rxPower", step: "any", placeholder: "Also available in Clearview."},
+            { label: "NMS Tool Downtime?", type: "select", name: "nmsToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "nmsEsolveTicketNum" },
+            { label: "NMS: Bandwidth Code", type: "text", name: "nmsBandwidthCode" },
+            // DMS Standalone
+            { label: "DMS Tool Downtime?", type: "select", name: "dmsToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "dmsEsolveTicketNum" },
+            { label: "DMS: ONU Status", type: "select", name: "dmsOnuStats", options: [
+                    "— Check Online Status in DMS —",
+                    "Check Mark",
+                    "X Mark",
+                    "Failed to Refresh",
+                    "No Record Found"
+                ]
+            },
+            { label: "Bandsteering (L2)", type: "select", name: "bandsteering", options: ["", "Enabled", "Disabled"] },
+            { label: "Device's Connection (L2)", type: "select", name: "deviceWifiBand", options: [
+                    "",
+                    "Device connected to 2.4G",
+                    "Device connected to 5G"
+                ]
+            },
+            // Other Network Details
+            { label: "RX Power", type: "number", name: "rxPower", step: "any", placeholder: "Available in FUSE/CV/NMS" },
             { label: "Option82 Config", type: "select", name: "option82Config", options: [
-                "", 
-                "Aligned", 
-                "Misaligned"
-            ]},
-            { label: "SAAA BW Code (L2)", type: "text", name: "saaaBandwidthCode"},
-            { label: "Connected Devices (L2)", type: "text", name: "connectedDevices", placeholder: "e.g. 2 on 2.4G, 3 on 5G, 2 LAN(Desktop/Laptop and Mesh)"},
-            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank."},
-            // DMS
-            { label: "Internet/Data Status(L2)", type: "select", name: "dmsInternetStatus", options: ["", "Online", "Offline" ]},
-            { label: "Device's WiFi Band (L2)", type: "select", name: "deviceWifiBand", options: [
-                "", 
-                "Device Found in 2.4G Wi-Fi", 
-                "Device Found in 5G Wi-Fi" 
-            ]},
-            { label: "Bandsteering (L2)", type: "select", name: "bandsteering", options: ["", "Enabled", "Disabled"]},
-            { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken."},
-            // BSMP/Clearview
-            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU"},
-            { label: "Latest RTA Request (L2)", type: "text", name: "rtaRequest"},
-            // Probing
+                    "— Check FUSE, CEP, CV, & NMS (EAAA/SAAA) —",
+                    "Aligned",
+                    "Misaligned"
+                ]
+            },
+            { label: "Option 82 Misaligned Details", type: "textarea", name: "option82MisalignedDetails", placeholder: "Specify the tool(s) where the Option 82 value is mismatched and include the incorrect or misaligned Option 82 value." },
+            { label: "Connected Devices (L2)", type: "text", name: "connectedDevices", placeholder: "e.g. 2 on 2.4G, 3 on 5G, 2 LAN(Desktop/Laptop and Mesh)" },
+            // Probing & Troubleshooting
             { label: "Connection Method", type: "select", name: "connectionMethod", options: [
-                "", 
-                "WiFi", 
-                "LAN"
-            ]},
-            { label: "Device Brand & Model", type: "text", name: "deviceBrandAndModel", placeholder: "Galaxy S25, Dell Latitude 3420"},
-            { label: "Ping Test Result", type: "number", name: "pingTestResult", step: "any"},
-            { label: "Speedtest Result", type: "number", name: "speedTestResult", step: "any"},
-            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “Only Acquiring 180MBPS.” DO NOT input the WOCAS!"},
-            { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+                    "",
+                    "WiFi",
+                    "LAN"
+                ]
+            },
+            { label: "Device Brand & Model (L2)", type: "text", name: "deviceBrandAndModel", placeholder: "Galaxy S25, Dell Latitude 3420" },
+            { label: "Download (Mbps)", type: "number", name: "download2", step: "any" },
+            { label: "Upload (Mbps)", type: "number", name: "upload2", step: "any" },
+            { label: "Ping (ms)", type: "number", name: "ping_2", step: "any" },
+            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
-            { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
-                "",
-                "Tested Ok",
-                "Failed RX",
-                "High Latency / Ping",
-                "Manual Troubleshooting",
-                "Mismatch Option 82 / Service ID",
-                "NMS Refresh / Configuration",
-                "Slow Browsing"
-            ]},
+            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “Only Acquiring 180MBPS.” DO NOT input the WOCAS!" },
+            { label: "FLM Findings/Resolution", type: "select", name: "resolution", options: [
+                    "",
+                    "Tested Ok",
+                    "Failed RX",
+                    "High Latency / Ping",
+                    "Manual Troubleshooting",
+                    "Mismatch Option 82 / Service ID",
+                    "NMS Refresh / Configuration",
+                    "Slow Browsing"
+                ]
+            },
             { label: "Tested Ok? (Y/N)", type: "select", name: "testedOk", options: [
-                "", 
-                "Yes", 
-                "No"
-            ] },
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Modem Light Status —",
-                "Normal Status",
-                "Not Applicable [Copper]",
-                "Not Applicable [via Store]",
-                "Unable to provide information"
-            ]},
+                    "— Modem Light Status —",
+                    "Normal Status",
+                    "Not Applicable [Copper]",
+                    "Not Applicable [via Store]",
+                    "Unable to provide information"
+                ]
+            },
             { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— NMS Parameters —",
-                "Passed RX",
-                "Failed RX",
-                "Up/Active",
-                "Not Applicable [NMS GUI]",
-                "Not Applicable [via Store]",
-            ]},
+                    "— NMS Parameters —",
+                    "Passed RX",
+                    "Failed RX",
+                    "Up/Active",
+                    "Not Applicable [NMS GUI]",
+                    "Not Applicable [via Store]",
+                ]
+            },
             { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Clearview Reading —",
-                "Fix bad splices",
-                "Missing Micro-Filter",
-                "Others/Error Code",
-                "Rogue ONU",
-                "Severely Degraded",
-                "The ONU performance is degraded",
-                "Unbalanced Pair",
-                "Without Line Problem Detected",
-                "Without Line Problem Detected - Link Quality Degraded"
-            ]},
+                    "— Clearview Reading —",
+                    "Fix bad splices",
+                    "Missing Micro-Filter",
+                    "Others/Error Code",
+                    "Rogue ONU",
+                    "Severely Degraded",
+                    "The ONU performance is degraded",
+                    "Unbalanced Pair",
+                    "Without Line Problem Detected",
+                    "Without Line Problem Detected - Link Quality Degraded"
+                ]
+            },
             { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "FCR - Low BW profile",
-                "FCR - Slow/Intermittent Browsing",
-                "High Latency",
-                "High Utilization OLT/PON Port",
-                "Individual Trouble",
-                "Misaligned Record",
-                "Network Trouble - High Latency",
-                "Network Trouble - Slow Internet Connection",
-                "Network Trouble - Slow/Intermittent Browsing",
-                "Not Applicable [via Store]",
-                "ONU Replacement to Latest Model",
-                "Slow/Intermittent Browsing",
-                "With historical alarms",
-                "Without historical alarms"
-            ]},
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
-            { label: "SLA / ETR", type: "text", name: "sla"},
+                    "— Select applicable Investigation 4 —",
+                    "FCR - Low BW profile",
+                    "FCR - Slow/Intermittent Browsing",
+                    "High Latency",
+                    "High Utilization OLT/PON Port",
+                    "Individual Trouble",
+                    "Misaligned Record",
+                    "Network Trouble - High Latency",
+                    "Network Trouble - Slow Internet Connection",
+                    "Network Trouble - Slow/Intermittent Browsing",
+                    "Not Applicable [via Store]",
+                    "ONU Replacement to Latest Model",
+                    "Slow/Intermittent Browsing",
+                    "With historical alarms",
+                    "Without historical alarms"
+                ]
+            },
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "SLA / ETR", type: "text", name: "sla" },
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
-            { label: "Landmarks", type: "textarea", name: "landmarks"},
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
-            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -4004,7 +4323,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -4078,7 +4397,7 @@ function createIntentBasedForm() {
                 fields.splice(index, 0, {
                     type: "noteRow",
                     name: "probingChecklist",
-                    relatedTo: "rxPower"
+                    relatedTo: "ping_1"
                 });
             }
         }
@@ -4091,7 +4410,7 @@ function createIntentBasedForm() {
                     label: `// ${label}`,
                     type: "toolLabel",
                     name: `toolLabel-${label.toLowerCase().replace(/\s/g, "-")}`,
-                    relatedTo: relatedFieldName 
+                    relatedTo: relatedFieldName
                 }
             );
         }
@@ -4111,16 +4430,19 @@ function createIntentBasedForm() {
 
         insertToolLabel(enhancedFields, "Visual Audit", "facility");
         insertEscaChecklistRow(enhancedFields, "outageStatus");
-        insertToolLabel(enhancedFields, "NMS Skin", "rxPower");
-        insertNoteRow(enhancedFields, "toolLabel-nms-skin");
-        insertToolLabel(enhancedFields, "BSMP/Clearview", "cvReading");
-        insertToolLabel(enhancedFields, "DMS", "dmsInternetStatus");
+        insertToolLabel(enhancedFields, "Initial/Before Troubleshooting Speedtest Result", "download1");
+        insertToolLabel(enhancedFields, "Clearview", "cvToolStatus");
+        insertToolLabel(enhancedFields, "NMS Skin", "nmsToolStatus");
+        insertNoteRow(enhancedFields, "toolLabel-clearview");
+        insertToolLabel(enhancedFields, "DMS", "dmsToolStatus");
+        insertToolLabel(enhancedFields, "Other Network Details", "rxPower");
+        insertToolLabel(enhancedFields, "After Troubleshooting Speedtest Result", "download2");
         insertToolLabel(enhancedFields, "Probe & Troubleshoot", "connectionMethod");
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
         insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
-        
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
             row.style.display = field.name === "facility" ? "table-row" : "none";
@@ -4298,7 +4620,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -4315,7 +4637,7 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") ? 6 : 
+                input.rows = (field.name === "remarks") ? 6 :
                     (field.name === "specialInstructions") ? 3 : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
@@ -4334,9 +4656,9 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
-        enhancedFields.forEach(field => table.appendChild(createFieldRow(field))); 
+
+        table.appendChild(createInstructionsRow());
+        enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
 
         function updateToolLabelVisibility() {
             const updateVisibility = (selector) => {
@@ -4380,32 +4702,32 @@ function createIntentBasedForm() {
             resetAllFields(["facility"]);
             if (facility.value === "Fiber") {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["resType", "planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
-                updateToolLabelVisibility(); 
+                hideSpecificFields(["resType", "outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "download1", "upload1", "ping_1", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "download2", "upload2", "ping_2", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                updateToolLabelVisibility();
             } else if (facility.value === "Fiber - Radius") {
-                showFields(["planDetails", "connectionMethod", "pingTestResult", "speedTestResult", "remarks", "issueResolved"]);
-                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                showFields(["planDetails", "connectionMethod", "download1", "upload1", "ping_1", "download2", "upload2", "ping_2", "remarks", "issueResolved"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else if (facility.value === "Copper VDSL") {
                 showFields(["resType"]);
-                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks","issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "download1", "upload1", "ping_1", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "download2", "upload2", "ping_2", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["resType", "planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "investigation1", "investigation2", "investigation3", "investigation4", "actualExp", "resolution", "testedOk" ,"issueResolved", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "download1", "upload1", "ping_1", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "download2", "upload2", "ping_2", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
-            updateToolLabelVisibility(); 
+            updateToolLabelVisibility();
         });
-    
+
         const resType = document.querySelector("[name='resType']");
         resType.addEventListener("change", () => {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
                 showFields(["outageStatus"]);
-                hideSpecificFields(["planDetails", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "download1", "upload1", "ping_1", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "download2", "upload2", "ping_2", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             } else {
                 showFields(["remarks"]);
-                hideSpecificFields(["planDetails", "outageStatus", "outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "download1", "upload1", "ping_1", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "download2", "upload2", "ping_2", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
             }
-            updateToolLabelVisibility(); 
+            updateToolLabelVisibility();
         });
 
         const outageStatus = document.querySelector("[name='outageStatus']");
@@ -4413,7 +4735,7 @@ function createIntentBasedForm() {
             resetAllFields(["facility", "resType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
-                hideSpecificFields(["planDetails", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "deviceBrandAndModel", "pingTestResult", "speedTestResult", "actualExp", "issueResolved", "testedOk", "availability", "address", "landmarks", "specialInstructions", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                hideSpecificFields(["planDetails", "onuModel", "onuSerialNum", "download1", "upload1", "ping_1", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "download2", "upload2", "ping_2", "actualExp", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -4422,17 +4744,117 @@ function createIntentBasedForm() {
                 }
             } else {
                 if (facility.value === "Fiber") {
-                    showFields(["planDetails", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "connectionMethod", "pingTestResult", "speedTestResult", "actualExp", "remarks", "issueResolved"]);
-                    hideSpecificFields(["resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "outageReference", "pcNumber", "deviceBrandAndModel", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                    showFields(["planDetails", "onuModel", "onuSerialNum", "download1", "upload1", "ping_1", "cvToolStatus", "nmsToolStatus", "dmsToolStatus", "rxPower", "option82Config", "connectionMethod", "deviceBrandAndModel", "download2", "upload2", "ping_2", "remarks", "issueResolved"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
 
                 } else {
-                    showFields(["planDetails", "connectionMethod", "pingTestResult", "speedTestResult", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "onuSerialNum", "rxPower", "option82Config", "saaaBandwidthCode", "connectedDevices", "nmsSkinRemarks", "cvReading", "rtaRequest", "onuModel", "dmsInternetStatus", "deviceWifiBand", "bandsteering", "dmsRemarks", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);   
+                    showFields(["planDetails", "connectionMethod", "download1", "upload1", "ping_1", "download2", "upload2", "ping_2", "remarks", "issueResolved"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
                 }
-                updateToolLabelVisibility(); 
+                updateToolLabelVisibility();
             }
 
-            updateToolLabelVisibility(); 
+            updateToolLabelVisibility();
+        });
+
+        const cvToolStatus = document.querySelector("[name='cvToolStatus']");
+        cvToolStatus.addEventListener("change", () => {
+            if (cvToolStatus.value === "Yes") {
+                showFields(["cvEsolveTicketNum"]);
+                hideSpecificFields(["cvReading", "rtaRequest", "cvErrorCode", "historicalAlarm", "typeOfAlarm"]);
+            } else {
+                showFields(["cvReading", "rtaRequest"])
+                hideSpecificFields(["cvEsolveTicketNum", "cvErrorCode", "historicalAlarm", "typeOfAlarm"]);
+            }
+        });
+
+        const cvReading = document.querySelector("[name='cvReading']");
+        cvReading.addEventListener("change", () => {
+            if (cvReading.value === "Others/Error Code") {
+                showFields(["cvErrorCode"]);
+                hideSpecificFields(["typeOfAlarm", "historicalAlarm"]);
+            } else if (cvReading.value === "The ONU performance is degraded" || cvReading.value === "Without Line Problem Detected - Link Quality Degraded") {
+                showFields(["historicalAlarm"]);
+                hideSpecificFields(["typeOfAlarm", "cvErrorCode"]);
+            } else {
+                hideSpecificFields(["historicalAlarm", "typeOfAlarm", "cvErrorCode"]);
+            }
+        });
+
+        const historicalAlarm = document.querySelector("[name='historicalAlarm']");
+        historicalAlarm.addEventListener("change", () => {
+            if (historicalAlarm.value === "Yes") {
+                showFields(["typeOfAlarm"]);
+            } else {
+                hideSpecificFields(["typeOfAlarm"]);
+            }
+        });
+
+        const nmsToolStatus = document.querySelector("[name='nmsToolStatus']");
+        const dmsToolStatus = document.querySelector("[name='dmsToolStatus']");
+        const dmsOnuStats = document.querySelector("[name='dmsOnuStats']");
+        const bandsteering = document.querySelector("[name='bandsteering']");
+
+        // Connected Devices Handler
+        function updateNetworkFields() {
+            if (nmsToolStatus.value === "Yes" && dmsToolStatus.value === "Yes") {
+                hideSpecificFields(["connectedDevices"]);
+            } else if (nmsToolStatus.value === "Yes" && dmsOnuStats.value === "No Record Found") {
+                hideSpecificFields(["connectedDevices"]);
+            } else {
+                showFields(["connectedDevices"]);
+            }
+        }
+
+        nmsToolStatus.addEventListener("change", () => {
+            if (nmsToolStatus.value === "Yes") {
+                showFields(["nmsEsolveTicketNum"]);
+                hideSpecificFields(["nmsBandwidthCode"]);
+            } else {
+                showFields(["nmsBandwidthCode"])
+                hideSpecificFields(["nmsEsolveTicketNum"]);
+            }
+            updateToolLabelVisibility();
+            updateNetworkFields();
+        });
+
+        dmsToolStatus.addEventListener("change", () => {
+            if (dmsToolStatus.value === "Yes") {
+                showFields(["dmsEsolveTicketNum"]);
+                hideSpecificFields(["dmsOnuStats"]);
+            } else {
+                showFields(["dmsOnuStats"]);
+                hideSpecificFields(["dmsEsolveTicketNum"]);
+            }
+            updateToolLabelVisibility();
+            updateNetworkFields();
+        });
+
+        dmsOnuStats.addEventListener("change", () => {
+            if (dmsOnuStats.value === "No Record Found") {
+                hideSpecificFields(["bandsteering"]);
+            } else {
+                showFields(["bandsteering"]);
+            }
+            updateToolLabelVisibility();
+            updateNetworkFields();
+        });
+
+        bandsteering.addEventListener("change", () => {
+            if (bandsteering.value === "Enabled") {
+                hideSpecificFields(["deviceWifiBand"]);
+            } else {
+                showFields(["deviceWifiBand"]);
+            }
+        });
+
+        const option82Config = document.querySelector("[name='option82Config']");
+        option82Config.addEventListener("change", () => {
+            if (option82Config.value === "Misaligned") {
+                showFields(["option82MisalignedDetails"]);
+            } else {
+                hideSpecificFields(["option82MisalignedDetails"]);
+            }
         });
 
         const connectionMethod = document.querySelector("[name='connectionMethod']");
@@ -4455,11 +4877,16 @@ function createIntentBasedForm() {
 
         const resolution = document.querySelector("[name='resolution']");
         const testedOk = document.querySelector("[name='testedOk']");
+
         function testedOkReso() {
-            if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
-                hideSpecificFields(["availability", "address", "landmarks"]);
+            if (issueResolved.value === "No - for Ticket Creation") {
+                if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
+                    hideSpecificFields(["availability", "address", "landmarks"]);
+                } else {
+                    showFields(["availability", "address", "landmarks"]);
+                }
             } else {
-                showFields(["availability", "address", "landmarks"]);
+                hideSpecificFields(["availability", "address", "landmarks"]);
             }
             updateToolLabelVisibility();
         }
@@ -4468,80 +4895,845 @@ function createIntentBasedForm() {
         testedOk.addEventListener("change", testedOkReso);
 
         updateToolLabelVisibility();
-    } else if (selectedValue === "form501_5" || selectedValue === "form501_6") { 
+    } else if (selectedValue === "form501_4") {
         const table = document.createElement("table");
 
         const fields = [
             // Visual Audit
-            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"]},
+            { label: "Account/Facility Type", type: "select", name: "facility", options: [
+                    "",
+                    "Fiber",
+                    "Fiber - Radius",
+                    "Copper VDSL",
+                    "Copper HDSL/NGN"
+                ]
+            },
+            { label: "Res. Vertical Address", type: "select", name: "resType", options: [
+                    "Bldg., Condo, etc.",
+                    "Yes",
+                    "No"
+                ]
+            },
+            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"] },
             { label: "Source Reference", type: "select", name: "outageReference", options: [
-                "— Network Outage Source —", 
-                "FUSE Outage Tab", 
-                "Lit365 Downtime Advisory",
-                "Clearview",
-                "CEP Affected Services Tab"
-            ]},
-            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
-            // BSMP/Clearview
-            { label: "SMP/Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU"},
-            { label: "Latest RTA Request (L2)", type: "text", name: "rtaRequest"},
+                    "— Network Outage Source —",
+                    "FUSE Outage Tab",
+                    "Lit365 Downtime Advisory",
+                    "Clearview",
+                    "CEP Affected Services Tab"
+                ]
+            },
+            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
+            { label: "Plan Details (L2)", type: "textarea", name: "planDetails", placeholder: "Please specify the plan details as indicated in FUSE.\ne.g. “Plan 2699 at 1GBPS”" },
+            { label: "ONU Model (L2)", type: "text", name: "onuModel", placeholder: "Available in DMS." },
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS." },
+            // Clearview
+            { label: "CV Tool Downtime?", type: "select", name: "cvToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "cvEsolveTicketNum" },
+            { label: "Clearview Reading", type: "select", name: "cvReading", options: [
+                    "",
+                    "Fix bad splices",
+                    "Missing Micro-Filter",
+                    "Others/Error Code",
+                    "Rogue ONU",
+                    "Severely Degraded",
+                    "The ONU performance is degraded",
+                    "Unbalanced Pair",
+                    "Without Line Problem Detected",
+                    "Without Line Problem Detected - Link Quality Degraded"
+                ]
+            },
+            { label: "Clearview Error Code/Msg", type: "text", name: "cvErrorCode" },
+            { label: "Completion Date (L2)", type: "text", name: "rtaRequest" },
+            { label: "With Historical Alarms", type: "select", name: "historicalAlarm", options: ["", "Yes", "No"] },
+            { label: "Type of Alarm", type: "text", name: "typeOfAlarm" },
             // NMS Skin
-            { label: "RX Power", type: "number", name: "rxPower", step: "any"},
-            // Probing & Remote Troubleshooting
-            { label: "Specific Timeframe", type: "text", name: "specificTimeframe", placeholder: "High latency/lag is being experienced."},
-            { label: "Ping Test Result", type: "text", name: "pingTestResult", placeholder: "Speedtest"},
-            { label: "Game Name and Server", type: "text", name: "gameNameAndServer", placeholder: "e.g. Dota2 - Singapore server"},
-            { label: "Game Server IP Address", type: "text", name: "gameServerIP", placeholder: "e.g. 103.10.124.118"},
-            { label: "Ping Test Result", type: "text", name: "pingTestResult2", placeholder: "Game Server IP Address"},
-            { label: "Traceroute PLDT side (Game Server IP Address)", type: "textarea", name: "traceroutePLDT", placeholder: "Hops with static.pldt.net suffix results. e.g. Hop 3 = PASS, Hop 4 = FAIL(RTO), Hop 5 = FAIL (42 ms), etc."},
-            { label: "Traceroute External side (Game Server IP Address)", type: "textarea", name: "tracerouteExt", placeholder: "Last Hop Result. e.g. Hop 10 = PASS"},
-            { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "NMS Tool Downtime?", type: "select", name: "nmsToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "nmsEsolveTicketNum" },
+            { label: "NMS: Bandwidth Code", type: "text", name: "nmsBandwidthCode" },
+            // DMS Standalone
+            { label: "DMS Tool Downtime?", type: "select", name: "dmsToolStatus", options: ["", "Yes", "No"] },
+            { label: "ESolve Ticket #", type: "text", name: "dmsEsolveTicketNum" },
+            { label: "DMS: ONU Status", type: "select", name: "dmsOnuStats", options: [
+                    "— Check Online Status in DMS —",
+                    "Check Mark",
+                    "X Mark",
+                    "Failed to Refresh",
+                    "No Record Found"
+                ]
+            },
+            { label: "Bandsteering (L2)", type: "select", name: "bandsteering", options: ["", "Enabled", "Disabled"] },
+            { label: "Device's Connection (L2)", type: "select", name: "deviceWifiBand", options: [
+                    "",
+                    "Device connected to 2.4G",
+                    "Device connected to 5G"
+                ]
+            },
+            // Other Network Details
+            { label: "RX Power", type: "number", name: "rxPower", step: "any", placeholder: "Available in FUSE/CV/NMS" },
+            { label: "Option82 Config", type: "select", name: "option82Config", options: [
+                    "— Check FUSE, CEP, CV, & NMS (EAAA/SAAA) —",
+                    "Aligned",
+                    "Misaligned"
+                ]
+            },
+            { label: "Option 82 Misaligned Details", type: "textarea", name: "option82MisalignedDetails", placeholder: "Specify the tool(s) where the Option 82 value is mismatched and include the incorrect or misaligned Option 82 value." },
+            { label: "Connected Devices (L2)", type: "text", name: "connectedDevices", placeholder: "e.g. 2 on 2.4G, 3 on 5G, 2 LAN(Desktop/Laptop and Mesh)" },
+            // Probing & Troubleshooting
+            { label: "Connection Method", type: "select", name: "connectionMethod", options: [
+                    "",
+                    "WiFi",
+                    "LAN"
+                ]
+            },
+            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
-            { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
-                "",
-                "Webpage Not Loading",
-                "Failed RX",
-                "High Latency / Ping"
-            ]},
+            { label: "Actual Experience (L2)", type: "textarea", name: "actualExp", placeholder: "Please input the customer's actual experience in detail.\ne.g. “Only Acquiring 180MBPS.” DO NOT input the WOCAS!" },
+            { label: "FLM Findings/Resolution", type: "select", name: "resolution", options: [
+                    "",
+                    "Tested Ok",
+                    "Failed RX",
+                    "High Latency / Ping",
+                    "Manual Troubleshooting",
+                    "Mismatch Option 82 / Service ID",
+                    "NMS Refresh / Configuration",
+                    "Slow Browsing"
+                ]
+            },
+            { label: "Tested Ok? (Y/N)", type: "select", name: "testedOk", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
             // CEP Investigation Tagging
             { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Modem Light Status —",
-                "Normal Status",
-                "Unable to provide information"
-            ]},
+                    "— Modem Light Status —",
+                    "Normal Status",
+                    "Not Applicable [Copper]",
+                    "Not Applicable [via Store]",
+                    "Unable to provide information"
+                ]
+            },
             { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— NMS Parameters —",
-                "Failed RX",
-                " Passed RX" ,
-                "Up/Active"
-            ]},
+                    "— NMS Parameters —",
+                    "Passed RX",
+                    "Failed RX",
+                    "Up/Active",
+                    "Not Applicable [NMS GUI]",
+                    "Not Applicable [via Store]",
+                ]
+            },
             { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Clearview Reading —",
-                "Severely Degraded",
-                "The ONU performance is degraded",
-                "Without Line Problem Detected",
-                "Others/Error Code"
-            ]},
+                    "— Clearview Reading —",
+                    "Fix bad splices",
+                    "Missing Micro-Filter",
+                    "Others/Error Code",
+                    "Rogue ONU",
+                    "Severely Degraded",
+                    "The ONU performance is degraded",
+                    "Unbalanced Pair",
+                    "Without Line Problem Detected",
+                    "Without Line Problem Detected - Link Quality Degraded"
+                ]
+            },
             { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "Individual Trouble",
-                "Network Trouble - High Latency",
-                "Network Trouble - Slow/Intermittent Browsing",
-                "High Latency",
-                "Cannot Reach Specific Website"
-            ]},
-            // Ticket Details
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
-            { label: "SLA / ETR", type: "text", name: "sla"},
+                    "— Select applicable Investigation 4 —",
+                    "FCR - Low BW profile",
+                    "FCR - Slow/Intermittent Browsing",
+                    "High Latency",
+                    "High Utilization OLT/PON Port",
+                    "Individual Trouble",
+                    "Misaligned Record",
+                    "Network Trouble - High Latency",
+                    "Network Trouble - Slow Internet Connection",
+                    "Network Trouble - Slow/Intermittent Browsing",
+                    "Not Applicable [via Store]",
+                    "ONU Replacement to Latest Model",
+                    "Slow/Intermittent Browsing",
+                    "With historical alarms",
+                    "Without historical alarms"
+                ]
+            },
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "SLA / ETR", type: "text", name: "sla" },
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
-            { label: "Landmarks", type: "textarea", name: "landmarks"},
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
-            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
+            // Cross-Sell/Upsell
+            { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
+            { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
+            { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
+            { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
+            { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason }
+        ];
+
+        function createInstructionsRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const instructionsDiv = document.createElement("div");
+            instructionsDiv.className = "form2DivInstructions";
+
+            const header = document.createElement("p");
+            header.textContent = "Reference Link";
+            header.className = "instructions-header";
+            instructionsDiv.appendChild(header);
+
+            const ul = document.createElement("ul");
+            ul.className = "instructions-list";
+
+            const li5 = document.createElement("li");
+            li5.textContent = "See ";
+
+            const link1 = document.createElement("a");
+
+            let url1 = "#";
+            if (channelField.value === "CDT-HOTLINE") {
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/HOTLINE_TROUBLESHOOTING_GUIDE.aspx";
+            } else if (channelField.value === "CDT-SOCMED") {
+                url1 = "https://pldt365.sharepoint.com/sites/PLDTHome/SitePages/CEP_SOCIAL_MEDIA_TROUBLESHOOTING_GUIDE.aspx";
+            }
+
+            link1.textContent = "CEP: Troubleshooting Guide";
+            link1.style.color = "lightblue";
+            link1.href = "#";
+
+            link1.addEventListener("click", (event) => {
+                event.preventDefault();
+                window.open(url1, "_blank", "width=1500,height=800,scrollbars=yes,resizable=yes");
+            });
+
+            li5.appendChild(link1);
+            li5.appendChild(document.createTextNode(" for Main PLDT Repair Work Instruction"));
+            ul.appendChild(li5);
+
+            const li6 = document.createElement("li");
+            li6.textContent = "See ";
+
+            const link2 = document.createElement("a");
+
+            let url2 = "#";
+            if (channelField.value === "CDT-HOTLINE") {
+                url2 = "https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/GAMMA_HOTLINE_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=hca4FV&CID=ef14f697-102a-48ca-acb6-4702d734a5d7";
+            } else if (channelField.value === "CDT-SOCMED") {
+                url2 = "https://pldt365.sharepoint.com/:u:/r/sites/PLDTCCareLIT365/SitePages/GAMMA_SOCMED_TROUBLESHOOTING_GUIDE.aspx?csf=1&web=1&e=XCDJdx";
+            }
+
+            link2.textContent = "Gamma: Troubleshooting Guide";
+            link2.style.color = "lightblue";
+            link2.href = "#";
+
+            link2.addEventListener("click", (event) => {
+                event.preventDefault();
+                window.open(url2, "_blank", "width=1500,height=800,scrollbars=yes,resizable=yes");
+            });
+
+            li6.appendChild(link2);
+            li6.appendChild(document.createTextNode(" for Main Gamma Repair Work Instruction"));
+            ul.appendChild(li6);
+
+            instructionsDiv.appendChild(ul);
+
+            td.appendChild(instructionsDiv);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function insertNoteRow(fields, toolLabelName) {
+            const index = fields.findIndex(f => f.name === toolLabelName);
+            if (index !== -1) {
+                fields.splice(index, 0, {
+                    type: "noteRow",
+                    name: "probingChecklist",
+                    relatedTo: "onuSerialNum"
+                });
+            }
+        }
+
+        function insertToolLabel(fields, label, relatedFieldName) {
+            fields.splice(
+                fields.findIndex(f => f.name === relatedFieldName),
+                0,
+                {
+                    label: `// ${label}`,
+                    type: "toolLabel",
+                    name: `toolLabel-${label.toLowerCase().replace(/\s/g, "-")}`,
+                    relatedTo: relatedFieldName
+                }
+            );
+        }
+
+        function insertEscaChecklistRow(fields, relatedFieldName) {
+            const index = fields.findIndex(f => f.name === relatedFieldName);
+            if (index !== -1) {
+                fields.splice(index, 0, {
+                    type: "escaChecklistRow",
+                    name: "escaChecklist",
+                    relatedTo: relatedFieldName
+                });
+            }
+        }
+
+        const enhancedFields = [...fields];
+
+        insertToolLabel(enhancedFields, "Visual Audit", "facility");
+        insertEscaChecklistRow(enhancedFields, "outageStatus");
+        insertToolLabel(enhancedFields, "Clearview", "cvToolStatus");
+        insertToolLabel(enhancedFields, "NMS Skin", "nmsToolStatus");
+        insertNoteRow(enhancedFields, "toolLabel-clearview");
+        insertToolLabel(enhancedFields, "DMS", "dmsToolStatus");
+        insertToolLabel(enhancedFields, "Other Network Details", "rxPower");
+        insertToolLabel(enhancedFields, "Probe & Troubleshoot", "connectionMethod");
+        insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
+        insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
+        insertToolLabel(enhancedFields, "Special Instructions", "contactName");
+        insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            row.style.display = field.name === "facility" ? "table-row" : "none";
+
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "noteRow") {
+                const row = document.createElement("tr");
+                row.classList.add("note-row");
+                row.dataset.relatedTo = field.relatedTo;
+                row.style.display = "none";
+
+                const td = document.createElement("td");
+                const checklistDiv = document.createElement("div");
+                checklistDiv.className = "form2DivPrompt";
+
+                const noteHeader = document.createElement("p");
+                noteHeader.textContent = "Note:";
+                noteHeader.className = "note-header";
+                checklistDiv.appendChild(noteHeader);
+
+                const ulNote = document.createElement("ul");
+                ulNote.className = "note";
+
+                const li1 = document.createElement("li");
+                li1.textContent = "Between NMS Skin and SMP/Clearview, always prioritize the RX parameter with lower value and ignore the zero value. If both have zero value, check RX parameter via DMS.";
+                ulNote.appendChild(li1);
+
+                const li2 = document.createElement("li");
+                li2.textContent = "All Wi-Fi 5 and Wi-Fi 6 modems have Band Steering enabled by default.";
+                ulNote.appendChild(li2);
+
+                const li3 = document.createElement("li");
+                li3.textContent = "If using laptop or desktop, advise customer to type “netsh wlan show driver” at command prompt and check Radio types supported IEEE Standard.";
+                ulNote.appendChild(li3);
+
+                const li4 = document.createElement("li");
+                li4.textContent = "If using mobile, check the reference table in the work instruction for common devices.";
+                ulNote.appendChild(li4);
+
+                const li5 = document.createElement("li");
+                li5.textContent = "If not listed in the reference table, advise customer to search via internet for the Device Specs or go to www.gsmarena.com (type the device name and model > select the device > scroll down at Comms > then see WLAN section for the Wi-Fi standard).";
+                ulNote.appendChild(li5);
+
+                const li6 = document.createElement("li");
+                li6.textContent = "Before running a speed test, ensure the device is connected to the 5 GHz Wi-Fi frequency and positioned close to the modem. Make sure no other applications or activities are running on the device during the test.";
+                ulNote.appendChild(li6);
+
+                const li7 = document.createElement("li");
+                li7.textContent = "Speed Test can also be done via DMS if customer can't follow or refused the instruction.";
+                ulNote.appendChild(li7);
+
+                checklistDiv.appendChild(ulNote);
+
+                td.appendChild(checklistDiv);
+                row.appendChild(td);
+
+                return row;
+            } else if (field.type === "toolLabel") {
+                const toolLabelRow = document.createElement("tr");
+                toolLabelRow.classList.add("tool-label-row");
+                toolLabelRow.dataset.relatedTo = field.relatedTo;
+                toolLabelRow.style.display = "none";
+
+                const td = document.createElement("td");
+                const div = document.createElement("div");
+                div.className = "formToolLabel";
+                div.textContent = field.label.replace(/^\/\/\s*/, "");
+
+                td.appendChild(div);
+                toolLabelRow.appendChild(td);
+                return toolLabelRow;
+            } else if (field.type === "escaChecklistRow") {
+                const row = document.createElement("tr");
+                row.classList.add("esca-checklist-row");
+                row.dataset.relatedTo = field.relatedTo;
+                row.style.display = "none";
+
+                const td = document.createElement("td");
+                const checklistDiv = document.createElement("div");
+                checklistDiv.className = "form2DivPrompt";
+
+                const checklistHeader = document.createElement("p");
+                checklistHeader.textContent = "L2/Zone/Network Escalation Checklist:";
+                checklistHeader.className = "esca-checklist-header";
+                checklistDiv.appendChild(checklistHeader);
+
+                const ulChecklist = document.createElement("ul");
+                ulChecklist.className = "esca-checklist";
+
+                const li6 = document.createElement("li");
+                li6.textContent = "Complaint Coverage Checking";
+                ulChecklist.appendChild(li6);
+
+                const li7 = document.createElement("li");
+                li7.textContent = "Option 82 Checking";
+                ulChecklist.appendChild(li7);
+
+                const li8 = document.createElement("li");
+                li8.textContent = "RX Parameter Result";
+                ulChecklist.appendChild(li8);
+
+                const li9 = document.createElement("li");
+                li9.textContent = "Network Downtime Checking";
+                ulChecklist.appendChild(li9);
+
+                const li10 = document.createElement("li");
+                li10.textContent = "Slowdown during Peak Hour Checking";
+                ulChecklist.appendChild(li10);
+
+                const li11 = document.createElement("li");
+                li11.textContent = "Rogue/Degraded ONU/Degraded Link Checking";
+                ulChecklist.appendChild(li11);
+
+                const li12 = document.createElement("li");
+                li12.textContent = "Bandwidth Code Checking";
+                ulChecklist.appendChild(li12);
+
+                const li13 = document.createElement("li");
+                li13.textContent = "Performed RA/Restart/Self-Heal";
+                ulChecklist.appendChild(li13);
+
+                const li14 = document.createElement("li");
+                li14.textContent = "ONU and Device Brand and Model";
+                ulChecklist.appendChild(li14);
+
+                const li15 = document.createElement("li");
+                li15.textContent = "ONU and Device Max WiFi Speed Checking";
+                ulChecklist.appendChild(li15);
+
+                const li16 = document.createElement("li");
+                li16.textContent = "5G WiFi Frequency Checking";
+                ulChecklist.appendChild(li16);
+
+                const li17 = document.createElement("li");
+                li17.textContent = "Activities Performed Checking";
+                ulChecklist.appendChild(li17);
+
+                const li18 = document.createElement("li");
+                li18.textContent = "Connected Devices Result";
+                ulChecklist.appendChild(li18);
+
+                const li19 = document.createElement("li");
+                li19.textContent = "Ping Test Result";
+                ulChecklist.appendChild(li19);
+
+                const li20 = document.createElement("li");
+                li20.textContent = "NMS Skin Result";
+                ulChecklist.appendChild(li20);
+
+                const li21 = document.createElement("li");
+                li21.textContent = "Clear View Result";
+                ulChecklist.appendChild(li21);
+
+                checklistDiv.appendChild(ulChecklist);
+
+                const checklistInstruction = document.createElement("p");
+                checklistInstruction.textContent = "Note: It is not necessary to complete every item in this escalation checklist. Refer to the LIT365 work instructions for proper guidance.\n\nMaintain clear and detailed documentation to prevent potential misdiagnosis.";
+                checklistInstruction.className = "esca-checklist-instruction";
+                checklistDiv.appendChild(checklistInstruction);
+
+                td.appendChild(checklistDiv);
+                row.appendChild(td);
+
+                return row;
+            } else if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index) => {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = (field.name === "remarks") ? 6 :
+                    (field.name === "specialInstructions") ? 3 : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        table.appendChild(createInstructionsRow());
+        enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
+
+        function updateToolLabelVisibility() {
+            const updateVisibility = (selector) => {
+                document.querySelectorAll(selector).forEach(row => {
+                    const relatedNamesRaw = row.dataset.relatedTo || "";
+                    const relatedNames = relatedNamesRaw.split(",").map(s => s.trim()).filter(Boolean);
+
+                    const shouldShow = relatedNames.some(name => {
+                        const relatedInput = document.querySelector(`[name="${name}"]`);
+                        if (!relatedInput) return false;
+                        const relatedRow = relatedInput.closest("tr");
+                        return relatedRow && relatedRow.style.display !== "none";
+                    });
+
+                    row.style.display = shouldShow ? "table-row" : "none";
+                });
+            };
+
+            updateVisibility(".tool-label-row");
+            updateVisibility(".note-row");
+            updateVisibility(".esca-checklist-row");
+        }
+
+        updateToolLabelVisibility();
+
+        form2Container.appendChild(table);
+
+        const buttonLabels = ["CEP", "SF & FUSE", "Endorse", "More"];
+        const buttonHandlers = [
+            ffupButtonHandler,
+            techNotesButtonHandler,
+            endorsementForm,
+            sfTaggingButtonHandler
+        ];
+
+        const buttonTable = createButtons(buttonLabels, buttonHandlers);
+        form2Container.appendChild(buttonTable);
+
+        const facility = document.querySelector("[name='facility']");
+        facility.addEventListener("change", () => {
+            resetAllFields(["facility"]);
+            if (facility.value === "Fiber") {
+                showFields(["outageStatus"]);
+                hideSpecificFields(["resType", "outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                updateToolLabelVisibility();
+            } else if (facility.value === "Fiber - Radius") {
+                showFields(["planDetails", "connectionMethod", "remarks", "issueResolved"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+            } else if (facility.value === "Copper VDSL") {
+                showFields(["resType"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+            } else {
+                showFields(["remarks"]);
+                hideSpecificFields(["resType", "outageStatus", "outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+            }
+            updateToolLabelVisibility();
+        });
+
+        const resType = document.querySelector("[name='resType']");
+        resType.addEventListener("change", () => {
+            resetAllFields(["facility", "resType"]);
+            if (resType.value === "Yes") {
+                showFields(["outageStatus"]);
+                hideSpecificFields(["outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "actualExp", "remarks", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+            } else {
+                showFields(["remarks"]);
+                hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "actualExp", "issueResolved", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+            }
+            updateToolLabelVisibility();
+        });
+
+        const outageStatus = document.querySelector("[name='outageStatus']");
+        outageStatus.addEventListener("change", () => {
+            resetAllFields(["facility", "resType", "outageStatus"]);
+            if (outageStatus.value === "Yes") {
+                showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
+                hideSpecificFields(["planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "actualExp", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+
+                if (channelField.value === "CDT-SOCMED") {
+                    showFields(["resolution"]);
+                } else {
+                    hideSpecificFields(["resolution"]);
+                }
+            } else {
+                if (facility.value === "Fiber") {
+                    showFields(["planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "nmsToolStatus", "dmsToolStatus", "rxPower", "option82Config", "connectionMethod", "remarks", "issueResolved"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+
+                } else {
+                    showFields(["planDetails", "connectionMethod", "remarks", "issueResolved"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "planDetails", "onuModel", "onuSerialNum", "cvToolStatus", "cvEsolveTicketNum", "cvReading", "cvErrorCode", "rtaRequest", "historicalAlarm", "typeOfAlarm", "nmsToolStatus", "nmsEsolveTicketNum", "nmsBandwidthCode", "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats", "bandsteering", "deviceWifiBand", "rxPower", "option82Config", "option82MisalignedDetails", "connectedDevices", "connectionMethod", "deviceBrandAndModel", "actualExp", "resolution", "testedOk", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell", "productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
+                }
+                updateToolLabelVisibility();
+            }
+
+            updateToolLabelVisibility();
+        });
+
+        const cvToolStatus = document.querySelector("[name='cvToolStatus']");
+        cvToolStatus.addEventListener("change", () => {
+            if (cvToolStatus.value === "Yes") {
+                showFields(["cvEsolveTicketNum"]);
+                hideSpecificFields(["cvReading", "rtaRequest", "cvErrorCode", "historicalAlarm", "typeOfAlarm"]);
+            } else {
+                showFields(["cvReading", "rtaRequest"])
+                hideSpecificFields(["cvEsolveTicketNum", "cvErrorCode", "historicalAlarm", "typeOfAlarm"]);
+            }
+        });
+
+        const cvReading = document.querySelector("[name='cvReading']");
+        cvReading.addEventListener("change", () => {
+            if (cvReading.value === "Others/Error Code") {
+                showFields(["cvErrorCode"]);
+                hideSpecificFields(["typeOfAlarm", "historicalAlarm"]);
+            } else if (cvReading.value === "The ONU performance is degraded" || cvReading.value === "Without Line Problem Detected - Link Quality Degraded") {
+                showFields(["historicalAlarm"]);
+                hideSpecificFields(["typeOfAlarm", "cvErrorCode"]);
+            } else {
+                hideSpecificFields(["historicalAlarm", "typeOfAlarm", "cvErrorCode"]);
+            }
+        });
+
+        const historicalAlarm = document.querySelector("[name='historicalAlarm']");
+        historicalAlarm.addEventListener("change", () => {
+            if (historicalAlarm.value === "Yes") {
+                showFields(["typeOfAlarm"]);
+            } else {
+                hideSpecificFields(["typeOfAlarm"]);
+            }
+        });
+
+        const nmsToolStatus = document.querySelector("[name='nmsToolStatus']");
+        const dmsToolStatus = document.querySelector("[name='dmsToolStatus']");
+        const dmsOnuStats = document.querySelector("[name='dmsOnuStats']");
+        const bandsteering = document.querySelector("[name='bandsteering']");
+
+        // Connected Devices Handler
+        function updateNetworkFields() {
+            if (nmsToolStatus.value === "Yes" && dmsToolStatus.value === "Yes") {
+                hideSpecificFields(["connectedDevices"]);
+            } else if (nmsToolStatus.value === "Yes" && dmsOnuStats.value === "No Record Found") {
+                hideSpecificFields(["connectedDevices"]);
+            } else {
+                showFields(["connectedDevices"]);
+            }
+        }
+
+        nmsToolStatus.addEventListener("change", () => {
+            if (nmsToolStatus.value === "Yes") {
+                showFields(["nmsEsolveTicketNum"]);
+                hideSpecificFields(["nmsBandwidthCode"]);
+            } else {
+                showFields(["nmsBandwidthCode"])
+                hideSpecificFields(["nmsEsolveTicketNum"]);
+            }
+            updateToolLabelVisibility();
+            updateNetworkFields();
+        });
+
+        dmsToolStatus.addEventListener("change", () => {
+            if (dmsToolStatus.value === "Yes") {
+                showFields(["dmsEsolveTicketNum"]);
+                hideSpecificFields(["dmsOnuStats"]);
+            } else {
+                showFields(["dmsOnuStats"]);
+                hideSpecificFields(["dmsEsolveTicketNum"]);
+            }
+            updateToolLabelVisibility();
+            updateNetworkFields();
+        });
+
+        dmsOnuStats.addEventListener("change", () => {
+            if (dmsOnuStats.value === "No Record Found") {
+                hideSpecificFields(["bandsteering"]);
+            } else {
+                showFields(["bandsteering"]);
+            }
+            updateToolLabelVisibility();
+            updateNetworkFields();
+        });
+
+        bandsteering.addEventListener("change", () => {
+            if (bandsteering.value === "Enabled") {
+                hideSpecificFields(["deviceWifiBand"]);
+            } else {
+                showFields(["deviceWifiBand"]);
+            }
+        });
+
+        const option82Config = document.querySelector("[name='option82Config']");
+        option82Config.addEventListener("change", () => {
+            if (option82Config.value === "Misaligned") {
+                showFields(["option82MisalignedDetails"]);
+            } else {
+                hideSpecificFields(["option82MisalignedDetails"]);
+            }
+        });
+
+        const connectionMethod = document.querySelector("[name='connectionMethod']");
+        connectionMethod.addEventListener("change", () => {
+            if (connectionMethod.value === "WiFi") {
+                showFields(["deviceBrandAndModel"]);
+            } else {
+                hideSpecificFields(["deviceBrandAndModel"]);
+            }
+        });
+
+        const issueResolved = document.querySelector("[name='issueResolved']");
+        issueResolved.addEventListener("change", () => handleIssueResolvedWithTestedOkChange(issueResolved));
+
+        const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
+        eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
+
+        const offerAccepted = document.querySelector("[name='offerAccepted']");
+        offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
+
+        const resolution = document.querySelector("[name='resolution']");
+        const testedOk = document.querySelector("[name='testedOk']");
+
+        function testedOkReso() {
+            if (issueResolved.value === "No - for Ticket Creation") {
+                if (resolution.value === "Tested Ok" || testedOk.value === "Yes") {
+                    hideSpecificFields(["availability", "address", "landmarks"]);
+                } else {
+                    showFields(["availability", "address", "landmarks"]);
+                }
+            } else {
+                hideSpecificFields(["availability", "address", "landmarks"]);
+            }
+            updateToolLabelVisibility();
+        }
+
+        resolution.addEventListener("change", testedOkReso);
+        testedOk.addEventListener("change", testedOkReso);
+
+        updateToolLabelVisibility();
+    } else if (selectedValue === "form501_5" || selectedValue === "form501_6") {
+        const table = document.createElement("table");
+
+        const fields = [
+            // Visual Audit
+            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"] },
+            {
+                label: "Source Reference", type: "select", name: "outageReference", options: [
+                    "— Network Outage Source —",
+                    "FUSE Outage Tab",
+                    "Lit365 Downtime Advisory",
+                    "Clearview",
+                    "CEP Affected Services Tab"
+                ]
+            },
+            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS." },
+            // Clearview
+            { label: "Clearview Reading", type: "textarea", name: "cvReading", placeholder: "e.g. Line Problem Detected - OLT to LCP, LCP to NAP, NAP to ONU" },
+            { label: "Latest RTA Request (L2)", type: "text", name: "rtaRequest" },
+            // NMS Skin
+            { label: "RX Power", type: "number", name: "rxPower", step: "any" },
+            // Probing & Remote Troubleshooting
+            { label: "Specific Timeframe", type: "text", name: "specificTimeframe", placeholder: "High latency/lag is being experienced." },
+            { label: "Ping Test Result", type: "text", name: "pingTestResult", placeholder: "Speedtest" },
+            { label: "Game Name and Server", type: "text", name: "gameNameAndServer", placeholder: "e.g. Dota2 - Singapore server" },
+            { label: "Game Server IP Address", type: "text", name: "gameServerIP", placeholder: "e.g. 103.10.124.118" },
+            { label: "Ping Test Result", type: "text", name: "ping2", placeholder: "Game Server IP Address" },
+            { label: "Traceroute PLDT side (Game Server IP Address)", type: "textarea", name: "traceroutePLDT", placeholder: "Hops with static.pldt.net suffix results. e.g. Hop 3 = PASS, Hop 4 = FAIL(RTO), Hop 5 = FAIL (42 ms), etc." },
+            { label: "Traceroute External side (Game Server IP Address)", type: "textarea", name: "tracerouteExt", placeholder: "Last Hop Result. e.g. Hop 10 = PASS" },
+            { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
+            {
+                label: "FLM Findings/Resolution", type: "select", name: "resolution", options: [
+                    "",
+                    "Webpage Not Loading",
+                    "Failed RX",
+                    "High Latency / Ping"
+                ]
+            },
+            // CEP Investigation Tagging
+            {
+                label: "Investigation 1", type: "select", name: "investigation1", options: [
+                    "— Modem Light Status —",
+                    "Normal Status",
+                    "Unable to provide information"
+                ]
+            },
+            {
+                label: "Investigation 2", type: "select", name: "investigation2", options: [
+                    "— NMS Parameters —",
+                    "Failed RX",
+                    " Passed RX",
+                    "Up/Active"
+                ]
+            },
+            {
+                label: "Investigation 3", type: "select", name: "investigation3", options: [
+                    "— Clearview Reading —",
+                    "Severely Degraded",
+                    "The ONU performance is degraded",
+                    "Without Line Problem Detected",
+                    "Others/Error Code"
+                ]
+            },
+            {
+                label: "Investigation 4", type: "select", name: "investigation4", options: [
+                    "— Select applicable Investigation 4 —",
+                    "Individual Trouble",
+                    "Network Trouble - High Latency",
+                    "Network Trouble - Slow/Intermittent Browsing",
+                    "High Latency",
+                    "Cannot Reach Specific Website"
+                ]
+            },
+            // Ticket Details
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "SLA / ETR", type: "text", name: "sla" },
+            // Special Instructions
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -4555,7 +5747,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -4644,7 +5836,7 @@ function createIntentBasedForm() {
                     label: `// ${label}`,
                     type: "toolLabel",
                     name: `toolLabel-${label.toLowerCase().replace(/\s/g, "-")}`,
-                    relatedTo: relatedFieldName 
+                    relatedTo: relatedFieldName
                 }
             );
         }
@@ -4665,14 +5857,14 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "Visual Audit", "outageStatus");
         insertEscaChecklistRow(enhancedFields, "outageStatus");
         insertToolLabel(enhancedFields, "NMS Skin", "rxPower");
-        insertToolLabel(enhancedFields, "BSMP/Clearview Reading", "cvReading");
+        insertToolLabel(enhancedFields, "BClearview Reading", "cvReading");
         insertToolLabel(enhancedFields, "Probe & Troubleshoot", "specificTimeframe");
         insertNoteRow(enhancedFields, "toolLabel-probing-&-troubleshooting");
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
         insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
-        
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
             const showFields = ["outageStatus"];
@@ -4844,7 +6036,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -4861,7 +6053,7 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") ? 5 : 
+                input.rows = (field.name === "remarks") ? 5 :
                     (field.name === "specialInstructions") ? 3 : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
@@ -4880,9 +6072,9 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
-        enhancedFields.forEach(field => table.appendChild(createFieldRow(field))); 
+
+        table.appendChild(createInstructionsRow());
+        enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
 
         function updateToolLabelVisibility() {
             const updateVisibility = (selector) => {
@@ -4954,7 +6146,7 @@ function createIntentBasedForm() {
             resetAllFields(["outageStatus"]);
             if (outageStatus.value === "Yes") {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
-                hideSpecificFields(["onuSerialNum", "rxPower", "cvReading", "rtaRequest", "specificTimeframe", "pingTestResult", "gameNameAndServer", "gameServerIP", "pingTestResult2", "traceroutePLDT", "tracerouteExt", "issueResolved", "availability", "address", "landmarks", "specialInstructions"]);
+                hideSpecificFields(["onuSerialNum", "rxPower", "cvReading", "rtaRequest", "specificTimeframe", "pingTestResult", "gameNameAndServer", "gameServerIP", "ping2", "traceroutePLDT", "tracerouteExt", "issueResolved", "availability", "address", "landmarks", "specialInstructions"]);
 
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
@@ -4962,12 +6154,12 @@ function createIntentBasedForm() {
                     hideSpecificFields(["resolution"]);
                 }
             } else if (outageStatus.value === "No") {
-                showFields(["onuSerialNum", "rxPower", "cvReading", "rtaRequest", "specificTimeframe", "pingTestResult", "gameNameAndServer", "gameServerIP", "pingTestResult2", "traceroutePLDT", "tracerouteExt", "remarks", "issueResolved"]);
+                showFields(["onuSerialNum", "rxPower", "cvReading", "rtaRequest", "specificTimeframe", "pingTestResult", "gameNameAndServer", "gameServerIP", "ping2", "traceroutePLDT", "tracerouteExt", "remarks", "issueResolved"]);
                 hideSpecificFields(["outageReference", "pcNumber", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
             }
             updateToolLabelVisibility();
         });
-    
+
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
@@ -4979,120 +6171,148 @@ function createIntentBasedForm() {
 
         updateToolLabelVisibility();
 
-    } else if (selectiveBrowseForms.includes(selectedValue)) { 
+    } else if (selectiveBrowseForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
             // Visual Audit
-            { label: "Account/Facility Type", type: "select", name: "facility", options: [
-                "", 
-                "Fiber", 
-                "Fiber - Radius", 
-                "Copper VDSL", 
-                "Copper HDSL/NGN" 
-            ]},
-            { label: "Res. Vertical Address", type: "select", name: "resType", options: [
-                "Bldg., Condo, etc.", 
-                "Yes", 
-                "No"
-            ]},
-            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"]},
-            { label: "Source Reference", type: "select", name: "outageReference", options: [
-                "— Network Outage Source —", 
-                "FUSE Outage Tab", 
-                "Lit365 Downtime Advisory",
-                "Clearview",
-                "CEP Affected Services Tab"
-            ]},
-            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
+            {
+                label: "Account/Facility Type", type: "select", name: "facility", options: [
+                    "",
+                    "Fiber",
+                    "Fiber - Radius",
+                    "Copper VDSL",
+                    "Copper HDSL/NGN"
+                ]
+            },
+            {
+                label: "Res. Vertical Address", type: "select", name: "resType", options: [
+                    "Bldg., Condo, etc.",
+                    "Yes",
+                    "No"
+                ]
+            },
+            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"] },
+            {
+                label: "Source Reference", type: "select", name: "outageReference", options: [
+                    "— Network Outage Source —",
+                    "FUSE Outage Tab",
+                    "Lit365 Downtime Advisory",
+                    "Clearview",
+                    "CEP Affected Services Tab"
+                ]
+            },
+            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
             // NMS Skin
-            { label: "RX Power (L2)", type: "number", name: "rxPower", step: "any"},
-            { label: "IP Address (L2)", type: "text", name: "ipAddress"},
+            { label: "RX Power (L2)", type: "number", name: "rxPower", step: "any" },
+            { label: "IP Address (L2)", type: "text", name: "ipAddress" },
             // DMS
-            { label: "Internet/Data Status(L2)", type: "select", name: "dmsInternetStatus", options: ["", "Online", "Offline" ]},
-            { label: "Connected Devices (L2)", type: "text", name: "connectedDevices"},
+            { label: "Internet/Data Status(L2)", type: "select", name: "dmsInternetStatus", options: ["", "Online", "Offline"] },
+            { label: "Connected Devices (L2)", type: "text", name: "connectedDevices" },
             // Probe & Troubleshoot
-            { label: "Website/App/VPN Name", type: "textarea", name: "websiteURL", placeholder: "Complete site address or name of Application or VPN"}, 
-            { label: "Error Message (L2)", type: "textarea", name: "errMsg", placeholder: "Error when accessing site, Application or VPN"},
-            { label: "Other Device/Browser Test?", type: "select", name: "otherDevice", options: [
-                "",
-                "Yes - Working on Other Devices",
-                "Yes - Working on Other Browsers",
-                "Yes - Working on Other Devices and Browsers",
-                "Yes - Not Working",
-                "No Other Device or Browser Available"
-            ] },
-            { label: "VPN Blocking Issue? (L2)", type: "select", name: "vpnBlocking", options: [
-                "", 
-                "Yes", 
-                "No"
-            ] },
-            { label: "Access Requires VPN? (L2)", type: "select", name: "vpnRequired", options: [
-                "", 
-                "Yes", 
-                "No"
-            ] },
-            { label: "Result w/ Other ISP (L2)", type: "select", name: "otherISP", options: [
-                "", 
-                "Yes - Working", 
-                "Yes - Not Working", 
-                "No Other ISP"
-            ] },
-            { label: "Has IT Support? (L2)", type: "select", name: "itSupport", options: [
-                "", 
-                "Yes", 
-                "None"
-            ] },
-            { label: "IT Support Remarks (L2)", type: "textarea", name: "itRemarks"},
-            { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Website/App/VPN Name", type: "textarea", name: "websiteURL", placeholder: "Complete site address or name of Application or VPN" },
+            { label: "Error Message (L2)", type: "textarea", name: "errMsg", placeholder: "Error when accessing site, Application or VPN" },
+            {
+                label: "Other Device/Browser Test?", type: "select", name: "otherDevice", options: [
+                    "",
+                    "Yes - Working on Other Devices",
+                    "Yes - Working on Other Browsers",
+                    "Yes - Working on Other Devices and Browsers",
+                    "Yes - Not Working",
+                    "No Other Device or Browser Available"
+                ]
+            },
+            {
+                label: "VPN Blocking Issue? (L2)", type: "select", name: "vpnBlocking", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
+            {
+                label: "Access Requires VPN? (L2)", type: "select", name: "vpnRequired", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
+            {
+                label: "Result w/ Other ISP (L2)", type: "select", name: "otherISP", options: [
+                    "",
+                    "Yes - Working",
+                    "Yes - Not Working",
+                    "No Other ISP"
+                ]
+            },
+            {
+                label: "Has IT Support? (L2)", type: "select", name: "itSupport", options: [
+                    "",
+                    "Yes",
+                    "None"
+                ]
+            },
+            { label: "IT Support Remarks (L2)", type: "textarea", name: "itRemarks" },
+            { label: "Other Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
-            { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
-                "",
-                "Tested Ok",
-                "Manual Troubleshooting",
-                "Request Timed Out",
-                "Webpage Not Loading"
-            ]},
-            { label: "Tested Ok? (Y/N)", type: "select", name: "testedOk", options: [
-                "", 
-                "Yes", 
-                "No"
-            ] },
+            {
+                label: "FLM Findings/Resolution", type: "select", name: "resolution", options: [
+                    "",
+                    "Tested Ok",
+                    "Manual Troubleshooting",
+                    "Request Timed Out",
+                    "Webpage Not Loading"
+                ]
+            },
+            {
+                label: "Tested Ok? (Y/N)", type: "select", name: "testedOk", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
             // CEP Investigation Tagging
-            { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Modem Light Status —",
-                "Normal Status",
-                "Not Applicable [via Store]",
-                "Unable to provide information"
-            ]},
-            { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— NMS Parameters —",
-                "Up/Active",
-                "Not Applicable [via Store]",
-            ]},
-            { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Clearview Reading —",
-                "The ONU performance is degraded",
-                "Without Line Problem Detected",
-            ]},
-            { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "Network Trouble - Selective Browsing",
-                "Cannot Reach Specific Website",
-                "FCR - Cannot Browse",
-                "Not Applicable [via Store]",
-            ]},
+            {
+                label: "Investigation 1", type: "select", name: "investigation1", options: [
+                    "— Modem Light Status —",
+                    "Normal Status",
+                    "Not Applicable [via Store]",
+                    "Unable to provide information"
+                ]
+            },
+            {
+                label: "Investigation 2", type: "select", name: "investigation2", options: [
+                    "— NMS Parameters —",
+                    "Up/Active",
+                    "Not Applicable [via Store]",
+                ]
+            },
+            {
+                label: "Investigation 3", type: "select", name: "investigation3", options: [
+                    "— Clearview Reading —",
+                    "The ONU performance is degraded",
+                    "Without Line Problem Detected",
+                ]
+            },
+            {
+                label: "Investigation 4", type: "select", name: "investigation4", options: [
+                    "— Select applicable Investigation 4 —",
+                    "Network Trouble - Selective Browsing",
+                    "Cannot Reach Specific Website",
+                    "FCR - Cannot Browse",
+                    "Not Applicable [via Store]",
+                ]
+            },
             // Ticket Details
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
-            { label: "SLA / ETR", type: "text", name: "sla"},
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "SLA / ETR", type: "text", name: "sla" },
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
-            { label: "Landmarks", type: "textarea", name: "landmarks"},
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
-            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -5106,7 +6326,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -5182,7 +6402,7 @@ function createIntentBasedForm() {
                     label: `// ${label}`,
                     type: "toolLabel",
                     name: `toolLabel-${label.toLowerCase().replace(/\s/g, "-")}`,
-                    relatedTo: relatedFieldName 
+                    relatedTo: relatedFieldName
                 }
             );
         }
@@ -5209,7 +6429,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
         insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
-        
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
             row.style.display = field.name === "facility" ? "table-row" : "none";
@@ -5299,7 +6519,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -5334,9 +6554,9 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
-        enhancedFields.forEach(field => table.appendChild(createFieldRow(field))); 
+
+        table.appendChild(createInstructionsRow());
+        enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
 
         function updateToolLabelVisibility() {
             const allToolLabels = document.querySelectorAll(".tool-label-row, .esca-checklist-row");
@@ -5391,7 +6611,7 @@ function createIntentBasedForm() {
             }
             updateToolLabelVisibility();
         });
-    
+
         resType.addEventListener("change", () => {
             resetAllFields(["facility", "resType"]);
             if (resType.value === "Yes") {
@@ -5439,7 +6659,7 @@ function createIntentBasedForm() {
                 hideSpecificFields(["itRemarks"]);
             }
         });
-    
+
         issueResolved.addEventListener("change", () => handleIssueResolvedChange(issueResolved));
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
@@ -5461,144 +6681,166 @@ function createIntentBasedForm() {
         testedOk.addEventListener("change", testedOkReso);
 
         updateToolLabelVisibility();
-    } else if (iptvForms.includes(selectedValue)) { 
+    } else if (iptvForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
             // Visual Audit
-            { label: "Account Type", type: "select", name: "accountType", options: [
-                "", 
-                "PLDT", 
-                "RADIUS"
-            ]},
-            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"]},
-            { label: "Source Reference", type: "select", name: "outageReference", options: [
-                "— Network Outage Source —", 
-                "FUSE Outage Tab", 
-                "Lit365 Downtime Advisory",
-                "Clearview",
-                "CEP Affected Services Tab"
-            ]},
-            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case"},
-            { label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
-                "", 
-                "FEOL", 
-                "HUOL"
-            ]},
-            { label: "Modem Brand", type: "select", name: "modemBrand", options: [
-                "", 
-                "FHTT", 
-                "HWTC", 
-                "ZTEG",
-                "AZRD",
-                "PRLN",
-                "Other Brands"
-            ]},
-            { label: "ONU Connection Type", type: "select", name: "onuConnectionType", options: [
-                "", 
-                "InterOp", 
-                "Non-interOp"
-            ]},
-            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS."},
+            {
+                label: "Account Type", type: "select", name: "accountType", options: [
+                    "",
+                    "PLDT",
+                    "RADIUS"
+                ]
+            },
+            { label: "Network Outage", type: "select", name: "outageStatus", options: ["", "Yes", "No"] },
+            {
+                label: "Source Reference", type: "select", name: "outageReference", options: [
+                    "— Network Outage Source —",
+                    "FUSE Outage Tab",
+                    "Lit365 Downtime Advisory",
+                    "Clearview",
+                    "CEP Affected Services Tab"
+                ]
+            },
+            { label: "Parent Case", type: "text", name: "pcNumber", placeholder: "Leave blank if Awaiting Parent Case" },
+            {
+                label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
+                    "",
+                    "FEOL",
+                    "HUOL"
+                ]
+            },
+            {
+                label: "Modem Brand", type: "select", name: "modemBrand", options: [
+                    "",
+                    "FHTT",
+                    "HWTC",
+                    "ZTEG",
+                    "AZRD",
+                    "PRLN",
+                    "Other Brands"
+                ]
+            },
+            {
+                label: "ONU Connection Type", type: "select", name: "onuConnectionType", options: [
+                    "",
+                    "InterOp",
+                    "Non-interOp"
+                ]
+            },
+            { label: "Modem/ONU Serial # (L2)", type: "text", name: "onuSerialNum", placeholder: "Available in FUSE/CV/DMS." },
             // NMS Skin
-            { label: "ONU Status/RUNSTAT", type: "select", name: "onuRunStats", options: [
-                "", 
-                "UP",
-                "Active",
-                "LOS",
-                "Down",
-                "Power is Off",
-                "Power is Down",
-                "/N/A"
-            ]},
-            { label: "RX Power", type: "number", name: "rxPower", step: "any"},
-            { label: "WAN NAME_3", type: "text", name: "wanName_3"},
-            { label: "SRVCTYPE_3", type: "text", name: "srvcType_3"},
-            { label: "CONNTYPE_3", type: "text", name: "connType_3"},
-            { label: "WANVLAN_3/LAN 4 Unicast", type: "text", name: "vlan_3"},
-            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank."},
+            {
+                label: "ONU Status/RUNSTAT", type: "select", name: "nmsOnuStats", options: [
+                    "",
+                    "UP",
+                    "Active",
+                    "LOS",
+                    "Down",
+                    "Power is Off",
+                    "Power is Down",
+                    "/N/A"
+                ]
+            },
+            { label: "RX Power", type: "number", name: "rxPower", step: "any" },
+            { label: "WAN NAME_3", type: "text", name: "wanName_3" },
+            { label: "SRVCTYPE_3", type: "text", name: "srvcType_3" },
+            { label: "CONNTYPE_3", type: "text", name: "connType_3" },
+            { label: "WANVLAN_3/LAN 4 Unicast", type: "text", name: "vlan_3" },
+            { label: "Actions Taken in NMS Skin", type: "textarea", name: "nmsSkinRemarks", placeholder: "Include the RA and DC action results here. If no action was taken, leave this field blank." },
             // DMS
-            { label: "LAN 4 Status", type: "text", name: "dmsLan4Status"},
-            { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken."}, 
+            { label: "LAN 4 Status", type: "text", name: "dmsLan4Status" },
+            { label: "Actions Taken in DMS", type: "textarea", name: "dmsRemarks", placeholder: "Leave this field blank if no action was taken." },
             // Request for Retracking
-            { label: "Request for Retracking?", type: "select", name: "req4retracking", options: ["", "Yes", "No"]},
-            { label: "Set-Top-Box ID", type: "text", name: "stbID"},
-            { label: "Smartcard ID", type: "text", name: "smartCardID"},
-            { label: "Cignal Plan", type: "text", name: "cignalPlan"},
-            { label: "Set-Top-Box IP Address", type: "text", name: "stbIpAddress"},
-            { label: "Tuned Services Multicast Address", type: "textarea", name: "tsMulticastAddress"},
-            { label: "Actual Experience", type: "textarea", name: "exactExp", placeholder: "Please input the customer's actual experience. e.g. “With IP but no tune service multicast” DO NOT input the WOCAS!"},
-            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Request for Retracking?", type: "select", name: "req4retracking", options: ["", "Yes", "No"] },
+            { label: "Set-Top-Box ID", type: "text", name: "stbID" },
+            { label: "Smartcard ID", type: "text", name: "smartCardID" },
+            { label: "Cignal Plan", type: "text", name: "cignalPlan" },
+            { label: "Set-Top-Box IP Address", type: "text", name: "stbIpAddress" },
+            { label: "Tuned Services Multicast Address", type: "textarea", name: "tsMulticastAddress" },
+            { label: "Actual Experience", type: "textarea", name: "exactExp", placeholder: "Please input the customer's actual experience. e.g. “With IP but no tune service multicast” DO NOT input the WOCAS!" },
+            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
-            { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
-                "",
-                "Cignal Retracking",
-                "Defective Cignal Accessories / Missing Cignal Accessories",
-                "Defective Set Top Box / Missing Set Top Box",
-                "Manual Troubleshooting",
-                "Network Configuration",
-                "Defective Remote Control"
-            ]},
+            {
+                label: "FLM Findings/Resolution", type: "select", name: "resolution", options: [
+                    "",
+                    "Cignal Retracking",
+                    "Defective Cignal Accessories / Missing Cignal Accessories",
+                    "Defective Set Top Box / Missing Set Top Box",
+                    "Manual Troubleshooting",
+                    "Network Configuration",
+                    "Defective Remote Control"
+                ]
+            },
             // CEP Investigation Tagging
-            { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Modem Light Status —",
-                "Normal Status",
-                "Not Applicable [Defective CPE]",
-                "Not Applicable [via Store]",
-                "Unable to provide information"
-            ]},
-            { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— NMS Parameters —",
-                "Not Applicable [NMS GUI]",
-                "Not Applicable [via Store]",
-                "Up/Active"
-            ]},
-            { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Clearview Reading —",
-                "Not Applicable",
-                "The ONU performance is degraded",
-                "Without Line Problem Detected"
-            ]},
-            { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "IPTV Trouble",
-                "Broken/Damaged STB/SC",
-                "Cannot Read Smart Card",
-                "Cignal IRN created - Missing Channels",
-                "Cignal IRN created - No Audio/Video Output",
-                "Cignal IRN created - Poor Audio/Video Quality",
-                "Defective STB/SC/Accessories/Physical Set-up",
-                "FCR - Cannot Read Smart Card",
-                "FCR - Freeze",
-                "FCR - Loop Back",
-                "FCR - Missing Channels",
-                "FCR - No Audio/Video Output w/ Test Channel",
-                "FCR - Out-of-Sync",
-                "FCR - Pixelated",
-                "FCR - Too long to Boot Up",
-                "Freeze",
-                "Loop Back",
-                "No Audio/Video Output w/ Test Channel",
-                "No Audio/Video Output w/o Test Channel",
-                "Not Applicable [via Store]",
-                "Out-of-Sync",
-                "Pixelated",
-                "Recording Error",
-                "Remote Control Issues",
-                "STB Not Synched",
-                "Too long to Boot Up"
-            ]},
+            {
+                label: "Investigation 1", type: "select", name: "investigation1", options: [
+                    "— Modem Light Status —",
+                    "Normal Status",
+                    "Not Applicable [Defective CPE]",
+                    "Not Applicable [via Store]",
+                    "Unable to provide information"
+                ]
+            },
+            {
+                label: "Investigation 2", type: "select", name: "investigation2", options: [
+                    "— NMS Parameters —",
+                    "Not Applicable [NMS GUI]",
+                    "Not Applicable [via Store]",
+                    "Up/Active"
+                ]
+            },
+            {
+                label: "Investigation 3", type: "select", name: "investigation3", options: [
+                    "— Clearview Reading —",
+                    "Not Applicable",
+                    "The ONU performance is degraded",
+                    "Without Line Problem Detected"
+                ]
+            },
+            {
+                label: "Investigation 4", type: "select", name: "investigation4", options: [
+                    "— Select applicable Investigation 4 —",
+                    "IPTV Trouble",
+                    "Broken/Damaged STB/SC",
+                    "Cannot Read Smart Card",
+                    "Cignal IRN created - Missing Channels",
+                    "Cignal IRN created - No Audio/Video Output",
+                    "Cignal IRN created - Poor Audio/Video Quality",
+                    "Defective STB/SC/Accessories/Physical Set-up",
+                    "FCR - Cannot Read Smart Card",
+                    "FCR - Freeze",
+                    "FCR - Loop Back",
+                    "FCR - Missing Channels",
+                    "FCR - No Audio/Video Output w/ Test Channel",
+                    "FCR - Out-of-Sync",
+                    "FCR - Pixelated",
+                    "FCR - Too long to Boot Up",
+                    "Freeze",
+                    "Loop Back",
+                    "No Audio/Video Output w/ Test Channel",
+                    "No Audio/Video Output w/o Test Channel",
+                    "Not Applicable [via Store]",
+                    "Out-of-Sync",
+                    "Pixelated",
+                    "Recording Error",
+                    "Remote Control Issues",
+                    "STB Not Synched",
+                    "Too long to Boot Up"
+                ]
+            },
             // Ticket Details
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
-            { label: "SLA / ETR", type: "text", name: "sla"},
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "SLA / ETR", type: "text", name: "sla" },
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
-            { label: "Landmarks", type: "textarea", name: "landmarks"},
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
-            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -5612,7 +6854,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -5686,7 +6928,7 @@ function createIntentBasedForm() {
                 fields.splice(index + 1, 0, {
                     type: "noteRow",
                     name: "nmsSkinChecklist",
-                    relatedTo: "onuRunStats"
+                    relatedTo: "nmsOnuStats"
                 });
             }
         }
@@ -5707,18 +6949,18 @@ function createIntentBasedForm() {
         const enhancedFields = [...fields];
 
         insertToolLabel(enhancedFields, "Visual Audit", "accountType");
-        insertToolLabel(enhancedFields, "NMS Skin", "onuRunStats");
-        insertNoteRow(enhancedFields, "toolLabel-nms-skin");  
+        insertToolLabel(enhancedFields, "NMS Skin", "nmsOnuStats");
+        insertNoteRow(enhancedFields, "toolLabel-nms-skin");
         insertToolLabel(enhancedFields, "DMS", "dmsLan4Status");
         insertToolLabel(enhancedFields, "Request for Retracking", "req4retracking");
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
         insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
-        
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
-            row.style.display = field.name === "accountType" ? "table-row" : "none"; 
+            row.style.display = field.name === "accountType" ? "table-row" : "none";
 
             const td = document.createElement("td");
             const divInput = document.createElement("div");
@@ -5854,17 +7096,17 @@ function createIntentBasedForm() {
                 }
 
                 optionsToUse.forEach((optionText, index) => {
-                const option = document.createElement("option");
-                option.value = optionText;
-                option.textContent = optionText;
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
 
-                if (index === 0) {
-                    option.disabled = true;
-                    option.selected = true;
-                    option.style.fontStyle = "italic";
-                }
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
 
-                input.appendChild(option);
+                    input.appendChild(option);
                 });
 
             } else if (field.type === "textarea") {
@@ -5889,9 +7131,9 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
-        enhancedFields.forEach(field => table.appendChild(createFieldRow(field))); 
+
+        table.appendChild(createInstructionsRow());
+        enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
 
         function updateToolLabelVisibility() {
             const allToolLabels = document.querySelectorAll(".tool-label-row, .note-row");
@@ -5924,16 +7166,16 @@ function createIntentBasedForm() {
             if (accountType.value === "PLDT") {
                 if (selectedValue === "form510_1" || selectedValue === "form510_2") {
                     showFields(["outageStatus"]);
-                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "nmsOnuStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "remarks", "issueResolved", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
                 } else if (selectedValue === "form511_1" || selectedValue === "form511_2" || selectedValue === "form511_3" || selectedValue === "form511_4" || selectedValue === "form511_5") {
                     showFields(["rxPower", "req4retracking", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "nmsOnuStats", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
                 } else if (selectedValue === "form512_1") {
                     showFields(["req4retracking", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "nmsOnuStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
                 } else if (selectedValue === "form510_7") {
                     showFields(["stbID", "smartCardID", "stbIpAddress", "tsMulticastAddress", "exactExp", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "cignalPlan", "issueResolved", "availability", "address", "landmarks", "specialInstructions"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "nmsOnuStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "cignalPlan", "issueResolved", "availability", "address", "landmarks", "specialInstructions"]);
 
                     if (channelField.value === "CDT-SOCMED") {
                         showFields(["resolution"]);
@@ -5942,34 +7184,34 @@ function createIntentBasedForm() {
                     }
                 } else {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "nmsOnuStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
                 }
                 updateToolLabelVisibility();
             } else if (accountType.value === "RADIUS") {
                 if (selectedValue === "form510_1" || selectedValue === "form510_2" || selectedValue === "form511_1" || selectedValue === "form511_2" || selectedValue === "form511_3" || selectedValue === "form511_4" || selectedValue === "form511_5" || selectedValue === "form512_1") {
                     showFields(["req4retracking", "remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "nmsOnuStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
                 } else {
                     showFields(["remarks", "issueResolved"]);
-                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
+                    hideSpecificFields(["outageStatus", "outageReference", "pcNumber", "equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "nmsOnuStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
                 }
                 updateToolLabelVisibility();
             }
         });
-    
+
         const outageStatus = document.querySelector("[name='outageStatus']");
         outageStatus.addEventListener("change", () => {
             resetAllFields(["accountType", "outageStatus"]);
             if (outageStatus.value === "Yes") {
                 showFields(["outageReference", "pcNumber", "remarks", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "rptCount", "eligibleForUpsell"]);
-                hideSpecificFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "issueResolved", "availability", "address", "landmarks", "specialInstructions"]);
+                hideSpecificFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "nmsOnuStats", "rxPower", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp", "issueResolved", "availability", "address", "landmarks", "specialInstructions"]);
                 if (channelField.value === "CDT-SOCMED") {
                     showFields(["resolution"]);
                 } else {
                     hideSpecificFields(["resolution"]);
                 }
             } else {
-                showFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "onuRunStats", "rxPower", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "exactExp", "remarks", "issueResolved"]);
+                showFields(["equipmentBrand", "modemBrand", "onuConnectionType", "onuSerialNum", "nmsOnuStats", "rxPower", "nmsSkinRemarks", "dmsLan4Status", "dmsRemarks", "req4retracking", "exactExp", "remarks", "issueResolved"]);
                 hideSpecificFields(["outageReference", "pcNumber", "wanName_3", "srvcType_3", "connType_3", "vlan_3", "stbID", "smartCardID", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "resolution", "investigation1", "investigation2", "investigation3", "investigation4", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "rptCount", "eligibleForUpsell"]);
             }
             updateToolLabelVisibility();
@@ -5981,24 +7223,24 @@ function createIntentBasedForm() {
 
         function updateONUConnectionType() {
             if (!equipmentBrand.value || !modemBrand.value) {
-                onuConnectionType.value = ""; 
-                onuConnectionType.dispatchEvent(new Event("change")); 
+                onuConnectionType.value = "";
+                onuConnectionType.dispatchEvent(new Event("change"));
                 return;
             }
 
             const newValue =
                 (equipmentBrand.value === "FEOL" && modemBrand.value === "FHTT") ||
-                (equipmentBrand.value === "HUOL" && modemBrand.value === "HWTC")
+                    (equipmentBrand.value === "HUOL" && modemBrand.value === "HWTC")
                     ? "Non-interOp"
                     : "InterOp";
 
             if (onuConnectionType.value !== newValue) {
-                onuConnectionType.value = ""; 
-                onuConnectionType.dispatchEvent(new Event("change")); 
+                onuConnectionType.value = "";
+                onuConnectionType.dispatchEvent(new Event("change"));
 
                 setTimeout(() => {
-                    onuConnectionType.value = newValue; 
-                    onuConnectionType.dispatchEvent(new Event("change")); 
+                    onuConnectionType.value = newValue;
+                    onuConnectionType.dispatchEvent(new Event("change"));
                 }, 0);
             }
         }
@@ -6015,14 +7257,14 @@ function createIntentBasedForm() {
         onuConnectionType.addEventListener("change", () => {
             if (onuConnectionType.value === "Non-interOp" && equipmentBrand.value === "FEOL") {
                 showFields(["vlan_3"]);
-                hideSpecificFields(["wanName_3", "srvcType_3", "connType_3"]);                 
+                hideSpecificFields(["wanName_3", "srvcType_3", "connType_3"]);
             } else if (onuConnectionType.value === "Non-interOp" && equipmentBrand.value === "HUOL") {
                 showFields(["wanName_3", "srvcType_3", "connType_3", "vlan_3"]);
             } else {
                 hideSpecificFields(["wanName_3", "srvcType_3", "connType_3", "vlan_3"]);
             }
         });
-    
+
         const req4retracking = document.querySelector("[name='req4retracking']");
         req4retracking.addEventListener("change", () => {
             // const isForm510 = selectedValue === "form510_1" || selectedValue === "form510_2";
@@ -6054,40 +7296,48 @@ function createIntentBasedForm() {
 
         updateToolLabelVisibility();
 
-    } else if (streamAppsForms.includes(selectedValue)) { 
+    } else if (streamAppsForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // CEP Investigation Tagging
-            { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Select applicable Investigation 1 —",
-                "Normal Status"
-            ]},
-            { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— Select applicable Investigation 2 —",
-                "Up/Active"                  
-            ]},
-            { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Select applicable Investigation 3 —",
-                "Without Line Problem Detected"
-            ]},
-            { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "Content",
-                "FCR - Device - Advised Physical Set Up",
-                "FCR - Device for Replacement in Store"
-            ]},
+            {
+                label: "Investigation 1", type: "select", name: "investigation1", options: [
+                    "— Select applicable Investigation 1 —",
+                    "Normal Status"
+                ]
+            },
+            {
+                label: "Investigation 2", type: "select", name: "investigation2", options: [
+                    "— Select applicable Investigation 2 —",
+                    "Up/Active"
+                ]
+            },
+            {
+                label: "Investigation 3", type: "select", name: "investigation3", options: [
+                    "— Select applicable Investigation 3 —",
+                    "Without Line Problem Detected"
+                ]
+            },
+            {
+                label: "Investigation 4", type: "select", name: "investigation4", options: [
+                    "— Select applicable Investigation 4 —",
+                    "Content",
+                    "FCR - Device - Advised Physical Set Up",
+                    "FCR - Device for Replacement in Store"
+                ]
+            },
             // Ticket Details
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
-            { label: "Landmarks", type: "textarea", name: "landmarks"},
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -6101,7 +7351,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -6177,7 +7427,7 @@ function createIntentBasedForm() {
                     label: `// ${label}`,
                     type: "toolLabel",
                     name: `toolLabel-${label.toLowerCase().replace(/\s/g, "-")}`,
-                    relatedTo: relatedFieldName 
+                    relatedTo: relatedFieldName
                 }
             );
         }
@@ -6189,7 +7439,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
         insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
-        
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
             row.style.display = (["remarks", "issueResolved"].includes(field.name)) ? "table-row" : "none";
@@ -6222,7 +7472,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -6239,7 +7489,7 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") ? 5 : 
+                input.rows = (field.name === "remarks") ? 5 :
                     (field.name === "specialInstructions") ? 3 : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
@@ -6258,9 +7508,9 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
-        enhancedFields.forEach(field => table.appendChild(createFieldRow(field))); 
+
+        table.appendChild(createInstructionsRow());
+        enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
 
         function updateToolLabelVisibility() {
             const allToolLabels = document.querySelectorAll(".tool-label-row");
@@ -6297,49 +7547,59 @@ function createIntentBasedForm() {
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
         updateToolLabelVisibility();
-    } else if (alwaysOnForms.includes(selectedValue)) { 
+    } else if (alwaysOnForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
             // Visual Audit
-            { label: "SIM Light Status", type: "select", name: "simLight", options: [
-                "— Modem Light Status —", 
-                "On", 
-                "Off"
-            ]},
-            { label: "MIN #", type: "number", name: "minNumber", placeholder: "0999XXXXXXX"},
-            { label: "Modem/ONU Serial #", type: "text", name: "onuSerialNum", placeholder: "Also available in DMS."},
+            {
+                label: "SIM Light Status", type: "select", name: "simLight", options: [
+                    "— Modem Light Status —",
+                    "On",
+                    "Off"
+                ]
+            },
+            { label: "MIN #", type: "number", name: "minNumber", placeholder: "0999XXXXXXX" },
+            { label: "Modem/ONU Serial #", type: "text", name: "onuSerialNum", placeholder: "Also available in DMS." },
             // Probe & Troubleshoot
-            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["",]},
+            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: ["",] },
             // CEP Investigation Tagging
-            { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Modem Light Status —",
-                "Not Applicable [Defective CPE]"
-            ]},
-            { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— NMS Parameters —",
-                "Not Applicable [NMS GUI]"
-            ]},
-            { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Clearview Reading —",
-                "Not Applicable"
-            ]},
-            { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "Broken/Damaged Modem/ONU"
-            ]},
+            {
+                label: "Investigation 1", type: "select", name: "investigation1", options: [
+                    "— Modem Light Status —",
+                    "Not Applicable [Defective CPE]"
+                ]
+            },
+            {
+                label: "Investigation 2", type: "select", name: "investigation2", options: [
+                    "— NMS Parameters —",
+                    "Not Applicable [NMS GUI]"
+                ]
+            },
+            {
+                label: "Investigation 3", type: "select", name: "investigation3", options: [
+                    "— Clearview Reading —",
+                    "Not Applicable"
+                ]
+            },
+            {
+                label: "Investigation 4", type: "select", name: "investigation4", options: [
+                    "— Select applicable Investigation 4 —",
+                    "Broken/Damaged Modem/ONU"
+                ]
+            },
             // Ticket Details
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
-            { label: "SLA / ETR", type: "text", name: "sla"},
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "SLA / ETR", type: "text", name: "sla" },
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
-            { label: "Landmarks", type: "textarea", name: "landmarks"},
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
-            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
+            { label: "Landmarks", type: "textarea", name: "landmarks" },
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
+            { label: "Repeats w/in 30 Days", type: "text", name: "rptCount" },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -6353,7 +7613,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -6429,7 +7689,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "Ticket Details", "cepCaseNumber");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
         insertToolLabel(enhancedFields, "Cross-Sell/Upsell", "eligibleForUpsell");
-        
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
             const showFields = ["simLight", "remarks", "issueResolved"];
@@ -6445,7 +7705,7 @@ function createIntentBasedForm() {
             label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
             label.setAttribute("for", field.name);
 
-            let input;                
+            let input;
             if (field.type === "toolLabel") {
                 const toolLabelRow = document.createElement("tr");
                 toolLabelRow.classList.add("tool-label-row");
@@ -6500,7 +7760,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -6535,9 +7795,9 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
-        enhancedFields.forEach(field => table.appendChild(createFieldRow(field))); 
+
+        table.appendChild(createInstructionsRow());
+        enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
 
         function updateToolLabelVisibility() {
             const allToolLabels = document.querySelectorAll(".tool-label-row, .esca-checklist-row");
@@ -6578,8 +7838,8 @@ function createIntentBasedForm() {
 
             const options =
                 selectedValue === "form500_6" ||
-                selectedValue === "form101_5" ||
-                selectedValue === "form510_9"
+                    selectedValue === "form101_5" ||
+                    selectedValue === "form510_9"
                     ? [
                         "Yes",
                         "No - Customer is Unresponsive",
@@ -6619,13 +7879,13 @@ function createIntentBasedForm() {
             }
             updateToolLabelVisibility();
         });
-    
+
         const issueResolved = document.querySelector("[name='issueResolved']");
         issueResolved.addEventListener("change", () => {
             if (issueResolved.value !== "No - for Ticket Creation") {
                 showFields(["eligibleForUpsell"]);
             }
-            updateToolLabelVisibility(); 
+            updateToolLabelVisibility();
         });
 
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
@@ -6640,89 +7900,109 @@ function createIntentBasedForm() {
     }
 
     // Tech Modem Request Transactions
-    else if (mrtForms.includes(selectedValue)) { 
+    else if (mrtForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
             // Visual Audit
-            { label: "Account Type", type: "select", name: "accountType", options: [
-                "", 
-                "PLDT", 
-                "RADIUS"
-            ]},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-            ]},
-            { label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
-                "", 
-                "FEOL", 
-                "HUOL"
-            ]},
-            { label: "Modem Brand", type: "select", name: "modemBrand", options: [
-                "", 
-                "FHTT", 
-                "HWTC", 
-                "ZTEG",
-                "AZRD",
-                "PRLN",
-                "Other Brands"
-            ]},
-            { label: "ONU Connection Type", type: "select", name: "onuConnectionType", options: [
-                "", 
-                "InterOp", 
-                "Non-interOp"
-            ]},
-            { label: "LAN Port Number", type: "number", name: "lanPortNum"},
+            {
+                label: "Account Type", type: "select", name: "accountType", options: [
+                    "",
+                    "PLDT",
+                    "RADIUS"
+                ]
+            },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                ]
+            },
+            {
+                label: "Equipment Brand", type: "select", name: "equipmentBrand", options: [
+                    "",
+                    "FEOL",
+                    "HUOL"
+                ]
+            },
+            {
+                label: "Modem Brand", type: "select", name: "modemBrand", options: [
+                    "",
+                    "FHTT",
+                    "HWTC",
+                    "ZTEG",
+                    "AZRD",
+                    "PRLN",
+                    "Other Brands"
+                ]
+            },
+            {
+                label: "ONU Connection Type", type: "select", name: "onuConnectionType", options: [
+                    "",
+                    "InterOp",
+                    "Non-interOp"
+                ]
+            },
+            { label: "LAN Port Number", type: "number", name: "lanPortNum" },
             // DMS
-            { label: "DMS: LAN Port Status", type: "text", name: "dmsLanPortStatus"},
+            { label: "DMS: LAN Port Status", type: "text", name: "dmsLanPortStatus" },
             // CEP Investigation Tagging
-            { label: "Investigation 1", type: "select", name: "investigation1", options: [
-                "— Select applicable Investigation 1 —",
-                "Normal Status",
-                "Not Applicable [via Store]"
-            ]},
-            { label: "Investigation 2", type: "select", name: "investigation2", options: [
-                "— Select applicable Investigation 2 —",
-                "Up/Active",
-                "VLAN Configuration issue",
-                "Not Applicable [via Store]"                    
-            ]},
-            { label: "Investigation 3", type: "select", name: "investigation3", options: [
-                "— Select applicable Investigation 5 —",
-                "Without Line Problem Detected",
-                "The ONU performance is degraded"
-            ]},
-            { label: "Investigation 4", type: "select", name: "investigation4", options: [
-                "— Select applicable Investigation 4 —",
-                "Cannot Browse",
-                "Change set-up Route to Bridge and Vice Versa",
-                "Change set-up Route to Bridge and Vice Versa [InterOP]",
-                "Data Bind Port",
-                "Device and Website IP Configuration",
-                "FCR - Change WiFi SSID UN/PW",
-                "Not Applicable [via Store]",
-                "Request Modem/ONU GUI Access",
-                "Request Modem/ONU GUI Access [InterOP]"
-            ]},
-            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            {
+                label: "Investigation 1", type: "select", name: "investigation1", options: [
+                    "— Select applicable Investigation 1 —",
+                    "Normal Status",
+                    "Not Applicable [via Store]"
+                ]
+            },
+            {
+                label: "Investigation 2", type: "select", name: "investigation2", options: [
+                    "— Select applicable Investigation 2 —",
+                    "Up/Active",
+                    "VLAN Configuration issue",
+                    "Not Applicable [via Store]"
+                ]
+            },
+            {
+                label: "Investigation 3", type: "select", name: "investigation3", options: [
+                    "— Select applicable Investigation 5 —",
+                    "Without Line Problem Detected",
+                    "The ONU performance is degraded"
+                ]
+            },
+            {
+                label: "Investigation 4", type: "select", name: "investigation4", options: [
+                    "— Select applicable Investigation 4 —",
+                    "Cannot Browse",
+                    "Change set-up Route to Bridge and Vice Versa",
+                    "Change set-up Route to Bridge and Vice Versa [InterOP]",
+                    "Data Bind Port",
+                    "Device and Website IP Configuration",
+                    "FCR - Change WiFi SSID UN/PW",
+                    "Not Applicable [via Store]",
+                    "Request Modem/ONU GUI Access",
+                    "Request Modem/ONU GUI Access [InterOP]"
+                ]
+            },
+            { label: "Actions Taken/ Troubleshooting/ Remarks", type: "textarea", name: "remarks", placeholder: "Ensure that all actions performed in each tool are properly documented. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
-            { label: "FLM Findings / Resolution", type: "select", name: "resolution", options: [
-                "",
-                "Defective Modem",
-                "Manual Troubleshooting",
-                "NMS Configuration",
-            ]},
-            { label: "CEP Case Number", type: "number", name: "cepCaseNumber"},
-            { label: "SLA / ETR", type: "text", name: "sla"},
+            {
+                label: "FLM Findings/Resolution", type: "select", name: "resolution", options: [
+                    "",
+                    "Defective Modem",
+                    "Manual Troubleshooting",
+                    "NMS Configuration",
+                ]
+            },
+            { label: "CEP Case Number", type: "number", name: "cepCaseNumber" },
+            { label: "SLA / ETR", type: "text", name: "sla" },
             // Special Instructions
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Preferred Date & Time", type: "text", name: "availability"},
-            { label: "Address", type: "textarea", name: "address"},
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Preferred Date & Time", type: "text", name: "availability" },
+            { label: "Address", type: "textarea", name: "address" },
             { label: "Landmarks", type: "textarea", name: "landmarks" },
-            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)"},
+            { label: "Special Instructions", type: "textarea", name: "specialInstructions", placeholder: "Enter any specific instructions from the customer for the technician (e.g. “Please leave a voicemail”, “Use side gate entrance”, “Please call 30 mins before arrival”, etc.)" },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             // { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -6736,7 +8016,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -6812,7 +8092,7 @@ function createIntentBasedForm() {
                     label: `// ${label}`,
                     type: "toolLabel",
                     name: `toolLabel-${label.toLowerCase().replace(/\s/g, "-")}`,
-                    relatedTo: relatedFieldName 
+                    relatedTo: relatedFieldName
                 }
             );
         }
@@ -6823,7 +8103,7 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "DMS", "dmsLanPortStatus");
         insertToolLabel(enhancedFields, "CEP Investigation Tagging", "investigation1");
         insertToolLabel(enhancedFields, "Special Instructions", "contactName");
-        
+
         function createFieldRow(field) {
             const row = document.createElement("tr");
             row.style.display = (field.name === "accountType" || field.name === "custAuth") ? "table-row" : "none";
@@ -6856,7 +8136,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                
+
                 let optionsToUse = field.options;
 
                 if (field.name === "resolution") {
@@ -6891,7 +8171,7 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") ? 6 : 
+                input.rows = (field.name === "remarks") ? 6 :
                     (field.name === "specialInstructions") ? 3 : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
@@ -6910,9 +8190,9 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
-        table.appendChild(createInstructionsRow()); 
-        enhancedFields.forEach(field => table.appendChild(createFieldRow(field))); 
+
+        table.appendChild(createInstructionsRow());
+        enhancedFields.forEach(field => table.appendChild(createFieldRow(field)));
 
         function updateToolLabelVisibility() {
             const allToolLabels = document.querySelectorAll(".tool-label-row");
@@ -6959,12 +8239,12 @@ function createIntentBasedForm() {
 
                     updateToolLabelVisibility();
                 } else if (["form300_2", "form300_3", "form300_4", "form300_5"].includes(selectedValue)) {
-                    showFields(["equipmentBrand", "modemBrand", "onuConnectionType", "investigation1", "investigation2", "investigation3", "investigation4", "remarks", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "resolution"]);  
+                    showFields(["equipmentBrand", "modemBrand", "onuConnectionType", "investigation1", "investigation2", "investigation3", "investigation4", "remarks", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "resolution"]);
 
                     updateToolLabelVisibility();
                 } else if (selectedValue === "form300_6") {
-                    showFields(["lanPortNum", "dmsLanPortStatus", "investigation1", "investigation2", "investigation3", "investigation4", "remarks", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "resolution"]);    
-                    
+                    showFields(["lanPortNum", "dmsLanPortStatus", "investigation1", "investigation2", "investigation3", "investigation4", "remarks", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "resolution"]);
+
                     updateToolLabelVisibility();
                 } else {
                     showFields(["investigation1", "investigation2", "investigation3", "investigation4", "remarks", "cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions", "resolution"]);
@@ -7013,24 +8293,24 @@ function createIntentBasedForm() {
 
         function updateONUConnectionType() {
             if (!equipmentBrand.value || !modemBrand.value) {
-                onuConnectionType.value = ""; 
-                onuConnectionType.dispatchEvent(new Event("change")); 
+                onuConnectionType.value = "";
+                onuConnectionType.dispatchEvent(new Event("change"));
                 return;
             }
 
             const newValue =
                 (equipmentBrand.value === "FEOL" && modemBrand.value === "FHTT") ||
-                (equipmentBrand.value === "HUOL" && modemBrand.value === "HWTC")
+                    (equipmentBrand.value === "HUOL" && modemBrand.value === "HWTC")
                     ? "Non-interOp"
                     : "InterOp";
 
             if (onuConnectionType.value !== newValue) {
-                onuConnectionType.value = ""; 
-                onuConnectionType.dispatchEvent(new Event("change")); 
+                onuConnectionType.value = "";
+                onuConnectionType.dispatchEvent(new Event("change"));
 
                 setTimeout(() => {
-                    onuConnectionType.value = newValue; 
-                    onuConnectionType.dispatchEvent(new Event("change")); 
+                    onuConnectionType.value = newValue;
+                    onuConnectionType.dispatchEvent(new Event("change"));
                 }, 0);
             }
         }
@@ -7043,7 +8323,7 @@ function createIntentBasedForm() {
         modemBrand.addEventListener("change", updateONUConnectionType);
 
         updateONUConnectionType();
-    
+
         issueResolved.addEventListener("change", () => {
             if (issueResolved.selectedIndex === 2) {
                 showFields(["cepCaseNumber", "sla", "contactName", "cbr", "availability", "address", "landmarks", "specialInstructions"]);
@@ -7069,25 +8349,29 @@ function createIntentBasedForm() {
     }
 
     // Non-Tech Requests
-     else if (selectedValue === "formReqAccMgt") { 
+    else if (selectedValue === "formReqAccMgt") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Go Green Registration",
-                "Service Renewal",
-                "Updating Contact Details"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO/SR", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Go Green Registration",
+                    "Service Renewal",
+                    "Updating Contact Details"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO/SR", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -7128,7 +8412,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -7179,7 +8463,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -7196,9 +8480,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -7216,7 +8500,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -7259,18 +8543,20 @@ function createIntentBasedForm() {
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
-    } else if (requestForms.includes(selectedValue)) { 
+    } else if (requestForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -7285,7 +8571,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const descriptionDiv = document.createElement("div");
-            descriptionDiv.className = "form2DivDefinition"; 
+            descriptionDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -7296,7 +8582,7 @@ function createIntentBasedForm() {
                 formReqTaxAdj: "Requests for a tax adjustment (typically for Microbusiness accounts)",
                 formReqChgTelUnit: "Requests for change of telephone unit (SO creation)",
                 formReqOcular: "Processing of SO for verification of the service area, address, and installed in actual. To check if the services installed are used for Personal or Business purposes.",
-                formReqProofOfSub: "For aftersales request (i.e Downgrade, Upgrade, Change of Ownership, etc.)"    
+                formReqProofOfSub: "For aftersales request (i.e Downgrade, Upgrade, Change of Ownership, etc.)"
             };
 
             const ul = document.createElement("ul");
@@ -7388,7 +8674,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -7405,9 +8691,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -7467,25 +8753,29 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
-    } else if (selectedValue === "formReqAddressMod") { 
+
+    } else if (selectedValue === "formReqAddressMod") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Billing Address",
-                "Modify Service Address / AMEND SAM (Physical)"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Billing Address",
+                    "Modify Service Address / AMEND SAM (Physical)"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -7526,7 +8816,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -7538,7 +8828,7 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Requests for modification of the billing address (without SO creation)";
-            
+
 
             const li2 = document.createElement("li");
             li2.textContent = "Requests for modification of the service address with SO creation for AMEND SAM";
@@ -7573,7 +8863,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -7590,9 +8880,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -7610,7 +8900,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -7646,31 +8936,35 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
-        
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
-    } else if (selectedValue === "formReqSupRetAccNum" || selectedValue === "formReqSupChangeAccNum") { 
+
+    } else if (selectedValue === "formReqSupRetAccNum" || selectedValue === "formReqSupChangeAccNum") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Straight or Plain Supersedure",
-                "Supersedure with Clause"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Straight or Plain Supersedure",
+                    "Supersedure with Clause"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -7685,7 +8979,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const descriptionDiv = document.createElement("div");
-            descriptionDiv.className = "form2DivDefinition"; 
+            descriptionDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -7719,7 +9013,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Mandatory Information";
@@ -7754,8 +9048,8 @@ function createIntentBasedForm() {
 
             const nestedUl = document.createElement("ul");
             [
-                "Remaining months of gadget amortization", 
-                "Remaining months of installation fee", 
+                "Remaining months of gadget amortization",
+                "Remaining months of installation fee",
                 "Remaining months of activation fee"
             ].forEach(text => {
                 const subLi1 = document.createElement("li");
@@ -7813,7 +9107,7 @@ function createIntentBasedForm() {
 
             const li14 = document.createElement("li");
             li14.textContent = "Deed of Sale (if the PLDT service is included in the sale of the house/property)";
-            
+
             if (requestType === "Straight or Plain Supersedure") {
                 [li8, li9, li11, li12, li13].forEach(li => reqTypeUl.appendChild(li));
             } else if (requestType === "Supersedure with Clause") {
@@ -7844,7 +9138,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -7861,9 +9155,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -7881,7 +9175,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -7923,34 +9217,40 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
-    } else if (selectedValue === "formReqDisconnection") { 
+
+    } else if (selectedValue === "formReqDisconnection") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Disconnection (VAS)",
-                "Permanent Disconnection",
-                "Temporary Disconnection (VTD/HTD)"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Disconnection (VAS)",
+                    "Permanent Disconnection",
+                    "Temporary Disconnection (VTD/HTD)"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
-            { label: "Sagip OL Discount", type: "select", name: "sagipOLDiscount", options: [
-                "", 
-                "Accepted",
-                "Declined",
-                "NA"
-            ] },
+            {
+                label: "Sagip OL Discount", type: "select", name: "sagipOLDiscount", options: [
+                    "",
+                    "Accepted",
+                    "Declined",
+                    "NA"
+                ]
+            },
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
             { label: "Offer Accepted?", type: "select", name: "offerAccepted", options: UPSELL_OPTIONS.offerAccepted },
@@ -7989,7 +9289,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -8001,7 +9301,7 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Requests for the disconnection of Value-Added Services (VAS) such as Mesh, Cignal Add-on, Always-On, etc.";
-            
+
 
             const li2 = document.createElement("li");
             li2.textContent = "Requests for the permanent disconnection of the account.";
@@ -8092,7 +9392,7 @@ function createIntentBasedForm() {
 
             if (requestType === "Disconnection (VAS)") {
                 reqTypeUl.appendChild(li4);
-            } else if (requestType === "Permanent Disconnection"){
+            } else if (requestType === "Permanent Disconnection") {
                 [li5, li6, li8, li9, li10, li11, li12].forEach(li => reqTypeUl.appendChild(li));
             } else {
                 [li13, li14, li15].forEach(li => reqTypeUl.appendChild(li));
@@ -8122,7 +9422,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -8139,9 +9439,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -8159,7 +9459,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -8213,30 +9513,34 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
-    } else if (selectedValue === "formReqDispute") { 
+
+    } else if (selectedValue === "formReqDispute") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Rebate Non Service",
-                "Rentals - MSF",
-                "Rentals - Lionsgate play/Netflix",
-                "Rentals - NRC- Cost of Unit/Gadgets",
-                "Rentals- Service Connection Charge",
-                "Usage - Tolls (UnliFam Call)",
-                "Usage - Other Tolls"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO/SR", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Rebate Non Service",
+                    "Rentals - MSF",
+                    "Rentals - Lionsgate play/Netflix",
+                    "Rentals - NRC- Cost of Unit/Gadgets",
+                    "Rentals- Service Connection Charge",
+                    "Usage - Tolls (UnliFam Call)",
+                    "Usage - Other Tolls"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO/SR", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -8245,11 +9549,13 @@ function createIntentBasedForm() {
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
             // Ordertake prompt for Rebate Non Service
-            { label: "Ordertake?", type: "select", name: "ordertake", options: [
-                "", 
-                "Yes", 
-                "No"
-            ]},
+            {
+                label: "Ordertake?", type: "select", name: "ordertake", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
         ];
 
         function createDefinitionRow() {
@@ -8283,7 +9589,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -8356,7 +9662,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -8373,9 +9679,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -8393,7 +9699,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -8445,29 +9751,33 @@ function createIntentBasedForm() {
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
-    } else if (selectedValue === "formReqDowngrade") { 
+    } else if (selectedValue === "formReqDowngrade") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Plan 1299",
-                "Plan 1399",
-                "Plan 1499",
-                "Plan 1799",
-                "Plan 1899",
-                "Plan 2599",
-                "Others"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Plan 1299",
+                    "Plan 1399",
+                    "Plan 1499",
+                    "Plan 1799",
+                    "Plan 1899",
+                    "Plan 2599",
+                    "Others"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -8508,7 +9818,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -8523,7 +9833,7 @@ function createIntentBasedForm() {
 
             const li2 = document.createElement("li");
             li2.textContent = "Processing of SO for downgrade from a higher plan to Plan 1399.";
-            
+
             const li5 = document.createElement("li");
             li5.textContent = "Processing of SO for downgrade from a higher plan to Plan 1499.";
 
@@ -8602,7 +9912,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -8619,9 +9929,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -8639,7 +9949,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -8675,31 +9985,35 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
-        
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
-    } else if (selectedValue === "formReqDDE") { 
+    } else if (selectedValue === "formReqDDE") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Temporary Due Date Extension",
-                "Permanent Due Date Extension"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Temporary Due Date Extension",
+                    "Permanent Due Date Extension"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -8740,7 +10054,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -8752,7 +10066,7 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Customer inquire for a due date/payment  extension within 7 days";
-            
+
 
             const li2 = document.createElement("li");
             li2.textContent = "Request for payment due date extension for (7) allowable period due to financial constraints to avoid account being restricted after the due date";
@@ -8800,7 +10114,7 @@ function createIntentBasedForm() {
             const li9 = document.createElement("li");
             li9.textContent = "Not tagged as Failed Promise to Pay or Bounced Check";
             reqTypeUl.appendChild(li9);
-            
+
             checklistDiv.appendChild(reqTypeUl);
 
             td.appendChild(checklistDiv);
@@ -8825,7 +10139,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -8842,9 +10156,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -8862,7 +10176,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -8898,26 +10212,28 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
-                
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
-    } else if (selectedValue === "formReqInmove") { 
+
+    } else if (selectedValue === "formReqInmove") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -8990,7 +10306,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -9007,9 +10323,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -9027,7 +10343,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -9046,26 +10362,28 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
-                
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
-    } else if (selectedValue === "formReqMigration") { 
+
+    } else if (selectedValue === "formReqMigration") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -9146,7 +10464,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -9163,9 +10481,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -9183,7 +10501,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -9208,20 +10526,22 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
-    } else if (selectedValue === "formReqMisappPay" || selectedValue === "formReqReflectPay") { 
+
+    } else if (selectedValue === "formReqMisappPay" || selectedValue === "formReqReflectPay") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -9248,11 +10568,11 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Requests related to Misapplied Payment (payment credited to wrong account number, payments intended for multiple accounts but credited to only one account)";
-            
+
 
             const li2 = document.createElement("li");
             li2.textContent = "Requests related to Unreflected Payment (payment not reflected in the customer's account)";
-            
+
 
             if (selectedValue === "formReqMisappPay") {
                 ul.appendChild(li1);
@@ -9316,7 +10636,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -9333,9 +10653,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -9353,7 +10673,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -9372,31 +10692,33 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
-                        
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
+
     } else if (selectedValue === "formReqReconnect") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
             { label: "Customer Authentication", type: "select", name: "custAuth", options: ["", "Failed", "Passed", "NA"] },
-            { label: "Request Type", type: "select", name: "requestType", options: [
-                "",
-                "Posted Payment",
-                "Posted Payment (DTS)",
-                "Promise To Pay",
-                "Renew (PD/OP)",
-                "Reported Payment",
-                "Reported Payment (DTS)",
-                "Resume (TD)",
-                "Tactical"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”, “PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            {
+                label: "Request Type", type: "select", name: "requestType", options: [
+                    "",
+                    "Posted Payment",
+                    "Posted Payment (DTS)",
+                    "Promise To Pay",
+                    "Renew (PD/OP)",
+                    "Reported Payment",
+                    "Reported Payment (DTS)",
+                    "Resume (TD)",
+                    "Tactical"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”, “PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -9585,27 +10907,31 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
-    } else if (selectedValue === "formReqRefund") { 
+
+    } else if (selectedValue === "formReqRefund") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Proactive AMSF (New Connect)",
-                "Reactive Final Account",
-                "Reactive Overpayment",
-                "Reactive Wrong Biller"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Proactive AMSF (New Connect)",
+                    "Reactive Final Account",
+                    "Reactive Overpayment",
+                    "Reactive Wrong Biller"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -9646,7 +10972,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -9658,7 +10984,7 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Processing of refund request related to advance payment for a cancelled new application.";
-            
+
 
             const li2 = document.createElement("li");
             li2.textContent = "Processing of refund request related to overpayment in a final account.";
@@ -9706,7 +11032,7 @@ function createIntentBasedForm() {
 
             const li10 = document.createElement("li");
             li10.textContent = "For Non-SOR - Valid ID of SOR and ID of the authorized representative";
-            
+
             if (requestType === "Proactive AMSF (New Connect)") {
                 [li5, li6].forEach(li => reqTypeUl.appendChild(li));
             } else {
@@ -9737,7 +11063,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -9754,9 +11080,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -9774,7 +11100,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -9810,32 +11136,36 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
-                    
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
-    } else if (selectedValue === "formReqRelocation") { 
+
+    } else if (selectedValue === "formReqRelocation") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Cancelled SO - Bypass SO",
-                "CID Creation",
-                "Relocation - SO Creation"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Cancelled SO - Bypass SO",
+                    "CID Creation",
+                    "Relocation - SO Creation"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -9844,11 +11174,13 @@ function createIntentBasedForm() {
             { label: "Decline Reason", type: "select", name: "declineReason", options: UPSELL_OPTIONS.declineReason },
             { label: "Not Eligible Reason", type: "select", name: "notEligibleReason", options: UPSELL_OPTIONS.notEligibleReason },
             // Ordertake
-            { label: "Ordertake?", type: "select", name: "ordertake", options: [
-                "", 
-                "Yes", 
-                "No"
-            ]},
+            {
+                label: "Ordertake?", type: "select", name: "ordertake", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
         ];
 
         function createDefinitionRow() {
@@ -9882,7 +11214,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -9894,7 +11226,7 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Request for reprocessing of relocation due to cancelled SO related to Bypass SO";
-            
+
 
             const li2 = document.createElement("li");
             li2.textContent = "Request for the CID creation process through Geocoder";
@@ -9952,7 +11284,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -9969,9 +11301,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -9989,7 +11321,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -10040,26 +11372,30 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-    } else if (selectedValue === "formReqSpecFeat") { 
+    } else if (selectedValue === "formReqSpecFeat") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "DDD Pin Resetting",
-                "NDD / IDD / DDD (Security Lock)",
-                "Super Bundle / Caller ID Bundle",
-                "Others"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO/SR", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "DDD Pin Resetting",
+                    "NDD / IDD / DDD (Security Lock)",
+                    "Super Bundle / Caller ID Bundle",
+                    "Others"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO/SR", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -10100,7 +11436,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -10112,7 +11448,7 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Customer requesting for PIN resetting";
-            
+
 
             const li2 = document.createElement("li");
             li2.textContent = "Customer requesting for the security code of the telephone related to special features (IDD, NDD, or DDD)";
@@ -10193,7 +11529,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -10210,9 +11546,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -10230,7 +11566,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -10273,25 +11609,29 @@ function createIntentBasedForm() {
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
-    } else if (selectedValue === "formReqSpeedAddOn") { 
+    } else if (selectedValue === "formReqSpeedAddOn") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Create SO - Disconnect",
-                "Create SO - Modify Speed",
-                "Interested (File MsForm)"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Create SO - Disconnect",
+                    "Create SO - Modify Speed",
+                    "Interested (File MsForm)"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -10332,7 +11672,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -10344,7 +11684,7 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Customer requested for the disconnection of the speed add-on 500 on the account";
-            
+
 
             const li2 = document.createElement("li");
             li2.textContent = "Customer requested for the speed add-on to be added on the account";
@@ -10384,7 +11724,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -10401,9 +11741,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -10421,7 +11761,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -10463,26 +11803,30 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-        
-    } else if (selectedValue === "formReqUfc") { 
+
+    } else if (selectedValue === "formReqUfc") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Activation",
-                "Deactivation"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
-           { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Activation",
+                    "Deactivation"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
+            { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
             { label: "Product/Services Offered", type: "select", name: "productsOffered", options: UPSELL_OPTIONS.productsOffered },
@@ -10522,7 +11866,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Requirement";
@@ -10560,7 +11904,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -10577,9 +11921,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -10597,7 +11941,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -10640,31 +11984,35 @@ function createIntentBasedForm() {
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
-    } else if (selectedValue === "formReqUpgrade") { 
+    } else if (selectedValue === "formReqUpgrade") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Plan 1399",
-                "Plan 1499",
-                "Plan 1599",
-                "Plan 1799",
-                "Plan 1899",
-                "Plan 2099",
-                "Plan 2599",
-                "Plan 2699",
-                "Others"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Plan 1399",
+                    "Plan 1499",
+                    "Plan 1599",
+                    "Plan 1799",
+                    "Plan 1899",
+                    "Plan 2099",
+                    "Plan 2599",
+                    "Plan 2699",
+                    "Others"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -10705,7 +12053,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -10720,7 +12068,7 @@ function createIntentBasedForm() {
 
             const li9 = document.createElement("li");
             li9.textContent = "Customer was requesting for the upgrade of service into plan 1499.";
-            
+
             const li2 = document.createElement("li");
             li2.textContent = "Customer was requesting for the upgrade of service into plan 1599.";
 
@@ -10804,7 +12152,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -10821,9 +12169,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -10841,7 +12189,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -10884,29 +12232,33 @@ function createIntentBasedForm() {
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
-    } else if (selectedValue === "formReqVAS") { 
+    } else if (selectedValue === "formReqVAS") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "",
-                "Always On",
-                "Cignal/IPTV",
-                "MyOwnWifi",
-                "Speed Add On",
-                "Speed Alignment",
-                "Wifi Mesh",
-                "Others"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Always On",
+                    "Cignal/IPTV",
+                    "MyOwnWifi",
+                    "Speed Add On",
+                    "Speed Alignment",
+                    "Wifi Mesh",
+                    "Others"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -10947,7 +12299,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -10977,7 +12329,7 @@ function createIntentBasedForm() {
 
             const li7 = document.createElement("li");
             li7.textContent = "Customer requesting for the other VAS add-on on the account";
-            
+
             if (requestType === "Always On") {
                 ul.appendChild(li1);
             } else if (requestType === "Cignal/IPTV") {
@@ -11057,7 +12409,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -11074,9 +12426,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -11094,7 +12446,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -11137,24 +12489,28 @@ function createIntentBasedForm() {
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
 
-    } else if (selectedValue === "formReqWireReroute") { 
+    } else if (selectedValue === "formReqWireReroute") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Re-Routing Inside Wire",
-                "Re-Routing Outside Wire"
-            ] },
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO", type: "text", name: "srNum"},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Re-Routing Inside Wire",
+                    "Re-Routing Outside Wire"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -11195,7 +12551,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const checklistDiv = document.createElement("div");
-            checklistDiv.className = "form2DivPrompt"; 
+            checklistDiv.className = "form2DivPrompt";
 
             const reqHeader = document.createElement("p");
             reqHeader.textContent = "Request Type Description";
@@ -11207,7 +12563,7 @@ function createIntentBasedForm() {
 
             const li1 = document.createElement("li");
             li1.textContent = "Customer request for rerouting or relocation of inside wiring.";
-            
+
 
             const li2 = document.createElement("li");
             li2.textContent = "Customer request for rerouting or relocation of outside wiring.";
@@ -11260,7 +12616,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -11277,9 +12633,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -11297,7 +12653,7 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
+
         table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
@@ -11343,12 +12699,12 @@ function createIntentBasedForm() {
     }
 
     // Non-Tech Complaints
-    else if (selectedValue === "formCompMyHomeWeb") { 
+    else if (selectedValue === "formCompMyHomeWeb") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -11377,7 +12733,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -11394,9 +12750,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -11442,16 +12798,18 @@ function createIntentBasedForm() {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
             { label: "Ownership", type: "select", name: "ownership", options: ["", "SOR", "Non-SOR"] },
             { label: "Misapplied Payment due to", type: "select", name: "findings", options: ["", "Wrong Account Number", "Wrong Biller"] },
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -11490,9 +12848,9 @@ function createIntentBasedForm() {
 
             const nestedUl = document.createElement("ul");
             ["CFSI - collection receipt provided by the CFSI tellers, machine-validated", "Banks - A payment slip with machine validation", "Online - A payment confirmation email", "ATM - A copy of the ATM payment slip"].forEach(text => {
-            const li = document.createElement("li");
-            li.textContent = text;
-            nestedUl.appendChild(li);
+                const li = document.createElement("li");
+                li.textContent = text;
+                nestedUl.appendChild(li);
             });
             li2.appendChild(nestedUl);
 
@@ -11504,9 +12862,9 @@ function createIntentBasedForm() {
 
             const nestedUl2 = document.createElement("ul");
             ["Account Number or SO Number", "E-wallet (MAYA or GCASH)", "E-wallet No.", "E-wallet Name"].forEach(text => {
-            const li = document.createElement("li");
-            li.textContent = text;
-            nestedUl2.appendChild(li);
+                const li = document.createElement("li");
+                li.textContent = text;
+                nestedUl2.appendChild(li);
             });
             li4.appendChild(nestedUl2);
 
@@ -11542,11 +12900,11 @@ function createIntentBasedForm() {
         function updateChecklist() {
             const existingChecklist = document.querySelector(".form2DivPrompt")?.parentElement?.parentElement;
             if (existingChecklist) {
-            existingChecklist.remove();
+                existingChecklist.remove();
             }
             const checklistRow = createPromptRow();
             if (ownershipRow && ownershipRow.parentNode) {
-            ownershipRow.parentNode.insertBefore(checklistRow, ownershipRow.nextSibling);
+                ownershipRow.parentNode.insertBefore(checklistRow, ownershipRow.nextSibling);
             }
         }
 
@@ -11578,9 +12936,9 @@ function createIntentBasedForm() {
                     option.value = optionText;
                     option.textContent = optionText;
                     if (index === 0) {
-                    option.disabled = true;
-                    option.selected = true;
-                    option.style.fontStyle = "italic";
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
                     }
                     input.appendChild(option);
                 });
@@ -11608,7 +12966,7 @@ function createIntentBasedForm() {
             const row = createFieldRow(field);
             table.appendChild(row);
             if (field.name === "findings") {
-            ownershipRow = row;
+                ownershipRow = row;
             }
         });
 
@@ -11620,7 +12978,7 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
-        
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
@@ -11630,17 +12988,19 @@ function createIntentBasedForm() {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
             { label: "Ownership", type: "select", name: "ownership", options: ["", "SOR", "Non-SOR"] },
             { label: "Payment Channel", type: "select", name: "paymentChannel", options: ["", "BDO", "GCash", "Paymaya", "Others"] },
-            { label: "Other Payment Channel", type: "text", name: "otherPaymentChannel"},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Other Payment Channel", type: "text", name: "otherPaymentChannel" },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -11679,9 +13039,9 @@ function createIntentBasedForm() {
 
             const nestedUl = document.createElement("ul");
             ["Make sure copy is clear and readable indicating account number, payment amount and date of payment", "If POP is invalid (no account number, no payment amount & date reflected), refrain from creating payment dispute. Please advise customer to raise concern to GCash as well."].forEach(text => {
-            const li = document.createElement("li");
-            li.textContent = text;
-            nestedUl.appendChild(li);
+                const li = document.createElement("li");
+                li.textContent = text;
+                nestedUl.appendChild(li);
             });
             li2.appendChild(nestedUl);
 
@@ -11690,9 +13050,9 @@ function createIntentBasedForm() {
 
             const nestedUl2 = document.createElement("ul");
             ["Make sure copy is clear and readable indicating account number, payment amount and date of payment"].forEach(text => {
-            const li = document.createElement("li");
-            li.textContent = text;
-            nestedUl2.appendChild(li);
+                const li = document.createElement("li");
+                li.textContent = text;
+                nestedUl2.appendChild(li);
             });
             li3.appendChild(nestedUl2);
 
@@ -11731,11 +13091,11 @@ function createIntentBasedForm() {
         function updateChecklist() {
             const existingChecklist = document.querySelector(".form2DivPrompt")?.parentElement?.parentElement;
             if (existingChecklist) {
-            existingChecklist.remove();
+                existingChecklist.remove();
             }
             const checklistRow = createPromptRow();
             if (ownershipRow && ownershipRow.parentNode) {
-            ownershipRow.parentNode.insertBefore(checklistRow, ownershipRow.nextSibling);
+                ownershipRow.parentNode.insertBefore(checklistRow, ownershipRow.nextSibling);
             }
         }
 
@@ -11767,9 +13127,9 @@ function createIntentBasedForm() {
                     option.value = optionText;
                     option.textContent = optionText;
                     if (index === 0) {
-                    option.disabled = true;
-                    option.selected = true;
-                    option.style.fontStyle = "italic";
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
                     }
                     input.appendChild(option);
                 });
@@ -11803,7 +13163,7 @@ function createIntentBasedForm() {
             const row = createFieldRow(field);
             table.appendChild(row);
             if (field.name === "paymentChannel") {
-            ownershipRow = row;
+                ownershipRow = row;
             }
         });
 
@@ -11830,23 +13190,25 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-    
+
     } else if (selectedValue === "formCompPersonnelIssue") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Personnel Being Reported", type: "select", name: "personnelType", options: [
-                "", 
-                "Delivery Courier Service", 
-                "Hotline Agent",
-                "Sales Agent",
-                "Social Media Agent",
-                "SSC Personnel",
-                "Technician",
-                "Telesales"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Personnel Being Reported", type: "select", name: "personnelType", options: [
+                    "",
+                    "Delivery Courier Service",
+                    "Hotline Agent",
+                    "Sales Agent",
+                    "Social Media Agent",
+                    "SSC Personnel",
+                    "Technician",
+                    "Telesales"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -11929,9 +13291,9 @@ function createIntentBasedForm() {
                     option.value = optionText;
                     option.textContent = optionText;
                     if (index === 0) {
-                    option.disabled = true;
-                    option.selected = true;
-                    option.style.fontStyle = "italic";
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
                     }
                     input.appendChild(option);
                 });
@@ -11978,27 +13340,29 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
-    
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-    } 
+    }
 
     // Non-Tech Inquiry
-    else if (inquiryForms.includes(selectedValue)) { 
+    else if (inquiryForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -12013,7 +13377,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const descriptionDiv = document.createElement("div");
-            descriptionDiv.className = "form2DivDefinition"; 
+            descriptionDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -12124,7 +13488,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -12141,9 +13505,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -12194,23 +13558,27 @@ function createIntentBasedForm() {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Bill Interpretation for", type: "select", name: "subType", options: [
-                "", 
-                "Add On Service", 
-                "New Connect",
-                "Relocation",
-                "Upgrade",
-                "Downgrade",
-                "Migration"
-            ]},
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            {
+                label: "Bill Interpretation for", type: "select", name: "subType", options: [
+                    "",
+                    "Add On Service",
+                    "New Connect",
+                    "Relocation",
+                    "Upgrade",
+                    "Downgrade",
+                    "Migration"
+                ]
+            },
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -12227,7 +13595,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivDefinition"; 
+            instructionsDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -12335,7 +13703,7 @@ function createIntentBasedForm() {
         form2Container.appendChild(buttonTable);
 
         hideSpecificFields(["productsOffered", "offerAccepted", "declineReason", "notEligibleReason"]);
-    
+
         const eligibleForUpsell = document.querySelector("[name='eligibleForUpsell']");
         eligibleForUpsell.addEventListener("change", () => handleEligibleForUpsellChange(eligibleForUpsell));
 
@@ -12346,15 +13714,17 @@ function createIntentBasedForm() {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
             { label: "Ownership", type: "select", name: "ownership", options: ["", "SOR", "Non-SOR"] },
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -12369,7 +13739,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivDefinition"; 
+            instructionsDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -12478,9 +13848,9 @@ function createIntentBasedForm() {
                     option.value = optionText;
                     option.textContent = optionText;
                     if (index === 0) {
-                    option.disabled = true;
-                    option.selected = true;
-                    option.style.fontStyle = "italic";
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
                     }
                     input.appendChild(option);
                 });
@@ -12530,31 +13900,35 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-    
+
     } else if (selectedValue === "formInqOutsBal") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Outstanding Balance for", type: "select", name: "subType", options: [
-                "", 
-                "Downgrade Fee", 
-                "Existing Customer",
-                "Modem & Installation Fee",
-                "New Connect",
-                "Payment Adjustment",
-                "Rebate",
-                "Refund",
-                "SCC (Transfer fee, Reroute, Change Unit)",
-                
-            ]},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Outstanding Balance for", type: "select", name: "subType", options: [
+                    "",
+                    "Downgrade Fee",
+                    "Existing Customer",
+                    "Modem & Installation Fee",
+                    "New Connect",
+                    "Payment Adjustment",
+                    "Rebate",
+                    "Refund",
+                    "SCC (Transfer fee, Reroute, Change Unit)",
+
+                ]
+            },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -12571,7 +13945,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivDefinition"; 
+            instructionsDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -12638,9 +14012,9 @@ function createIntentBasedForm() {
                     option.value = optionText;
                     option.textContent = optionText;
                     if (index === 0) {
-                    option.disabled = true;
-                    option.selected = true;
-                    option.style.fontStyle = "italic";
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
                     }
                     input.appendChild(option);
                 });
@@ -12687,26 +14061,30 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-    
+
     } else if (selectedValue === "formInqRefund") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Refund Inquiry Type", type: "select", name: "subType", options: [
-                "", 
-                "Proactive AMSF (New Connect)", 
-                "Reactive Final Account",
-                "Reactive Overpayment",
-                "Reactive Wrong Biller"
-            ]},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Refund Inquiry Type", type: "select", name: "subType", options: [
+                    "",
+                    "Proactive AMSF (New Connect)",
+                    "Reactive Final Account",
+                    "Reactive Overpayment",
+                    "Reactive Wrong Biller"
+                ]
+            },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -12723,7 +14101,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivDefinition"; 
+            instructionsDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -12786,9 +14164,9 @@ function createIntentBasedForm() {
                     option.value = optionText;
                     option.textContent = optionText;
                     if (index === 0) {
-                    option.disabled = true;
-                    option.selected = true;
-                    option.style.fontStyle = "italic";
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
                     }
                     input.appendChild(option);
                 });
@@ -12835,50 +14213,64 @@ function createIntentBasedForm() {
 
         const offerAccepted = document.querySelector("[name='offerAccepted']");
         offerAccepted.addEventListener("change", () => handleUpsellDeclinedChange(offerAccepted));
-    
+
     }
 
     // Non-Tech Follow-Up
-    if (ffupForms.includes(selectedValue)) { 
+    if (ffupForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                ""
-            ] },
-            { label: "Dispute Type", type: "select", name: "disputeType", options: [
-                "", 
-                "Rebate Non Service", 
-                "Rentals",
-                "Usage",
-                "Usage MSF"
-            ]},
-            { label: "Approver", type: "select", name: "approver", options: [
-                ""
-            ]},
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Ownership", type: "select", name: "ownership", options: [
-                "", 
-                "SOR", 
-                "Non-SOR"
-            ]},
-            { label: "Customer Authentication", type: "select", name: "custAuth", options: [
-                "", 
-                "Failed", 
-                "Passed",
-                "NA"
-            ]},
-            { label: "Status", type: "select", name: "ffupStatus", options: [
-                "", 
-                "Beyond SLA", 
-                "Within SLA"
-            ]},
-            { label: "Findings", type: "select", name: "findings", options: [
-                ""
-            ] },
-            { label: "VAS Product", type: "text", name: "vasProduct"},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "SO/SR #", type: "text", name: "srNum"},
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    ""
+                ]
+            },
+            {
+                label: "Dispute Type", type: "select", name: "disputeType", options: [
+                    "",
+                    "Rebate Non Service",
+                    "Rentals",
+                    "Usage",
+                    "Usage MSF"
+                ]
+            },
+            {
+                label: "Approver", type: "select", name: "approver", options: [
+                    ""
+                ]
+            },
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            {
+                label: "Ownership", type: "select", name: "ownership", options: [
+                    "",
+                    "SOR",
+                    "Non-SOR"
+                ]
+            },
+            {
+                label: "Customer Authentication", type: "select", name: "custAuth", options: [
+                    "",
+                    "Failed",
+                    "Passed",
+                    "NA"
+                ]
+            },
+            {
+                label: "Status", type: "select", name: "ffupStatus", options: [
+                    "",
+                    "Beyond SLA",
+                    "Within SLA"
+                ]
+            },
+            {
+                label: "Findings", type: "select", name: "findings", options: [
+                    ""
+                ]
+            },
+            { label: "VAS Product", type: "text", name: "vasProduct" },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO/SR #", type: "text", name: "srNum" },
             { label: "Issue Resolved? (Y/N)", type: "select", name: "issueResolved", options: IR_OPTIONS.issueResolved },
             // Cross-Sell/Upsell
             { label: "Eligible for Cross/Upsell?", type: "select", name: "eligibleForUpsell", options: UPSELL_OPTIONS.eligibleForUpsell },
@@ -12893,7 +14285,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const descriptionDiv = document.createElement("div");
-            descriptionDiv.className = "form2DivDefinition"; 
+            descriptionDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -12955,7 +14347,7 @@ function createIntentBasedForm() {
                     li.textContent = definition.main;
 
                     const subUl = document.createElement("ul");
-                    subUl.className = "checklist-sub"; 
+                    subUl.className = "checklist-sub";
 
                     definition.sub.forEach(subItem => {
                         const subLi = document.createElement("li");
@@ -13082,8 +14474,8 @@ function createIntentBasedForm() {
         const reqTypeSelect = document.querySelector('select[name="requestType"]');
         const reqTypeOptions = [
             "",
-            "Activation", 
-            "Deactivation", 
+            "Activation",
+            "Deactivation",
             "Supersedure retain Account number",
             "Supersedure with change account number"
         ];
@@ -13132,8 +14524,8 @@ function createIntentBasedForm() {
         const approverSelect = document.querySelector('select[name="approver"]');
 
         const allApproverOptions = [
-            "", 
-            "Account Admin", 
+            "",
+            "Account Admin",
             "Agent (P0-P1,000)",
             "Cust TL (P1,001-P2,000)",
             "Cust Sup (P2,001 and Up)",
@@ -13176,17 +14568,17 @@ function createIntentBasedForm() {
         const findingsSelect = document.querySelector('select[name="findings"]');
         const allFindingsOptions = [
             "",
-            "Activation", 
-            "Activation Task", 
+            "Activation",
+            "Activation Task",
             "Activation Task (DTS)",
             "CCAM (Processing)",
             "DeActivation Task",
-            "No SO Generated", 
+            "No SO Generated",
             "No SO Generated (DTS)",
             "Opsim",
-            "PMA", 
-            "RSO Customer", 
-            "RSO PLDT", 
+            "PMA",
+            "RSO Customer",
+            "RSO PLDT",
             "System Task / Stuck SO",
             "System Task / Stuck SO (DTS)",
             "Tech Repair - Data"
@@ -13329,12 +14721,12 @@ function createIntentBasedForm() {
     }
 
     // Others
-    else if (othersForms.includes(selectedValue)) { 
+    else if (othersForms.includes(selectedValue)) {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
         ];
 
         function createDefinitionRow() {
@@ -13342,7 +14734,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const descriptionDiv = document.createElement("div");
-            descriptionDiv.className = "form2DivDefinition"; 
+            descriptionDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -13394,7 +14786,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -13411,9 +14803,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -13452,22 +14844,24 @@ function createIntentBasedForm() {
         const buttonTable = createButtons(buttonLabels, buttonHandlers);
         form2Container.appendChild(buttonTable);
 
-    } else if (selectedValue === "othersToolsDown") { 
+    } else if (selectedValue === "othersToolsDown") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Affected Tool", type: "select", name: "affectedTool", options: [
-                "", 
-                "Clarity/CEP", 
-                "CSP",
-                "FUSE",
-                "Kenan",
-                "Other PLDT tools"
-            ]},
-            { label: "Specify Other PLDT Tool", type: "text", name: "otherTool"},
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "E-Solve/Snow Ticket #", type: "text", name: "eSnowTicketNum"},
+            {
+                label: "Affected Tool", type: "select", name: "affectedTool", options: [
+                    "",
+                    "Clarity/CEP",
+                    "CSP",
+                    "FUSE",
+                    "Kenan",
+                    "Other PLDT tools"
+                ]
+            },
+            { label: "Specify Other PLDT Tool", type: "text", name: "otherTool" },
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "E-Solve/Snow Ticket #", type: "text", name: "eSnowTicketNum" },
         ];
 
         function createDefinitionRow() {
@@ -13475,7 +14869,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivDefinition"; 
+            instructionsDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -13527,7 +14921,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -13544,9 +14938,9 @@ function createIntentBasedForm() {
                 input = document.createElement("textarea");
                 input.name = field.name;
                 input.className = "form2-textarea";
-                input.rows = (field.name === "remarks") 
-                        ? 6 
-                        : 2;
+                input.rows = (field.name === "remarks")
+                    ? 6
+                    : 2;
                 if (field.placeholder) input.placeholder = field.placeholder;
             } else {
                 input = document.createElement("input");
@@ -13568,8 +14962,8 @@ function createIntentBasedForm() {
 
             return row;
         }
-        
-        table.appendChild(createDefinitionRow()); 
+
+        table.appendChild(createDefinitionRow());
         fields.forEach((field, index) => {
             const row = createFieldRow(field);
             table.appendChild(row);
@@ -13596,55 +14990,57 @@ function createIntentBasedForm() {
             }
         });
 
-    } else if (selectedValue === "others164") { 
+    } else if (selectedValue === "others164") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern."},
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
+            { label: "Concern", type: "textarea", name: "custConcern", placeholder: "Please input short description of the concern." },
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. Avoid using generic notations such as “ACK CX”,“PROVIDE EMPATHY”, “CONDUCT VA”, or “CONDUCT BTS”. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
             // Endorsement  to TL or SME using this template
-            { label: "Telephone Number", type: "text", name: "telNum164"},
-            { label: "Customer/Caller Name", type: "text", name: "callerName"},
-            { label: "Contact Person", type: "text", name: "contactName"},
-            { label: "Contact Number", type: "number", name: "cbr"},
-            { label: "Active Email Address", type: "text", name: "emailAdd"},
-            { label: "Address/Landmarks", type: "textarea", name: "address"},
-            { label: "Concern", type: "select", name: "concern164", options: [
-                "", 
-                "Broken Manhole Cover", 
-                "Broken Pole", 
-                "Cut Cable", 
-                "Cut Pole", 
-                "Damaged Conduit Pipe", 
-                "Dangling Wire", 
-                "Detached Alley Arm", 
-                "Detached Protector Box", 
-                "Detached Terminal Box/DP Box", 
-                "Down Cable", 
-                "Down Pole", 
-                "Down Wire", 
-                "Hanging Alley Arm", 
-                "Hanging Pole Attachment", 
-                "Leaning Pole", 
-                "Missing Manhole Cover", 
-                "Open Cabinet Box", 
-                "Open Manhole", 
-                "Open Protector Box", 
-                "Open Terminal Box/DP Box", 
-                "Relocation of Cabinet Box", 
-                "Relocation of Guywire", 
-                "Relocation of Pole", 
-                "Removal of Cabinet Box", 
-                "Removal of Guywire", 
-                "Removal of Idle Wires", 
-                "Removal of Pole", 
-                "Rotten Pole", 
-                "Sagging Cable", 
-                "Sagging Wire", 
-                "Stolen Cable", 
-                "Stolen Electric Meter", 
-                "Transferring of Pole Attachment"
-            ] },
+            { label: "Telephone Number", type: "text", name: "telNum164" },
+            { label: "Customer/Caller Name", type: "text", name: "callerName" },
+            { label: "Contact Person", type: "text", name: "contactName" },
+            { label: "Contact Number", type: "number", name: "cbr" },
+            { label: "Active Email Address", type: "text", name: "emailAdd" },
+            { label: "Address/Landmarks", type: "textarea", name: "address" },
+            {
+                label: "Concern", type: "select", name: "concern164", options: [
+                    "",
+                    "Broken Manhole Cover",
+                    "Broken Pole",
+                    "Cut Cable",
+                    "Cut Pole",
+                    "Damaged Conduit Pipe",
+                    "Dangling Wire",
+                    "Detached Alley Arm",
+                    "Detached Protector Box",
+                    "Detached Terminal Box/DP Box",
+                    "Down Cable",
+                    "Down Pole",
+                    "Down Wire",
+                    "Hanging Alley Arm",
+                    "Hanging Pole Attachment",
+                    "Leaning Pole",
+                    "Missing Manhole Cover",
+                    "Open Cabinet Box",
+                    "Open Manhole",
+                    "Open Protector Box",
+                    "Open Terminal Box/DP Box",
+                    "Relocation of Cabinet Box",
+                    "Relocation of Guywire",
+                    "Relocation of Pole",
+                    "Removal of Cabinet Box",
+                    "Removal of Guywire",
+                    "Removal of Idle Wires",
+                    "Removal of Pole",
+                    "Rotten Pole",
+                    "Sagging Cable",
+                    "Sagging Wire",
+                    "Stolen Cable",
+                    "Stolen Electric Meter",
+                    "Transferring of Pole Attachment"
+                ]
+            },
         ];
 
         function createInstructionsRow() {
@@ -13652,7 +15048,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivInstructions"; 
+            instructionsDiv.className = "form2DivInstructions";
 
             const header = document.createElement("p");
             header.textContent = "Reference Link";
@@ -13696,7 +15092,7 @@ function createIntentBasedForm() {
             const td = document.createElement("td");
 
             const instructionsDiv = document.createElement("div");
-            instructionsDiv.className = "form2DivDefinition"; 
+            instructionsDiv.className = "form2DivDefinition";
 
             const header = document.createElement("p");
             header.textContent = "Definition";
@@ -13764,10 +15160,10 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                if (field.name === "onuRunStats") {
+                if (field.name === "nmsOnuStats") {
                     input.id = field.name;
                 }
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -13803,7 +15199,7 @@ function createIntentBasedForm() {
             return row;
         }
 
-        table.appendChild(createInstructionsRow()); 
+        table.appendChild(createInstructionsRow());
         table.appendChild(createDefinitionRow());
         enhancedFields.forEach(field => {
             const row = createFieldRow(field);
@@ -13843,79 +15239,97 @@ function createIntentBasedForm() {
     // ============================================== //
 
     // Non-Tech Intents
-    else if (selectedValue === "ccbo_formReqBillAdjust" || selectedValue === "ccbo_formFfupBillAdjust") { 
+    else if (selectedValue === "ccbo_formReqBillAdjust" || selectedValue === "ccbo_formFfupBillAdjust") {
         const table = document.createElement("table");
 
         const fields = [
-            { label: "Callout Attempt", type: "select", name: "calloutAttempt", options: [
-                "", 
-                "1st", 
-                "2nd",
-                "NA - Happy Path",
-                "NA - Complete Requirements"
-            ]},
-            { label: "Type of Request", type: "select", name: "requestType", options: [
-                "", 
-                "Rebate Non Service",
-                "Rentals - MSF",
-                "Rentals - Lionsgate play/Netflix",
-                "Rentals - NRC- Cost of Unit/Gadgets",
-                "Rentals- Service Connection Charge",
-                "Usage - Tolls (UnliFam Call)",
-                "Usage - Other Tolls",
-                "Others"
-            ] },
-            { label: "Other Concern", type: "text", name: "othersConcern", placeholder: "Describe the customer's concern."},
-            { label: "Request Status", type: "select", name: "ffupStatus", options: [
-                "", 
-                "Beyond SLA", 
-                "Within SLA"
-            ]},
+            {
+                label: "Callout Attempt", type: "select", name: "calloutAttempt", options: [
+                    "",
+                    "1st",
+                    "2nd",
+                    "NA - Happy Path",
+                    "NA - Complete Requirements"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Rebate Non Service",
+                    "Rentals - MSF",
+                    "Rentals - Lionsgate play/Netflix",
+                    "Rentals - NRC- Cost of Unit/Gadgets",
+                    "Rentals- Service Connection Charge",
+                    "Usage - Tolls (UnliFam Call)",
+                    "Usage - Other Tolls",
+                    "Others"
+                ]
+            },
+            { label: "Other Concern", type: "text", name: "othersConcern", placeholder: "Describe the customer's concern." },
+            {
+                label: "Request Status", type: "select", name: "ffupStatus", options: [
+                    "",
+                    "Beyond SLA",
+                    "Within SLA"
+                ]
+            },
             // Actions Taken & Other Details
-            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency."},
-            { label: "CASIO Notes", type: "textarea", name: "casio"},
-            { label: "SO/SR", type: "text", name: "srNum"},
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "CASIO Notes", type: "textarea", name: "casio" },
+            { label: "SO/SR", type: "text", name: "srNum" },
             // Callout Details - Primary
-            { label: "Primary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails1", placeholder: "Copy all and paste here."},
-            { label: "Result", type: "select", name: "outboundResult1", options: [
-                "", 
-                "Answered",
-                "No Answer",
-                "Unattended"
-            ] },
+            { label: "Primary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails1", placeholder: "Copy all and paste here." },
+            {
+                label: "Result", type: "select", name: "outboundResult1", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
             // Secondary
-            { label: "Same w/ Primary #?", type: "select", name: "checkSecondaryNum", options: [
-                "", 
-                "Yes",
-                "No"
-            ] },
-            { label: "Secondary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails2", placeholder: "Copy all and paste here"},
-            { label: "Result", type: "select", name: "outboundResult2", options: [
-                "", 
-                "Answered",
-                "No Answer",
-                "Unattended"
-            ] },
+            {
+                label: "Same w/ Primary #?", type: "select", name: "checkSecondaryNum", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
+            { label: "Secondary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails2", placeholder: "Copy all and paste here" },
+            {
+                label: "Result", type: "select", name: "outboundResult2", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
             // Landline
-            { label: "Landline Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails3", placeholder: "Copy all and paste here."},
-            { label: "Result", type: "select", name: "outboundResult3", options: [
-                "", 
-                "Answered",
-                "No Answer",
-                "Unattended"
-            ] },
-            { label: "SMS Sent? Y/N", type: "select", name: "smsSent", options: [
-                "", 
-                "Yes",
-                "No"
-            ] },
-            { label: "Case Status", type: "select", name: "caseStatus", options: [
-                "", 
-                "Closed Engage",
-                "Closed - Escalated",
-                "Closed - Resolved",
-                "Manage"
-            ] },
+            { label: "Landline Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails3", placeholder: "Copy all and paste here." },
+            {
+                label: "Result", type: "select", name: "outboundResult3", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
+            {
+                label: "SMS Sent? Y/N", type: "select", name: "smsSent", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
+            {
+                label: "Case Status", type: "select", name: "caseStatus", options: [
+                    "",
+                    "Closed Engage",
+                    "Closed - Escalated",
+                    "Closed - Resolved",
+                    "Manage"
+                ]
+            },
         ];
 
         function createDefinitionRow() {
@@ -13952,7 +15366,7 @@ function createIntentBasedForm() {
 
         function createFieldRow(field) {
             const row = document.createElement("tr");
-            row.style.display = field.name === "calloutAttempt" ? "table-row" : "none"; 
+            row.style.display = field.name === "calloutAttempt" ? "table-row" : "none";
 
             const td = document.createElement("td");
             const divInput = document.createElement("div");
@@ -13983,7 +15397,7 @@ function createIntentBasedForm() {
                 input = document.createElement("select");
                 input.name = field.name;
                 input.className = "form2-input";
-                field.options.forEach((optionText, index)=> {
+                field.options.forEach((optionText, index) => {
                     const option = document.createElement("option");
                     option.value = optionText;
                     option.textContent = optionText;
@@ -14038,7 +15452,322 @@ function createIntentBasedForm() {
         insertToolLabel(enhancedFields, "Secondary Contact", "checkSecondaryNum");
         insertToolLabel(enhancedFields, "Landline", "cosmoDetails3");
         insertToolLabel(enhancedFields, "Actions Taken & Other Details", "remarks");
-        
+
+        table.appendChild(createDefinitionRow());
+
+        enhancedFields.forEach((field) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+        });
+
+        function updateToolLabelVisibility() {
+            const allToolLabels = document.querySelectorAll(".tool-label-row");
+            allToolLabels.forEach(labelRow => {
+                const relatedName = labelRow.dataset.relatedTo;
+                const relatedInput = document.querySelector(`[name="${relatedName}"]`);
+                if (relatedInput) {
+                    const relatedRow = relatedInput.closest("tr");
+                    labelRow.style.display = (relatedRow && relatedRow.style.display !== "none") ? "table-row" : "none";
+                }
+            });
+        }
+
+        form2Container.appendChild(table);
+
+        const calloutAttempt = document.querySelector("[name='calloutAttempt']");
+        calloutAttempt.addEventListener("change", () => {
+            resetAllFields(["calloutAttempt"]);
+            if (calloutAttempt.selectedIndex === 1) {
+                showFields(["remarks", "srNum", "cosmoDetails1", "outboundResult1", "smsSent", "caseStatus"]);
+                if (selectedValue === "ccbo_formFfupBillAdjust") {
+                    showFields(["ffupStatus"]);
+                    hideSpecificFields(["requestType", "casio"]);
+                } else {
+                    showFields(["requestType", "casio"]);
+                    hideSpecificFields(["ffupStatus"]);
+                }
+                hideSpecificFields(["checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            } else if (calloutAttempt.selectedIndex === 2) {
+                showFields(["cosmoDetails1", "outboundResult1", "remarks", "smsSent", "caseStatus"]);
+                hideSpecificFields(["requestType", "ffupStatus", "casio", "srNum", "checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            } else {
+                showFields(["requestType", "srNum", "remarks", "smsSent", "caseStatus"]);
+                if (selectedValue === "ccbo_formFfupBillAdjust") {
+                    showFields(["ffupStatus"]);
+                    hideSpecificFields(["requestType", "casio"])
+                } else {
+                    showFields(["requestType", "casio"]);
+                    hideSpecificFields(["ffupStatus"]);
+                }
+                hideSpecificFields(["cosmoDetails1", "outboundResult1", "checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            }
+            updateToolLabelVisibility();
+            renderButtons();
+        });
+
+        const requestType = document.querySelector("[name='requestType']");
+        requestType.addEventListener("change", () => {
+            if (requestType.value === "Others") {
+                showFields(["othersConcern"]);
+            } else {
+                hideSpecificFields(["othersConcern"]);
+            }
+        });
+
+        const outboundResult1 = document.querySelector("[name='outboundResult1']");
+        if (outboundResult1) {
+            outboundResult1.addEventListener("change", () => {
+                if (outboundResult1.selectedIndex === 2 || outboundResult1.selectedIndex === 3) {
+                    showFields(["checkSecondaryNum"]);
+                } else {
+                    hideSpecificFields(["checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        const checkSecondaryNum = document.querySelector("[name='checkSecondaryNum']");
+        if (checkSecondaryNum) {
+            checkSecondaryNum.addEventListener("change", () => {
+                if (checkSecondaryNum.selectedIndex === 2) {
+                    showFields(["cosmoDetails2", "outboundResult2"]);
+                    hideSpecificFields(["cosmoDetails3", "outboundResult3"]);
+                } else {
+                    showFields(["cosmoDetails3", "outboundResult3"]);
+                    hideSpecificFields(["cosmoDetails2", "outboundResult2"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        const outboundResult2 = document.querySelector("[name='outboundResult2']");
+        if (outboundResult2) {
+            outboundResult2.addEventListener("change", () => {
+                if (outboundResult2.selectedIndex === 2 || outboundResult2.selectedIndex === 3) {
+                    showFields(["cosmoDetails3", "outboundResult3"]);
+                } else {
+                    hideSpecificFields(["cosmoDetails3", "outboundResult3"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        updateToolLabelVisibility();
+    } else if (selectedValue === "ccbo_formInqBill") {
+        const table = document.createElement("table");
+
+        const fields = [
+            {
+                label: "Callout Attempt", type: "select", name: "calloutAttempt", options: [
+                    "",
+                    "1st",
+                    "2nd",
+                    "NA - Happy Path",
+                    "NA - Complete Requirements"
+                ]
+            },
+            {
+                label: "Type of Inquiry", type: "select", name: "requestType", options: [
+                    "",
+                    "Account Balance",
+                    "Payment Details",
+                    "Payment Posting",
+                    "Others"
+                ]
+            },
+            {
+                label: "Account Balance for", type: "select", name: "subType", options: [
+                    "",
+                    "Downgrade Fee",
+                    "Existing Customer",
+                    "Modem & Installation Fee",
+                    "New Connect",
+                    "Payment Adjustment",
+                    "Rebate",
+                    "Refund",
+                    "SCC (Transfer fee, Reroute, Change Unit)",
+
+                ]
+            },
+            { label: "Other Concern", type: "text", name: "othersConcern", placeholder: "Describe the customer's concern." },
+            // Actions Taken & Other Details
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            // Callout Details - Primary
+            { label: "Primary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails1", placeholder: "Copy all and paste here." },
+            {
+                label: "Result", type: "select", name: "outboundResult1", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
+            // Secondary
+            {
+                label: "Same w/ Primary #?", type: "select", name: "checkSecondaryNum", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
+            { label: "Secondary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails2", placeholder: "Copy all and paste here" },
+            {
+                label: "Result", type: "select", name: "outboundResult2", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
+            // Landline
+            { label: "Landline Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails3", placeholder: "Copy all and paste here." },
+            {
+                label: "Result", type: "select", name: "outboundResult3", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
+            {
+                label: "SMS Sent? Y/N", type: "select", name: "smsSent", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
+            {
+                label: "Case Status", type: "select", name: "caseStatus", options: [
+                    "",
+                    "Closed Engage",
+                    "Closed - Escalated",
+                    "Closed - Resolved",
+                    "Manage"
+                ]
+            },
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Billing Inquiries on Payment Details, Payment Posting, and Account Balance.";
+            ul.appendChild(li);
+
+            // Work Instructions link
+            const linkLi = document.createElement("li");
+            linkLi.innerHTML = `See <a href="https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/CCBO_HANDLING_BILL_INQUIRY_VIA_WEB_FORM.aspx" target="_blank">Cust Care Back Office (CCBO) Handling Bill Inquiry Via Web Form</a> for detailed handling procedures and work instructions.`;
+            ul.appendChild(linkLi);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            row.style.display = field.name === "calloutAttempt" ? "table-row" : "none";
+
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "toolLabel") {
+                const row = document.createElement("tr");
+                row.className = "tool-label-row";
+                row.dataset.relatedTo = field.relatedTo;
+
+                const td = document.createElement("td");
+                const div = document.createElement("div");
+
+                div.className = "formToolLabel";
+                div.textContent = field.label.replace("// ", ""); // cleaner display
+
+                td.appendChild(div);
+                row.appendChild(td);
+
+                return row;
+            } else if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index) => {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = field.name === "remarks" ? 4 : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function insertToolLabel(fields, label, relatedFieldName) {
+            fields.splice(
+                fields.findIndex(f => f.name === relatedFieldName),
+                0,
+                {
+                    label: `// ${label}`,
+                    type: "toolLabel",
+                    name: `toolLabel-${label.toLowerCase().replace(/\s/g, "-")}`,
+                    relatedTo: relatedFieldName
+                }
+            );
+        }
+
+        const enhancedFields = [...fields];
+
+        insertToolLabel(enhancedFields, "Primary Contact", "cosmoDetails1");
+        insertToolLabel(enhancedFields, "Secondary Contact", "checkSecondaryNum");
+        insertToolLabel(enhancedFields, "Landline", "cosmoDetails3");
+        insertToolLabel(enhancedFields, "Actions Taken & Other Details", "remarks");
+
         table.appendChild(createDefinitionRow());
 
         enhancedFields.forEach((field) => {
@@ -14065,26 +15794,12 @@ function createIntentBasedForm() {
             resetAllFields(["calloutAttempt"]);
             if (calloutAttempt.selectedIndex === 1) {
                 showFields(["requestType", "remarks", "cosmoDetails1", "outboundResult1", "smsSent", "caseStatus"]);
-                if (selectedValue === "ccbo_formFfupBillAdjust") {
-                    showFields(["ffupStatus"]);
-                    hideSpecificFields(["casio", "srNum"]);
-                } else {
-                    showFields(["casio", "srNum"]);
-                    hideSpecificFields(["ffupStatus"]);
-                }
                 hideSpecificFields(["checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
             } else if (calloutAttempt.selectedIndex === 2) {
                 showFields(["cosmoDetails1", "outboundResult1", "remarks", "smsSent", "caseStatus"]);
                 hideSpecificFields(["requestType", "ffupStatus", "casio", "srNum", "checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
             } else {
                 showFields(["requestType", "remarks", "smsSent", "caseStatus"]);
-                if (selectedValue === "ccbo_formFfupBillAdjust") {
-                    showFields(["ffupStatus"]);
-                    hideSpecificFields(["casio", "srNum"])
-                } else {
-                    showFields(["casio", "srNum"]);
-                    hideSpecificFields(["ffupStatus"]);
-                }
                 hideSpecificFields(["cosmoDetails1", "outboundResult1", "checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
             }
             updateToolLabelVisibility();
@@ -14093,11 +15808,636 @@ function createIntentBasedForm() {
 
         const requestType = document.querySelector("[name='requestType']");
         requestType.addEventListener("change", () => {
-            if (requestType.value === "Others") {
-                showFields(["othersConcern"]);
-            } else {
+            resetAllFields(["calloutAttempt", "requestType"]);
+            if (requestType.selectedIndex === 1) {
+                showFields(["subType"]);
                 hideSpecificFields(["othersConcern"]);
+            } else if (requestType.selectedIndex === 4) {
+                showFields(["othersConcern"]);
+                hideSpecificFields(["subType"]);
+            } else {
+                hideSpecificFields(["subType", "othersConcern"]);
             }
+        });
+
+        const outboundResult1 = document.querySelector("[name='outboundResult1']");
+        if (outboundResult1) {
+            outboundResult1.addEventListener("change", () => {
+                if (outboundResult1.selectedIndex === 2 || outboundResult1.selectedIndex === 3) {
+                    showFields(["checkSecondaryNum"]);
+                } else {
+                    hideSpecificFields(["checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        const checkSecondaryNum = document.querySelector("[name='checkSecondaryNum']");
+        if (checkSecondaryNum) {
+            checkSecondaryNum.addEventListener("change", () => {
+                if (checkSecondaryNum.selectedIndex === 2) {
+                    showFields(["cosmoDetails2", "outboundResult2"]);
+                    hideSpecificFields(["cosmoDetails3", "outboundResult3"]);
+                } else {
+                    showFields(["cosmoDetails3", "outboundResult3"]);
+                    hideSpecificFields(["cosmoDetails2", "outboundResult2"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        const outboundResult2 = document.querySelector("[name='outboundResult2']");
+        if (outboundResult2) {
+            outboundResult2.addEventListener("change", () => {
+                if (outboundResult2.selectedIndex === 2 || outboundResult2.selectedIndex === 3) {
+                    showFields(["cosmoDetails3", "outboundResult3"]);
+                } else {
+                    hideSpecificFields(["cosmoDetails3", "outboundResult3"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        updateToolLabelVisibility();
+    } else if (selectedValue === "ccbo_formReqChangeOwnership" || selectedValue === "ccbo_formFfupChangeOwnership") {
+        const table = document.createElement("table");
+
+        const fields = [
+            {
+                label: "Callout Attempt", type: "select", name: "calloutAttempt", options: [
+                    "",
+                    "1st",
+                    "2nd",
+                    "NA - Happy Path",
+                    "NA - Complete Requirements"
+                ]
+            },
+            {
+                label: "Type of Request", type: "select", name: "requestType", options: [
+                    "",
+                    "Supersedure retain Account number",
+                    "Supersedure with change account number"
+                ]
+            },
+            {
+                label: "Sub-Type", type: "select", name: "subType", options: [
+                    "",
+                    "Straight or Plain Supersedure",
+                    "Supersedure with Clause"
+
+                ]
+            },
+            {
+                label: "Request Status", type: "select", name: "ffupStatus", options: [
+                    "",
+                    "Beyond SLA",
+                    "Within SLA"
+                ]
+            },
+            // Actions Taken & Other Details
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO/SR", type: "text", name: "srNum" },
+            // Callout Details - Primary
+            { label: "Primary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails1", placeholder: "Copy all and paste here." },
+            {
+                label: "Result", type: "select", name: "outboundResult1", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
+            // Secondary
+            {
+                label: "Same w/ Primary #?", type: "select", name: "checkSecondaryNum", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
+            { label: "Secondary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails2", placeholder: "Copy all and paste here" },
+            {
+                label: "Result", type: "select", name: "outboundResult2", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
+            // Landline
+            { label: "Landline Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails3", placeholder: "Copy all and paste here." },
+            {
+                label: "Result", type: "select", name: "outboundResult3", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
+            {
+                label: "SMS Sent? Y/N", type: "select", name: "smsSent", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
+            {
+                label: "Case Status", type: "select", name: "caseStatus", options: [
+                    "",
+                    "Closed Engage",
+                    "Closed - Escalated",
+                    "Closed - Resolved",
+                    "Manage"
+                ]
+            },
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests or follow-ups related to service relocation.";
+            ul.appendChild(li);
+
+            // Work Instructions link
+            const linkLi = document.createElement("li");
+            linkLi.innerHTML = `See <a href="https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/CCBO_GENUINE_SUPERSEDURE_REQUEST_VIA_WEBFORM.aspx" target="_blank">CCBO: Handling of Supersedure Requests via Webform</a> for detailed handling procedures and work instructions.`;
+            ul.appendChild(linkLi);
+
+            const promptHeader = document.createElement("p");
+            promptHeader.textContent = "Required Documents";
+            promptHeader.className = "checklist-header";
+
+            const promptList = document.createElement("ul");
+            promptList.className = "checklist";
+
+            const items = [
+                "Signed Affidavit Form by the incoming customer",
+                "Signed Service Request Form (SRF) & Subs Declaration ",
+                "LOA if the application/request is through an authorized representative ",
+                "Valid ID of incoming and outgoing customers"
+            ];
+
+            items.forEach(text => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                promptList.appendChild(li);
+            });
+
+            // Append everything in order
+            div.appendChild(header);
+            div.appendChild(ul);
+            div.appendChild(promptHeader);
+            div.appendChild(promptList);
+
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            row.style.display = field.name === "calloutAttempt" ? "table-row" : "none";
+
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "toolLabel") {
+                const row = document.createElement("tr");
+                row.className = "tool-label-row";
+                row.dataset.relatedTo = field.relatedTo;
+
+                const td = document.createElement("td");
+                const div = document.createElement("div");
+
+                div.className = "formToolLabel";
+                div.textContent = field.label.replace("// ", ""); // cleaner display
+
+                td.appendChild(div);
+                row.appendChild(td);
+
+                return row;
+            } else if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index) => {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = field.name === "remarks" ? 4 : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function insertToolLabel(fields, label, relatedFieldName) {
+            fields.splice(
+                fields.findIndex(f => f.name === relatedFieldName),
+                0,
+                {
+                    label: `// ${label}`,
+                    type: "toolLabel",
+                    name: `toolLabel-${label.toLowerCase().replace(/\s/g, "-")}`,
+                    relatedTo: relatedFieldName
+                }
+            );
+        }
+
+        const enhancedFields = [...fields];
+
+        insertToolLabel(enhancedFields, "Primary Contact", "cosmoDetails1");
+        insertToolLabel(enhancedFields, "Secondary Contact", "checkSecondaryNum");
+        insertToolLabel(enhancedFields, "Landline", "cosmoDetails3");
+        insertToolLabel(enhancedFields, "Actions Taken & Other Details", "remarks");
+
+        table.appendChild(createDefinitionRow());
+
+        enhancedFields.forEach((field) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+        });
+
+        function updateToolLabelVisibility() {
+            const allToolLabels = document.querySelectorAll(".tool-label-row");
+            allToolLabels.forEach(labelRow => {
+                const relatedName = labelRow.dataset.relatedTo;
+                const relatedInput = document.querySelector(`[name="${relatedName}"]`);
+                if (relatedInput) {
+                    const relatedRow = relatedInput.closest("tr");
+                    labelRow.style.display = (relatedRow && relatedRow.style.display !== "none") ? "table-row" : "none";
+                }
+            });
+        }
+
+        form2Container.appendChild(table);
+
+        const calloutAttempt = document.querySelector("[name='calloutAttempt']");
+        calloutAttempt.addEventListener("change", () => {
+            resetAllFields(["calloutAttempt"]);
+            if (calloutAttempt.selectedIndex === 1) {
+                showFields(["remarks", "srNum", "cosmoDetails1", "outboundResult1", "smsSent", "caseStatus"]);
+                if (selectedValue === "ccbo_formFfupChangeOwnership") {
+                    showFields(["ffupStatus"]);
+                    hideSpecificFields(["requestType", "subType"]);
+                } else {
+                    showFields(["requestType", "subType"]);
+                    hideSpecificFields(["ffupStatus"]);
+                }
+                hideSpecificFields(["checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            } else if (calloutAttempt.selectedIndex === 2) {
+                showFields(["cosmoDetails1", "outboundResult1", "remarks", "smsSent", "caseStatus"]);
+                hideSpecificFields(["requestType", "subType", "ffupStatus", "casio", "srNum", "checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            } else {
+                showFields(["remarks", "srNum", "cosmoDetails1", "outboundResult1", "smsSent", "caseStatus"]);
+                if (selectedValue === "ccbo_formFfupChangeOwnership") {
+                    showFields(["ffupStatus"]);
+                    hideSpecificFields(["requestType", "subType"]);
+                } else {
+                    showFields(["requestType", "subType"]);
+                    hideSpecificFields(["ffupStatus"]);
+                }
+                hideSpecificFields(["cosmoDetails1", "outboundResult1", "checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            }
+            updateToolLabelVisibility();
+            renderButtons();
+        });
+
+        const outboundResult1 = document.querySelector("[name='outboundResult1']");
+        if (outboundResult1) {
+            outboundResult1.addEventListener("change", () => {
+                if (outboundResult1.selectedIndex === 2 || outboundResult1.selectedIndex === 3) {
+                    showFields(["checkSecondaryNum"]);
+                } else {
+                    hideSpecificFields(["checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        const checkSecondaryNum = document.querySelector("[name='checkSecondaryNum']");
+        if (checkSecondaryNum) {
+            checkSecondaryNum.addEventListener("change", () => {
+                if (checkSecondaryNum.selectedIndex === 2) {
+                    showFields(["cosmoDetails2", "outboundResult2"]);
+                    hideSpecificFields(["cosmoDetails3", "outboundResult3"]);
+                } else {
+                    showFields(["cosmoDetails3", "outboundResult3"]);
+                    hideSpecificFields(["cosmoDetails2", "outboundResult2"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        const outboundResult2 = document.querySelector("[name='outboundResult2']");
+        if (outboundResult2) {
+            outboundResult2.addEventListener("change", () => {
+                if (outboundResult2.selectedIndex === 2 || outboundResult2.selectedIndex === 3) {
+                    showFields(["cosmoDetails3", "outboundResult3"]);
+                } else {
+                    hideSpecificFields(["cosmoDetails3", "outboundResult3"]);
+                }
+                updateToolLabelVisibility();
+            });
+        }
+
+        updateToolLabelVisibility();
+    } else if (selectedValue === "ccbo_formReqChangeTelNum" || selectedValue === "ccbo_formInqChangeTelNum" || selectedValue === "ccbo_formFfupChangeTelNum") {
+        const table = document.createElement("table");
+
+        const fields = [
+            {
+                label: "Callout Attempt", type: "select", name: "calloutAttempt", options: [
+                    "",
+                    "1st",
+                    "2nd",
+                    "NA - Happy Path",
+                    "NA - Complete Requirements"
+                ]
+            },
+            {
+                label: "Request Status", type: "select", name: "ffupStatus", options: [
+                    "",
+                    "Beyond SLA",
+                    "Within SLA"
+                ]
+            },
+            // Actions Taken & Other Details
+            { label: "Actions Taken/ Remarks", type: "textarea", name: "remarks", placeholder: "Please input all actions taken, details/information shared, or any additional remarks to assist the customer. You may also include any SNOW or E-Solve tickets raised for tool-related issues or latency." },
+            { label: "SO/SR", type: "text", name: "srNum" },
+            // Callout Details - Primary
+            { label: "Primary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails1", placeholder: "Copy all and paste here." },
+            {
+                label: "Result", type: "select", name: "outboundResult1", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
+            // Secondary
+            {
+                label: "Same w/ Primary #?", type: "select", name: "checkSecondaryNum", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
+            { label: "Secondary Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails2", placeholder: "Copy all and paste here" },
+            {
+                label: "Result", type: "select", name: "outboundResult2", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
+            // Landline
+            { label: "Landline Number, Arrival Time & Message Details in COSMO", type: "textarea", name: "cosmoDetails3", placeholder: "Copy all and paste here." },
+            {
+                label: "Result", type: "select", name: "outboundResult3", options: [
+                    "",
+                    "Answered",
+                    "No Answer",
+                    "Unattended"
+                ]
+            },
+            {
+                label: "SMS Sent? Y/N", type: "select", name: "smsSent", options: [
+                    "",
+                    "Yes",
+                    "No"
+                ]
+            },
+            {
+                label: "Case Status", type: "select", name: "caseStatus", options: [
+                    "",
+                    "Closed Engage",
+                    "Closed - Escalated",
+                    "Closed - Resolved",
+                    "Manage"
+                ]
+            },
+        ];
+
+        function createDefinitionRow() {
+            const row = document.createElement("tr");
+            const td = document.createElement("td");
+
+            const div = document.createElement("div");
+            div.className = "form2DivDefinition";
+
+            const header = document.createElement("p");
+            header.textContent = "Definition";
+            header.className = "definition-header";
+
+            const ul = document.createElement("ul");
+            ul.className = "checklist";
+
+            const li = document.createElement("li");
+            li.textContent = "Requests, inquiries or follow-ups related to change of telephone number.";
+            ul.appendChild(li);
+
+            // Work Instructions link
+            const linkLi = document.createElement("li");
+            linkLi.innerHTML = `See <a href="https://pldt365.sharepoint.com/sites/PLDTCCareLIT365/SitePages/WEBFORM_HANDLING_CHANGE_TELEPHONE_NUMBER.aspx" target="_blank">Handling of change of telephone number requests and inquiries received by PLDT Customer Care Back Office</a> for detailed handling procedures and work instructions.`;
+            ul.appendChild(linkLi);
+
+            div.appendChild(header);
+            div.appendChild(ul);
+
+            td.appendChild(div);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function createFieldRow(field) {
+            const row = document.createElement("tr");
+            row.style.display = field.name === "calloutAttempt" ? "table-row" : "none";
+
+            const td = document.createElement("td");
+            const divInput = document.createElement("div");
+            divInput.className = field.type === "textarea" ? "form2DivTextarea" : "form2DivInput";
+
+            const label = document.createElement("label");
+            label.textContent = `${field.label}`;
+            label.className = field.type === "textarea" ? "form2-label-textarea" : "form2-label";
+            label.setAttribute("for", field.name);
+
+            let input;
+            if (field.type === "toolLabel") {
+                const row = document.createElement("tr");
+                row.className = "tool-label-row";
+                row.dataset.relatedTo = field.relatedTo;
+
+                const td = document.createElement("td");
+                const div = document.createElement("div");
+
+                div.className = "formToolLabel";
+                div.textContent = field.label.replace("// ", ""); // cleaner display
+
+                td.appendChild(div);
+                row.appendChild(td);
+
+                return row;
+            } else if (field.type === "select") {
+                input = document.createElement("select");
+                input.name = field.name;
+                input.className = "form2-input";
+                field.options.forEach((optionText, index) => {
+                    const option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+
+                    if (index === 0) {
+                        option.disabled = true;
+                        option.selected = true;
+                        option.style.fontStyle = "italic";
+                    }
+
+                    input.appendChild(option);
+                });
+            } else if (field.type === "textarea") {
+                input = document.createElement("textarea");
+                input.name = field.name;
+                input.className = "form2-textarea";
+                input.rows = field.name === "remarks" ? 4 : 2;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = field.name;
+                input.className = "form2-input";
+                if (field.step) input.step = field.step;
+                if (field.placeholder) input.placeholder = field.placeholder;
+            }
+
+            divInput.appendChild(label);
+            divInput.appendChild(input);
+            td.appendChild(divInput);
+            row.appendChild(td);
+
+            return row;
+        }
+
+        function insertToolLabel(fields, label, relatedFieldName) {
+            fields.splice(
+                fields.findIndex(f => f.name === relatedFieldName),
+                0,
+                {
+                    label: `// ${label}`,
+                    type: "toolLabel",
+                    name: `toolLabel-${label.toLowerCase().replace(/\s/g, "-")}`,
+                    relatedTo: relatedFieldName
+                }
+            );
+        }
+
+        const enhancedFields = [...fields];
+
+        insertToolLabel(enhancedFields, "Primary Contact", "cosmoDetails1");
+        insertToolLabel(enhancedFields, "Secondary Contact", "checkSecondaryNum");
+        insertToolLabel(enhancedFields, "Landline", "cosmoDetails3");
+        insertToolLabel(enhancedFields, "Actions Taken & Other Details", "remarks");
+
+        table.appendChild(createDefinitionRow());
+
+        enhancedFields.forEach((field) => {
+            const row = createFieldRow(field);
+            table.appendChild(row);
+        });
+
+        function updateToolLabelVisibility() {
+            const allToolLabels = document.querySelectorAll(".tool-label-row");
+            allToolLabels.forEach(labelRow => {
+                const relatedName = labelRow.dataset.relatedTo;
+                const relatedInput = document.querySelector(`[name="${relatedName}"]`);
+                if (relatedInput) {
+                    const relatedRow = relatedInput.closest("tr");
+                    labelRow.style.display = (relatedRow && relatedRow.style.display !== "none") ? "table-row" : "none";
+                }
+            });
+        }
+
+        form2Container.appendChild(table);
+
+        const calloutAttempt = document.querySelector("[name='calloutAttempt']");
+        calloutAttempt.addEventListener("change", () => {
+            resetAllFields(["calloutAttempt"]);
+            if (calloutAttempt.selectedIndex === 1) {
+                showFields(["remarks", "cosmoDetails1", "outboundResult1", "smsSent", "caseStatus"]);
+                if (selectedValue === "ccbo_formFfupChangeTelNum") {
+                    showFields(["ffupStatus", "srNum"]);
+                } else if (selectedValue === "ccbo_formReqChangeTelNum") {
+                    showFields(["srNum"]);
+                    hideSpecificFields(["ffupStatus"]);
+                } else {
+                    hideSpecificFields(["ffupStatus", "srNum"]);
+                }
+                hideSpecificFields(["checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            } else if (calloutAttempt.selectedIndex === 2) {
+                showFields(["cosmoDetails1", "outboundResult1", "remarks", "smsSent", "caseStatus"]);
+                hideSpecificFields(["requestType", "ffupStatus", "casio", "srNum", "checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            } else {
+                showFields(["requestType", "remarks", "smsSent", "caseStatus"]);
+                if (selectedValue === "ccbo_formFfupChangeTelNum") {
+                    showFields(["ffupStatus", "srNum"]);
+                } else if (selectedValue === "ccbo_formReqChangeTelNum") {
+                    showFields(["srNum"]);
+                    hideSpecificFields(["ffupStatus"]);
+                } else {
+                    hideSpecificFields(["ffupStatus", "srNum"]);
+                }
+                hideSpecificFields(["cosmoDetails1", "outboundResult1", "checkSecondaryNum", "cosmoDetails2", "outboundResult2", "cosmoDetails3", "outboundResult3"]);
+            }
+            updateToolLabelVisibility();
+            renderButtons();
         });
 
         const outboundResult1 = document.querySelector("[name='outboundResult1']");
@@ -14438,7 +16778,7 @@ function createButtons(buttonLabels, buttonHandlers) {
                 button.classList.add("form2-button");
 
                 cell.appendChild(button);
-                
+
                 if (isNonTech && (label === "FUSE" || label === "FUSE & SF")) {
                     cell.colSpan = 2;
                     colIndex++;
@@ -14494,10 +16834,10 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
     const missingFields = [];
 
     // Prefer stored global values, fallback to vars
-    const channel  = window.agentDetailsData?.channel;
+    const channel = window.agentDetailsData?.channel;
     const pldtUser = window.agentDetailsData?.pldtUser;
 
-    if (!channel)  missingFields.push("Channel");
+    if (!channel) missingFields.push("Channel");
     if (!pldtUser) missingFields.push("PLDT Username");
 
     if (enableValidation && missingFields.length > 0) {
@@ -14508,24 +16848,24 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
     }
 
     const fields = [
-        { name: "selectChannel"},
-        { name: "pldtUser"},
-        { name: "sfCaseNum", label: "SF#"},
-        { name: "cepCaseNumber", label: "CEP Case #"},
-        { name: "pcNumber", label: "Parent Case"},
-        { name: "ticketStatus", label: "Case Status"},
-        { name: "ffupCount", label: "No. of Follow-Up(s)"},
-        { name: "statusReason", label: "Status Reason"},
-        { name: "subStatus", label: "Sub Status"},
-        { name: "queue", label: "Queue"},
-        { name: "ticketAge", label: "Ticket Age"},
-        { name: "remarks", label: "Remarks"},
-        { name: "investigation1", label: "Investigation 1"},
-        { name: "investigation2", label: "Investigation 2"},
-        { name: "investigation3", label: "Investigation 3"},
-        { name: "investigation4", label: "Investigation 4"},
-        { name: "sla", label: "SLA"},
-        { name: "offerALS",}
+        { name: "selectChannel" },
+        { name: "pldtUser" },
+        { name: "sfCaseNum", label: "SF#" },
+        { name: "cepCaseNumber", label: "CEP Case #" },
+        { name: "pcNumber", label: "Parent Case" },
+        { name: "ticketStatus", label: "Case Status" },
+        { name: "ffupCount", label: "No. of Follow-Up(s)" },
+        { name: "statusReason", label: "Status Reason" },
+        { name: "subStatus", label: "Sub Status" },
+        { name: "queue", label: "Queue" },
+        { name: "ticketAge", label: "Ticket Age" },
+        { name: "remarks", label: "Remarks" },
+        { name: "investigation1", label: "Investigation 1" },
+        { name: "investigation2", label: "Investigation 2" },
+        { name: "investigation3", label: "Investigation 3" },
+        { name: "investigation4", label: "Investigation 4" },
+        { name: "sla", label: "SLA" },
+        { name: "offerALS", }
     ];
 
     // Check all visible fields are not blank in the form except pcNumber
@@ -14603,7 +16943,7 @@ function ffupButtonHandler(showFloating = true, enableValidation = true, include
                 case "remarks":
                     remarks = value;
                     break;
-                
+
                 case "alsPackOffered":
                     output += `${field.label?.toUpperCase() || field.name.toUpperCase()}: Offered ${value}\n`;
                     break;
@@ -14713,23 +17053,23 @@ function showFfupFloatingDiv(sections, sectionLabels) {
         section.textContent = sectionText;
 
         section.addEventListener("mouseover", () => {
-        section.style.backgroundColor = "#edf2f7";
+            section.style.backgroundColor = "#edf2f7";
         });
         section.addEventListener("mouseout", () => {
-        section.style.backgroundColor = "";
+            section.style.backgroundColor = "";
         });
 
         section.onclick = () => {
-        section.style.transform = "scale(0.99)";
-        navigator.clipboard.writeText(sectionText).then(() => {
-            section.style.backgroundColor = "#ddebfb";
-            setTimeout(() => {
-            section.style.transform = "scale(1)";
-            section.style.backgroundColor = "";
-            }, 150);
-        }).catch(err => {
-            console.error("Copy failed:", err);
-        });
+            section.style.transform = "scale(0.99)";
+            navigator.clipboard.writeText(sectionText).then(() => {
+                section.style.backgroundColor = "#ddebfb";
+                setTimeout(() => {
+                    section.style.transform = "scale(1)";
+                    section.style.backgroundColor = "";
+                }, 150);
+            }).catch(err => {
+                console.error("Copy failed:", err);
+            });
         };
 
         copiedValues.appendChild(section);
@@ -14748,8 +17088,8 @@ function showFfupFloatingDiv(sections, sectionLabels) {
     closeButton.onclick = () => {
         floatingDiv.classList.remove("show");
         setTimeout(() => {
-        floatingDiv.style.display = "none";
-        overlay.style.display = "none";
+            floatingDiv.style.display = "none";
+            overlay.style.display = "none";
         }, 300);
     };
 }
@@ -14757,23 +17097,23 @@ function showFfupFloatingDiv(sections, sectionLabels) {
 // Generating CEP Notes
 function cepCaseTitle() {
     const vars = initializeVariables();
-    const channel  = window.agentDetailsData?.channel;
+    const channel = window.agentDetailsData?.channel;
 
     let caseTitle = "";
 
     const intentGroups = {
-        group1: { intents: ["form100_1", "form100_2", "form100_3", "form100_4", "form100_5", "form100_6", "form100_7"], title: "NO DIAL TONE AND NO INTERNET CONNECTION"},
-        group2: { intents: ["form101_1", "form101_2", "form101_3", "form101_4"], title: "NO DIAL TONE"},
-        group3: { intents: ["form102_1", "form102_2", "form102_3", "form102_4", "form102_5", "form102_6", "form102_7"], title: "NOISY LINE"},
-        group4: { intents: ["form103_1", "form103_2", "form103_3"], title: "CANNOT MAKE CALLS"},
-        group5: { intents: ["form103_4", "form103_5"], title: "CANNOT RECEIVE CALLS"},
-        group6: { intents: ["form500_1", "form500_2"], title: "NO INTERNET CONNECTION"},
+        group1: { intents: ["form100_1", "form100_2", "form100_3", "form100_4", "form100_5", "form100_6", "form100_7"], title: "NO DIAL TONE AND NO INTERNET CONNECTION" },
+        group2: { intents: ["form101_1", "form101_2", "form101_3", "form101_4"], title: "NO DIAL TONE" },
+        group3: { intents: ["form102_1", "form102_2", "form102_3", "form102_4", "form102_5", "form102_6", "form102_7"], title: "NOISY LINE" },
+        group4: { intents: ["form103_1", "form103_2", "form103_3"], title: "CANNOT MAKE CALLS" },
+        group5: { intents: ["form103_4", "form103_5"], title: "CANNOT RECEIVE CALLS" },
+        group6: { intents: ["form500_1", "form500_2"], title: "NO INTERNET CONNECTION" },
         group7: { intents: ["form500_3", "form500_4"], title: () => vars.meshtype.toUpperCase() },
-        group8: { intents: ["form501_1", "form501_2", "form501_3"], title: "SLOW INTERNET CONNECTION"},
-        group9: { intents: ["form501_4"], title: "FREQUENT DISCONNECTION"},
-        group10: { intents: ["form501_5"], title: "Gaming - High Latency"},
-        group11: { intents: ["form501_5"], title: "Gaming - Lag"},
-        group12: { intents: ["form502_1", "form502_2"], title: "SELECTIVE BROWSING"},
+        group8: { intents: ["form501_1", "form501_2", "form501_3"], title: "SLOW INTERNET CONNECTION" },
+        group9: { intents: ["form501_4"], title: "FREQUENT DISCONNECTION" },
+        group10: { intents: ["form501_5"], title: "Gaming - High Latency" },
+        group11: { intents: ["form501_5"], title: "Gaming - Lag" },
+        group12: { intents: ["form502_1", "form502_2"], title: "SELECTIVE BROWSING" },
         group13: { intents: ["form510_1", "form510_2", "form510_3", "form510_4", "form510_5", "form510_6", "form510_7", "form510_8"], title: "IPTV NO AUDIO VIDEO OUTPUT", useAccountType: true },
         group14: { intents: ["form511_1", "form511_2", "form511_3", "form511_4", "form511_5"], title: "IPTV POOR AUDIO VIDEO QUALITY", useAccountType: true },
         group15: { intents: ["form512_1", "form512_2", "form512_3"], title: "IPTV MISSING SET-TOP-BOX FUNCTIONS", useAccountType: true },
@@ -14799,9 +17139,9 @@ function cepCaseTitle() {
             let title;
             if (vars.selectedIntent === "form501_5" || vars.selectedIntent === "form501_6") {
                 if ([
-                    "Individual Trouble", 
-                    "Network Trouble - High Latency", 
-                    "Network Trouble - Slow/Intermittent Browsing", 
+                    "Individual Trouble",
+                    "Network Trouble - High Latency",
+                    "Network Trouble - Slow/Intermittent Browsing",
                     "High Latency"
                 ].includes(vars.investigation4)) {
                     title = "SLOW INTERNET CONNECTION";
@@ -14833,18 +17173,18 @@ function cepCaseDescription(showAddlDetails = true) {
     const vars = initializeVariables();
 
     const techIntents = [
-        "form100_1","form100_2","form100_3","form100_4","form100_5","form100_6","form100_7",
-        "form101_1","form101_2","form101_3","form101_4",
-        "form102_1","form102_2","form102_3","form102_4","form102_5","form102_6","form102_7",
-        "form103_1","form103_2","form103_3","form103_4","form103_5",
-        "form500_1","form500_2","form500_3","form500_4","form500_6",
-        "form501_1","form501_2","form501_3","form501_4","form501_5",
-        "form502_1","form502_2",
-        "form510_1","form510_2","form510_3","form510_4","form510_5","form510_6","form510_7","form510_8",
-        "form511_1","form511_2","form511_3","form511_4","form511_5",
-        "form512_1","form512_2","form512_3",
-        "formStrmApps_1","formStrmApps_2","formStrmApps_3","formStrmApps_4","formStrmApps_5",
-        "form300_1","form300_2","form300_3","form300_4","form300_5","form300_6","form300_7", "form300_8"
+        "form100_1", "form100_2", "form100_3", "form100_4", "form100_5", "form100_6", "form100_7",
+        "form101_1", "form101_2", "form101_3", "form101_4",
+        "form102_1", "form102_2", "form102_3", "form102_4", "form102_5", "form102_6", "form102_7",
+        "form103_1", "form103_2", "form103_3", "form103_4", "form103_5",
+        "form500_1", "form500_2", "form500_3", "form500_4", "form500_6",
+        "form501_1", "form501_2", "form501_3", "form501_4", "form501_5",
+        "form502_1", "form502_2",
+        "form510_1", "form510_2", "form510_3", "form510_4", "form510_5", "form510_6", "form510_7", "form510_8",
+        "form511_1", "form511_2", "form511_3", "form511_4", "form511_5",
+        "form512_1", "form512_2", "form512_3",
+        "formStrmApps_1", "formStrmApps_2", "formStrmApps_3", "formStrmApps_4", "formStrmApps_5",
+        "form300_1", "form300_2", "form300_3", "form300_4", "form300_5", "form300_6", "form300_7", "form300_8"
     ];
 
     let caseDescription = "";
@@ -14874,7 +17214,11 @@ function cepCaseDescription(showAddlDetails = true) {
     }
 
     if (isFieldVisible("cvReading") && vars.cvReading) {
-        visibleFields.push(vars.cvReading);
+        if (vars.cvReading === "Others/Error Code" && vars.cvErrorCode) {
+            visibleFields.push(vars.cvErrorCode);
+        } else {
+            visibleFields.push(vars.cvReading);
+        }
     } else if (
         vars.facility !== "Fiber - Radius" &&
         vars.accountType !== "RADIUS" &&
@@ -14882,16 +17226,25 @@ function cepCaseDescription(showAddlDetails = true) {
         investigation3Index &&
         investigation3Index.selectedIndex > 0 &&
         vars.investigation3 &&
-        !vars.investigation3.startsWith("Not Applicable")
+        !vars.investigation3.startsWith("Not Applicable") &&
+        vars.investigation3 !== "Others/Error Code"
     ) {
         visibleFields.push(investigation3Index.options[investigation3Index.selectedIndex].textContent);
     }
 
-    if (getValueIfVisible("Option82")) 
+    if (getValueIfVisible("typeOfAlarm"))
+        visibleFields.push(`W/ Historical Alarm: ${getValueIfVisible("typeOfAlarm")}`);
+
+    if (getValueIfVisible("Option82"))
         visibleFields.push(getValueIfVisible("Option82"));
 
-    if (getValueIfVisible("rxPower"))
-        visibleFields.push(`RX: ${vars.rxPower}`);
+    if (
+        vars.investigation2 === "Failed RX" &&
+        isFieldVisible("rxPower") &&
+        vars.rxPower
+    ) {
+        visibleFields.push(`RX ${vars.rxPower}`);
+    }
 
     if (
         vars.investigation1 === "Blinking/No PON/FIBR/ADSL" &&
@@ -14912,35 +17265,35 @@ function cepCaseDescription(showAddlDetails = true) {
         if (reso === "Tested Ok" || testedOk === "Yes") {
             if (selectedIntent === "form500_1") {
                 pushFormFields([
-                    { name: "dmsInternetStatus", label: "DMS Internet/Data Status"},
-                    { name: "connectedDevices", label: "No of devices connected"},
-                    { name: "dmsSelfHeal", label: "Self Heal Result"},
-                    { name: "onuModel", label: "ONU Model"},
-                    { name: "onuSerialNum", label: "SN"},
-                    { name: "dmsWifiState", label: "DMS Wifi Status" }
+                    { name: "dmsOnuStats", label: "DMS: ONU Status" },
+                    { name: "connectedDevices", label: "No of devices connected" },
+                    { name: "onuModel", label: "ONU Model" },
+                    { name: "onuSerialNum", label: "SN" },
                 ]);
             } else if (selectedIntent === "form501_1" || selectedIntent === "form501_2") {
                 pushFormFields([
-                    { name: "dmsInternetStatus", label: "DMS Internet/Data Status"},
-                    { name: "connectedDevices", label: "No of devices connected"},
-                    { name: "dmsSelfHeal", label: "Self Heal Result"},
-                    { name: "onuModel", label: "ONU Model"},
-                    { name: "onuSerialNum", label: "SN"},
-                    { name: "speedTestResult", label: "Initial Speedtest Result"},
-                    { name: "bandsteering", label: "Bandsteering"},
-                    { name: "saaaBandwidthCode", label: "NMS Skin BW Code" }
+                    { name: "dmsOnuStats", label: "DMS: ONU Status" },
+                    { name: "connectedDevices", label: "No of devices connected" },
+                    { name: "onuModel", label: "ONU Model" },
+                    { name: "onuSerialNum", label: "SN" },
+                    // { name: "download1", label: "Download Speed 1" },
+                    // { name: "download2", label: "Download Speed 2" },
+                    // { name: "upload1", label: "Upload Speed 1" },
+                    // { name: "upload2", label: "Upload Speed 2" },
+                    // { name: "ping_1", label: "Ping Test 1" },
+                    // { name: "ping_2", label: "Ping Test 2" }
                 ]);
             } else if (selectedIntent === "form502_1") {
                 pushFormFields([
-                    { name: "ipAddress", label: "IP Address"},
-                    { name: "dmsInternetStatus", label: "DMS Internet/Data Status"},
-                    { name: "connectedDevices", label: "No of devices connected"},
-                    { name: "websiteURL", label: "Affected Site, Application or VPN"},
-                    { name: "errMsg", label: "Error"},
-                    { name: "vpnBlocking", label: "Possible VPN Blocking issue"},
-                    { name: "vpnRequired", label: "Using VPN in accessing site or app"},
-                    { name: "otherISP", label: "Result using other ISP"},
-                    { name: "itSupport", label: "Has IT support"},
+                    { name: "ipAddress", label: "IP Address" },
+                    { name: "dmsOnuStats", label: "DMS: ONU Status" },
+                    { name: "connectedDevices", label: "No of devices connected" },
+                    { name: "websiteURL", label: "Affected Site, Application or VPN" },
+                    { name: "errMsg", label: "Error" },
+                    { name: "vpnBlocking", label: "Possible VPN Blocking issue" },
+                    { name: "vpnRequired", label: "Using VPN in accessing site or app" },
+                    { name: "otherISP", label: "Result using other ISP" },
+                    { name: "itSupport", label: "Has IT support" },
                     { name: "itRemarks", label: "IT Support Remarks" }
                 ]);
             }
@@ -14955,9 +17308,9 @@ function cepCaseDescription(showAddlDetails = true) {
 
     if ((showAddlDetails && reso !== "Tested Ok") || testedOk === "No") {
         pushFormFields([
-            { name: "availability", label: "PREFERRED DATE AND TIME"},
-            { name: "address"},
-            { name: "landmarks", label: "LANDMARK"},
+            { name: "availability", label: "PREFERRED DATE AND TIME" },
+            { name: "address" },
+            { name: "landmarks", label: "LANDMARK" },
             { name: "rptCount", label: "REPEATER" }
         ]);
     }
@@ -14992,103 +17345,117 @@ function cepCaseNotes(includeSpecialInst = true) {
     }
 
     function constructCaseNotes() {
+
         const fields = [
             // CEP Investigation Tagging
-            { name: "investigation1", label: "Investigation 1"},
-            { name: "investigation2", label: "Investigation 2"},
-            { name: "investigation3", label: "Investigation 3"},
-            { name: "investigation4", label: "Investigation 4"},
+            { name: "investigation1", label: "Investigation 1" },
+            { name: "investigation2", label: "Investigation 2" },
+            { name: "investigation3", label: "Investigation 3" },
+            { name: "investigation4", label: "Investigation 4" },
 
             // Other Details
-            { name: "sfCaseNum", label: "SF"},
-            { name: "outageStatus", label: "Outage"},
-            { name: "outageReference", label: "Source Reference"},
-            { name: "custAuth", label: "Cust Auth"},
-            { name: "simLight", label: "Sim Light Status"},
-            { name: "minNumber", label: "MIN"},
-            { name: "onuModel", label: "ONU Model"},
-            { name: "onuSerialNum", label: "ONU SN"},
-            { name: "Option82"},
-            { name: "modemLights"},
-            { name: "intLightStatus", label: "Internet Light"},
-            { name: "wanLightStatus", label: "WAN Light"},
-            { name: "onuConnectionType"},
+            { name: "sfCaseNum" },
+            { name: "outageStatus" },
+            { name: "outageReference", label: "Src Ref" },
+            { name: "custAuth", label: "Cust Auth" },
+            { name: "simLight", label: "Sim Light Status" },
+            { name: "minNumber", label: "MIN" },
+            { name: "onuModel", label: "ONU Model" },
+            { name: "onuSerialNum", label: "ONU SN" },
+            { name: "Option82" },
+            { name: "modemLights" },
+            { name: "intLightStatus", label: "Internet Light" },
+            { name: "wanLightStatus", label: "WAN Light" },
+            { name: "onuConnectionType" },
 
             // Clearview
-            { name: "cvReading", label: "CV"},
-            { name: "rtaRequest", label: "Real-time Request"},
+            { name: "cvToolStatus" },
+            { name: "cvEsolveTicketNum" },
+            { name: "cvReading" },
+            { name: "typeOfAlarm", label: "W/ Historical Alarm" },
+            { name: "rtaRequest" },
 
             //NMS Skin
-            { name: "onuRunStats", label: "NMS Skin ONU Status"},
-            { name: "rxPower", label: "RX"},
-            { name: "vlan", label: "VLAN"},
-            { name: "ipAddress", label: "IP Address"},
-            { name: "connectedDevices", label: "No. of Connected Devices"},
-            { name: "fsx1Status", label: "FXS1"},
-            { name: "wanName_3", label: "WAN NAME_3"},
-            { name: "srvcType_3", label: "SRVCTYPE_3"},
-            { name: "connType_3", label: "CONNTYPE_3"},
-            { name: "vlan_3", label: "WANVLAN_3"},
-            { name: "saaaBandwidthCode"},
-            { name: "routingIndex", label: "Routing Index"},
-            { name: "callSource", label: "Call Source"},
-            { name: "ldnSet", label: "LDN Set"},
-            { name: "option82Config", label: "Option82 Config"},
-            { name: "nmsSkinRemarks", label: "NMS"},
-            
+            { name: "nmsToolStatus" },
+            { name: "nmsEsolveTicketNum" },
+            { name: "nmsOnuStats", label: "NMS ONU Status" },
+            { name: "fsx1Status", label: "FXS1" },
+            { name: "wanName_3", label: "WAN NAME_3" },
+            { name: "srvcType_3", label: "SRVCTYPE_3" },
+            { name: "connType_3", label: "CONNTYPE_3" },
+            { name: "vlan_3", label: "WANVLAN_3" },
+            { name: "nmsBandwidthCode" },
+            { name: "routingIndex", label: "Routing Index" },
+            { name: "callSource", label: "Call Source" },
+            { name: "ldnSet", label: "LDN Set" },
+            { name: "nmsSkinRemarks", label: "NMS" },
+
             // DMS
-            { name: "dmsInternetStatus", label: "DMS Internet/Data Status"},
-            { name: "deviceWifiBand"},
-            { name: "bandsteering", label: "Bandsteering"},
-            { name: "dmsVoipServiceStatus", label: "VoIP Status in DMS"},
-            { name: "dmsLanPortStatus", label: "LAN Port Status in DMS"},
-            { name: "dmsWifiState", label: "Wi-Fi State in DMS"},
-            { name: "dmsLan4Status", label: "LAN Port Status in DMS"},
-            { name: "dmsSelfHeal"},
-            { name: "dmsRemarks", label: "DMS"  },
+            { name: "dmsToolStatus" },
+            { name: "dmsEsolveTicketNum" },
+            { name: "dmsOnuStats", label: "DMS ONU Status" },
+            { name: "dmsInternetStatus", label: "DMS Internet/Data Status" },
+            { name: "deviceWifiBand" },
+            { name: "bandsteering", label: "Bandsteering" },
+            { name: "dmsVoipServiceStatus", label: "VoIP Status in DMS" },
+            { name: "dmsLanPortStatus", label: "LAN Port Status in DMS" },
+            { name: "dmsSelfHeal" },
+            { name: "dmsRemarks", label: "DMS" },
+
+            // Other Network Fields
+            { name: "rxPower", label: "RX" },
+            { name: "vlan", label: "VLAN" },
+            { name: "ipAddress", label: "IP" },
+            { name: "connectedDevices", label: "No. of Connected Devices" },
+            { name: "option82Config", label: "Option82 Config" },
+            { name: "option82MisalignedDetails" },
 
             // Probe & Troubleshoot
-            { name: "callType", label: "Call Type"},
-            { name: "lanPortNum", label: "LAN Port Number"},
-            { name: "serviceStatus", label: "Voice Service Status"},
-            { name: "services", label: "Service(s)"},
-            { name: "connectionMethod", label: "Connected via"},
-            { name: "deviceBrandAndModel", label: "Device Brand and Model"},
-            { name: "specificTimeframe"},
-            { name: "speedTestResult", label: "Initial Speedtest Result"},
-            { name: "pingTestResult", label: "Ping"},
-            { name: "gameNameAndServer"},
-            { name: "gameServerIP", label: "Game Server IP Address"},
-            { name: "pingTestResult2", label: "Game Server IP Address Ping Test Result"},
-            { name: "traceroutePLDT", label: "Tracerout PLDT"},
-            { name: "tracerouteExt", label: "Tracerout External"},
-            { name: "meshtype"},
-            { name: "meshOwnership", label: "Mesh"},
-            { name: "websiteURL", label: "Website Address"},
-            { name: "errMsg", label: "Error Message"},
-            { name: "otherDevice", label: "Tested on Other Devices or Browsers"},
-            { name: "vpnBlocking", label: "Possible VPN Blocking Issue"},
-            { name: "vpnBlocking", label: "VPN Required When Accessing Website or App"},
-            { name: "otherISP", label: "Result Using Other ISP"},
-            { name: "itSupport", label: "Has IT Support"},
-            { name: "itRemarks", label: "IT Support Remarks"},
+            { name: "callType", label: "Call Type" },
+            { name: "lanPortNum", label: "LAN Port Number" },
+            { name: "serviceStatus", label: "Voice Service Status" },
+            { name: "services", label: "Service(s)" },
+            { name: "connectionMethod", label: "Connected via" },
+            { name: "deviceBrandAndModel", label: "Device Brand and Model" },
+            { name: "specificTimeframe" },
+            { name: "download1" },
+            { name: "download2" },
+            { name: "upload1" },
+            { name: "upload2" },
+            { name: "ping_1" },
+            { name: "ping_2" },
+            { name: "gameNameAndServer" },
+            { name: "gameServerIP", label: "Game Server IP Address" },
+            { name: "ping2", label: "Game Server IP Address Ping Test Result" },
+            { name: "traceroutePLDT", label: "Tracerout PLDT" },
+            { name: "tracerouteExt", label: "Tracerout External" },
+            { name: "meshtype" },
+            { name: "meshOwnership", label: "Mesh" },
+            { name: "websiteURL", label: "Website Address" },
+            { name: "errMsg", label: "Error Message" },
+            { name: "otherDevice", label: "Tested on Other Devices or Browsers" },
+            { name: "vpnBlocking", label: "Possible VPN Blocking Issue" },
+            { name: "vpnBlocking", label: "VPN Required When Accessing Website or App" },
+            { name: "otherISP", label: "Result Using Other ISP" },
+            { name: "itSupport", label: "Has IT Support" },
+            { name: "itRemarks", label: "IT Support Remarks" },
 
-            { name: "actualExp", label: "Actual Experience"},
-            { name: "remarks", label: "Actions Taken"},
+            { name: "actualExp", label: "Actual Experience" },
+            { name: "remarks", label: "Actions Taken" },
 
             // Ticket Details
-            { name: "pcNumber", label: "Parent Case"},
-            { name: "cepCaseNumber"},
-            { name: "sla"},
+            { name: "pcNumber", label: "Parent Case" },
+            { name: "cepCaseNumber" },
+            { name: "sla" },
 
             // For Retracking
-            { name: "stbID", label: "STB Serial Number"},
-            { name: "smartCardID", label: "Smartcard ID"},
-            { name: "accountNum", label: "PLDT Account Number"},
-            { name: "cignalPlan", label: "CIGNAL TV Plan"},
-            { name: "stbIpAddress", label: "STB IP Address"}, 
-            { name: "tsMulticastAddress", label: "Tuned Service Multicast Address"}, 
-            { name: "exactExp", label: "Exact Experience"}, 
+            { name: "stbID", label: "STB Serial Number" },
+            { name: "smartCardID", label: "Smartcard ID" },
+            { name: "accountNum", label: "PLDT Account Number" },
+            { name: "cignalPlan", label: "CIGNAL TV Plan" },
+            { name: "stbIpAddress", label: "STB IP Address" },
+            { name: "tsMulticastAddress", label: "Tuned Service Multicast Address" },
+            { name: "exactExp", label: "Exact Experience" },
         ];
 
         const seenFields = new Set();
@@ -15098,6 +17465,11 @@ function cepCaseNotes(includeSpecialInst = true) {
 
         const req4retrackingValue = document.querySelector('[name="req4retracking"]')?.value || "";
         const retrackingFields = ["stbID", "smartCardID", "accountNum", "cignalPlan", "stbIpAddress", "tsMulticastAddress", "exactExp"];
+
+        // Check for NMS Skin and DMS result availability
+        const nmsToolStatus = getFieldValueIfVisible("nmsToolStatus");
+        const dmsToolStatus = getFieldValueIfVisible("dmsToolStatus");
+        const dmsOnuStats = getFieldValueIfVisible("dmsOnuStats");
 
         fields.forEach(field => {
             const isRetrackingField = retrackingFields.includes(field.name);
@@ -15112,7 +17484,7 @@ function cepCaseNotes(includeSpecialInst = true) {
                 !isRetrackingRequested &&
                 isRetrackingField &&
                 !(vars.selectedIntent === "form510_7" &&
-                (field.name === "stbID" || field.name === "smartCardID"))
+                    (field.name === "stbID" || field.name === "smartCardID"))
             ) {
                 return;
             }
@@ -15127,14 +17499,47 @@ function cepCaseNotes(includeSpecialInst = true) {
 
             seenFields.add(field.name);
 
-            // Add units if needed
             let displayValue = value;
+
             switch (field.name) {
-                case "pingTestResult":
-                    displayValue += " MS";
-                    break;
-                case "speedTestResult":
-                    displayValue += " MBPS";
+                case "download1":
+                case "upload1":
+                case "ping_1":
+                case "download2":
+                case "upload2":
+                case "ping_2":
+
+                    if (seenFields.has("speedTestCombined")) return;
+
+                    seenFields.add("speedTestCombined");
+
+                    const speedParts = [];
+
+                    if (vars.download1 || vars.upload1 || vars.ping_1) {
+                        speedParts.push(
+                            `Initial Speedtest Result: ${
+                                [
+                                    vars.download1 && `DL ${vars.download1}Mbps`,
+                                    vars.upload1 && `UL ${vars.upload1}Mbps`,
+                                    vars.ping_1 && `${vars.ping_1}ms`
+                                ].filter(Boolean).join("/")
+                            }`
+                        );
+                    }
+
+                    if (vars.download2 || vars.upload2 || vars.ping_2) {
+                        speedParts.push(
+                            `After TS Speedtest Result: ${
+                                [
+                                    vars.download2 && `DL ${vars.download2}Mbps`,
+                                    vars.upload2 && `UL ${vars.upload2}Mbps`,
+                                    vars.ping_2 && `${vars.ping_2}ms`
+                                ].filter(Boolean).join("/")
+                            }`
+                        );
+                    }
+
+                    displayValue = speedParts.join("/ ");
                     break;
             }
 
@@ -15152,11 +17557,49 @@ function cepCaseNotes(includeSpecialInst = true) {
                     );
                     break;
 
+                case field.name === "cvToolStatus":
+                    if (displayValue === "Yes") {
+                        actionsTakenParts.push("CV Downtime");
+                    }
+                    break;
+                
+                case field.name === "nmsToolStatus":
+                    if (displayValue === "Yes") {
+                        actionsTakenParts.push("NMS Skin Unavailable");
+                    }
+                    break;
+
+                case field.name === "dmsToolStatus":
+                    if (displayValue === "Yes") {
+                        actionsTakenParts.push("DMS Downtime");
+                    }
+                    break;
+
+                case field.name === "dmsOnuStats":
+                    if (displayValue === "Check Mark") {
+                        actionsTakenParts.push(`${field.label}: Connected`);
+                    } else if (displayValue === "X Mark") {
+                        actionsTakenParts.push(`${field.label}: Offline`);
+                    } else if (displayValue === "Failed to Refresh") {
+                        actionsTakenParts.push(`${field.label}: Failed to Refresh`);
+                    } else if (displayValue === "No Record Found") {
+                        actionsTakenParts.push("No Record Found in DMS Using Serial/MAC/Phone No");
+                    }
+                    break;
+
                 case field.name === "dmsSelfHeal":
                     if (displayValue === "Yes/Resolved") {
                         actionsTakenParts.push("Performed Self Heal and the Issue was Resolved");
                     } else if (displayValue === "Yes/Unresolved") {
                         actionsTakenParts.push("Performed Self Heal but Issue was still Unresolved");
+                    }
+                    break;
+
+                case field.name === "cvReading":
+                    if (vars.cvReading === "Others/Error Code" && vars.cvErrorCode) {
+                        actionsTakenParts.push(vars.cvErrorCode);
+                    } else if (vars.cvReading) {
+                        actionsTakenParts.push(vars.cvReading);
                     }
                     break;
 
@@ -15179,19 +17622,19 @@ function cepCaseNotes(includeSpecialInst = true) {
         }
 
         const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
-        if (issueResolvedValue === "Yes") 
+        if (issueResolvedValue === "Yes")
             actionsTakenParts.push("Resolved");
-        else if (issueResolvedValue === "No - Customer is Unresponsive") 
+        else if (issueResolvedValue === "No - Customer is Unresponsive")
             actionsTakenParts.push("Customer is Unresponsive");
-        else if (issueResolvedValue === "No - Customer is Not At Home") 
+        else if (issueResolvedValue === "No - Customer is Not At Home")
             actionsTakenParts.push("Customer is Not At Home");
-        else if (issueResolvedValue === "No - Customer Declined Further Assistance") 
+        else if (issueResolvedValue === "No - Customer Declined Further Assistance")
             actionsTakenParts.push("Customer Declined Further Assistance");
-        else if (issueResolvedValue === "No - System Ended Chat") 
+        else if (issueResolvedValue === "No - System Ended Chat")
             actionsTakenParts.push("System Ended Chat");
 
         const facilityValue = document.querySelector('[name="facility"]')?.value || "";
-        if (facilityValue === "Copper VDSL") 
+        if (facilityValue === "Copper VDSL")
             actionsTakenParts.push("Copper");
 
         const actionsTaken = actionsTakenParts.join("/ ");
@@ -15204,11 +17647,10 @@ function cepCaseNotes(includeSpecialInst = true) {
     }
 
     const notes = constructCaseNotes();
-    // return notes;
 
     // If Special Instructions is needed in the future
     const specialInst = includeSpecialInst
-        ? (specialInstButtonHandler(false) || "").toUpperCase() 
+        ? (specialInstButtonHandler(false) || "").toUpperCase()
         : "";
 
     return [notes, specialInst]
@@ -15217,25 +17659,26 @@ function cepCaseNotes(includeSpecialInst = true) {
 
 }
 
-function specialInstButtonHandler(includeWocas = true) {
+function specialInstButtonHandler(includeOtherDetails = true) {
     const vars = initializeVariables();
 
     const allFields = [
-        { name: "contactName", label: "Person to Contact"},
-        { name: "cbr", label: "CBR"},
-        { name: "availability", label: "Preferred Date & Time"},
-        { name: "address", label: "Address"},
-        { name: "landmarks", label: "Landmarks"},
-        { name: "specialInstructions"},
-        { name: "rptCount", label: "Repeater"},
-        { name: "rxPower", label: "RX"},
-        { name: "WOCAS", label: "WOCAS"},
-        { name: "reOpenStatsReason", label: "Re-Open Status Reason"},
+        { name: "contactName", label: "Contact" },
+        { name: "cbr", label: "CBR" },
+        { name: "availability", label: "Preferred Sched" },
+        { name: "address", label: "Address" },
+        { name: "landmarks", label: "Landmarks" },
+        { name: "specialInstructions" },
+        { name: "rptCount", label: "Rpt" },
+        { name: "rxPower", label: "RX" },
+        { name: "WOCAS", label: "WOCAS" },
+        { name: "typeOfAlarm", label: "W/ Historical Alarm" },
+        { name: "reOpenStatsReason", label: "Re-Open Status Reason" },
     ];
 
-    const fieldsToProcess = includeWocas
+    const fieldsToProcess = includeOtherDetails
         ? allFields
-        : allFields.filter(field => field.name !== "WOCAS" && field.name !== "rxPower");
+        : allFields.filter(field => field.name !== "WOCAS" && field.name !== "rxPower" && field.name !== "typeOfAlarm" && field.name !== "reOpenStatsReason");
 
     const contactName = getFieldValueIfVisible("contactName");
     const cbr = getFieldValueIfVisible("cbr");
@@ -15399,14 +17842,14 @@ function validateUpsellFields() {
             return false;
         }
 
-        if (
-            accepted === "No - Declined" &&
-            isFieldVisible("declineReason") &&
-            !decline
-        ) {
-            showAlert("Cannot generate notes. Please select *Decline Reason.");
-            return false;
-        }
+        // if (
+        //     accepted === "No - Declined" &&
+        //     isFieldVisible("declineReason") &&
+        //     !decline
+        // ) {
+        //     showAlert("Cannot generate notes. Please select *Decline Reason.");
+        //     return false;
+        // }
     }
 
     if (eligible === "No - Not Eligible") {
@@ -15425,7 +17868,7 @@ function validateUpsellFields() {
 // Generate FUSE and SF notes for Tech Intents
 function getSfFieldValueIfVisible(fieldName) {
     const vars = initializeVariables();
-    
+
     if (!isFieldVisible(fieldName)) return "";
 
     const field = document.querySelector(`[name="${fieldName}"]`);
@@ -15441,12 +17884,12 @@ function getSfFieldValueIfVisible(fieldName) {
 }
 
 function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
-    
+
     // STOP execution if upsell is incomplete
     if (!validateUpsellFields()) return;
 
     const vars = initializeVariables();
-    const channel  = window.agentDetailsData?.channel || ""; 
+    const channel = window.agentDetailsData?.channel || "";
 
     let concernCopiedText = "";
     let actionsTakenCopiedText = "";
@@ -15476,33 +17919,168 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
     ]
 
     function constTechActionsTakenOutput() {
+
         const fields = [
+            // Actions Taken
+            { name: "outageStatus" },
+
+            // Fields to show if not for ticket creation
+            // ONU Lights Status
+            { name: "modemLights" },
+            { name: "intLightStatus", label: "Internet Light Status" },
+            { name: "wanLightStatus", label: "WAN Light Status" },
+
+            // Clearview
+            { name: "cvToolStatus" },
+            { name: "cvEsolveTicketNum" },
+            { name: "cvReading" },
+            { name: "rtaRequest" },
+            { name: "typeOfAlarm", label: "W/ Historical Alarm" },
+
+            // NMS Skin
+            { name: "nmsToolStatus" },
+            { name: "nmsEsolveTicketNum" },
+            { name: "nmsOnuStats", label: "NMS ONU Status" },
+            { name: "fsx1Status", label: "FXS1" },
+            { name: "wanName_3", label: "WAN NAME_3" },
+            { name: "srvcType_3", label: "SRVCTYPE_3" },
+            { name: "connType_3", label: "CONNTYPE_3" },
+            { name: "vlan_3", label: "WANVLAN_3" },
+            { name: "nmsBandwidthCode" },
+            { name: "routingIndex", label: "Routing Index" },
+            { name: "callSource", label: "Call Source" },
+            { name: "ldnSet", label: "LDN Set" },
+
+            // DMS
+            { name: "dmsToolStatus" },
+            { name: "dmsEsolveTicketNum" },
+            { name: "dmsOnuStats", label: "DMS ONU Status" },
+            { name: "dmsInternetStatus", label: "DMS Internet/Data Status" },
+            { name: "deviceWifiBand"},
+            { name: "bandsteering", label: "Bandsteering" },
+            { name: "dmsVoipServiceStatus", label: "VoIP Status in DMS" },
+            { name: "dmsLanPortStatus", label: "LAN Port Status in DMS" },
+            { name: "dmsLan4Status", label: "LAN Port Status in DMS" },
+            { name: "dmsSelfHeal", label: "Performed Self Heal" },
+
+            { name: "rxPower", label: "RX" },
+            { name: "vlan", label: "VLAN" },
+            { name: "ipAddress", label: "IP Address" },
+            { name: "connectedDevices", label: "No. of Connected Devices" },
+            { name: "option82Config", label: "Option82 Config" },
+            { name: "option82MisalignedDetails" },
+
+            // Probe & Troubleshoot
+            { name: "callType", label: "Call Type" },
+            { name: "lanPortNum", label: "LAN Port Number" },
+            { name: "serviceStatus", label: "Voice Service Status" },
+            { name: "services", label: "Service(s)" },
+            { name: "connectionMethod", label: "Connected via" },
+            { name: "deviceBrandAndModel", label: "Device Brand and Model" },
+            { name: "specificTimeframe", label: "Specific Timeframe" },
+            { name: "download1" },
+            { name: "download2" },
+            { name: "upload1" },
+            { name: "upload2" },
+            { name: "ping_1" },
+            { name: "ping_2" },
+            { name: "gameNameAndServer", label: "Game Name and Server" },
+            { name: "gameServerIP", label: "Game Server IP Address" },
+            { name: "ping2", label: "Game Server IP Address Ping Test Result" },
+            { name: "traceroutePLDT", label: "Tracerout PLDT" },
+            { name: "tracerouteExt", label: "Tracerout External" },
+            { name: "meshtype", label: "Mesh Type" },
+            { name: "meshOwnership", label: "Mesh Ownership" },
+            { name: "websiteURL", label: "Website Address" },
+            { name: "errMsg", label: "Error Message" },
+            { name: "otherDevice", label: "Tested on Other Devices or Browsers" },
+            { name: "vpnBlocking", label: "Possible VPN Blocking Issue" },
+            { name: "vpnRequired", label: "VPN Required When Accessing Website or App" },
+            { name: "otherISP", label: "Result Using Other ISP" },
+            { name: "itSupport", label: "Has IT Support" },
+
             // Remarks
-            { name: "outageStatus"},
-            { name: "nmsSkinRemarks"},
-            { name: "dmsRemarks"},
-            { name: "remarks"},
+            { name: "itRemarks", label: "IT Support Remarks" },
+            { name: "nmsSkinRemarks" },
+            { name: "dmsRemarks" },
+            { name: "remarks" },
 
             // Alternative Services
-            { name: "offerALS"},
-            { name: "alsPackOffered"},
-            { name: "effectiveDate", label: "Effectivity Date"},
-            { name: "nomiMobileNum", label: "MOBILE #"},
+            { name: "offerALS" },
+            { name: "alsPackOffered" },
+            { name: "effectiveDate", label: "Effectivity Date" },
+            { name: "nomiMobileNum", label: "MOBILE #" },
 
             // Cross-Sell/Upsell
             // { name: "eligibleForUpsell" },
-            { name: "productsOffered", label: "OFFERED"},
-            { name: "declineReason", label: "BUT CUST DECLINED"},
-            { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL BEC THE"},
+            { name: "productsOffered", label: "OFFERED" },
+            { name: "declineReason", label: "BUT CUST DECLINED" },
+            { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL BEC THE" },
+
+            // WOCAS
+            { name: "WOCAS", label: "WOCAS" },
+
+
+
         ];
 
         const seenFields = new Set();
         let actionsTakenParts = [];
 
         const offerALS = document.querySelector('[name="offerALS"]')?.value || "";
+        const alsPackOffered = document.querySelector('[name="alsPackOffered"]')?.value || "";
         const eligibleForUpsellValue = document.querySelector('[name="eligibleForUpsell"]')?.value || "";
         const offerAcceptedValue = document.querySelector('[name="offerAccepted"]')?.value || "";
-        const lobValue = document.getElementById("lob")?.value || "";
+        const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
+
+        // Check for NMS Skin and DMS result availability
+        const nmsToolStatus = getFieldValueIfVisible("nmsToolStatus");
+        const dmsToolStatus = getFieldValueIfVisible("dmsToolStatus");
+        const dmsOnuStats = getFieldValueIfVisible("dmsOnuStats");
+
+        const includeDiagnosticFields = issueResolvedValue !== "No - for Ticket Creation";
+
+        const diagnosticFields = [
+            // ONU Lights Status
+            "modemLights", "intLightStatus", "wanLightStatus",
+
+            // Clearview
+            "cvToolStatus", "cvEsolveTicketNum", "cvReading",
+            "rtaRequest", "typeOfAlarm",
+
+            // NMS Skin
+            "nmsToolStatus", "nmsEsolveTicketNum", "nmsOnuStats",
+            "fsx1Status", "wanName_3", "srvcType_3", "connType_3",
+            "vlan_3", "nmsBandwidthCode", "routingIndex",
+            "callSource", "ldnSet",
+
+            // DMS
+            "dmsToolStatus", "dmsEsolveTicketNum", "dmsOnuStats",
+            "dmsInternetStatus", "deviceWifiBand",
+            "bandsteering", "dmsVoipServiceStatus",
+            "dmsLanPortStatus", "dmsLan4Status",
+            "dmsSelfHeal",
+
+            // Other Network Fields
+            "rxPower", "vlan", "ipAddress",
+            "connectedDevices", "option82Config",
+            "option82MisalignedDetails",
+
+            // Probe & Troubleshoot
+            "callType", "lanPortNum", "serviceStatus",
+            "services", "connectionMethod",
+            "deviceBrandAndModel", "specificTimeframe",
+            "download1", "download2",
+            "upload1", "upload2",
+            "ping_1", "ping_2",
+            "gameNameAndServer", "gameServerIP",
+            "ping2", "traceroutePLDT",
+            "tracerouteExt", "meshtype",
+            "meshOwnership", "websiteURL",
+            "errMsg", "otherDevice",
+            "vpnBlocking", "vpnRequired",
+            "otherISP", "itSupport"
+        ];
 
         let productsOfferedText = "";
         let declineReasonText = "";
@@ -15510,20 +18088,60 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
 
         fields.forEach(field => {
             const inputElement = document.querySelector(`[name="${field.name}"]`);
-            let value = getSfFieldValueIfVisible(field.name);
+            const value = getSfFieldValueIfVisible(field.name);
+            let displayValue = value;
 
             if (inputElement && inputElement.tagName === "SELECT" && inputElement.selectedIndex === 0) {
                 return;
             }
 
-            const alsPackValue = getSfFieldValueIfVisible("alsPackOffered");
+            if (!includeDiagnosticFields && diagnosticFields.includes(field.name)) {
+                return;
+            }
 
             if (value && !seenFields.has(field.name)) {
                 seenFields.add(field.name);
 
+                const speedTestFields = [
+                    "download1", "upload1", "ping_1",
+                    "download2", "upload2", "ping_2"
+                ];
+
+                if (speedTestFields.includes(field.name)) {
+                    if (seenFields.has("speedTestCombined")) return;
+
+                    seenFields.add("speedTestCombined");
+
+                    const speedParts = [];
+
+                    if (vars.download1 || vars.upload1 || vars.ping_1) {
+                        speedParts.push(
+                            `Initial Speedtest Result: ` +
+                            [
+                                vars.download1 && `DL ${vars.download1}Mbps`,
+                                vars.upload1 && `UL ${vars.upload1}Mbps`,
+                                vars.ping_1 && `${vars.ping_1}ms`
+                            ].filter(Boolean).join("/")
+                        );
+                    }
+
+                    if (vars.download2 || vars.upload2 || vars.ping_2) {
+                        speedParts.push(
+                            `After TS Speedtest Result: ` +
+                            [
+                                vars.download2 && `DL ${vars.download2}Mbps`,
+                                vars.upload2 && `UL ${vars.upload2}Mbps`,
+                                vars.ping_2 && `${vars.ping_2}ms`
+                            ].filter(Boolean).join("/")
+                        );
+                    }
+
+                    displayValue = speedParts.join("/ ");
+                }
+
                 if (field.name === "offerALS") {
                     const alsMessages = {
-                        "Offered ALS/Accepted": `Customer Accepted ${alsPackValue || "ALS"} Offer`,
+                        "Offered ALS/Accepted": "Customer Accepted ALS Offered",
                         "Offered ALS/Declined": "Offered ALS But Customer Declined",
                         "Offered ALS/No Confirmation": "Offered ALS But No Confirmation",
                         "Previous Agent Already Offered ALS": "Previous Agent Already Offered ALS"
@@ -15531,23 +18149,57 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
 
                     const alsValue = alsMessages[offerALS];
                     if (alsValue) actionsTakenParts.push(alsValue);
-                }  else if (field.name === "outageStatus") {
+                } else if (field.name === "alsPackOffered") {
+                    const alsPackOfferedMessages = {
+                        "SMART PREPAID/TNT/SMART BRO PREPAID DATA OFFER": "free 10GB Open Access data + 5GB/day for Youtube, NBA, Cignal and iWantTFC valid for 7 days",
+                        "SMART PREPAID VOICE OFFER": "free Unlimited call to Smart/TNT/SUN, Unlimited text to all network and 500MB of data for Viber, Messenger, WhatsApp and Telegram valid for 7 days",
+                        "SMART PREPAID VOICE AND DATA OFFER": "free 10GB Open Access data, 5GB/day for Youtube, NBA, Cignal and iWantTFC, Unlimited call to Smart/TNT/SUN, Unlimited text to all network and 500MB of data for Viber, Messenger, WhatsApp and Telegram valid for 7 days",
+                        "TNT VOICE AND DATA OFFER": "free 10GB Open Access data, 5GB/day for Youtube, NBA, Cignal and iWantTFC, Unlimited all-net texts, Unlimited tri-net calls, 1.5 GB of Data, 100 MB/Day for Facebook valid for 7 days",
+                        "TNT VOICE OFFER": "free Unlimited all-net texts, Unlimited tri-net calls, 1.5 GB of Data, 100 MB/Day for Facebook",
+                        "PHW": "Regular Data Load Php 199",
+                        "Not Applicable": "",
+                    };
+
+                    const alsPackOfferedValue = alsPackOfferedMessages[alsPackOffered];
+                    if (alsPackOfferedValue) actionsTakenParts.push(alsPackOfferedValue);
+                } else if (field.name === "outageStatus") {
                     const outageValue = value === "Yes" ? "Affected by a network outage" : "Not part of network outage";
                     actionsTakenParts.push(outageValue);
-
-                }
-                
-                // else if (field.name === "eligibleForUpsell") {
-                //     const discoCallChatMsg = {
-                //         "No - Disconnected Call": "UNABLE TO OFFER UPSELL AS THE CALL GOT DISCONNECTED",
-                //         "No - Disconnected Chat": "UNABLE TO OFFER UPSELL AS THE CHAT WAS DISCONNECTED"
-                //     };
-
-                //     const discoCallChatValue = discoCallChatMsg[eligibleForUpsellValue];
-                //     if (discoCallChatValue) actionsTakenParts.push(discoCallChatValue);
-                // } 
-                
-                else if (field.name === "productsOffered") {
+                } else if (field.name === "cvToolStatus") {
+                    if (value === "Yes") {
+                        actionsTakenParts.push("CV Downtime");
+                    }
+                } else if (field.name === "nmsToolStatus") {
+                    if (value === "Yes") {
+                        actionsTakenParts.push("NMS Skin Unavailable");
+                    }
+                }  else if (field.name === "dmsToolStatus") {
+                    if (value === "Yes") {
+                        actionsTakenParts.push("DMS Downtime");
+                    }
+                } else if (field.name === "dmsOnuStats") {
+                    if (displayValue === "Check Mark") {
+                        actionsTakenParts.push(`${field.label}: Connected`);
+                    } else if (displayValue === "X Mark") {
+                        actionsTakenParts.push(`${field.label}: Offline`);
+                    } else if (displayValue === "Failed to Refresh") {
+                        actionsTakenParts.push(`${field.label}: Failed to Refresh`);
+                    } else if (displayValue === "No Record Found") {
+                        actionsTakenParts.push("No Record Found in DMS Using Serial/MAC/Phone No");
+                    }
+                } else if (field.name === "dmsSelfHeal") {
+                    if (displayValue === "Yes/Resolved") {
+                        actionsTakenParts.push("Performed Self Heal and the Issue was Resolved");
+                    } else if (displayValue === "Yes/Unresolved") {
+                        actionsTakenParts.push("Performed Self Heal but Issue was still Unresolved");
+                    }
+                } else if (field.name === "cvReading") {
+                    if (vars.cvReading === "Others/Error Code" && vars.cvErrorCode) {
+                        actionsTakenParts.push(vars.cvErrorCode);
+                    } else if (vars.cvReading) {
+                        actionsTakenParts.push(vars.cvReading);
+                    }
+                } else if (field.name === "productsOffered" && value && value !== "Not Applicable" ) {
                     productsOfferedText = (field.label ? `${field.label} ` : "") + value;
                 } else if (field.name === "declineReason") {
                     declineReasonText = (field.label ? `${field.label} - ` : "") + value;
@@ -15568,7 +18220,6 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
             );
         }
 
-        const issueResolvedValue = document.querySelector('[name="issueResolved"]')?.value || "";
         const issueResolvedMap = {
             "Yes": "Resolved",
             "No - Customer is Unresponsive": "Customer is Unresponsive",
@@ -15619,117 +18270,117 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
 
     function constOtherDetails() {
         const fields = [
-            { name: "investigation1", label: "INVESTIGATION 1"},
-            { name: "investigation2", label: "INVESTIGATION 2"},
-            { name: "investigation3", label: "INVESTIGATION 3"},
-            { name: "investigation4", label: "INVESTIGATION 4"},
+            { name: "investigation1", label: "INVESTIGATION 1" },
+            { name: "investigation2", label: "INVESTIGATION 2" },
+            { name: "investigation3", label: "INVESTIGATION 3" },
+            { name: "investigation4", label: "INVESTIGATION 4" },
 
             // Other Details
-            { name: "custAuth", label: "CUST AUTH"},
-            { name: "simLight", label: "Sim Light Status"},
-            { name: "minNumber", label: "MIN"},
-            { name: "onuModel", label: "ONU Model"},
-            { name: "onuSerialNum", label: "ONU SN"},
-            { name: "Option82", label: "Option82"},
-            
+            { name: "custAuth", label: "CUST AUTH" },
+            { name: "simLight", label: "Sim Light Status" },
+            { name: "minNumber", label: "MIN" },
+            { name: "onuModel", label: "ONU Model" },
+            { name: "onuSerialNum", label: "ONU SN" },
+            { name: "Option82", label: "Option82" },
+
             // Network Outage Status
             // { name: "outageStatus"},
 
             // ONU Lights Status and Connection Type
-            { name: "modemLights", label: "Modem Lights Status"},
-            { name: "intLightStatus", label: "Internet Light Status"},
-            { name: "wanLightStatus", label: "WAN Light Status"},
-            { name: "onuConnectionType", label: "ONU Connection Type"},
+            { name: "modemLights" },
+            { name: "intLightStatus", label: "Internet Light Status" },
+            { name: "wanLightStatus", label: "WAN Light Status" },
+            { name: "onuConnectionType" },
 
             // Clearview
-            { name: "cvReading", label: "CV"},
-            { name: "rtaRequest", label: "Real-time Request"},
+            { name: "cvReading", label: "CV" },
+            { name: "rtaRequest", label: "Real-time Request" },
 
             //NMS Skin
-            { name: "onuRunStats", label: "NMS Skin ONU Status"},
-            { name: "rxPower", label: "RX"},
-            { name: "vlan", label: "VLAN"},
-            { name: "ipAddress", label: "IP Address"},
-            { name: "connectedDevices", label: "No. of Connected Devices"},
-            { name: "fsx1Status", label: "FXS1"},
-            { name: "wanName_3", label: "WAN NAME_3"},
-            { name: "srvcType_3", label: "SRVCTYPE_3"},
-            { name: "connType_3", label: "CONNTYPE_3"},
-            { name: "vlan_3", label: "WANVLAN_3"},
-            { name: "saaaBandwidthCode"},
-            { name: "routingIndex", label: "Routing Index"},
-            { name: "callSource", label: "Call Source"},
-            { name: "ldnSet", label: "LDN Set"},
-            { name: "option82Config", label: "Option82 Config"},
+            { name: "nmsOnuStats", label: "NMS Skin ONU Status" },
+            { name: "rxPower", label: "RX" },
+            { name: "vlan", label: "VLAN" },
+            { name: "ipAddress", label: "IP Address" },
+            { name: "connectedDevices", label: "No. of Connected Devices" },
+            { name: "fsx1Status", label: "FXS1" },
+            { name: "wanName_3", label: "WAN NAME_3" },
+            { name: "srvcType_3", label: "SRVCTYPE_3" },
+            { name: "connType_3", label: "CONNTYPE_3" },
+            { name: "vlan_3", label: "WANVLAN_3" },
+            { name: "nmsBandwidthCode" },
+            { name: "routingIndex", label: "Routing Index" },
+            { name: "callSource", label: "Call Source" },
+            { name: "ldnSet", label: "LDN Set" },
+            { name: "option82Config", label: "Option82 Config" },
             // { name: "nmsSkinRemarks", label: "NMS"  },
-            
+
             // DMS
-            { name: "dmsInternetStatus", label: "DMS Internet/Data Status"},
-            { name: "deviceWifiBand", label: "Device used found in"},
-            { name: "bandsteering", label: "Bandsteering"},
-            { name: "dmsVoipServiceStatus", label: "VoIP Status in DMS"},
-            { name: "dmsLanPortStatus", label: "LAN Port Status in DMS"},
-            { name: "dmsWifiState", label: "Wi-Fi State in DMS"},
-            { name: "dmsLan4Status", label: "LAN Port Status in DMS"},
-            { name: "dmsSelfHeal", label: "Performed Self Heal"},
+            { name: "dmsInternetStatus", label: "DMS Internet/Data Status" },
+            { name: "deviceWifiBand", label: "Device used found in" },
+            { name: "bandsteering", label: "Bandsteering" },
+            { name: "dmsVoipServiceStatus", label: "VoIP Status in DMS" },
+            { name: "dmsLanPortStatus", label: "LAN Port Status in DMS" },
+            { name: "dmsWifiState", label: "Wi-Fi State in DMS" },
+            { name: "dmsLan4Status", label: "LAN Port Status in DMS" },
+            { name: "dmsSelfHeal", label: "Performed Self Heal" },
             // { name: "dmsRemarks", label: "DMS"},
 
             // Probe & Troubleshoot
-            { name: "callType", label: "Call Type"},
-            { name: "lanPortNum", label: "LAN Port Number"},
-            { name: "serviceStatus", label: "Voice Service Status"},
-            { name: "services", label: "Service(s)"},
-            { name: "outageStatus", label: "Outage"},
-            { name: "outageReference", label: "Source Reference"},
-            { name: "connectionMethod", label: "Connected via"},
-            { name: "deviceBrandAndModel", label: "Device Brand and Model"},
-            { name: "specificTimeframe", label: "Specific Timeframe"},
-            { name: "speedTestResult", label: "Initial Speedtest Result"},
-            { name: "pingTestResult", label: "Ping"},
-            { name: "gameNameAndServer", label: "Game Name and Server"},
-            { name: "gameServerIP", label: "Game Server IP Address"},
-            { name: "pingTestResult2", label: "Game Server IP Address Ping Test Result"},
-            { name: "traceroutePLDT", label: "Tracerout PLDT"},
-            { name: "tracerouteExt", label: "Tracerout External"},
-            { name: "meshtype", label: "Mesh Type"},
-            { name: "meshOwnership", label: "Mesh Ownership"},
-            { name: "websiteURL", label: "Website Address"},
-            { name: "errMsg", label: "Error Message"},
-            { name: "otherDevice", label: "Tested on Other Devices or Browsers"},
-            { name: "vpnBlocking", label: "Possible VPN Blocking Issue"},
-            { name: "vpnBlocking", label: "VPN Required When Accessing Website or App"},
-            { name: "otherISP", label: "Result Using Other ISP"},
-            { name: "itSupport", label: "Has IT Support"},
-            { name: "itRemarks", label: "IT Support Remarks"},
-            { name: "actualExp", label: "Actual Experience"},
+            { name: "callType", label: "Call Type" },
+            { name: "lanPortNum", label: "LAN Port Number" },
+            { name: "serviceStatus", label: "Voice Service Status" },
+            { name: "services", label: "Service(s)" },
+            { name: "outageStatus", label: "Outage" },
+            { name: "outageReference", label: "Source Reference" },
+            { name: "connectionMethod", label: "Connected via" },
+            { name: "deviceBrandAndModel", label: "Device Brand and Model" },
+            { name: "specificTimeframe", label: "Specific Timeframe" },
+            { name: "speedTestResult", label: "Initial Speedtest Result" },
+            { name: "pingTestResult", label: "Ping" },
+            { name: "gameNameAndServer", label: "Game Name and Server" },
+            { name: "gameServerIP", label: "Game Server IP Address" },
+            { name: "ping2", label: "Game Server IP Address Ping Test Result" },
+            { name: "traceroutePLDT", label: "Tracerout PLDT" },
+            { name: "tracerouteExt", label: "Tracerout External" },
+            { name: "meshtype", label: "Mesh Type" },
+            { name: "meshOwnership", label: "Mesh Ownership" },
+            { name: "websiteURL", label: "Website Address" },
+            { name: "errMsg", label: "Error Message" },
+            { name: "otherDevice", label: "Tested on Other Devices or Browsers" },
+            { name: "vpnBlocking", label: "Possible VPN Blocking Issue" },
+            { name: "vpnRequired", label: "VPN Required When Accessing Website or App" },
+            { name: "otherISP", label: "Result Using Other ISP" },
+            { name: "itSupport", label: "Has IT Support" },
+            { name: "itRemarks", label: "IT Support Remarks" },
+            { name: "actualExp", label: "Actual Experience" },
 
             // For Retracking
-            { name: "stbID", label: "STB Serial Number"},
-            { name: "smartCardID", label: "Smartcard ID"},
-            { name: "accountNum", label: "PLDT Account Number"},
-            { name: "cignalPlan", label: "CIGNAL TV Plan"},
-            { name: "stbIpAddress", label: "STB IP Address"}, 
-            { name: "tsMulticastAddress", label: "Tuned Service Multicast Address"}, 
-            { name: "exactExp", label: "Exact Experience"},
+            { name: "stbID", label: "STB Serial Number" },
+            { name: "smartCardID", label: "Smartcard ID" },
+            { name: "accountNum", label: "PLDT Account Number" },
+            { name: "cignalPlan", label: "CIGNAL TV Plan" },
+            { name: "stbIpAddress", label: "STB IP Address" },
+            { name: "tsMulticastAddress", label: "Tuned Service Multicast Address" },
+            { name: "exactExp", label: "Exact Experience" },
 
             // Ticket Details
-            { name: "cepCaseNumber", label: "CEP"},
-            { name: "pcNumber", label: "Parent Case"},
-            { name: "ffupCount", label: "FFUP Count"},
-            { name: "statusReason"},
-            { name: "subStatus"},
-            { name: "queue", label: "Queue"},
-            { name: "ticketAge", label: "Case Age"},
-            { name: "sla", label: "SLA"},
-            { name: "reOpenStatsReason", label: "Re-Open Status Reason"},
+            { name: "cepCaseNumber", label: "CEP" },
+            { name: "pcNumber", label: "Parent Case" },
+            { name: "ffupCount", label: "FFUP Count" },
+            { name: "statusReason" },
+            { name: "subStatus" },
+            { name: "queue", label: "Queue" },
+            { name: "ticketAge", label: "Case Age" },
+            { name: "sla", label: "SLA" },
+            { name: "reOpenStatsReason", label: "Re-Open Status Reason" },
 
             // Special Instructions
-            { name: "contactName", label: "CONTACT PERSON"},
-            { name: "cbr", label: "CBR"},
-            { name: "availability", label: "AVAILABILITY"},
-            { name: "address", label: "COMPLETE ADDRESS"},
-            { name: "landmarks", label: "NEAREST LANDMARK"},
-            { name: "rptCount", label: "REPEATER"},
+            { name: "contactName", label: "CONTACT PERSON" },
+            { name: "cbr", label: "CBR" },
+            { name: "availability", label: "AVAILABILITY" },
+            { name: "address", label: "COMPLETE ADDRESS" },
+            { name: "landmarks", label: "NEAREST LANDMARK" },
+            { name: "rptCount", label: "REPEATER" },
             { name: "WOCAS", label: "WOCAS" }
         ];
 
@@ -15876,7 +18527,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
 
     concernCopiedText = concernCopiedText.toUpperCase();
     // otherDetailsCopiedText = otherDetailsCopiedText.toUpperCase();
-    
+
     let otherDetailsSections = [];
 
     if (otherDetailsCopiedText) {
@@ -15888,7 +18539,7 @@ function techNotesButtonHandler(showFloating = true, showOtherDetails = true) {
         concernCopiedText,
         actionsTakenCopiedText
     ].filter(Boolean)
-    .join("\n");
+        .join("\n");
 
     const textToCopy = [
         notes_part1,
@@ -15924,7 +18575,7 @@ function splitIntoSections(text, maxChars = 250) {
 
 function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
     const vars = initializeVariables();
-    
+
     const floatingDiv = document.getElementById("floatingDiv");
     const overlay = document.getElementById("overlay");
 
@@ -15943,7 +18594,7 @@ function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
         const sectionWrapper = document.createElement("div");
         sectionWrapper.style.marginTop = "10px";
 
-        if (title) { 
+        if (title) {
             const sectionTitle = document.createElement("div");
             sectionTitle.textContent = title;
             sectionTitle.style.fontWeight = "bold";
@@ -15984,7 +18635,7 @@ function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
         return sectionWrapper;
     }
 
-    const channel  = window.agentDetailsData?.channel || vars.channel;
+    const channel = window.agentDetailsData?.channel || vars.channel;
     const isHotline = channel === "CDT-HOTLINE";
     const isFollowUpRepair = vars.selectedIntent === "formFfupRepair";
 
@@ -16009,7 +18660,7 @@ function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
             copiedValues.appendChild(createCopySection("", notes_part1));
         }
     }
- 
+
     overlay.style.display = "block";
     floatingDiv.style.display = "block";
     setTimeout(() => floatingDiv.classList.add("show"), 10);
@@ -16028,7 +18679,7 @@ function showTechNotesFloatingDiv(notes_part1, notes_part2 = "") {
 // Generate FUSE notes for Non-Tech Intents
 function getFuseFieldValueIfVisible(fieldName) {
     const vars = initializeVariables();
-    
+
     if (!isFieldVisible(fieldName)) return "";
 
     const field = document.querySelector(`[name="${fieldName}"]`);
@@ -16055,10 +18706,10 @@ function nontechNotesButtonHandler(showFloating = true) {
 
     // STOP execution if upsell is incomplete
     if (!validateUpsellFields()) return;
-    
+
     const vars = initializeVariables();
-    const channel  = window.agentDetailsData?.channel || ""; 
-    const caseOrigin  = window.agentDetailsData?.caseOrigin || ""; 
+    const channel = window.agentDetailsData?.channel || "";
+    const caseOrigin = window.agentDetailsData?.caseOrigin || "";
     const calloutAttempt = getFuseFieldValueIfVisible("calloutAttempt");
 
     let concernCopiedText = "";
@@ -16080,25 +18731,25 @@ function nontechNotesButtonHandler(showFloating = true) {
 
     function constructFuseOutput() {
         const fields = [
-            { name: "offerALS"},
-            { name: "alsPackOffered"},
-            { name: "effectiveDate", label: "Effectivity Date"},
-            { name: "nomiMobileNum"},
-            { name: "cepCaseNumber"},
-            { name: "ownership"},
-            { name: "custAuth", label: "CUST AUTH"},
-            { name: "paymentChannel", label: "PAYMENT CHANNEL"},
-            { name: "otherPaymentChannel", label: "PAYMENT CHANNEL"},
-            { name: "resolution"},
-            { name: "remarks"},
+            { name: "offerALS" },
+            { name: "alsPackOffered" },
+            { name: "effectiveDate", label: "Effectivity Date" },
+            { name: "nomiMobileNum" },
+            { name: "cepCaseNumber" },
+            { name: "ownership" },
+            { name: "custAuth", label: "CUST AUTH" },
+            { name: "paymentChannel", label: "PAYMENT CHANNEL" },
+            { name: "otherPaymentChannel", label: "PAYMENT CHANNEL" },
+            { name: "resolution" },
+            { name: "remarks" },
 
             // CCBO Callout Details
-            { name: "calloutAttempt"},
+            { name: "calloutAttempt" },
 
             // Cross-Sell/Upsell
-            { name: "productsOffered", label: "OFFERED"},
-            { name: "declineReason", label: "CUST DECLINED OFFER"},
-            { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL DUE TO"},
+            { name: "productsOffered", label: "OFFERED" },
+            { name: "declineReason", label: "CUST DECLINED OFFER" },
+            { name: "notEligibleReason", label: "NOT ELIGIBLE FOR UPSELL DUE TO" },
         ];
 
         const seenFields = new Set();
@@ -16155,6 +18806,11 @@ function nontechNotesButtonHandler(showFloating = true) {
                 }
             }
         });
+
+        const srNumValue = getFuseFieldValueIfVisible("srNum");
+        if (channel === "CNDT_CCBO" && srNumValue) {
+            actionsTakenParts.push(`${srNumValue}`);
+        }
 
         // Affected Tool
         const affectedTool = getFuseFieldValueIfVisible("affectedTool");
@@ -16218,7 +18874,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         } else if (offerAcceptedValue in upsellMap.offerAccepted) {
             upsellNote = upsellMap.offerAccepted[offerAcceptedValue];
         }
- 
+
         // Sagip OL Discount Mapping
         const sagipOLDiscountValue = document.querySelector('[name="sagipOLDiscount"]')?.value || "";
 
@@ -16256,7 +18912,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         if (casio) {
             actionsTaken += (actionsTaken ? "\n" : "") + casio;
         }
-        
+
         // Append upsell note (DO NOT uppercase)
         if (upsellNote) {
             actionsTaken += (actionsTaken ? "\n\n" : "") + upsellNote;
@@ -16298,19 +18954,19 @@ function nontechNotesButtonHandler(showFloating = true) {
 
     function constructOutboundDetails() {
         const fields = [
-            { name: "calloutAttempt"},
-            { name: "cosmoDetails1"},
-            { name: "outboundResult1"},
-            { name: "checkSecondaryNum"},
-            { name: "cosmoDetails2"},
-            { name: "outboundResult2"},
-            { name: "cosmoDetails3"},
-            { name: "outboundResult3"},
-            { name: "remarks"},
-            { name: "srNum"},
-            { name: "casio"},
-            { name: "smsSent"},
-            { name: "caseStatus"},
+            { name: "calloutAttempt" },
+            { name: "cosmoDetails1" },
+            { name: "outboundResult1" },
+            { name: "checkSecondaryNum" },
+            { name: "cosmoDetails2" },
+            { name: "outboundResult2" },
+            { name: "cosmoDetails3" },
+            { name: "outboundResult3" },
+            { name: "remarks" },
+            { name: "srNum" },
+            { name: "casio" },
+            { name: "smsSent" },
+            { name: "caseStatus" },
         ];
 
         const seenFields = new Set();
@@ -16405,7 +19061,7 @@ function nontechNotesButtonHandler(showFloating = true) {
                             return;
                         }
                     }
-                    
+
                     if (modifiedValue) {
                         outboundDetailParts.push(
                             (field.label ? `${field.label}: ` : "") + modifiedValue
@@ -16463,10 +19119,26 @@ function nontechNotesButtonHandler(showFloating = true) {
         "formReqAccMgt", "formReqAddressMod", "formReqDisconnection", "formReqDispute", "formReqDowngrade", "formReqReconnect", "formReqRefund", "formReqVAS", "formReqSupRetAccNum", "formReqSupChangeAccNum"
     ];
 
-    const basedOnSelectedIntentAndRequestTypeCCBO = [
-        "ccbo_formReqBillAdjust", "ccbo_formInqBill", "ccbo_formCompMistreat", "ccbo_formReqSpecFeat", "ccbo_formInqSpecialFeatures"
+    const reqBasedOnSelectedIntentCCBO = [
+        "ccbo_formReqChangeTelNum"
     ];
-    
+
+    const reqBasedOnSelectedIntentAndRequestTypeCCBO = [
+        "ccbo_formReqBillAdjust", "ccbo_formReqChangeOwnership"
+    ];
+
+    const inqBasedOnSelectedIntentCCBO = [
+        "ccbo_formInqChangeTelNum"
+    ];
+
+    const inqBasedOnSelectedIntentAndRequestTypeCCBO = [
+        "ccbo_formInqBill",
+    ];
+
+    const ffupBasedOnSelectedIntentCCBO = [
+        "ccbo_formFfupBillAdjust", "ccbo_formFfupChangeOwnership", "ccbo_formFfupChangeTelNum"
+    ];
+
     // non-Tech Complaints
     if (vars.selectedIntent === "formCompMyHomeWeb") {
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/ ${vars.selectedIntentText}${insertCustConcern(vars.custConcern)}`;
@@ -16485,7 +19157,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         actionsTakenCopiedText = constructFuseOutput();
 
     }
-    
+
     // non-Tech Inquiries
     else if (inquiryForms.includes(vars.selectedIntent)) {
 
@@ -16508,7 +19180,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         actionsTakenCopiedText = constructFuseOutput();
 
     }
-    
+
     // Non-Tech Follow-Ups
     else if (ffupForms.includes(vars.selectedIntent)) {
 
@@ -16609,7 +19281,7 @@ function nontechNotesButtonHandler(showFloating = true) {
         actionsTakenCopiedText = constructFuseOutput();
 
     }
-    
+
     // Non-Tech Requests
     else if (reqBasedIntent.includes(vars.selectedIntent)) {
         concernCopiedText = `${custName}${sfCaseNum}${accountNum}${landlineNum}\nC: ${channel}/${vars.selectedIntentText}${soSrNum}${insertCustConcern(vars.custConcern)}`;
@@ -16626,19 +19298,66 @@ function nontechNotesButtonHandler(showFloating = true) {
     }
 
     // CCBO Non-Tech Requests
-    else if (basedOnSelectedIntentAndRequestTypeCCBO.includes(vars.selectedIntent)) {
+    else if (reqBasedOnSelectedIntentCCBO.includes(vars.selectedIntent)) {
+        if (calloutAttempt !== "2nd") {
+            concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC: ${vars.selectedIntentText} REQUEST`;
+            actionsTakenCopiedText = constructFuseOutput();
+            outboundDetailsCopiedText = constructOutboundDetails();
+        } else {
+            outboundDetailsCopiedText = constructOutboundDetails();
+        }
+    } else if (reqBasedOnSelectedIntentAndRequestTypeCCBO.includes(vars.selectedIntent)) {
         if (calloutAttempt !== "2nd") {
             if (vars.requestType === "Others") {
-                concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC:  ${vars.selectedIntentText} - ${vars.othersConcern}`;
+                concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC:  ${vars.selectedIntentText} - ${vars.othersConcern} REQUEST`;
             } else {
-                concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC: ${vars.selectedIntentText} - ${vars.requestType}`;
+                concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC: ${vars.selectedIntentText} - ${vars.requestType} REQUEST`;
             }
             actionsTakenCopiedText = constructFuseOutput();
             outboundDetailsCopiedText = constructOutboundDetails();
         } else {
             outboundDetailsCopiedText = constructOutboundDetails();
         }
+    }
 
+    // CCBO Non-Tech Inquiries
+    else if (inqBasedOnSelectedIntentCCBO.includes(vars.selectedIntent)) {
+        if (calloutAttempt !== "2nd") {
+            concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC: ${vars.selectedIntentText} INQUIRY`;
+            actionsTakenCopiedText = constructFuseOutput();
+            outboundDetailsCopiedText = constructOutboundDetails();
+        } else {
+            outboundDetailsCopiedText = constructOutboundDetails();
+        }
+    } else if (inqBasedOnSelectedIntentAndRequestTypeCCBO.includes(vars.selectedIntent)) {
+        if (calloutAttempt !== "2nd") {
+            if (vars.selectedIntent === "ccbo_formInqBill") {
+                if (vars.requestType === "Others") {
+                    concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC: ${vars.selectedIntentText} - ${vars.othersConcern}`;
+                } else if (vars.requestType === "Account Balance") {
+                    concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC: ${vars.selectedIntentText} - ${vars.requestType} FOR ${vars.subType}`;
+                } else {
+                    concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC: ${vars.selectedIntentText} - ${vars.requestType}`;
+                }
+            } else {
+                concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC: ${vars.selectedIntentText} INQUIRY`;
+            }
+            actionsTakenCopiedText = constructFuseOutput();
+            outboundDetailsCopiedText = constructOutboundDetails();
+        } else {
+            outboundDetailsCopiedText = constructOutboundDetails();
+        }
+    }
+
+    // CCBO Non-Tech Follow-Ups
+    else if (ffupBasedOnSelectedIntentCCBO.includes(vars.selectedIntent)) {
+        if (calloutAttempt !== "2nd") {
+            concernCopiedText = `${channel}/ ${caseOrigin} - CASE# ${sfCaseNum}\nC: FOLLOW-UP ON ${vars.selectedIntentText} REQUEST - ${vars.ffupStatus}`;
+            actionsTakenCopiedText = constructFuseOutput();
+            outboundDetailsCopiedText = constructOutboundDetails();
+        } else {
+            outboundDetailsCopiedText = constructOutboundDetails();
+        }
     }
 
     concernCopiedText = concernCopiedText.toUpperCase();
@@ -16747,16 +19466,16 @@ function bantayKableButtonHandler(showFloating = true) {
         return value && value !== "" ? `/ ${value}` : "";
     }
 
-    const sfCaseNum = (isFieldVisible("sfCaseNum") && vars.sfCaseNum) 
-        ? `/ SF#: ${vars.sfCaseNum}` 
+    const sfCaseNum = (isFieldVisible("sfCaseNum") && vars.sfCaseNum)
+        ? `/ SF#: ${vars.sfCaseNum}`
         : "";
 
-    const accountNum = (isFieldVisible("accountNum") && vars.accountNum) 
-        ? `/ ACC#: ${vars.accountNum}` 
+    const accountNum = (isFieldVisible("accountNum") && vars.accountNum)
+        ? `/ ACC#: ${vars.accountNum}`
         : "";
 
     function constructOutput(fields) {
-        const channel  = window.agentDetailsData?.channel  || vars.selectChannel;
+        const channel = window.agentDetailsData?.channel || vars.selectChannel;
         const seenFields = new Set();
         let section1 = "";
         let section2 = "";
@@ -16799,15 +19518,15 @@ function bantayKableButtonHandler(showFloating = true) {
     }
 
     const fields = [
-        { name: "custConcern", label: "Concern"},
-        { name: "remarks", label: "Actions Taken/Remarks"},
-        { name: "telNum164", label: "Telephone Number"},
-        { name: "callerName", label: "Customer/Caller Name"},
-        { name: "contactName", label: "Contact Person"},
-        { name: "cbr", label: "Contact Number"},
-        { name: "emailAdd", label: "Active Email Address"},
-        { name: "address", label: "Address/Landmarks"},
-        { name: "concern164", label: "Concern"},
+        { name: "custConcern", label: "Concern" },
+        { name: "remarks", label: "Actions Taken/Remarks" },
+        { name: "telNum164", label: "Telephone Number" },
+        { name: "callerName", label: "Customer/Caller Name" },
+        { name: "contactName", label: "Contact Person" },
+        { name: "cbr", label: "Contact Number" },
+        { name: "emailAdd", label: "Active Email Address" },
+        { name: "address", label: "Address/Landmarks" },
+        { name: "concern164", label: "Concern" },
     ];
 
     const { section1, section2 } = constructOutput(fields);
@@ -16983,7 +19702,7 @@ function sfTaggingButtonHandler() {
 
     const ffupRefund = ["formFfupCustDependency", "formFfupAMSF", "formFfupFinalAcc", "formFfupOverpayment", "formFfupWrongBiller"];
 
-    const ffupVAS =["formFfupVasAct", "formFfupVasDel"];
+    const ffupVAS = ["formFfupVasAct", "formFfupVasDel"];
 
     const alwaysOn = ["form500_5", "form501_7", "form101_5", "form510_9", "form500_6"];
 
@@ -17010,8 +19729,8 @@ function sfTaggingButtonHandler() {
     } else if (voiceAndDataForms.includes(vars.selectedIntent)) {
         const caseSubType =
             (vars.resolution === 'Network / Outage' || vars.resolution === 'Zone')
-            ? `No Dial Tone and No Internet Connection - ${vars.resolution}`
-            : `NDT NIC - ${vars.resolution}`;
+                ? `No Dial Tone and No Internet Connection - ${vars.resolution}`
+                : `NDT NIC - ${vars.resolution}`;
 
         bauRows = [
             ['VOC:', 'Complaint'],
@@ -17023,9 +19742,9 @@ function sfTaggingButtonHandler() {
 
         if (['form101_1', 'form101_2', 'form101_3', 'form101_4'].includes(vars.selectedIntent)) {
             if (vars.resolution === 'Zone' || vars.resolution === 'Network / Outage') {
-            caseSubType = `No Dial Tone - ${vars.resolution}`;
+                caseSubType = `No Dial Tone - ${vars.resolution}`;
             } else {
-            caseSubType = `Dial Tone Problem - ${vars.resolution}`;
+                caseSubType = `Dial Tone Problem - ${vars.resolution}`;
             }
         } else if (['form102_1', 'form102_2', 'form102_3', 'form102_4', 'form102_5', 'form102_6', 'form102_7'].includes(vars.selectedIntent)) {
             caseSubType = `Poor Call Quality - ${vars.resolution}`;
@@ -17074,11 +19793,11 @@ function sfTaggingButtonHandler() {
         ];
     } else if (vars.selectedIntent === 'form501_5' || vars.selectedIntent === 'form501_6') {
         const caseSubType =
-        (vars.resolution === 'Webpage Not Loading')
-            ? 'Selective Browsing - Webpage Not Loading'
-            : (vars.resolution === 'Network / Outage' || vars.resolution === 'Zone')
-                ? `Slow Internet Connection - ${vars.resolution}`
-                : `SIC - ${vars.resolution}`;
+            (vars.resolution === 'Webpage Not Loading')
+                ? 'Selective Browsing - Webpage Not Loading'
+                : (vars.resolution === 'Network / Outage' || vars.resolution === 'Zone')
+                    ? `Slow Internet Connection - ${vars.resolution}`
+                    : `SIC - ${vars.resolution}`;
 
         bauRows = [
             ['VOC:', 'Complaint'],
@@ -17122,15 +19841,15 @@ function sfTaggingButtonHandler() {
             caseSubType = `Change Wifi UN/PW - ${vars.resolution}`;
         } else if (['form300_2'].includes(vars.selectedIntent)) {
             if (vars.resolution === "Defective Modem") {
-                caseSubType = `GUI Access - ${vars.resolution}`;   
+                caseSubType = `GUI Access - ${vars.resolution}`;
             } else {
                 caseSubType = `GUI Reset (Local User) - ${vars.resolution}`;
-            } 
+            }
         } else if (['form300_3'].includes(vars.selectedIntent)) {
             caseSubType = `GUI Access (Super Admin) - ${vars.resolution}`;
         } else if (['form300_4', 'form300_5', 'form300_7', 'form300_8'].includes(vars.selectedIntent)) {
             if (vars.resolution === "NMS Configuration") {
-                caseSubType = `Mode Set-Up - ${vars.resolution} (Route to Bridge or Bridge to Route - indicate in remarks)`;  
+                caseSubType = `Mode Set-Up - ${vars.resolution} (Route to Bridge or Bridge to Route - indicate in remarks)`;
             } else {
                 caseSubType = `Mode Set-Up - ${vars.resolution}`;
             }
@@ -17207,7 +19926,7 @@ function sfTaggingButtonHandler() {
             ['Sub_SetCategory:', `${vars.personnelType}`]
         ];
     }
-    
+
     // Non-Tech Inquiry
     else if (inqAccounts.includes(vars.selectedIntent)) {
         smntRows = [
@@ -17270,7 +19989,7 @@ function sfTaggingButtonHandler() {
         ];
     } else if (vars.selectedIntent === 'formInqOutsBal') {
         let subType = '';
-        
+
         subType = `${vars.selectedIntentText} - ${vars.subType}`;
 
         smntRows = [
@@ -17338,7 +20057,7 @@ function sfTaggingButtonHandler() {
             ['Case Type:', 'Entertainment'],
             ['Case Sub-Type:', 'Lions Gate/HBO Go/Viu/Others']
         ];
-        
+
         baaRows = [
             ['WrapUp:', 'Inquiry'],
             ['Sub_WrapUp:', 'Entertainment'],
@@ -17501,7 +20220,7 @@ function sfTaggingButtonHandler() {
             ['Sub_SetCategory:', 'Processing Fees / SLA']
         ];
     }
-    
+
     // Non-Tech Follow-up
     else if (vars.selectedIntent === 'formFfupChangeOwnership') {
         smntRows = [
@@ -17723,26 +20442,26 @@ function sfTaggingButtonHandler() {
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Re-Route/OW - Opsim']
         ];
-        
+
         baaRows = [
             ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
             ['Sub_WrapUp:', `${vars.selectedIntentText}`],
             ['Sub_SetCategory:', 'Re-Route/OW - Opsim']
         ];
-    }  else if (vars.selectedIntent === 'formFfupWT') {
+    } else if (vars.selectedIntent === 'formFfupWT') {
         smntRows = [
             ['VOC:', `Follow-up - ${vars.ffupStatus}`],
             ['Case Type:', `${vars.selectedIntentText}`],
             ['Case Sub-Type:', 'Withholding Tax (CCAM)']
         ];
-        
+
         baaRows = [
             ['WrapUp:', `Follow-up - ${vars.ffupStatus}`],
             ['Sub_WrapUp:', `${vars.selectedIntentText}`],
             ['Sub_SetCategory:', 'Withholding Tax (CCAM)']
         ];
-    } 
-    
+    }
+
     // For validation
     else if (vars.selectedIntent === 'formFfupRepairRecon') {
         smntRows = [
@@ -17755,7 +20474,7 @@ function sfTaggingButtonHandler() {
             ['Sub_WrapUp:', `${vars.selectedIntentText}`],
             ['Sub_SetCategory:', 'Reconnection']
         ];
-    } 
+    }
 
     // Non-Tech Request
     else if (reqFormat1.includes(vars.selectedIntent)) {
@@ -17834,7 +20553,7 @@ function sfTaggingButtonHandler() {
             ['Case Type:', 'UNLI FAM CALL'],
             ['Case Sub-Type:', 'UFC Activation/Deactivation']
         ];
-        
+
         baaRows = [
             ['WrapUp:', 'Request'],
             ['Sub_WrapUp:', 'UNLI FAM CALL'],
@@ -17922,7 +20641,7 @@ function sfTaggingButtonHandler() {
             ['Case Type:', 'Refer to other hotline'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
-        
+
         baaRows = [
             ['WrapUp:', 'Others'],
             ['Sub_WrapUp:', 'Refer to other hotline'],
@@ -17934,7 +20653,7 @@ function sfTaggingButtonHandler() {
             ['Case Type:', 'Transfer'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
-        
+
         baaRows = [
             ['WrapUp:', 'Others'],
             ['Sub_WrapUp:', 'Transfer'],
@@ -17946,7 +20665,7 @@ function sfTaggingButtonHandler() {
             ['Case Type:', 'Unsuccessful Transaction'],
             ['Case Sub-Type:', `${vars.selectedIntentText}`]
         ];
-        
+
         baaRows = [
             ['WrapUp:', 'Others'],
             ['Sub_WrapUp:', 'Unsuccessful Transaction'],
@@ -17966,7 +20685,7 @@ function sfTaggingButtonHandler() {
     floating1DivHeader.textContent = "CASE TAGGING";
 
     const sfTaggingValues = document.getElementById("sfTaggingValues");
-    sfTaggingValues.innerHTML = '';  
+    sfTaggingValues.innerHTML = '';
 
     function createTable(title, rows) {
         const table = document.createElement('table');
@@ -18072,12 +20791,12 @@ function endorsementForm() {
         );
         return;
     }
-    
+
     const overlay = document.getElementById("overlay");
-    overlay.style.display = "block"; 
+    overlay.style.display = "block";
 
     const floating2Div = document.createElement("div");
-    floating2Div.id = "floating2Div"; 
+    floating2Div.id = "floating2Div";
 
     const header = document.createElement("div");
     header.id = "floating2DivHeader";
@@ -18093,32 +20812,32 @@ function endorsementForm() {
     table.id = "form2Table";
 
     const formFields = [
-        { label: "Endorsement Type", type: "select", name: "endorsementType", options: ["", "Zone", "Network", "Potential Crisis", "Sup Call"]},
-        { label: "WOCAS", type: "textarea", name: "WOCAS2"},
-        { label: "SF Case #", type: "number", name: "sfCaseNum2"},
-        { label: "Account Name", type: "text", name: "accOwnerName"},
-        { label: "Account #", type: "number", name: "accountNum2"},
-        { label: "Telephone #", type: "number", name: "landlineNum2"},
-        { label: "Contact Person", type: "text", name: "contactName2"},
-        { label: "Mobile #/CBR", type: "number", name: "cbr2"},
-        { label: "Preferred Date & Time", type: "text", name: "availability2"},
-        { label: "Address", type: "textarea", name: "address2"},
-        { label: "Landmarks", type: "textarea", name: "landmarks2"},
-        { label: "CEP Case #", type: "number", name: "cepCaseNumber2"},
-        { label: "Queue", type: "text", name: "queue2"},
-        { label: "Ticket Status", type: "text", name: "ticketStatus2"},
-        { label: "Agent Name", type: "text", name: "agentName2"},
-        { label: "Team Leader", type: "text", name: "teamLead2"},
-        { label: "Reference #", type: "", name: "refNumber2"},
-        { label: "Payment Channel", type: "", name: "paymentChannel2"},
-        { label: "Amount Paid", type: "", name: "amountPaid2"},
-        { label: "Date", type: "date", name: "date"},
-        { label: "Escalation Remarks", type: "textarea", name: "remarks2", placeholder: "Please indicate the specific reason for escalation. Do NOT include actions taken in this field."},
+        { label: "Endorsement Type", type: "select", name: "endorsementType", options: ["", "Zone", "Network", "Potential Crisis", "Sup Call"] },
+        { label: "WOCAS", type: "textarea", name: "WOCAS2" },
+        { label: "SF Case #", type: "number", name: "sfCaseNum2" },
+        { label: "Account Name", type: "text", name: "accOwnerName" },
+        { label: "Account #", type: "number", name: "accountNum2" },
+        { label: "Telephone #", type: "number", name: "landlineNum2" },
+        { label: "Contact Person", type: "text", name: "contactName2" },
+        { label: "Mobile #/CBR", type: "number", name: "cbr2" },
+        { label: "Preferred Date & Time", type: "text", name: "availability2" },
+        { label: "Address", type: "textarea", name: "address2" },
+        { label: "Landmarks", type: "textarea", name: "landmarks2" },
+        { label: "CEP Case #", type: "number", name: "cepCaseNumber2" },
+        { label: "Queue", type: "text", name: "queue2" },
+        { label: "Ticket Status", type: "text", name: "ticketStatus2" },
+        { label: "Agent Name", type: "text", name: "agentName2" },
+        { label: "Team Leader", type: "text", name: "teamLead2" },
+        { label: "Reference #", type: "", name: "refNumber2" },
+        { label: "Payment Channel", type: "", name: "paymentChannel2" },
+        { label: "Amount Paid", type: "", name: "amountPaid2" },
+        { label: "Date", type: "date", name: "date" },
+        { label: "Escalation Remarks", type: "textarea", name: "remarks2", placeholder: "Please indicate the specific reason for escalation. Do NOT include actions taken in this field." },
     ];
 
     formFields.forEach(field => {
         const row = document.createElement("tr");
-        row.style.display = field.name === "endorsementType" ? "table-row" : "none"; 
+        row.style.display = field.name === "endorsementType" ? "table-row" : "none";
 
         const td = document.createElement("td");
         td.colSpan = 2;
@@ -18137,7 +20856,7 @@ function endorsementForm() {
             input = document.createElement("select");
             input.name = field.name;
             input.className = "form3-input";
-            
+
             field.options.forEach(optionValue => {
                 const option = document.createElement("option");
                 option.value = optionValue;
@@ -18175,20 +20894,20 @@ function endorsementForm() {
     form3Container.appendChild(table);
 
     const autofillMappings = [
-        { source: "WOCAS", target: "WOCAS2"},
-        { source: "sfCaseNum", target: "sfCaseNum2"},
-        { source: "accountNum", target: "accountNum2"},
-        { source: "landlineNum", target: "landlineNum2"},
-        { source: "contactName", target: "contactName2"},
-        { source: "cbr", target: "cbr2"},
-        { source: "availability", target: "availability2"},
-        { source: "address", target: "address2"},
-        { source: "landmarks", target: "landmarks2"},
-        { source: "cepCaseNumber", target: "cepCaseNumber2"},
-        { source: "queue", target: "queue2"},
-        { source: "ticketStatus", target: "ticketStatus2"},
-        { source: "agentName", target: "agentName2"},
-        { source: "teamLead", target: "teamLead2"},
+        { source: "WOCAS", target: "WOCAS2" },
+        { source: "sfCaseNum", target: "sfCaseNum2" },
+        { source: "accountNum", target: "accountNum2" },
+        { source: "landlineNum", target: "landlineNum2" },
+        { source: "contactName", target: "contactName2" },
+        { source: "cbr", target: "cbr2" },
+        { source: "availability", target: "availability2" },
+        { source: "address", target: "address2" },
+        { source: "landmarks", target: "landmarks2" },
+        { source: "cepCaseNumber", target: "cepCaseNumber2" },
+        { source: "queue", target: "queue2" },
+        { source: "ticketStatus", target: "ticketStatus2" },
+        { source: "agentName", target: "agentName2" },
+        { source: "teamLead", target: "teamLead2" },
     ];
 
     autofillMappings.forEach(({ source, target }) => {
@@ -18230,11 +20949,11 @@ function endorsementForm() {
 
     generateButton.onclick = () => {
 
-    floating2Div.classList.remove("show");
+        floating2Div.classList.remove("show");
 
-    setTimeout(() => {
-        floating2Div.style.display = "none";
-    }, 300);
+        setTimeout(() => {
+            floating2Div.style.display = "none";
+        }, 300);
 
         const textParts = [];
 
@@ -18504,101 +21223,101 @@ function resetForm2ContainerAndRebuildButtons() {
 // Reset forms
 function resetButtonHandler(requireSave = true) {
     showConfirm2("Are you sure you want to reset the form?")
-    .then((userChoice) => {
-        if (!userChoice) return;
+        .then((userChoice) => {
+            if (!userChoice) return;
 
-        let isSaved = true;
+            let isSaved = true;
 
-        // Only attempt save if required
-        if (requireSave) {
-            isSaved = saveFormData();
+            // Only attempt save if required
+            if (requireSave) {
+                isSaved = saveFormData();
+
+                // Block reset if validation failed
+                if (!isSaved) return;
+            }
 
             // Block reset if validation failed
             if (!isSaved) return;
-        }
 
-        // Block reset if validation failed
-        if (!isSaved) return;
+            handleTimer('reset', true);
 
-        handleTimer('reset', true);
+            const agentName = document.getElementsByName("agentName")[0];
+            const teamLead = document.getElementsByName("teamLead")[0];
+            const pldtUser = document.getElementsByName("pldtUser")[0];
+            const Channel = document.getElementsByName("selectChannel")[0];
+            const caseOrigin = document.getElementsByName("caseOrigin")[0];
 
-        const agentName = document.getElementsByName("agentName")[0]; 
-        const teamLead = document.getElementsByName("teamLead")[0]; 
-        const pldtUser = document.getElementsByName("pldtUser")[0]; 
-        const Channel = document.getElementsByName("selectChannel")[0];
-        const caseOrigin = document.getElementsByName("caseOrigin")[0];
+            const agentNameValue = agentName.value;
+            const teamLeadValue = teamLead.value;
+            const pldtUserValue = pldtUser.value;
+            const ChannelValue = Channel.value;
+            const caseOriginValue = caseOrigin.value;
 
-        const agentNameValue = agentName.value;
-        const teamLeadValue = teamLead.value;
-        const pldtUserValue = pldtUser.value;
-        const ChannelValue = Channel.value;
-        const caseOriginValue = caseOrigin.value;
+            document.getElementById("frm1").reset();
 
-        document.getElementById("frm1").reset();
+            agentName.value = agentNameValue;
+            teamLead.value = teamLeadValue;
+            pldtUser.value = pldtUserValue;
+            Channel.value = ChannelValue;
+            caseOrigin.value = caseOriginValue;
 
-        agentName.value = agentNameValue;
-        teamLead.value = teamLeadValue;
-        pldtUser.value = pldtUserValue;
-        Channel.value = ChannelValue;
-        caseOrigin.value = caseOriginValue;
+            resetForm2ContainerAndRebuildButtons();
 
-        resetForm2ContainerAndRebuildButtons();
+            // Reset + hide saved notes row
+            const savedNotesRow = document.getElementById("saved-notes-row");
 
-        // Reset + hide saved notes row
-        const savedNotesRow = document.getElementById("saved-notes-row");
+            if (savedNotesRow) {
+                savedNotesRow.style.display = "none";
+            }
 
-        if (savedNotesRow) {
-            savedNotesRow.style.display = "none";
-        }
+            const rowsToHide = [
+                "landline-num-row",
+                "service-id-row",
+                "option82-row",
+                "intent-wocas-row",
+                // "wocas-row"
+            ];
 
-        const rowsToHide = [
-            "landline-num-row",
-            "service-id-row",
-            "option82-row",
-            "intent-wocas-row",
-            "wocas-row"
-        ];
+            rowsToHide.forEach(id => {
+                const row = document.getElementById(id);
+                if (row) row.style.display = "none";
+            });
 
-        rowsToHide.forEach(id => {
-            const row = document.getElementById(id);
-            if (row) row.style.display = "none";
-        });
 
-        
-        // --- RESET LOB ---
-        lobSelect.innerHTML = "";
-        const blankLobOption = document.createElement("option");
-        blankLobOption.value = "";
-        blankLobOption.textContent = "";
-        blankLobOption.disabled = true;
-        blankLobOption.selected = true;
-        lobSelect.appendChild(blankLobOption);
+            // --- RESET LOB ---
+            lobSelect.innerHTML = "";
+            const blankLobOption = document.createElement("option");
+            blankLobOption.value = "";
+            blankLobOption.textContent = "";
+            blankLobOption.disabled = true;
+            blankLobOption.selected = true;
+            lobSelect.appendChild(blankLobOption);
 
-        // Only repopulate LOB if channel already has a value
-        if (Channel.value !== "") {
-            allLobOptions.forEach(optData => {
-                if (optData.value !== "") {
-                    const opt = document.createElement("option");
-                    opt.value = optData.value;
-                    opt.textContent = optData.text;
-                    lobSelect.appendChild(opt);
+            // Only repopulate LOB if channel already has a value
+            if (Channel.value !== "") {
+                allLobOptions.forEach(optData => {
+                    if (optData.value !== "") {
+                        const opt = document.createElement("option");
+                        opt.value = optData.value;
+                        opt.textContent = optData.text;
+                        lobSelect.appendChild(opt);
+                    }
+                });
+            }
+
+            // Reset VOC
+            vocSelect.innerHTML = "";
+            const placeholder = allVocOptions.find(opt => opt.value === "");
+            if (placeholder) {
+                vocSelect.appendChild(placeholder.cloneNode(true));
+            }
+
+            allVocOptions.forEach(option => {
+                if (option.value !== "") {
+                    vocSelect.appendChild(option.cloneNode(true));
                 }
             });
-        }
-
-        // Reset VOC
-        vocSelect.innerHTML = "";
-        const placeholder = allVocOptions.find(opt => opt.value === "");
-        if (placeholder) {
-            vocSelect.appendChild(placeholder.cloneNode(true));
-        }
-
-        allVocOptions.forEach(option => {
-            if (option.value !== "") {
-                vocSelect.appendChild(option.cloneNode(true));
-            }
         });
-    });
 }
 
 // Save generated notes to localStorage
@@ -18619,13 +21338,9 @@ function saveFormData() {
         return false;
     }
 
-    const inquiryForms = [
-        "formInqAccSrvcStatus", "formInqLockIn", "formInqCopyOfBill", "formInqMyHomeAcc", "formInqPlanDetails", "formInqAda", "formInqRebCredAdj", "formInqBalTransfer", "formInqBrokenPromise", "formInqCreditAdj", "formInqCredLimit", "formInqNSR", "formInqDdate", "formInqBillDdateExt", "formInqEcaPip", "formInqNewBill", "formInqOneTimeCharges", "formInqOverpay", "formInqPayChannel", "formInqPayPosting", "formInqPayRefund", "formInqPayUnreflected", "formInqDdateMod", "formInqBillRefund", "formInqSmsEmailBill", "formInqTollUsage", "formInqCoRetain", "formInqCoChange", "formInqPermaDisc", "formInqTempDisc", "formInqD1299", "formInqD1399", "formInqD1799", "formInqDOthers", "formInqDdateExt", "formInqEntertainment", "formInqInmove", "formInqMigration", "formInqProdAndPromo", "formInqHomeRefNC", "formInqHomeDisCredit", "formInqReloc", "formInqRewards", "formInqDirectDial", "formInqBundle", "formInqSfOthers", "formInqSAO500", "formInqUfcEnroll", "formInqUfcPromoMech", "formInqUpg1399", "formInqUpg1599", "formInqUpg1799", "formInqUpg2099", "formInqUpg2499", "formInqUpg2699", "formInqUpgOthers", "formInqVasAO", "formInqVasIptv", "formInqVasMOW", "formInqVasSAO", "formInqVasWMesh", "formInqVasOthers", "formInqWireReRoute"
-    ]
-
     const vars = initializeVariables();
     const ffupNotes = ffupButtonHandler(false, false, false, false);
-    
+
     const newTicketNotes = [
         cepCaseTitle(),
         cepCaseDescription(false),
@@ -18634,7 +21349,9 @@ function saveFormData() {
     ].filter(Boolean);
 
     const techNotes = techNotesButtonHandler(false, false);
-    const nontechNotes = `SF & FUSE NOTES:\n${nontechNotesButtonHandler(false)}`;
+    const nontechNotes = `${selectedChannel === "CNDT_CCBO"
+        ? "FUSE NOTES:\n"
+        : "SF & FUSE NOTES:\n"}${nontechNotesButtonHandler(false)}`;
 
     const fuseNotes = techNotes
         ? `SF & FUSE NOTES:\n${techNotes}`
@@ -18645,90 +21362,36 @@ function saveFormData() {
         : "";
 
     const bantayKableNotes = `SF & FUSE NOTES:\n${bantayKableButtonHandler(false)}`;
+
+    const inquiryForms = [
+        "formInqAccSrvcStatus", "formInqLockIn", "formInqCopyOfBill", "formInqMyHomeAcc", "formInqPlanDetails", "formInqAda", "formInqRebCredAdj", "formInqBalTransfer", "formInqBrokenPromise", "formInqCreditAdj", "formInqCredLimit", "formInqNSR", "formInqDdate", "formInqBillDdateExt", "formInqEcaPip", "formInqNewBill", "formInqOneTimeCharges", "formInqOverpay", "formInqPayChannel", "formInqPayPosting", "formInqPayRefund", "formInqPayUnreflected", "formInqDdateMod", "formInqBillRefund", "formInqSmsEmailBill", "formInqTollUsage", "formInqCoRetain", "formInqCoChange", "formInqPermaDisc", "formInqTempDisc", "formInqD1299", "formInqD1399", "formInqD1799", "formInqDOthers", "formInqDdateExt", "formInqEntertainment", "formInqInmove", "formInqMigration", "formInqProdAndPromo", "formInqHomeRefNC", "formInqHomeDisCredit", "formInqReloc", "formInqRewards", "formInqDirectDial", "formInqBundle", "formInqSfOthers", "formInqSAO500", "formInqUfcEnroll", "formInqUfcPromoMech", "formInqUpg1399", "formInqUpg1599", "formInqUpg1799", "formInqUpg2099", "formInqUpg2499", "formInqUpg2699", "formInqUpgOthers", "formInqVasAO", "formInqVasIptv", "formInqVasMOW", "formInqVasSAO", "formInqVasWMesh", "formInqVasOthers", "formInqWireReRoute"
+    ];
+
     const nonTechIntents = [
         // Complaint
         "formReqNonServiceRebate", "formReqReconnection", "formCompMyHomeWeb", "formCompMisappliedPayment", "formCompUnreflectedPayment", "formCompPersonnelIssue",
 
         // Inquiry
         ...inquiryForms,
-        "formInqBillInterpret",
-        "formInqOutsBal",
-        "formInqRefund",
+        "formInqBillInterpret", "formInqOutsBal", "formInqRefund",
 
         // Follow-up
-        "formFfupChangeOwnership",
-        "formFfupChangeTelNum",
-        "formFfupChangeTelUnit",
-        "formFfupDiscoVas",
-        "formFfupDispute",
-        "formFfupDowngrade",
-        "formFfupDDE",
-        "formFfupInmove",
-        "formFfupMigration",
-        "formFfupMisappPay",
-        "formFfupNewApp",
-        "formFfupOcular",
-        "formFfupOverpay",
-        "formFfupPermaDisco",
-        "formFfupRenew",
-        "formFfupResume",
-        "formFfupUnbar",
-        "formFfupCustDependency",
-        "formFfupAMSF",
-        "formFfupFinalAcc",
-        "formFfupOverpayment",
-        "formFfupWrongBiller",
-        "formFfupReloc",
-        "formFfupRelocCid",
-        "formFfupSpecialFeat",
-        "formFfupSAO",
-        "formFfupTempDisco",
-        "formFfupUP",
-        "formFfupUpgrade",
-        "formFfupVasAct",
-        "formFfupVasDel",
-        "formFfupReroute",
-        "formFfupWT",
-        
+        "formFfupChangeOwnership", "formFfupChangeTelNum", "formFfupChangeTelUnit", "formFfupDiscoVas", "formFfupDispute", "formFfupDowngrade", "formFfupDDE", "formFfupInmove", "formFfupMigration", "formFfupMisappPay", "formFfupNewApp", "formFfupOcular", "formFfupOverpay", "formFfupPermaDisco", "formFfupRenew", "formFfupResume", "formFfupUnbar", "formFfupCustDependency", "formFfupAMSF", "formFfupFinalAcc", "formFfupOverpayment", "formFfupWrongBiller", "formFfupReloc", "formFfupRelocCid", "formFfupSpecialFeat", "formFfupSAO", "formFfupTempDisco", "formFfupUP", "formFfupUpgrade", "formFfupVasAct", "formFfupVasDel", "formFfupReroute", "formFfupWT",
+
         // Request
-        "formReqAccMgt",
-        "formReqAddressMod",
-        "formReqTaxAdj",
-        "formReqSupRetAccNum",
-        "formReqSupChangeAccNum",
-        "formReqChgTelUnit",
-        "formReqDisconnection",
-        "formReqDispute",
-        "formReqDowngrade",
-        "formReqReconnect",
-        "formReqRefund",
-        "formReqRelocation",
-        "formReqSpecFeat",
-        "formReqSpeedAddOn",
-        "formReqUfc",
-        "formReqUpgrade",
-        "formReqVAS",
-        "formReqWireReroute",
-        "formReqInmove",
-        "formReqDDE",
-        "formReqMigration",
-        "formReqMisappPay",
-        "formReqReflectPay",
-        "formReqOcular",
-        "formReqProofOfSub",
-        
+        "formReqAccMgt", "formReqAddressMod", "formReqTaxAdj", "formReqSupRetAccNum", "formReqSupChangeAccNum", "formReqChgTelUnit", "formReqDisconnection", "formReqDispute", "formReqDowngrade", "formReqReconnect", "formReqRefund", "formReqRelocation", "formReqSpecFeat", "formReqSpeedAddOn", "formReqUfc", "formReqUpgrade", "formReqVAS", "formReqWireReroute", "formReqInmove", "formReqDDE", "formReqMigration", "formReqMisappPay", "formReqReflectPay", "formReqOcular", "formReqProofOfSub",
+
         // Others
-        "othersToolsDown",
-        "othersWebForm",
-        "othersEntAcc",
-        "othersHomeBro",
-        "othersSmart",
-        "othersSME177",
-        "othersAO",
-        "othersRepair",
-        "othersBillAndAcc",
-        "others164",
-        "othersUT"
+        "othersToolsDown", "othersWebForm", "othersEntAcc", "othersHomeBro", "othersSmart", "othersSME177", "othersAO", "othersRepair", "othersBillAndAcc", "others164", "othersUT",
+
+        // Request CCBO
+        "ccbo_formReqBillAdjust", "ccbo_formReqChangeOwnership", "ccbo_formReqChangeTelNum",
+
+        // Follow-up CCBO
+        "ccbo_formFfupBillAdjust", "ccbo_formFfupChangeOwnership", "ccbo_formFfupChangeTelNum",
+
+        // Inquiry CCBO
+        "ccbo_formInqBill", "ccbo_formInqChangeTelNum"
     ];
 
     let combinedNotes = "";
@@ -18854,10 +21517,29 @@ function saveFormData() {
             return false;
         }
 
-        // Replace existing entry with updated notes and timestamp
+        // CNDT_CCBO + 2nd Callout Attempt = append notes without FUSE NOTES label
+        let updatedNotes = savedEntry.combinedNotes;
+        const calloutAttempt = document.querySelector('[name="calloutAttempt"]')?.value?.trim();
+
+        if (selectedChannel === "CNDT_CCBO" && calloutAttempt === "2nd") {
+            const cleanedNewNotes = (savedEntry.combinedNotes || "")
+                .replace(/^FUSE NOTES:\s*/i, "")
+                .trim();
+
+            updatedNotes = [
+                existing.combinedNotes,
+                cleanedNewNotes
+            ]
+                .filter(Boolean)
+                .join("\n\n");
+
+            updatedNotes = removeDuplicateBlocks(updatedNotes);
+        }
+
+        // Update existing entry
         savedData[uniqueKey] = {
             ...existing,
-            combinedNotes: savedEntry.combinedNotes,
+            combinedNotes: updatedNotes,
             upsell: savedEntry.upsell,
             productsOffered: savedEntry.productsOffered,
             declineReason: savedEntry.declineReason,
@@ -19036,7 +21718,7 @@ function displaySavedNotesViewer() {
 // Export saved notes as a text file, sorted by timestamp
 function exportDataAsTxt() {
     const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
-    
+
     if (Object.keys(savedData).length === 0) {
         showAlert("No data available to export.");
         return;
@@ -19110,18 +21792,18 @@ function exportDataAsTxt() {
 
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    
+
     link.download = `Saved Notes_${formattedDate}.txt`;
 
     link.click();
-    
+
     showAlert("Notes exported successfully!");
 }
 
 // Export saved notes as an excel file, sorted by timestamp
 function exportDataAsExcel() {
     const savedData = JSON.parse(localStorage.getItem("tempDatabase") || "{}");
-    
+
     if (Object.keys(savedData).length === 0) {
         showAlert("No data available to export.");
         return;
@@ -19153,9 +21835,9 @@ function exportDataAsExcel() {
             "Modified On": entry.lastUpdated || "",
             "Timer": entry.timerValue || "",
             "Channel": entry.selectChannel || "",
-            "Agent Name": entry.agentName || "", 
-            "Team Leader": entry.teamLead || "", 
-            "SF Case #": entry.sfCaseNumber || "",  
+            "Agent Name": entry.agentName || "",
+            "Team Leader": entry.teamLead || "",
+            "SF Case #": entry.sfCaseNumber || "",
             "Customer Name": entry.custName || "",
             "LOB": entry.selectLOB || "",
             "VOC": entry.selectVOC || "",
@@ -19213,26 +21895,26 @@ function exportDataAsExcel() {
 // Delete all saved data in localStorage
 function deleteAllData() {
     showConfirm2("Are you sure you want to delete all saved records in this workstation?")
-    .then((userChoice) => {
-        if (!userChoice) return;
+        .then((userChoice) => {
+            if (!userChoice) return;
 
-        localStorage.clear();
-        showAlert("All data has been deleted successfully.");
+            localStorage.clear();
+            showAlert("All data has been deleted successfully.");
 
-        // Refresh Saved Notes Viewer after reset
-        setTimeout(() => {
-            displaySavedNotesViewer();
-        }, 300);
-    });
+            // Refresh Saved Notes Viewer after reset
+            setTimeout(() => {
+                displaySavedNotesViewer();
+            }, 300);
+        });
 }
 
 // Show appropriate buttons based on form state
 const primaryButtons = {
-  resetButton: () => resetButtonHandler(false)
+    resetButton: () => resetButtonHandler(false)
 };
 
 Object.entries(primaryButtons).forEach(([id, handler]) => {
-  document.getElementById(id)?.addEventListener("click", handler);
+    document.getElementById(id)?.addEventListener("click", handler);
 });
 
 // Form Container Scrollbar Behavior
@@ -19438,31 +22120,35 @@ const introduction = [
     {
         version: "Standard Notes Generator (Autodocs) V5",
         updates: [
-            { title: "About", items: [
-                "<strong>Where consistency meets efficiency.</strong>",
-                "This tool is designed to standardize and streamline case documentation across all workflows.",
-                "By enforcing a consistent structure, it enables agents and support teams to easily track, review, and understand case details.",
-                "This reduces manual effort, minimizes errors, and improves overall case handling efficiency and accuracy."
-            ]},
-            { title: "Features", items: [
-                "<strong>Concern Type Categorization:</strong> Easily identify whether a case is technical or non-technical, helping agents apply the correct handling approach.",
-                "<strong>Voice of the Customer (VOC) Classification:</strong> Categorizes customer intent (e.g., complaint, request, follow-up, inquiry) for better case understanding and documentation accuracy.",
-                "<strong>WOCAS-Based Intents:</strong> Intents are aligned with actual customer statements, guiding agents in selecting the correct option while enabling the system to generate accurate documentation output.",
-                "<strong>Saved Notes Checker:</strong> Detects existing saved notes upon startup and prompts agents to either keep or delete them.",
-                "<strong>Built-in Notepad:</strong> Provides a dedicated space for temporary notes or frequently used spiels.",
-                "<strong>One-Click Copy Function:</strong> Simplifies copying of details or notes with a single click, no manual highlighting needed.",
-                "<strong>One-Click Notes Generation:</strong> Automatically generates structured and standardized case notes, eliminating the need for manual formatting.",
-                "<strong>Quick Copy for Generated Notes:</strong> Allows agents to instantly copy generated notes directly from the output section.",
-                "<strong>Multiple Notes Format Support:</strong> Generates notes in different formats depending on the documentation requirements of the selected tool or process.",
-                "<strong>Auto Data Retrieval:</strong> Automatically retrieves previously saved data or notes from the database, reducing the need for repeated data entry.",
-                "<strong>Update Notes Feature:</strong> Appends new notes to existing records without overwriting previously saved information.",
-                "<strong>Auto-Populate Fields:</strong> Automatically fills in key details such as customer name, account number, landline, concern type, VOC, service ID, Option 82, and WOCAS when available in the database.",
-                "<strong>Intent-Based Fields:</strong> Dynamically displays only relevant fields based on the selected intent, ensuring required information is captured while excluding unnecessary inputs.",
-                "<strong>Endorsement Notes Generation:</strong> Enables agents to generate endorsement notes aligned with standard endorsement guidelines when escalation is required.",
-                "<strong>Instructions and Updates Section:</strong> Centralized area for tool updates, enhancements, and important instructions.",
-                "<strong>LIT365 Work Instructions Integration:</strong> Provides intent-specific work instruction links to reduce time spent searching for guidelines.",
-                "<strong>Export Saved Notes:</strong> Allows agents to export saved notes into Excel or Notepad format for reporting or backup purposes."
-            ]},
+            {
+                title: "About", items: [
+                    "<strong>Where consistency meets efficiency.</strong>",
+                    "This tool is designed to standardize and streamline case documentation across all workflows.",
+                    "By enforcing a consistent structure, it enables agents and support teams to easily track, review, and understand case details.",
+                    "This reduces manual effort, minimizes errors, and improves overall case handling efficiency and accuracy."
+                ]
+            },
+            {
+                title: "Features", items: [
+                    "<strong>Concern Type Categorization:</strong> Easily identify whether a case is technical or non-technical, helping agents apply the correct handling approach.",
+                    "<strong>Voice of the Customer (VOC) Classification:</strong> Categorizes customer intent (e.g., complaint, request, follow-up, inquiry) for better case understanding and documentation accuracy.",
+                    "<strong>WOCAS-Based Intents:</strong> Intents are aligned with actual customer statements, guiding agents in selecting the correct option while enabling the system to generate accurate documentation output.",
+                    "<strong>Saved Notes Checker:</strong> Detects existing saved notes upon startup and prompts agents to either keep or delete them.",
+                    "<strong>Built-in Notepad:</strong> Provides a dedicated space for temporary notes or frequently used spiels.",
+                    "<strong>One-Click Copy Function:</strong> Simplifies copying of details or notes with a single click, no manual highlighting needed.",
+                    "<strong>One-Click Notes Generation:</strong> Automatically generates structured and standardized case notes, eliminating the need for manual formatting.",
+                    "<strong>Quick Copy for Generated Notes:</strong> Allows agents to instantly copy generated notes directly from the output section.",
+                    "<strong>Multiple Notes Format Support:</strong> Generates notes in different formats depending on the documentation requirements of the selected tool or process.",
+                    "<strong>Auto Data Retrieval:</strong> Automatically retrieves previously saved data or notes from the database, reducing the need for repeated data entry.",
+                    "<strong>Update Notes Feature:</strong> Appends new notes to existing records without overwriting previously saved information.",
+                    "<strong>Auto-Populate Fields:</strong> Automatically fills in key details such as customer name, account number, landline, concern type, VOC, service ID, Option 82, and WOCAS when available in the database.",
+                    "<strong>Intent-Based Fields:</strong> Dynamically displays only relevant fields based on the selected intent, ensuring required information is captured while excluding unnecessary inputs.",
+                    "<strong>Endorsement Notes Generation:</strong> Enables agents to generate endorsement notes aligned with standard endorsement guidelines when escalation is required.",
+                    "<strong>Instructions and Updates Section:</strong> Centralized area for tool updates, enhancements, and important instructions.",
+                    "<strong>LIT365 Work Instructions Integration:</strong> Provides intent-specific work instruction links to reduce time spent searching for guidelines.",
+                    "<strong>Export Saved Notes:</strong> Allows agents to export saved notes into Excel or Notepad format for reporting or backup purposes."
+                ]
+            },
         ]
     }
 ];
@@ -19495,6 +22181,34 @@ const upsellingTips = [
 ];
 
 const versions = [
+    {
+        version: "V5.5.021126",
+        updates: [
+            {
+                title: "Enhancements",
+                items: [
+                    "Improved <strong>UI</strong> to provide a more intuitive and user-friendly experience.",
+                    "Enhanced the <strong>Follow-Up</strong> intent workflow to support more accurate and efficient documentation.",
+                    "Updated <strong>SIC</strong> and <strong>NIC</strong> intents to align field configurations with the latest process requirements.",
+                    "<strong>SF</strong> and <strong>FUSE</strong> generated notes now capture additional details, including NMS Skin and DMS information, for cases that do not require ticket creation."
+                ]
+            },
+            {
+                title: "New Features",
+                items: [
+                    "Added a dedicated <strong>Frequent Disconnection</strong> intent to improve case notation and documentation accuracy.",
+                    "Added a <strong>Historical Alarm</strong> field to ensure complete and consistent documentation of alarm-related information.",
+                    "Added a <strong>Not Applicable</strong> option under the <strong>Products Offered</strong> field for more standardized documentation."
+                ]
+            },
+            {
+                title: "Fixes",
+                items: [
+                    "Resolved an issue where <strong>Others/Error Code</strong> and <strong>Failed RX</strong> values were not correctly reflected in the CEP Case Description notes output."
+                ]
+            }
+        ]
+    },
     {
         version: "V5.5.010926",
         updates: [
@@ -19705,198 +22419,246 @@ const versions = [
     {
         version: "V5.5.010526",
         updates: [
-            { title: "Improvements", items: [
-                "<strong>Smart Auto‑Hide for Agent Details</strong> - Agent Details now automatically hide once completed to keep the form clean and focused, with values securely stored to prevent unnecessary validation prompts and ensure consistent autofill.",
-                "Added a <strong>“My Details”</strong> option in the Smart Assistant for quick access and updating of agent information.",
-                "New <strong>Notepad</strong> section – Allows agents to continue using the notepad even when the main window is minimized.",
-                "Introducing the <strong>“Saved Notes Viewer”</strong> – Gives agents real-time visibility into their saved notes without exporting it to a notepad or excel file.",
-                "Enhanced generated notes by adding an <strong>“Other Details”</strong> section in Salesforce and FUSE, improving documentation accuracy and enabling easier tracking."
-            ]},
-            { title: "Fixes", items: [
-                "Resolved an issue causing repeated “Request for Retracking Submitted” entries in SF & FUSE notes and restored the ability for agents to provide retracking details across all applicable IPTV intents.",
-            ]},
+            {
+                title: "Improvements", items: [
+                    "<strong>Smart Auto‑Hide for Agent Details</strong> - Agent Details now automatically hide once completed to keep the form clean and focused, with values securely stored to prevent unnecessary validation prompts and ensure consistent autofill.",
+                    "Added a <strong>“My Details”</strong> option in the Smart Assistant for quick access and updating of agent information.",
+                    "New <strong>Notepad</strong> section – Allows agents to continue using the notepad even when the main window is minimized.",
+                    "Introducing the <strong>“Saved Notes Viewer”</strong> – Gives agents real-time visibility into their saved notes without exporting it to a notepad or excel file.",
+                    "Enhanced generated notes by adding an <strong>“Other Details”</strong> section in Salesforce and FUSE, improving documentation accuracy and enabling easier tracking."
+                ]
+            },
+            {
+                title: "Fixes", items: [
+                    "Resolved an issue causing repeated “Request for Retracking Submitted” entries in SF & FUSE notes and restored the ability for agents to provide retracking details across all applicable IPTV intents.",
+                ]
+            },
         ]
     },
     {
         version: "V5.4.170426",
         updates: [
-            { title: "Prompt & Alert Message Improvements", items: [
-                "Improved prompt and alert messages for better clarity and consistency.",
-                "Refined wording to make instructions easier to understand.",
-                "Minor adjustments for a smoother user experience.",
-            ]},
-            { title: "Fixes", items: [
-                "Moved <strong>Change Configuration - Data</strong> intents from NON-TECH to TECH to match LIT365 standards and improve field visibility based on selection.",
-            ]},
+            {
+                title: "Prompt & Alert Message Improvements", items: [
+                    "Improved prompt and alert messages for better clarity and consistency.",
+                    "Refined wording to make instructions easier to understand.",
+                    "Minor adjustments for a smoother user experience.",
+                ]
+            },
+            {
+                title: "Fixes", items: [
+                    "Moved <strong>Change Configuration - Data</strong> intents from NON-TECH to TECH to match LIT365 standards and improve field visibility based on selection.",
+                ]
+            },
         ]
     },
     {
         version: "V5.4.150426",
         updates: [
-            { title: "UI Enhancements:", items: [
-                "Added Tool Overview. See <strong>Standard Notes Generator (Autodocs) V5</strong> section.",
-                "Refined visuals for better readability.",
-                "Consolidated multiple secondary actions into a single expandable “More” button to reduce clutter and improve usability.",
-            ]},
-            { title: "Fixes", items: [
-                "<strong>Duplication Detection:</strong> Enhanced fallback key logic for saved hotline notes to improve duplicate detection accuracy.",
-            ]},
+            {
+                title: "UI Enhancements:", items: [
+                    "Added Tool Overview. See <strong>Standard Notes Generator (Autodocs) V5</strong> section.",
+                    "Refined visuals for better readability.",
+                    "Consolidated multiple secondary actions into a single expandable “More” button to reduce clutter and improve usability.",
+                ]
+            },
+            {
+                title: "Fixes", items: [
+                    "<strong>Duplication Detection:</strong> Enhanced fallback key logic for saved hotline notes to improve duplicate detection accuracy.",
+                ]
+            },
         ]
     },
     {
         version: "V5.4.080426",
         updates: [
-            { title: "Improvements", items: [
-                "<strong>Auto Data Retrieval:</strong> Form now automatically loads saved data when a matching SF Case Number is detected, in preparation for live chat to PM/DM migration.",
-                "<strong>Improved Matching Logic:</strong> Refined lookup to ensure accurate retrieval from local storage.",
-                "<strong>Dynamic Notes Display:</strong> Saved notes section now appears only when data exists.",
-                "<strong>Upsell Notes & Tagging:</strong> Added upsell details to notes and Excel (Product Offered, Decline Reason, Not Eligible Reason) for easier tracking.",
-                "Enhanced note parsing to replace “|” with “/” in both FUSE and SF notes for consistent formatting.",
-                "<strong>Added “Modified On” Timestamp:</strong> Saved and exported notes will now show when they were last updated, making it easier to track recent changes.",
-                "<strong>Upsell Notes:</strong> Updated upsell options by mapping selections to predefined tags (e.g., #UpsellAccepted, #UpsellDeclined, #UpsellIgnored, #UpsellUndecided, #UpsellNotEligible)."
-            ]},
-            { title: "Fixes", items: [
-                "<strong>Stability Fixes:</strong> Resolved issue where load function triggered only once.",
-                "<strong>UI Behavior Fix:</strong> Addressed textarea auto-expand not triggering on initial load.",
-                "<strong>Missing Options in Request Dropdown:</strong> Resolved an issue where only one option was showing under <stong>“Change Configuration - Data”</stong> when selecting a Request. All available options are now displayed correctly.",
-                "<strongData Saving Fix: </strong> Saved notes now update correctly when changes are made."
-            ]},
+            {
+                title: "Improvements", items: [
+                    "<strong>Auto Data Retrieval:</strong> Form now automatically loads saved data when a matching SF Case Number is detected, in preparation for live chat to PM/DM migration.",
+                    "<strong>Improved Matching Logic:</strong> Refined lookup to ensure accurate retrieval from local storage.",
+                    "<strong>Dynamic Notes Display:</strong> Saved notes section now appears only when data exists.",
+                    "<strong>Upsell Notes & Tagging:</strong> Added upsell details to notes and Excel (Product Offered, Decline Reason, Not Eligible Reason) for easier tracking.",
+                    "Enhanced note parsing to replace “|” with “/” in both FUSE and SF notes for consistent formatting.",
+                    "<strong>Added “Modified On” Timestamp:</strong> Saved and exported notes will now show when they were last updated, making it easier to track recent changes.",
+                    "<strong>Upsell Notes:</strong> Updated upsell options by mapping selections to predefined tags (e.g., #UpsellAccepted, #UpsellDeclined, #UpsellIgnored, #UpsellUndecided, #UpsellNotEligible)."
+                ]
+            },
+            {
+                title: "Fixes", items: [
+                    "<strong>Stability Fixes:</strong> Resolved issue where load function triggered only once.",
+                    "<strong>UI Behavior Fix:</strong> Addressed textarea auto-expand not triggering on initial load.",
+                    "<strong>Missing Options in Request Dropdown:</strong> Resolved an issue where only one option was showing under <stong>“Change Configuration - Data”</stong> when selecting a Request. All available options are now displayed correctly.",
+                    "<strongData Saving Fix: </strong> Saved notes now update correctly when changes are made."
+                ]
+            },
         ]
     },
     {
         version: "V5.3.010426",
         updates: [
-            { title: "Improvements", items: [
-                "Added ESA tagging for SMNT-BAA agents.",
-                "Refined declined reason for upselling to enable clearer and more consistent tracking."
-            ]},
+            {
+                title: "Improvements", items: [
+                    "Added ESA tagging for SMNT-BAA agents.",
+                    "Refined declined reason for upselling to enable clearer and more consistent tracking."
+                ]
+            },
         ]
     },
     {
         version: "V5.3.270326",
         updates: [
-            { title: "Improvements", items: [
-                "Added startup detection of existing saved notes with options to keep or delete them before saving new ones.",
-                "Added an option to export saved notes to Excel in the Smart Assistant (Saya).",
-                "Enhanced note parsing to replace “|” with “/” for consistent formatting."
-            ]},
+            {
+                title: "Improvements", items: [
+                    "Added startup detection of existing saved notes with options to keep or delete them before saving new ones.",
+                    "Added an option to export saved notes to Excel in the Smart Assistant (Saya).",
+                    "Enhanced note parsing to replace “|” with “/” for consistent formatting."
+                ]
+            },
         ]
     },
     {
         version: "V5.3.230326",
         updates: [
-            { title: "🎉 Introducing Saya", items: [
-                "Meet <strong>Saya</strong>, your smart assistant that provides helpful tips, suggests actions, and makes your workflow faster and easier.",
-            ]},
-            { title: "🎨 UI Improvements", items: [
-                "Improved the layout of alerts and confirmation messages for better clarity",
-                "Fixed buttons alignment for a cleaner and more consistent look",
-                "Enhanced how pop-ups appear and close for a smoother experience",
-                "Reduced screen clutter to help you stay focused",
-                "Added NIC Investigation 4 options under NIC-NDT",
-                "Enhanced the Option82 field to allow agents to copy either the node or the complete Option82 value."
-            ]},
-            { title: "🛠️ Fixes", items: [
-                "Fixed errors caused by missing functions to improve stability",
-                "Corrected NDT intent logic for Copper VDSL accounts under network outage conditions.",
-            ]},
-            { title: "🚀 Overall Impact", items: [
-                "Smoother and more seamless interactions",
-                "Cleaner and more organized interface",
-                "Faster and more responsive assistant behavior",
-                "Easier to understand and use"
-            ]},
+            {
+                title: "🎉 Introducing Saya", items: [
+                    "Meet <strong>Saya</strong>, your smart assistant that provides helpful tips, suggests actions, and makes your workflow faster and easier.",
+                ]
+            },
+            {
+                title: "🎨 UI Improvements", items: [
+                    "Improved the layout of alerts and confirmation messages for better clarity",
+                    "Fixed buttons alignment for a cleaner and more consistent look",
+                    "Enhanced how pop-ups appear and close for a smoother experience",
+                    "Reduced screen clutter to help you stay focused",
+                    "Added NIC Investigation 4 options under NIC-NDT",
+                    "Enhanced the Option82 field to allow agents to copy either the node or the complete Option82 value."
+                ]
+            },
+            {
+                title: "🛠️ Fixes", items: [
+                    "Fixed errors caused by missing functions to improve stability",
+                    "Corrected NDT intent logic for Copper VDSL accounts under network outage conditions.",
+                ]
+            },
+            {
+                title: "🚀 Overall Impact", items: [
+                    "Smoother and more seamless interactions",
+                    "Cleaner and more organized interface",
+                    "Faster and more responsive assistant behavior",
+                    "Easier to understand and use"
+                ]
+            },
         ]
     },
     {
         version: "V5.3.130326",
         updates: [
-            { title: "✨ Enhancements", items: [
-                "Main form behavior updated to display the correct fields based on the selected agent channel.",
-                "Improved <strong>Updates</strong> section for better visuals.",
-                "Expanded <strong>Notepad</strong> section to provide more space for notes and improve usability.",
-                "Improved Upsell Notes integration to capture reasons for declined and ineligible offers for <strong>NIC-NDT</strong>, <strong>NIC</strong>, <strong>SIC</strong> and all <strong>Non-Tech</strong> intents."
-            ]},
-            { title: "➕ Added", items: [
-                "Ordertake option for NSR and Relocation added for tracking purposes.",
-                "Upsell <strong>Pending Req. (For callback)</strong> option added.",
-                "Non-Tech request intents(<strong>Inmove</strong>, <strong>DDE</strong>, <strong>Migration</strong>, <strong>Misapplied Payment</strong>, <strong>Occular Inspection/Amend SAM</strong>, <strong>Proof of PLDT Subscription</strong>, and <strong>Unreflected Payment</strong>).",
-                "<strong>NIC Intent</strong>: Reintroduced Equipment and Modem Brand fields to enable easier identification of the ONU connection type (InterOp vs. Non-InterOp).",
-                "Added NIC Investigation 4 options for NIC-NDT intent."
-            ]},
-            { title: "🛠️ Fixes", items: [
-                "Resolved a bug causing decline and ineligibility reasons to not display in the generated notes for all non-technical intents.",
-            ]},
+            {
+                title: "✨ Enhancements", items: [
+                    "Main form behavior updated to display the correct fields based on the selected agent channel.",
+                    "Improved <strong>Updates</strong> section for better visuals.",
+                    "Expanded <strong>Notepad</strong> section to provide more space for notes and improve usability.",
+                    "Improved Upsell Notes integration to capture reasons for declined and ineligible offers for <strong>NIC-NDT</strong>, <strong>NIC</strong>, <strong>SIC</strong> and all <strong>Non-Tech</strong> intents."
+                ]
+            },
+            {
+                title: "➕ Added", items: [
+                    "Ordertake option for NSR and Relocation added for tracking purposes.",
+                    "Upsell <strong>Pending Req. (For callback)</strong> option added.",
+                    "Non-Tech request intents(<strong>Inmove</strong>, <strong>DDE</strong>, <strong>Migration</strong>, <strong>Misapplied Payment</strong>, <strong>Occular Inspection/Amend SAM</strong>, <strong>Proof of PLDT Subscription</strong>, and <strong>Unreflected Payment</strong>).",
+                    "<strong>NIC Intent</strong>: Reintroduced Equipment and Modem Brand fields to enable easier identification of the ONU connection type (InterOp vs. Non-InterOp).",
+                    "Added NIC Investigation 4 options for NIC-NDT intent."
+                ]
+            },
+            {
+                title: "🛠️ Fixes", items: [
+                    "Resolved a bug causing decline and ineligibility reasons to not display in the generated notes for all non-technical intents.",
+                ]
+            },
         ]
     },
     {
         version: "V5.2.040326",
         updates: [
-        { title: "➕ Added", items: [
-            "Non-Tech Request intents: <strong>Address Modification (Record), Disconnection, Dispute, Refund, Relocation, Special Features, Speed Add On 500, Unli Fam Call, Upgrade, VAS, Withholding Tax Adjustment,</strong> and <strong>Wire Re-Route</strong>.",
-            "<strong>Service ID</strong> is now included in the generated notes for Non-Tech intents.",
-            "Enabled <strong>ESA tagging</strong> for all Non-Tech intents (Hotline agents).",
-        ]},
+            {
+                title: "➕ Added", items: [
+                    "Non-Tech Request intents: <strong>Address Modification (Record), Disconnection, Dispute, Refund, Relocation, Special Features, Speed Add On 500, Unli Fam Call, Upgrade, VAS, Withholding Tax Adjustment,</strong> and <strong>Wire Re-Route</strong>.",
+                    "<strong>Service ID</strong> is now included in the generated notes for Non-Tech intents.",
+                    "Enabled <strong>ESA tagging</strong> for all Non-Tech intents (Hotline agents).",
+                ]
+            },
         ]
     },
     {
         version: "V5.2.160226",
         updates: [
-        { title: "🛠️ Fixed", items: [
-            "Formatting issue causing generated endorsement notes to be incorrectly split into multiple sections." ]},
-        { title: "✨ Improvements", items: [
-            "Enhanced the Endorsement Form to dynamically display only relevant fields based on the selected endorsement type, improving clarity and reducing unnecessary inputs." ]}
+            {
+                title: "🛠️ Fixed", items: [
+                    "Formatting issue causing generated endorsement notes to be incorrectly split into multiple sections."]
+            },
+            {
+                title: "✨ Improvements", items: [
+                    "Enhanced the Endorsement Form to dynamically display only relevant fields based on the selected endorsement type, improving clarity and reducing unnecessary inputs."]
+            }
         ]
     },
     {
         version: "V5.2.140226",
         updates: [
-        { title: "✨ Improvements", items: [
-            "Enhanced Endorsement Form UI", 
-            "Improved generating endorsement notes" ]},
-        { title: "➕ Added", items: [
-            "Non-Tech Request intents: <strong>Downgrade</strong> and <strong>Reconnection</strong>.", 
-            "<strong>Repeater count</strong> field under FFUP intent.", 
-            "<strong>“Not Applicable”</strong> option for ALS offering. This applies to tickets beyond the 24-hour SLA but still within the 36-hour ALS eligibility threshold." ]},
-        { title: "🐞 Bug Fixes", items: [
-            "Resolved layout overflow issue" ]},
-        { title: "➖ Removed", items: [
-            "ALS Offering notation from the CEP tool. ALS details will be available exclusively in FUSE or Salesforce (SF) notation.",
-            "Ticket creation timer" ]}
+            {
+                title: "✨ Improvements", items: [
+                    "Enhanced Endorsement Form UI",
+                    "Improved generating endorsement notes"]
+            },
+            {
+                title: "➕ Added", items: [
+                    "Non-Tech Request intents: <strong>Downgrade</strong> and <strong>Reconnection</strong>.",
+                    "<strong>Repeater count</strong> field under FFUP intent.",
+                    "<strong>“Not Applicable”</strong> option for ALS offering. This applies to tickets beyond the 24-hour SLA but still within the 36-hour ALS eligibility threshold."]
+            },
+            {
+                title: "🐞 Bug Fixes", items: [
+                    "Resolved layout overflow issue"]
+            },
+            {
+                title: "➖ Removed", items: [
+                    "ALS Offering notation from the CEP tool. ALS details will be available exclusively in FUSE or Salesforce (SF) notation.",
+                    "Ticket creation timer"]
+            }
         ]
     },
     {
         version: "V5.2.101225",
         updates: [
-        { title: "➕ Added", items: ["Instructions to always utilize LIT365 work instructions for proper guidance", "Investigation 4 options for SIC (High Utilization OLT/PON Port)", "DC and RA Exec status fields in the NMS skin"] },
-        { title: "✨ Improvements", items: ["UI enhancements for better usability", "Save and Export function enhancements to ensure accurate notation is saved and exported", "Special Instructions functionality", "Case Notes timeline formatting", "Enabled FCR notation for CEP tool"] },
-        { title: "🐞 Bug Fixes", items: ["Fixed minor bugs in generated notes", "Resolved SF Tagging issue for SOCMED agents"] }
+            { title: "➕ Added", items: ["Instructions to always utilize LIT365 work instructions for proper guidance", "Investigation 4 options for SIC (High Utilization OLT/PON Port)", "DC and RA Exec status fields in the NMS skin"] },
+            { title: "✨ Improvements", items: ["UI enhancements for better usability", "Save and Export function enhancements to ensure accurate notation is saved and exported", "Special Instructions functionality", "Case Notes timeline formatting", "Enabled FCR notation for CEP tool"] },
+            { title: "🐞 Bug Fixes", items: ["Fixed minor bugs in generated notes", "Resolved SF Tagging issue for SOCMED agents"] }
         ]
     },
     {
         version: "V5.2.131125",
         updates: [
-        { title: "➕ Added Non-Tech Follow-up Intents", items: ["Refund", "Relocation", "Relocation - CID Creation", "Special Features", "Speed Add On 500", "Temporary Disconnection (VTD/HTD)", "Unreflected Payment", "Upgrade", "VAS", "Wire Re-Route", "Withholding Tax Adjustment"] }
+            { title: "➕ Added Non-Tech Follow-up Intents", items: ["Refund", "Relocation", "Relocation - CID Creation", "Special Features", "Speed Add On 500", "Temporary Disconnection (VTD/HTD)", "Unreflected Payment", "Upgrade", "VAS", "Wire Re-Route", "Withholding Tax Adjustment"] }
         ]
     },
     {
         version: "V5.2.301025",
         updates: [
-        { title: "✨ Generated FUSE Notes (Hotline)", items: ["Generated notes are automatically divided into sections, eliminating the need for manual formatting or separation"] },
-        { title: "🛠️ Fixes", items: ["Resolved issue on Concern Type options not displaying correctly", "Fixed scrolling behavior for smoother navigation through form sections"] },
-        { title: "✨ Improvements", items: ["Refined interface for smoother visuals and seamless workflow", "Enhanced user experience for more user-friendly navigation"] },
+            { title: "✨ Generated FUSE Notes (Hotline)", items: ["Generated notes are automatically divided into sections, eliminating the need for manual formatting or separation"] },
+            { title: "🛠️ Fixes", items: ["Resolved issue on Concern Type options not displaying correctly", "Fixed scrolling behavior for smoother navigation through form sections"] },
+            { title: "✨ Improvements", items: ["Refined interface for smoother visuals and seamless workflow", "Enhanced user experience for more user-friendly navigation"] },
         ]
     },
     {
         version: "V5.2.291025",
         updates: [
-        { title: "➖ Removed fields", items: ["Equipment Brand, Modem Brand, and ONU Connection Type (NIC)"] },
-        { title: "➕ Added Intents", items: ["Request for Private IP", "Gaming - High Latency/Lag"] },
-        { title: "➕ Added fields", items: ["Clearview Latest real-time request completion date", "Tested OK for Hotline Agents (NIC/SIC/Selective Browsing intents)"] },
-        { title: "➕ Added CEP Investigation 4 tagging", items: ["Device and Website IP Configuration (Request for Public/Private IP)", "No Audio/Video Output w/ Test Channel (IPTV Intents)"] },
-        { title: "✨ Updated field labels", items: ["'DMS Status' to 'Internet/Data Status'", "'RX Power/OPTICSRXPOWER' to 'RX Power'", "'No. of Connected Devices (L2)' to 'No. of Conn. Devices (L2)'"] },
-        { title: "🛠️ Fix", items: ["Resolved Offer ALS notation bug"] },
-        { title: "🎨 UI Enhancements", items: ["Slight tweaks for a fresher, more modern feel.", "New Instructions and Updates section: Your quick guide to staying informed!"] }
+            { title: "➖ Removed fields", items: ["Equipment Brand, Modem Brand, and ONU Connection Type (NIC)"] },
+            { title: "➕ Added Intents", items: ["Request for Private IP", "Gaming - High Latency/Lag"] },
+            { title: "➕ Added fields", items: ["Clearview Latest real-time request completion date", "Tested OK for Hotline Agents (NIC/SIC/Selective Browsing intents)"] },
+            { title: "➕ Added CEP Investigation 4 tagging", items: ["Device and Website IP Configuration (Request for Public/Private IP)", "No Audio/Video Output w/ Test Channel (IPTV Intents)"] },
+            { title: "✨ Updated field labels", items: ["'DMS Status' to 'Internet/Data Status'", "'RX Power/OPTICSRXPOWER' to 'RX Power'", "'No. of Connected Devices (L2)' to 'No. of Conn. Devices (L2)'"] },
+            { title: "🛠️ Fix", items: ["Resolved Offer ALS notation bug"] },
+            { title: "🎨 UI Enhancements", items: ["Slight tweaks for a fresher, more modern feel.", "New Instructions and Updates section: Your quick guide to staying informed!"] }
         ]
     }
 ];
@@ -20449,93 +23211,93 @@ function enqueueRandomMessage() {
 
 // CUSTOM ALERT
 function showAlert(message) {
-  const overlay = document.getElementById("customAlert");
-  const messageBox = document.getElementById("alertMessage");
-  const okBtn = document.getElementById("alertOkBtn");
+    const overlay = document.getElementById("customAlert");
+    const messageBox = document.getElementById("alertMessage");
+    const okBtn = document.getElementById("alertOkBtn");
 
-  messageBox.textContent = message;
+    messageBox.textContent = message;
 
-  // SHOW (fade in)
-  overlay.classList.remove("hide");
-  overlay.style.display = "flex";
-  requestAnimationFrame(() => {
-    overlay.classList.add("show");
-  });
+    // SHOW (fade in)
+    overlay.classList.remove("hide");
+    overlay.style.display = "flex";
+    requestAnimationFrame(() => {
+        overlay.classList.add("show");
+    });
 
-  const closeAlert = () => {
-    overlay.classList.remove("show");
-    overlay.classList.add("hide");
+    const closeAlert = () => {
+        overlay.classList.remove("show");
+        overlay.classList.add("hide");
 
-    setTimeout(() => {
-      overlay.style.display = "none";
-      overlay.classList.remove("hide");
-    }, 300); // match CSS transition
-  };
+        setTimeout(() => {
+            overlay.style.display = "none";
+            overlay.classList.remove("hide");
+        }, 300); // match CSS transition
+    };
 
-  okBtn.onclick = closeAlert;
+    okBtn.onclick = closeAlert;
 }
 
 // CUSTOM CONFIRM
 function showConfirm1(message) {
-  return new Promise((resolve) => {
-    const overlay = document.getElementById("customConfirm1");
+    return new Promise((resolve) => {
+        const overlay = document.getElementById("customConfirm1");
 
-    const messageBox = overlay.querySelector("#confirmMessage1");
-    const okBtn = overlay.querySelector("#confirmDelete");
-    const cancelBtn = overlay.querySelector("#confirmKeep");
+        const messageBox = overlay.querySelector("#confirmMessage1");
+        const okBtn = overlay.querySelector("#confirmDelete");
+        const cancelBtn = overlay.querySelector("#confirmKeep");
 
-    messageBox.textContent = message;
+        messageBox.textContent = message;
 
-    overlay.classList.remove("hide");
-    overlay.style.display = "flex";
-    requestAnimationFrame(() => overlay.classList.add("show"));
-
-    const cleanup = (result) => {
-      overlay.classList.remove("show");
-      overlay.classList.add("hide");
-
-      setTimeout(() => {
-        overlay.style.display = "none";
         overlay.classList.remove("hide");
-        okBtn.onclick = null;
-        cancelBtn.onclick = null;
-        resolve(result);
-      }, 300);
-    };
+        overlay.style.display = "flex";
+        requestAnimationFrame(() => overlay.classList.add("show"));
 
-    okBtn.onclick = () => cleanup(true);
-    cancelBtn.onclick = () => cleanup(false);
-  });
+        const cleanup = (result) => {
+            overlay.classList.remove("show");
+            overlay.classList.add("hide");
+
+            setTimeout(() => {
+                overlay.style.display = "none";
+                overlay.classList.remove("hide");
+                okBtn.onclick = null;
+                cancelBtn.onclick = null;
+                resolve(result);
+            }, 300);
+        };
+
+        okBtn.onclick = () => cleanup(true);
+        cancelBtn.onclick = () => cleanup(false);
+    });
 }
 
 function showConfirm2(message) {
-  return new Promise((resolve) => {
-    const overlay = document.getElementById("customConfirm2");
+    return new Promise((resolve) => {
+        const overlay = document.getElementById("customConfirm2");
 
-    const messageBox = overlay.querySelector("#confirmMessage2");
-    const okBtn = overlay.querySelector("#confirmOk");
-    const cancelBtn = overlay.querySelector("#confirmCancel");
+        const messageBox = overlay.querySelector("#confirmMessage2");
+        const okBtn = overlay.querySelector("#confirmOk");
+        const cancelBtn = overlay.querySelector("#confirmCancel");
 
-    messageBox.textContent = message;
+        messageBox.textContent = message;
 
-    overlay.classList.remove("hide");
-    overlay.style.display = "flex";
-    requestAnimationFrame(() => overlay.classList.add("show"));
-
-    const cleanup = (result) => {
-      overlay.classList.remove("show");
-      overlay.classList.add("hide");
-
-      setTimeout(() => {
-        overlay.style.display = "none";
         overlay.classList.remove("hide");
-        okBtn.onclick = null;
-        cancelBtn.onclick = null;
-        resolve(result);
-      }, 300);
-    };
+        overlay.style.display = "flex";
+        requestAnimationFrame(() => overlay.classList.add("show"));
 
-    okBtn.onclick = () => cleanup(true);
-    cancelBtn.onclick = () => cleanup(false);
-  });
+        const cleanup = (result) => {
+            overlay.classList.remove("show");
+            overlay.classList.add("hide");
+
+            setTimeout(() => {
+                overlay.style.display = "none";
+                overlay.classList.remove("hide");
+                okBtn.onclick = null;
+                cancelBtn.onclick = null;
+                resolve(result);
+            }, 300);
+        };
+
+        okBtn.onclick = () => cleanup(true);
+        cancelBtn.onclick = () => cleanup(false);
+    });
 }

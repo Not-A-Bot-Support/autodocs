@@ -45,7 +45,7 @@
             <div class="notepadHeader">
                 <h3>🗒️ Notepad</h3>
             </div>
-            <div class="notepad" contenteditable="true"></div>
+            <div class="notepad" contenteditable="true" id="notepad"></div>
         </div>
 
         <div class="scrollWrapper">
@@ -111,6 +111,15 @@
                                 <div class="form1DivHeader">CASE & ACCOUNT DETAILS</div>
                             </th>
                         </tr>
+                        <tr id="cust-name-row" style="display: none;">
+                            <td colspan="2">
+                                <label for="cust-name">Customer/Caller Name</label>
+                                <div class="form1DivInput">
+                                    <input type="text" class="input-and-button" id="cust-name" name="custName">
+                                    <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
+                                </div>
+                            </td>
+                        </tr>
                         <tr id="case-num-row" style="display: none;">
                             <td colspan="2">
                                 <label for="case-num" id="case-num-label">Salesforce Case #</label>
@@ -120,12 +129,11 @@
                                 </div>
                             </td> 
                         </tr>
-                        <tr id="cust-name-row" style="display: none;">
+                        <tr id="wocas-row" style="display: none;">
                             <td colspan="2">
-                                <label for="cust-name">Customer/Caller Name</label>
+                                <label for="wocas" id="wocas-label">WOCAS</label>
                                 <div class="form1DivInput">
-                                    <input type="text" class="input-and-button" id="cust-name" name="custName">
-                                    <button type="button" class="input-and-button" tabindex="-1">📋 Copy</button>
+                                    <textarea class="wocas" rows="2" id="wocas" name="WOCAS"></textarea>
                                 </div>
                             </td>
                         </tr>
@@ -182,14 +190,6 @@
                                         <option value="REQUEST">REQUEST</option>
                                         <option value="OTHERS">OTHERS</option>
                                     </select>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr id="wocas-row" style="display: none;">
-                            <td colspan="2">
-                                <label for="wocas" id="wocas-label">WOCAS</label>
-                                <div class="form1DivInput">
-                                    <textarea class="wocas" rows="2" id="wocas" name="WOCAS"></textarea>
                                 </div>
                             </td>
                         </tr>
@@ -525,16 +525,12 @@
 
                                         <!--- CCBO Non-Tech Request --->
                                         <option value="ccbo_formReqBillAdjust" data-group="ccbo_nontech_request">Billing Adjustment</option>
-                                        <optgroup label="Change Ownership" data-group="ccbo_nontech_request">
-                                            <option value="ccbo_formReqSupRetAccNum">Supersedure retain Account number</option>
-                                            <option value="ccbo_formReqSupChangeAccNum">Supersedure with change account number</option>
-                                        </optgroup>
+                                        <option value="ccbo_formReqChangeOwnership" data-group="ccbo_nontech_request">Change Ownership</option>
                                         <option value="ccbo_formReqChangeTelNum" data-group="ccbo_nontech_request">Change Telephone Number</option>
                                         <option value="ccbo_formReqCignalIPTV" data-group="ccbo_nontech_request">Cignal/IPTV</option>
                                         <option value="ccbo_formReqTempDisco" data-group="ccbo_nontech_request">Disconnection (HD/VTD)</option>
                                         <option value="ccbo_formReqDowngrade" data-group="ccbo_nontech_request">Downgrade</option>
                                         <option value="ccbo_formReqInmove" data-group="ccbo_nontech_request">Inmove</option>
-                                        <!-- <option data-group="ccbo_request" value="formReqMigration">Migration</option> -->
                                         <option value="ccbo_formReqPermaDisco" data-group="ccbo_nontech_request">Permanent Disconnection</option>
                                         <option value="ccbo_formReqReconnect" data-group="ccbo_nontech_request">Reconnection</option>
                                         <option value="ccbo_formReqRelocation" data-group="ccbo_nontech_request">Relocation</option>
@@ -544,8 +540,8 @@
 
                                         <!--- CCBO Non-Tech Inquiry ---->
                                         <option value="ccbo_formInqBill" data-group="ccbo_nontech_inquiry">Billing Inquiry</option>
-                                        <option value="ccbo_formInqDowngrade" data-group="ccbo_nontech_inquiry">Downgrade</option>
                                         <option value="ccbo_formInqChangeTelNum" data-group="ccbo_nontech_inquiry">Change Telephone Number</option>
+                                        <option value="ccbo_formInqDowngrade" data-group="ccbo_nontech_inquiry">Downgrade</option>
                                         <option value="ccbo_formInqSpecialFeatures" data-group="ccbo_nontech_inquiry">Special Features</option>
                                         <option value="ccbo_formInqUpgrade" data-group="ccbo_nontech_inquiry">Upgrade</option>
                                         <option value="ccbo_formInqOthers" data-group="ccbo_nontech_inquiry">Others</option>
@@ -557,9 +553,9 @@
 
                                         <!--- CCBO Non-Tech Follow-Up ---->
                                         <option value="ccbo_formFfupBillAdjust" data-group="ccbo_nontech_follow-up">Bill Adjustment</option>
-                                        <option value="ccbo_formFfupCignalIPTV" data-group="ccbo_nontech_follow-up">Cignal/IPTV</option>
                                         <option value="ccbo_formFfupChangeOwnership" data-group="ccbo_nontech_follow-up">Change Ownership</option>
                                         <option value="ccbo_formFfupChangeTelNum" data-group="ccbo_nontech_follow-up">Change Telephone Number</option>
+                                        <option value="ccbo_formFfupCignalIPTV" data-group="ccbo_nontech_follow-up">Cignal/IPTV</option>
                                         <option value="ccbo_formFfupDowngrade" data-group="ccbo_nontech_follow-up">Downgrade</option>
                                         <option value="ccbo_formFfupInmove" data-group="ccbo_nontech_follow-up">Inmove</option>
                                         <option value="ccbo_formFfupMisappPay" data-group="ccbo_nontech_follow-up">Misapplied Payment</option>
@@ -778,7 +774,7 @@
                 </table>
             </div>
             <div class="footer-text">
-                <span id="footerValue">Standard Notes Generator Version 5.5.010926</span>
+                <span id="footerValue">Standard Notes Generator Version 5.5.021126</span>
                 <span>&copy; Developed and designed by: QA Team</span>
             </div>
         </div>

@@ -120,7 +120,7 @@ header {
     border: 1px solid #ddd;
     overflow-y: auto;
     outline: none;
-    line-height: 1.5;
+    line-height: 1.5em;
     color: #2C3E50;
     background-color: white;
 
